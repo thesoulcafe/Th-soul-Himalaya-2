@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingBag, Heart, Search, Filter, ShoppingCart, Plus, Minus, Edit2 } from 'lucide-react';
+import { ShoppingBag, Heart, Search, Filter, ShoppingCart, Plus, Minus, Edit2, Share2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,6 +18,27 @@ export default function Shop() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [productList, setProductList] = useState<any[]>(DEFAULT_SHOP);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity } = useCart();
+
+  const handleShare = async (product: any) => {
+    const shareData = {
+      title: `Soul Himalaya Shop - ${product.name}`,
+      text: `Check out this handcrafted treasure: ${product.name}`,
+      url: `${window.location.origin}${window.location.pathname}?id=${product.id}`
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Link copied to clipboard!");
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error("Sharing failed:", err);
+      }
+    }
+  };
   const categories = ['All', 'Wall Decor', 'Home Decor', 'Accessories'];
 
   useEffect(() => {
@@ -28,6 +49,10 @@ export default function Shop() {
           id: doc.id,
           ...doc.data().data
         })).sort((a, b) => {
+          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+
           const aAvail = a.isAvailable !== false;
           const bAvail = b.isAvailable !== false;
           if (aAvail && !bAvail) return -1;
@@ -106,10 +131,21 @@ export default function Shop() {
                         </Badge>
                       </div>
                     )}
-                    <div className="absolute top-4 right-4 space-y-2">
+                    <div className="absolute top-4 right-4 space-y-2 z-10">
                       <Button size="icon" variant="secondary" className="rounded-full bg-white/90 text-forest hover:bg-terracotta hover:text-white transition-colors shadow-md">
                         <Heart className="h-4 w-4" />
                       </Button>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleShare(product);
+                        }}
+                        className="flex items-center justify-center h-10 w-10 bg-white/90 p-2 rounded-full shadow-lg hover:bg-terracotta hover:text-white transition-colors group/share"
+                        title="Share Product"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </button>
                       {profile?.role === 'admin' && (
                         <Link 
                           to={product.id ? `/admin?tab=content&type=shop_item&edit=${product.id}` : `/admin?tab=content&type=shop_item`}

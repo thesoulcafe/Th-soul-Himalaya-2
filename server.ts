@@ -5,6 +5,8 @@ import { fileURLToPath } from "url";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import dotenv from "dotenv";
+import multer from "multer";
+import fs from "fs";
 
 dotenv.config();
 
@@ -12,8 +14,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import { streamText, tool } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { z } from "zod";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 async function startServer() {
   const app = express();
@@ -21,11 +27,49 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Ensure uploads directory exists
+  const uploadsDir = path.join(__dirname, "uploads");
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  // Configure Multer for local storage
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+    },
+  });
+
+  const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith("image/")) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only images are allowed"));
+      }
+    },
+  });
+
+  // Serve uploaded files
+  app.use("/uploads", express.static(uploadsDir));
+
   // AI Chat Endpoint for Generative UI
   app.post("/api/chat", async (req, res) => {
+    console.log("Chat request received:", req.body.messages?.length, "messages");
     try {
       const { messages, profile } = req.body;
       
+      if (!messages || !Array.isArray(messages)) {
+        return res.status(400).json({ error: "Messages are required" });
+      }
+
       let personalization = "";
       if (profile) {
         personalization = `
@@ -84,6 +128,29 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", message: "The Soul Himalaya API is running" });
+  });
+
+  // Backend File Upload Endpoint
+  app.post("/api/upload", upload.single("file"), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Construct the URL to access the uploaded file
+      // In production, we use a root-relative path for maximum compatibility behind proxies
+      const fileUrl = `/uploads/${req.file.filename}`;
+
+      res.json({
+        url: fileUrl,
+        filename: req.file.filename,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+      });
+    } catch (error) {
+      console.error("Upload failed:", error);
+      res.status(500).json({ error: "Failed to upload file to backend" });
+    }
   });
 
   // Razorpay Create Order

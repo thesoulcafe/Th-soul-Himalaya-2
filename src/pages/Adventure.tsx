@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as HomeIcon, Star, Edit2, Calendar, ChevronDown, Clock, Sparkles, CheckCircle2, ShoppingCart } from 'lucide-react';
+import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as HomeIcon, Star, Edit2, Calendar, ChevronDown, Clock, Sparkles, CheckCircle2, ShoppingCart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,6 +22,27 @@ export default function Adventure() {
   const [activities, setActivities] = useState<any[]>(DEFAULT_ADVENTURE);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
+
+  const handleShare = async (activity: any) => {
+    const shareData = {
+      title: `The Soul Himalaya - ${activity.title}`,
+      text: activity.description || `Feel the adrenaline with this: ${activity.title}`,
+      url: `${window.location.origin}${window.location.pathname}?id=${activity.id}`
+    };
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Link copied to clipboard!");
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error("Sharing failed:", err);
+      }
+    }
+  };
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [activeSlotActivity, setActiveSlotActivity] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
@@ -35,6 +56,10 @@ export default function Adventure() {
           id: doc.id,
           ...doc.data().data
         })).sort((a, b) => {
+          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+
           const aAvail = a.isAvailable !== false;
           const bAvail = b.isAvailable !== false;
           if (aAvail && !bAvail) return -1;
@@ -141,12 +166,27 @@ export default function Adventure() {
                       {profile?.role === 'admin' && (
                         <Link 
                           to={activity.id ? `/admin?tab=content&type=adventure&edit=${activity.id}` : `/admin?tab=content&type=adventure`}
-                          className="absolute top-6 right-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit"
+                          className="absolute top-6 right-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
                           title={activity.id ? "Edit Activity" : "Sync defaults to edit"}
                         >
                           <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                         </Link>
                       )}
+
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleShare(activity);
+                        }}
+                        className={cn(
+                          "absolute top-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/share z-10",
+                          profile?.role === 'admin' ? "right-16" : "right-6"
+                        )}
+                        title="Share Adventure"
+                      >
+                        <Share2 className="h-4 w-4 text-forest group-hover/share:text-terracotta transition-colors" />
+                      </button>
                     </div>
                   <CardContent className="p-8 flex-grow flex flex-col">
                     <div>
@@ -396,6 +436,14 @@ export default function Adventure() {
                 <Plus className="h-5 w-5 rotate-45" />
               </button>
 
+              <button 
+                onClick={() => handleShare(activeSlotActivity)}
+                className="absolute top-6 left-20 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
+                title="Share"
+              >
+                <Share2 className="h-5 w-5" />
+              </button>
+
               <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 text-white">
                 <Badge className="bg-terracotta text-white border-none mb-4 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg">
                   High Adrenaline Adventure
@@ -409,12 +457,21 @@ export default function Adventure() {
 
             {/* Right Side: Details */}
             <div className="flex-grow p-8 md:p-12 overflow-y-auto bg-white relative">
-              <button 
-                onClick={() => setActiveSlotActivity(null)}
-                className="absolute top-6 right-6 bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
-              >
-                <Plus className="h-6 w-6 rotate-45" />
-              </button>
+              <div className="absolute top-6 right-6 flex items-center gap-3">
+                <button 
+                  onClick={() => handleShare(activeSlotActivity)}
+                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
+                  title="Share Adventure"
+                >
+                  <Share2 className="h-5 w-5" />
+                </button>
+                <button 
+                  onClick={() => setActiveSlotActivity(null)}
+                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
+                >
+                  <Plus className="h-6 w-6 rotate-45" />
+                </button>
+              </div>
 
               {/* Quick Info Grid */}
               <div className="grid grid-cols-2 gap-6 mb-10 pb-8 border-b border-forest/5">

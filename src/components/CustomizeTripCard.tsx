@@ -25,6 +25,22 @@ export default function CustomizeTripCard({
 }: CustomizeTripCardProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [guests, setGuests] = useState('1');
+  const [requests, setRequests] = useState('');
+  const [selectedPlaces, setSelectedPlaces] = useState<string[]>([]);
+  const [selectedTreks, setSelectedTreks] = useState<string[]>([]);
+  const [selectedYoga, setSelectedYoga] = useState<string[]>([]);
+  const [selectedMeditation, setSelectedMeditation] = useState<string[]>([]);
+
+  const toggleSelection = (list: string[], setList: (l: string[]) => void, item: string) => {
+    if (list.includes(item)) {
+      setList(list.filter(i => i !== item));
+    } else {
+      setList([...list, item]);
+    }
+  };
 
   return (
     <Card className="border-none shadow-2xl rounded-[2.5rem] bg-forest text-white overflow-hidden">
@@ -40,14 +56,30 @@ export default function CustomizeTripCard({
       </div>
 
       <div className="p-8 pt-0">
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={(e) => {
+          e.preventDefault();
+          alert(`Thank you ${fullName}! Your request for ${selectedPlaces.join(', ') || 'Himalayas'} has been received.`);
+        }}>
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>
-            <Input placeholder="Enter your name" className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" />
+            <Input 
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Enter your name" 
+              className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
+              required
+            />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Email Address</label>
-            <Input type="email" placeholder="Enter your email" className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" />
+            <Input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email" 
+              className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
+              required
+            />
           </div>
           
           <div className="space-y-4">
@@ -56,7 +88,12 @@ export default function CustomizeTripCard({
               <div className="grid grid-cols-2 gap-2">
                 {places.map(place => (
                   <label key={place} className="flex items-center space-x-2 text-[10px] text-white/70 cursor-pointer hover:text-terracotta transition-colors bg-white/5 p-2 rounded-xl border border-white/5 hover:border-terracotta/30">
-                    <input type="checkbox" className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" />
+                    <input 
+                      type="checkbox" 
+                      checked={selectedPlaces.includes(place)}
+                      onChange={() => toggleSelection(selectedPlaces, setSelectedPlaces, place)}
+                      className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" 
+                    />
                     <span className="truncate">{place}</span>
                   </label>
                 ))}
@@ -68,7 +105,12 @@ export default function CustomizeTripCard({
               <div className="grid grid-cols-2 gap-2">
                 {treks.map(trek => (
                   <label key={trek} className="flex items-center space-x-2 text-[10px] text-white/70 cursor-pointer hover:text-terracotta transition-colors bg-white/5 p-2 rounded-xl border border-white/5 hover:border-terracotta/30">
-                    <input type="checkbox" className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" />
+                    <input 
+                      type="checkbox" 
+                      checked={selectedTreks.includes(trek)}
+                      onChange={() => toggleSelection(selectedTreks, setSelectedTreks, trek)}
+                      className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" 
+                    />
                     <span className="truncate">{trek}</span>
                   </label>
                 ))}
@@ -81,7 +123,12 @@ export default function CustomizeTripCard({
                 <div className="space-y-2">
                   {yoga.slice(0, 2).map(y => (
                     <label key={y} className="flex items-center space-x-2 text-[10px] text-white/70 cursor-pointer hover:text-terracotta transition-colors bg-white/5 p-2 rounded-xl border border-white/5 hover:border-terracotta/30">
-                      <input type="checkbox" className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" />
+                      <input 
+                        type="checkbox" 
+                        checked={selectedYoga.includes(y)}
+                        onChange={() => toggleSelection(selectedYoga, setSelectedYoga, y)}
+                        className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" 
+                      />
                       <span className="truncate">{y}</span>
                     </label>
                   ))}
@@ -92,7 +139,12 @@ export default function CustomizeTripCard({
                 <div className="space-y-2">
                   {meditation.slice(0, 2).map(m => (
                     <label key={m} className="flex items-center space-x-2 text-[10px] text-white/70 cursor-pointer hover:text-terracotta transition-colors bg-white/5 p-2 rounded-xl border border-white/5 hover:border-terracotta/30">
-                      <input type="checkbox" className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" />
+                      <input 
+                        type="checkbox" 
+                        checked={selectedMeditation.includes(m)}
+                        onChange={() => toggleSelection(selectedMeditation, setSelectedMeditation, m)}
+                        className="rounded border-white/10 text-terracotta focus:ring-terracotta bg-transparent h-3 w-3" 
+                      />
                       <span className="truncate">{m}</span>
                     </label>
                   ))}
@@ -124,15 +176,27 @@ export default function CustomizeTripCard({
 
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Guests</label>
-            <Input type="number" min="1" placeholder="1" className="rounded-2xl border-white/10 bg-white/5 text-white h-12 focus:ring-terracotta/50" />
+            <Input 
+              type="number" 
+              min="1" 
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              placeholder="1" 
+              className="rounded-2xl border-white/10 bg-white/5 text-white h-12 focus:ring-terracotta/50" 
+            />
           </div>
           
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Special Requests</label>
-            <Textarea placeholder="Any specific requirements?" className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 min-h-[80px] focus:ring-terracotta/50" />
+            <Textarea 
+              value={requests}
+              onChange={(e) => setRequests(e.target.value)}
+              placeholder="Any specific requirements?" 
+              className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 min-h-[80px] focus:ring-terracotta/50" 
+            />
           </div>
 
-          <Button className="w-full bg-terracotta hover:bg-terracotta/90 text-white py-8 rounded-2xl text-lg font-bold shadow-xl shadow-terracotta/20 group">
+          <Button type="submit" className="w-full bg-terracotta hover:bg-terracotta/90 text-white py-8 rounded-2xl text-lg font-bold shadow-xl shadow-terracotta/20 group">
             <Zap className="h-5 w-5 mr-2 transition-transform group-hover:scale-125" />
             Enquire Now
           </Button>

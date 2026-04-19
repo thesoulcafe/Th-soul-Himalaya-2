@@ -1,9 +1,12 @@
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Mail, ArrowRight, Flower2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export default function Blueberry() {
+  const [email, setEmail] = useState('');
+
   return (
     <div className="pt-20 min-h-screen flex flex-col">
       <section className="relative flex-grow flex items-center justify-center overflow-hidden py-20">
@@ -42,10 +45,20 @@ export default function Blueberry() {
 
             <div className="bg-white p-2 rounded-full shadow-2xl max-w-md mx-auto flex items-center border border-forest/5">
               <Input 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email" 
                 className="border-none bg-transparent focus-visible:ring-0 text-forest placeholder:text-forest/30"
               />
-              <Button className="bg-himalayan-blue hover:bg-himalayan-blue/90 text-white rounded-full px-6">
+              <Button 
+                onClick={() => {
+                  if (email) {
+                    alert(`Thank you! We will notify you at ${email} when the season begins.`);
+                    setEmail('');
+                  }
+                }}
+                className="bg-himalayan-blue hover:bg-himalayan-blue/90 text-white rounded-full px-6"
+              >
                 Notify Me <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

@@ -40,18 +40,16 @@ export default function Services() {
             return !title.includes('cafe') && !title.includes('food');
           })
           .sort((a, b) => {
-          // Sort by order first
-          const aOrder = a.order || 999;
-          const bOrder = b.order || 999;
-          if (aOrder !== bOrder) return aOrder - bOrder;
+            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+            if (aOrder !== bOrder) return aOrder - bOrder;
 
-          // Then by availability
-          const aAvail = a.isAvailable !== false;
-          const bAvail = b.isAvailable !== false;
-          if (aAvail && !bAvail) return -1;
-          if (!aAvail && bAvail) return 1;
-          return 0;
-        });
+            const aAvail = a.isAvailable !== false;
+            const bAvail = b.isAvailable !== false;
+            if (aAvail && !bAvail) return -1;
+            if (!aAvail && bAvail) return 1;
+            return 0;
+          });
         setServices(dbServices);
       }
     });

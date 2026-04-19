@@ -64,6 +64,7 @@ export default function Dashboard() {
   const [experienceLevel, setExperienceLevel] = useState(profile?.experienceLevel || 'novice');
   const [difficulty, setDifficulty] = useState(profile?.trekPreferences?.difficulty || 'moderate');
   const [groupSize, setGroupSize] = useState(profile?.trekPreferences?.groupSize || 'solo');
+  const [displayName, setDisplayName] = useState(user?.displayName || '');
 
   useEffect(() => {
     if (profile) {
@@ -71,7 +72,10 @@ export default function Dashboard() {
       setDifficulty(profile.trekPreferences?.difficulty || 'moderate');
       setGroupSize(profile.trekPreferences?.groupSize || 'solo');
     }
-  }, [profile]);
+    if (user) {
+      setDisplayName(user.displayName || '');
+    }
+  }, [profile, user]);
 
   useEffect(() => {
     if (!user) {
@@ -678,12 +682,26 @@ export default function Dashboard() {
                           <label className="text-[10px] text-forest/40 uppercase tracking-widest font-bold">Display Name</label>
                           <input 
                             type="text" 
-                            defaultValue={user.displayName || ''} 
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
                             placeholder="Enter your name"
                             className="w-full p-4 bg-white rounded-2xl text-forest font-medium border border-forest/10 focus:border-terracotta/50 outline-none transition-all"
                           />
                         </div>
-                        <Button className="w-full h-14 rounded-full bg-forest text-white font-bold shadow-lg shadow-forest/20 mt-4">
+                        <Button 
+                          onClick={async () => {
+                            if (user && displayName) {
+                              try {
+                                const docRef = doc(db, 'users', user.uid);
+                                await updateDoc(docRef, { displayName });
+                                alert("Profile updated!");
+                              } catch (err) {
+                                console.error("Profile update failed:", err);
+                              }
+                            }
+                          }}
+                          className="w-full h-14 rounded-full bg-forest text-white font-bold shadow-lg shadow-forest/20 mt-4"
+                        >
                           Update Profile
                         </Button>
                       </div>

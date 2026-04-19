@@ -77,7 +77,7 @@ export default function ReviewsDialog({ serviceId, serviceType, serviceName, tri
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !newComment.trim()) return;
+    if (!user || !newComment?.trim()) return;
 
     setIsSubmitting(true);
     try {
@@ -184,7 +184,7 @@ export default function ReviewsDialog({ serviceId, serviceType, serviceName, tri
                       />
                       <Button 
                         type="submit" 
-                        disabled={isSubmitting || !newComment.trim()}
+                        disabled={isSubmitting || !newComment?.trim()}
                         className="w-full bg-terracotta hover:bg-terracotta/90 text-white rounded-full"
                       >
                         {isSubmitting ? 'Posting...' : 'Post Review'}

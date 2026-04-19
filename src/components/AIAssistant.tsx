@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useChat } from '@ai-sdk/react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
 import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
@@ -30,13 +30,89 @@ export default function AIAssistant() {
   // Use stable state for starter questions
   const [showStarters, setShowStarters] = useState(true);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append, setInput } = useChat({
-    api: '/api/chat',
-    body: { profile },
-    initialMessages: [
-      { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide. How can I help you plan your spiritual or adventurous retreat today?' }
-    ]
-  } as any) as any;
+  // Manual chat state management for client-side Gemini
+  const [messages, setMessages] = useActivityState<any[]>('soul_guide_messages', [
+    { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide. How can I help you plan your spiritual or adventurous retreat today?' }
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize Gemini
+  const genAI = useMemo(() => {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      console.warn("GEMINI_API_KEY is missing. AI Guide will not be available.");
+      return null;
+    }
+    return new GoogleGenAI({ apiKey: key });
+  }, []);
+
+  const append = async (message: { role: string; content: string }) => {
+    if (!genAI) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: "My spiritual connection is currently limited (API key missing). Please check the environment configuration."
+      }]);
+      return;
+    }
+    const userMessage = { id: Date.now().toString(), ...message };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setIsLoading(true);
+    setShowStarters(false);
+
+    try {
+      const model = genAI.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: newMessages.map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        })),
+        config: {
+          systemInstruction: `You are the Soul Guide at Soul Himalaya. Help users with travel plans, bookings, and regional info. 
+          The user is ${profile?.displayName || 'a traveler'}.
+          Himalayan Experience Level: ${profile?.experienceLevel || 'unknown'}.
+          Trek Preferences: ${JSON.stringify(profile?.trekPreferences || {})}.
+          Loyalty Points: ${profile?.loyaltyPoints || 0}.
+          Use this information to personalize your responses and recommendations.`,
+        }
+      });
+
+      const response = await model;
+      const text = response.text;
+
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: text
+      }]);
+    } catch (error) {
+      console.error("Gemini Error:", error);
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm sorry, my spiritual connection is weak right now. Please try again later."
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    const currentInput = input;
+    setInput('');
+    await append({ role: 'user', content: currentInput });
+  };
+
+  // Extremely defensive check for input
+  const safeInput = (input || '').toString();
 
   const starterQuestions = [
     { text: "Find a peaceful yoga retreat", icon: Flower2 },
@@ -85,7 +161,7 @@ export default function AIAssistant() {
 
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input?.trim() || isLoading) return;
+    if (!safeInput.trim() || isLoading) return;
     
     setShowStarters(false);
     try {
@@ -95,7 +171,7 @@ export default function AIAssistant() {
       // Fallback: if standard handleSubmit fails, try append
       append({
         role: 'user',
-        content: input
+        content: safeInput
       });
     }
   };
@@ -283,13 +359,13 @@ export default function AIAssistant() {
                   className="relative group/form"
                 >
                   <input
-                    value={input}
+                    value={safeInput}
                     onChange={handleInputChange}
                     placeholder="Ask your Soul Guide anything..."
                     className="w-full pl-6 pr-20 py-5 bg-forest/[0.03] rounded-[2rem] text-sm font-medium text-forest placeholder:text-forest/30 focus:outline-none focus:ring-4 focus:ring-terracotta/10 transition-all border-2 border-forest/5 focus:border-terracotta/30 shadow-inner"
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    {input.trim() && (
+                    {safeInput.trim() && (
                       <motion.button
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}

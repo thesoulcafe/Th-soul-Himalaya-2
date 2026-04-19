@@ -153,23 +153,19 @@ export default function Admin() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
-    if (isUploading) {
-      console.log('Upload already in progress, skipping...');
-      return;
-    }
+    if (isUploading) return;
 
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setNotification({ message: 'File too large (Max 10MB)', type: 'error' });
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification({ message: 'File too large (Max 5MB for Firebase)', type: 'error' });
       e.target.value = '';
       return;
     }
 
     setIsUploading(true);
     setUploadProgress(0);
-    console.log('Starting upload for:', file.name);
     
     try {
       const storageRef = ref(storage, `content/${Date.now()}_${file.name}`);
@@ -177,60 +173,43 @@ export default function Admin() {
 
       uploadTask.on('state_changed', 
         (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          const roundedProgress = Math.round(progress);
-          setUploadProgress(roundedProgress);
-          console.log(`Upload is ${roundedProgress}% done (state: ${snapshot.state})`);
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgress(progress);
         }, 
         (error) => {
-          console.error('Upload failed with error:', error);
-          let msg = 'Failed to upload image';
-          if (error.code === 'storage/unauthorized') {
-            msg = 'Permission denied. Please check Storage Rules.';
-          } else if (error.code === 'storage/canceled') {
-            msg = 'Upload canceled.';
-          }
-          setNotification({ message: msg, type: 'error' });
+          console.error('Upload failed:', error);
+          setNotification({ message: 'Upload failed: ' + error.message, type: 'error' });
           setIsUploading(false);
-          setUploadProgress(0);
-          e.target.value = '';
         }, 
         async () => {
-          try {
-            console.log('Upload complete, fetching download URL...');
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            
-            setFormData(prev => {
-              const updated = { ...prev };
-              if (fieldName === 'image') {
-                updated.image = downloadURL;
-              } else if (fieldName === 'images' && typeof index === 'number') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                currentImages[index] = downloadURL;
-                updated.images = currentImages;
-              } else if (fieldName === 'new_image') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                updated.images = [...currentImages, downloadURL];
-              }
-              return updated;
-            });
-            
-            setNotification({ message: 'Image uploaded successfully!', type: 'success' });
-          } catch (urlError) {
-            console.error('Error getting download URL:', urlError);
-            setNotification({ message: 'Upload succeeded but failed to get URL', type: 'error' });
-          } finally {
-            setIsUploading(false);
-            setUploadProgress(0);
-            if (e.target) e.target.value = '';
-          }
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          
+          setFormData(prev => {
+            const updated = { ...prev };
+            if (fieldName === 'image') {
+              updated.image = downloadURL;
+            } else if (fieldName === 'images' && typeof index === 'number') {
+              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+              currentImages[index] = downloadURL;
+              updated.images = currentImages;
+            } else if (fieldName === 'new_image') {
+              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+              updated.images = [...currentImages, downloadURL];
+            }
+            return updated;
+          });
+          
+          setNotification({ message: 'Image successfully uploaded to Cloud Storage!', type: 'success' });
+          setIsUploading(false);
+          setUploadProgress(0);
         }
       );
     } catch (error) {
-      console.error('Error starting upload:', error);
+      console.error('Upload startup failed:', error);
       setNotification({ message: 'Failed to start upload', type: 'error' });
       setIsUploading(false);
-      e.target.value = '';
+    } finally {
+      if (e.target) e.target.value = '';
     }
   };
   const [searchTerm, setSearchTerm] = useState('');
@@ -1608,12 +1587,10 @@ export default function Admin() {
                   );
                 })
                 .sort((a, b) => {
-                  // Sort by order first
-                  const aOrder = a.data.order || 999;
-                  const bOrder = b.data.order || 999;
+                  const aOrder = (a.data.order !== undefined && a.data.order !== null) ? Number(a.data.order) : 999;
+                  const bOrder = (b.data.order !== undefined && b.data.order !== null) ? Number(b.data.order) : 999;
                   if (aOrder !== bOrder) return aOrder - bOrder;
                   
-                  // Then by availability
                   const aAvail = a.data.isAvailable !== false;
                   const bAvail = b.data.isAvailable !== false;
                   if (aAvail && !bAvail) return -1;

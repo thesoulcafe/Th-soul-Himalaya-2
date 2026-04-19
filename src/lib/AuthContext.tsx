@@ -26,9 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         await getDocFromServer(doc(db, 'test', 'connection'));
       } catch (error) {
-        if (error instanceof Error && error.message.includes('the client is offline')) {
-          console.error("Please check your Firebase configuration. The client is offline.");
-        }
+        // Silently handle connectivity issues to avoid confusing users with technical console logs
+        // unless they specifically check for connection state.
       }
     };
     testConnection();

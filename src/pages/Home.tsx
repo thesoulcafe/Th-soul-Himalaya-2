@@ -146,7 +146,11 @@ export default function Home() {
             const title = (service.title || '').toLowerCase();
             return !title.includes('cafe') && !title.includes('food');
           })
-          .sort((a, b) => (a.order || 999) - (b.order || 999));
+          .sort((a, b) => {
+            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+            return aOrder - bOrder;
+          });
         setServices(dbServices);
       }
     });
