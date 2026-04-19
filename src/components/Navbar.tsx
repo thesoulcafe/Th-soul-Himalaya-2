@@ -39,12 +39,19 @@ export default function Navbar() {
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
+              whileTap={{ scale: 0.85 }}
             >
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate(-1)}
-                className="text-white hover:bg-white/10 h-10 w-10 md:h-12 md:w-12 rounded-full"
+                onClick={() => {
+                  if (window.history.length > 2) {
+                    navigate(-1);
+                  } else {
+                    navigate('/');
+                  }
+                }}
+                className="text-white hover:bg-white/10 h-10 w-10 md:h-12 md:w-12 rounded-full active:bg-white/20"
                 title="Go Back"
               >
                 <ChevronLeft className="h-6 w-6" />
@@ -53,14 +60,14 @@ export default function Navbar() {
           )}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <Link to="/" className="flex items-center">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20">
+            <Link to="/" className="flex items-center group">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors">
                 <img 
                   src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
                   alt="The Soul Himalaya Logo" 
-                  className="h-8 md:h-10 w-auto object-contain brightness-110 contrast-125"
+                  className="h-8 md:h-10 w-auto object-contain brightness-110 contrast-125 group-hover:scale-110 transition-transform duration-500"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -147,6 +154,24 @@ export default function Navbar() {
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="p-6 pt-20 h-full flex flex-col">
                 <div className="flex flex-col space-y-1.5">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="mb-2"
+                  >
+                    <Link
+                      to="/"
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        'flex items-center justify-center w-full px-3 py-3 rounded-lg transition-all duration-200 group border border-forest/10 bg-white/5 text-cream',
+                        location.pathname === '/' && 'text-terracotta font-bold border-terracotta/20 bg-white/10'
+                      )}
+                    >
+                      <HomeIcon className="h-4 w-4 mr-2" />
+                      <span className="text-sm font-bold tracking-wide uppercase">Home</span>
+                    </Link>
+                  </motion.div>
                   {user && (
                     <div className="flex flex-col gap-2 mb-2">
                       <motion.div

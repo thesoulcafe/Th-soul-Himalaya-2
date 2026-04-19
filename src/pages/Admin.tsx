@@ -158,56 +158,57 @@ export default function Admin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setNotification({ message: 'File too large (Max 5MB for Firebase)', type: 'error' });
+    if (file.size > 10 * 1024 * 1024) { // Matches server limit
+      setNotification({ message: 'File too large (Max 10MB)', type: 'error' });
       e.target.value = '';
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(0);
+    setUploadProgress(10); // Initial feedback
     
     try {
-      const storageRef = ref(storage, `content/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const formData = new FormData();
+      formData.append('file', file);
 
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setUploadProgress(progress);
-        }, 
-        (error) => {
-          console.error('Upload failed:', error);
-          setNotification({ message: 'Upload failed: ' + error.message, type: 'error' });
-          setIsUploading(false);
-        }, 
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          
-          setFormData(prev => {
-            const updated = { ...prev };
-            if (fieldName === 'image') {
-              updated.image = downloadURL;
-            } else if (fieldName === 'images' && typeof index === 'number') {
-              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-              currentImages[index] = downloadURL;
-              updated.images = currentImages;
-            } else if (fieldName === 'new_image') {
-              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-              updated.images = [...currentImages, downloadURL];
-            }
-            return updated;
-          });
-          
-          setNotification({ message: 'Image successfully uploaded to Cloud Storage!', type: 'success' });
-          setIsUploading(false);
-          setUploadProgress(0);
+      // We use the backend endpoint for more reliable uploads in this environment
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed on server');
+      }
+
+      const data = await response.json();
+      const downloadURL = data.url;
+      
+      setUploadProgress(100);
+      
+      setFormData(prev => {
+        const updated = { ...prev };
+        if (fieldName === 'image') {
+          updated.image = downloadURL;
+        } else if (fieldName === 'images' && typeof index === 'number') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          currentImages[index] = downloadURL;
+          updated.images = currentImages;
+        } else if (fieldName === 'new_image') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          updated.images = [...currentImages, downloadURL];
         }
-      );
-    } catch (error) {
-      console.error('Upload startup failed:', error);
-      setNotification({ message: 'Failed to start upload', type: 'error' });
+        return updated;
+      });
+      
+      setNotification({ message: 'Image successfully uploaded to the server!', type: 'success' });
       setIsUploading(false);
+      setTimeout(() => setUploadProgress(0), 1000);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setNotification({ message: 'Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'), type: 'error' });
+      setIsUploading(false);
+      setUploadProgress(0);
     } finally {
       if (e.target) e.target.value = '';
     }

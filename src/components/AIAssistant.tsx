@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
-import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2 } from 'lucide-react';
+import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,7 @@ export default function AIAssistant() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
   // Initialize Gemini
   const genAI = useMemo(() => {
@@ -75,18 +76,34 @@ export default function AIAssistant() {
           Himalayan Experience Level: ${profile?.experienceLevel || 'unknown'}.
           Trek Preferences: ${JSON.stringify(profile?.trekPreferences || {})}.
           Loyalty Points: ${profile?.loyaltyPoints || 0}.
-          Use this information to personalize your responses and recommendations.`,
+          
+          CRITICAL RULES:
+          1. Keep your response short and concise, exactly 4-5 lines.
+          2. Use an interactive, helpful, and welcoming tone.
+          3. End your response with 3 specific follow-up questions for the user based on the conversation.
+          4. Format the follow-up questions at the very end of your response, each on a new line starting with "[SUGGESTION]" followed by the question.`,
         }
       });
 
       const response = await model;
       const text = response.text;
 
+      // Extract suggestions
+      const lines = text.split('\n');
+      const cleanText = lines.filter(l => !l.startsWith('[SUGGESTION]')).join('\n');
+      const suggestions = lines
+        .filter(l => l.startsWith('[SUGGESTION]'))
+        .map(l => l.replace('[SUGGESTION]', '').trim());
+
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: text
+        content: cleanText
       }]);
+
+      if (suggestions.length > 0) {
+        setSuggestedQuestions(suggestions);
+      }
     } catch (error) {
       console.error("Gemini Error:", error);
       setMessages(prev => [...prev, {
@@ -114,12 +131,20 @@ export default function AIAssistant() {
   // Extremely defensive check for input
   const safeInput = (input || '').toString();
 
-  const starterQuestions = [
+  const ALL_STARTER_QUESTIONS = [
     { text: "Find a peaceful yoga retreat", icon: Flower2 },
     { text: "Top hidden spots in Kasol", icon: Map },
     { text: "Best time for Kheerganga trek", icon: Compass },
-    { text: "Curate a 3-day itinerary", icon: Calendar }
+    { text: "Curate a 3-day itinerary", icon: Calendar },
+    { text: "Spiritual cafes in Malana", icon: Flower2 },
+    { text: "Luxury stays in Tosh", icon: HomeIcon },
+    { text: "Guided meditation near Parvati river", icon: Wind },
+    { text: "Best sunrise points in Pulga", icon: Map },
+    { text: "Beginner friendly treks in Himachal", icon: Compass },
+    { text: "Weather update for Manikaran", icon: Wind }
   ];
+
+  const [currentStarters, setCurrentStarters] = useState(ALL_STARTER_QUESTIONS.slice(0, 4));
 
   const handleStarterClick = async (question: string) => {
     setShowStarters(false);
@@ -198,27 +223,45 @@ export default function AIAssistant() {
   return (
     <>
       <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[100] flex flex-col items-end gap-3">
-        {/* Helper tooltip for mobile accessibility */}
-        {!isOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-forest text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl border border-white/10 mb-[-8px] pointer-events-none"
-          >
-            Soul Guide Chat
-          </motion.div>
-        )}
         <Button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            const nextOpen = !isOpen;
+            if (nextOpen) {
+              // Reset chat when opening for a fresh experience
+              setMessages([
+                { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide. How can I help you plan your spiritual or adventurous retreat today?' }
+              ]);
+              setShowStarters(true);
+              setSuggestedQuestions([]);
+              
+              // Shuffle and select 4 random starter questions
+              const shuffled = [...ALL_STARTER_QUESTIONS].sort(() => 0.5 - Math.random());
+              setCurrentStarters(shuffled.slice(0, 4));
+            }
+            setIsOpen(nextOpen);
+          }}
           className={cn(
-            "h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl transition-all duration-500 flex items-center justify-center preserve-3d",
-            isOpen ? "bg-terracotta rotate-y-180 scale-110" : "bg-forest hover:scale-110 hover:-translate-y-1"
+            "h-14 w-14 md:h-16 md:w-16 rounded-full shadow-[0_20px_50px_rgba(242,_153,_74,_0.5)] transition-all duration-500 flex items-center justify-center preserve-3d group overflow-hidden border border-white/20",
+            isOpen 
+              ? "bg-linear-to-tr from-[#FF512F] to-[#DD2476] rotate-y-180 scale-110 shadow-magenta-500/40" 
+              : "bg-linear-to-tr from-[#F2994A] via-[#F2C94C] to-[#F2994A] hover:scale-110 hover:-translate-y-2 hover:shadow-orange-500/40 shadow-orange-950/40"
           )}
         >
-          <div className="relative h-full w-full flex items-center justify-center">
-            {isOpen ? <X className="h-6 w-6 text-white" /> : <MessageSquare className="h-6 w-6 text-white" />}
+          {/* Animated Glow Effect */}
+          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+          
+          <div className="relative h-full w-full flex items-center justify-center z-10">
+            {isOpen ? (
+              <X className="h-6 w-6 text-white" />
+            ) : (
+              <MessageSquare className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
+            )}
           </div>
-          {!isOpen && <Sparkles className="absolute -top-1 -right-1 h-5 w-5 text-amber-400 animate-pulse" />}
+          {!isOpen && (
+            <div className="absolute -top-1 -right-1 z-20">
+              <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
+            </div>
+          )}
         </Button>
       </div>
 
@@ -231,22 +274,28 @@ export default function AIAssistant() {
             className="fixed inset-0 md:inset-auto md:bottom-28 md:right-8 w-full md:w-[420px] h-full md:h-[650px] z-[100] md:rounded-[2.5rem] overflow-hidden perspective-1000"
           >
             <Card className="h-full border-none bg-white rounded-none md:rounded-[2.5rem] flex flex-col overflow-hidden shadow-2xl transform-gpu">
-              <div className="p-6 bg-forest text-white flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
+              <div className="p-6 bg-forest text-white flex items-center justify-between shrink-0 relative overflow-hidden">
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+                
+                <div className="flex items-center gap-3 relative z-10">
+                  <motion.div 
+                    whileHover={{ rotate: 15, scale: 1.1 }}
+                    className="h-10 w-10 rounded-full bg-linear-to-tr from-white/20 to-white/5 flex items-center justify-center border border-white/20 shadow-lg"
+                  >
                     <Bot className="h-6 w-6 text-terracotta" />
-                  </div>
+                  </motion.div>
                   <div>
                     <h3 className="font-heading font-bold text-lg">Soul Guide</h3>
                     <p className="text-[10px] text-white/50 uppercase tracking-widest font-black">2026 Generative Engine</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 relative z-10">
                   <Button 
                     variant="ghost" 
                     size="icon" 
                     onClick={handleShare}
-                    className="text-white/50 hover:text-white hover:bg-white/10"
+                    className="text-white/50 hover:text-white hover:bg-white/10 rounded-full"
                     title="Share Guide"
                   >
                     <Share2 className="h-5 w-5" />
@@ -255,7 +304,7 @@ export default function AIAssistant() {
                     variant="ghost" 
                     size="icon" 
                     onClick={() => setIsOpen(false)}
-                    className="md:hidden text-white/50 hover:text-white"
+                    className="md:hidden text-white/50 hover:text-white rounded-full"
                   >
                     <X className="h-6 w-6" />
                   </Button>
@@ -273,12 +322,17 @@ export default function AIAssistant() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                     >
-                      <div className={cn(
-                        "h-8 w-8 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                        m.role === 'user' ? "bg-terracotta" : "bg-forest"
-                      )}>
+                      <motion.div 
+                        whileHover={{ scale: 1.1 }}
+                        className={cn(
+                          "h-8 w-8 rounded-full flex items-center justify-center shrink-0 shadow-md border border-white/20 transition-all",
+                          m.role === 'user' 
+                            ? "bg-linear-to-tr from-terracotta to-orange-400" 
+                            : "bg-linear-to-tr from-forest to-emerald-800"
+                        )}
+                      >
                         {m.role === 'user' ? <User className="h-4 w-4 text-white" /> : <Bot className="h-4 w-4 text-white" />}
-                      </div>
+                      </motion.div>
                       <div className={cn(
                         "max-w-[85%] p-4 rounded-3xl text-sm font-medium leading-relaxed shadow-sm",
                         m.role === 'user' 
@@ -293,16 +347,18 @@ export default function AIAssistant() {
                             return (
                               <motion.div 
                                 key={ti.toolCallId} 
-                                className="mt-4 p-4 bg-cream rounded-2xl border border-terracotta/20 space-y-3"
+                                className="mt-4 p-4 bg-cream rounded-2xl border border-terracotta/20 space-y-3 shadow-inner"
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                               >
                                 <div className="flex items-center gap-2 text-terracotta">
-                                  <Map className="h-4 w-4" />
+                                  <div className="p-1.5 rounded-lg bg-terracotta/10">
+                                    <Map className="h-4 w-4" />
+                                  </div>
                                   <span className="font-bold uppercase text-[10px] tracking-widest">Custom Itinerary: {ti.result.place}</span>
                                 </div>
                                 <p className="text-xs text-forest/80 font-semibold tracking-tight">Planning a {ti.result.days}-day soul journey through {ti.result.place}...</p>
-                                <Button variant="outline" size="sm" className="w-full rounded-full border-terracotta/30 text-terracotta text-[10px] font-black uppercase hover:bg-terracotta hover:text-white transition-all">
+                                <Button variant="outline" size="sm" className="w-full rounded-full border-terracotta/30 text-terracotta text-[10px] font-black uppercase hover:bg-terracotta hover:text-white transition-all shadow-sm">
                                   View Details <ArrowRight className="h-3 w-3 ml-2" />
                                 </Button>
                               </motion.div>
@@ -315,10 +371,10 @@ export default function AIAssistant() {
                   </div>
                 ))}
 
-                {/* Show starter questions if no interaction yet */}
-                {showStarters && (
+                {/* Show starter or suggested questions */}
+                {(showStarters || suggestedQuestions.length > 0) && (
                   <div className="grid grid-cols-1 gap-2 p-2">
-                    {starterQuestions.map((sq, si) => (
+                    {(suggestedQuestions.length > 0 ? suggestedQuestions.map(q => ({ text: q, icon: Sparkles })) : currentStarters).map((sq, si) => (
                       <motion.button
                         key={si}
                         initial={{ opacity: 0, x: -10 }}
@@ -327,10 +383,10 @@ export default function AIAssistant() {
                         onClick={() => handleStarterClick(sq.text)}
                         className="flex items-center gap-3 p-3 text-left rounded-2xl bg-white border border-forest/5 hover:border-terracotta/40 hover:bg-cream/50 transition-all group shadow-sm active:scale-95"
                       >
-                        <div className="p-2 rounded-xl bg-forest/5 text-forest group-hover:scale-110 transition-transform">
+                        <div className="p-2 mr-1 rounded-xl bg-linear-to-br from-forest/5 to-forest/10 text-forest group-hover:from-terracotta/20 group-hover:to-terracotta/40 group-hover:text-terracotta transition-all duration-300 group-hover:scale-110 shadow-inner">
                           <sq.icon className="h-4 w-4" />
                         </div>
-                        <span className="text-xs font-bold text-forest/80">{sq.text}</span>
+                        <span className="text-xs font-bold text-forest/80 line-clamp-2">{sq.text}</span>
                         <ArrowRight className="h-3 w-3 ml-auto text-terracotta opacity-0 group-hover:opacity-100 transition-opacity" />
                       </motion.button>
                     ))}
@@ -339,9 +395,13 @@ export default function AIAssistant() {
                 
                 {isLoading && (
                   <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-full bg-forest flex items-center justify-center animate-spin-slow">
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                      className="h-8 w-8 rounded-full bg-linear-to-tr from-forest to-emerald-800 flex items-center justify-center shadow-md border border-white/20"
+                    >
                       <Bot className="h-4 w-4 text-white" />
-                    </div>
+                    </motion.div>
                     <div className="p-4 bg-white rounded-3xl rounded-tl-none border border-forest/5 shadow-sm min-w-[60px]">
                       <div className="flex gap-1.5">
                         <div className="h-2 w-2 bg-terracotta rounded-full animate-bounce" />

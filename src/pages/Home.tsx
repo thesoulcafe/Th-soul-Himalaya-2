@@ -237,8 +237,8 @@ export default function Home() {
                     to="/dashboard"
                     className="w-48 bg-terracotta/30 hover:bg-terracotta/50 text-white border-2 border-terracotta/60 py-6 rounded-full flex items-center justify-center gap-2 transition-all duration-500 backdrop-blur-md shadow-[0_10px_40px_rgba(214,93,72,0.4)]"
                   >
-                    <LogIn className="h-5 w-5" />
-                    Login Now
+                    <Zap className="h-5 w-5 text-amber-400" />
+                    Dashboard
                   </Link>
                 )}
               </motion.div>

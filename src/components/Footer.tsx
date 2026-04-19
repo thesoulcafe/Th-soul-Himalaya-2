@@ -33,17 +33,21 @@ export default function Footer() {
               }
             />
           </motion.div>
-          <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20">
+          <Link to="/" className="flex items-center gap-4 group cursor-pointer">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="h-20 w-20 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors"
+            >
               <img 
                 src="https://i.postimg.cc/V6CDy34v/IMG-8050.jpg" 
                 alt="The Soul Himalaya Logo" 
-                className="h-16 w-auto brightness-110 contrast-110"
+                className="h-16 w-auto brightness-110 contrast-110 group-hover:scale-110 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
-            </div>
-            <span className="text-xl font-heading font-bold text-white tracking-tight">The Soul Himalaya</span>
-          </div>
+            </motion.div>
+            <span className="text-xl font-heading font-bold text-white tracking-tight group-hover:text-terracotta transition-colors">The Soul Himalaya</span>
+          </Link>
           <p className="text-cream/70 text-sm leading-relaxed">
             Authentic Himalayan experiences in the heart of Parvati Valley. 
             From soulful stays to adventurous trekks, we bring you closer to the spirit of the mountains.
@@ -61,9 +65,9 @@ export default function Footer() {
           <div className="space-y-6">
             <h4 className="text-lg font-bold">Quick Links</h4>
             <ul className="space-y-3 text-sm text-cream/70">
-              {['About', 'Gallery', 'Contact', 'Blueberry'].map((item) => (
+              {['Home', 'About', 'Gallery', 'Contact', 'Blueberry'].map((item) => (
                 <motion.li key={item} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300 }}>
-                  <Link to={`/${item.toLowerCase()}`} className="hover:text-terracotta transition-colors flex items-center gap-2">
+                  <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="hover:text-terracotta transition-colors flex items-center gap-2">
                     <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {item === 'Blueberry' ? 'Blueberry Farm' : item === 'Contact' ? 'Contact Us' : item === 'About' ? 'Our Story' : item}
                   </Link>
