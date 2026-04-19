@@ -130,27 +130,32 @@ async function startServer() {
     res.json({ status: "ok", message: "The Soul Himalaya API is running" });
   });
 
-  // Backend File Upload Endpoint
-  app.post("/api/upload", upload.single("file"), (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
+  app.post("/api/upload", (req, res) => {
+    upload.single("file")(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        return res.status(400).json({ error: err.message });
       }
+      
+      try {
+        if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
+        }
 
-      // Construct the URL to access the uploaded file
-      // In production, we use a root-relative path for maximum compatibility behind proxies
-      const fileUrl = `/uploads/${req.file.filename}`;
+        // Construct the URL to access the uploaded file
+        const fileUrl = `/uploads/${req.file.filename}`;
 
-      res.json({
-        url: fileUrl,
-        filename: req.file.filename,
-        mimetype: req.file.mimetype,
-        size: req.file.size,
-      });
-    } catch (error) {
-      console.error("Upload failed:", error);
-      res.status(500).json({ error: "Failed to upload file to backend" });
-    }
+        res.json({
+          url: fileUrl,
+          filename: req.file.filename,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+        });
+      } catch (error) {
+        console.error("Upload handler failed:", error);
+        res.status(500).json({ error: "Failed to process upload" });
+      }
+    });
   });
 
   // Razorpay Create Order

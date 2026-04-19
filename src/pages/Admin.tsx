@@ -168,20 +168,29 @@ export default function Admin() {
     setUploadProgress(10); // Initial feedback
     
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const formDataToSend = new FormData();
+      formDataToSend.append('file', file);
 
       // We use the backend endpoint for more reliable uploads in this environment
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        body: formDataToSend,
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed on server');
+        let errorMsg = 'Upload failed on server';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch (e) {
+          errorMsg = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
+      if (!data.url) throw new Error("Server response missing file URL");
+      
       const downloadURL = data.url;
       
       setUploadProgress(100);

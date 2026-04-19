@@ -146,6 +146,14 @@ export default function AIAssistant() {
 
   const [currentStarters, setCurrentStarters] = useState(ALL_STARTER_QUESTIONS.slice(0, 4));
 
+  // Rotate questions every time the chat is opened
+  useEffect(() => {
+    if (isOpen) {
+      const shuffled = [...ALL_STARTER_QUESTIONS].sort(() => 0.5 - Math.random());
+      setCurrentStarters(shuffled.slice(0, 4));
+    }
+  }, [isOpen]);
+
   const handleStarterClick = async (question: string) => {
     setShowStarters(false);
     
