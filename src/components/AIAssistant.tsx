@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
-import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind } from 'lucide-react';
+import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind, Star, Clock, CheckCircle2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/AuthContext';
+import { DEFAULT_TOURS } from '@/constants';
+import { Link } from 'react-router-dom';
+import { useCart } from '@/lib/CartContext';
 
 // Phase 3: React 2026 'Activity' hook simulation
 // This hook preserves the chat history even if the component is visually hidden/unmounted in some flows.
@@ -37,6 +40,7 @@ export default function AIAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+  const { addToCart } = useCart();
 
   // Initialize Gemini
   const genAI = useMemo(() => {
@@ -64,42 +68,57 @@ export default function AIAssistant() {
     setShowStarters(false);
 
     try {
-      const model = genAI.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: newMessages.map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }]
-        })),
-        config: {
-          systemInstruction: `You are the Soul Guide at Soul Himalaya. Help users with travel plans, bookings, and regional info. 
-          The user is ${profile?.displayName || 'a traveler'}.
-          Himalayan Experience Level: ${profile?.experienceLevel || 'unknown'}.
-          Trek Preferences: ${JSON.stringify(profile?.trekPreferences || {})}.
-          Loyalty Points: ${profile?.loyaltyPoints || 0}.
-          
-          CRITICAL RULES:
-          1. Keep your response short and concise, exactly 4-5 lines.
-          2. Use an interactive, helpful, and welcoming tone.
-          3. End your response with 3 specific follow-up questions for the user based on the conversation.
-          4. Format the follow-up questions at the very end of your response, each on a new line starting with "[SUGGESTION]" followed by the question.`,
-        }
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: newMessages.map(m => ({
+            role: m.role,
+            content: m.content,
+            toolInvocations: m.toolInvocations
+          })),
+          profile
+        })
       });
 
-      const response = await model;
-      const text = response.text;
+      if (!response.ok) throw new Error('Soul Guide connection failed');
 
-      // Extract suggestions
-      const lines = text.split('\n');
-      const cleanText = lines.filter(l => !l.startsWith('[SUGGESTION]')).join('\n');
-      const suggestions = lines
+      // Simple implementation for non-streaming UI integration or standard responses
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedText = '';
+      
+      // We'll create a temporary message for the stream
+      const tempId = (Date.now() + 1).toString();
+      setMessages(prev => [...prev, { id: tempId, role: 'assistant', content: '', toolInvocations: [] }]);
+
+      while (true && reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Very basic parsing for development - ideally use @ai-sdk/ui or similar
+        // For this demo, we'll handle the text and simple tool markers if present
+        accumulatedText += chunk;
+        
+        setMessages(prev => prev.map(m => 
+          m.id === tempId ? { ...m, content: accumulatedText } : m
+        ));
+      }
+
+      // Final cleanup and suggestion extraction (similar to before but adapted for API flow)
+      const finalLines = accumulatedText.split('\n');
+      const suggestions = finalLines
         .filter(l => l.startsWith('[SUGGESTION]'))
         .map(l => l.replace('[SUGGESTION]', '').trim());
 
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: cleanText
-      }]);
+      setMessages(prev => prev.map(m => 
+        m.id === tempId ? { 
+          ...m, 
+          content: accumulatedText.split('\n').filter(l => !l.startsWith('[SUGGESTION]')).join('\n') 
+        } : m
+      ));
 
       if (suggestions.length > 0) {
         setSuggestedQuestions(suggestions);
@@ -351,6 +370,110 @@ export default function AIAssistant() {
                         
                         {/* Generative UI Components */}
                         {m.toolInvocations?.map((ti: any) => {
+                          if (ti.toolName === 'showTours' && ti.state === 'result') {
+                            const filteredTours = DEFAULT_TOURS
+                              .filter(t => ti.result.category === 'Recommended' || t.category === ti.result.category)
+                              .slice(0, ti.result.limit || 3);
+
+                            return (
+                              <motion.div 
+                                key={ti.toolCallId} 
+                                className="mt-4 space-y-3"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                              >
+                                <div className="flex items-center gap-2 text-terracotta mb-2">
+                                  <Sparkles className="h-4 w-4" />
+                                  <span className="font-bold uppercase text-[10px] tracking-widest">{ti.result.category} Journeys</span>
+                                </div>
+                                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2">
+                                  {filteredTours.map((tour) => (
+                                    <Card key={tour.id} className="min-w-[240px] max-w-[240px] shrink-0 overflow-hidden border-forest/5 shadow-md rounded-2xl group bg-white">
+                                      <div className="relative h-28 overflow-hidden">
+                                        <img src={tour.image} alt={tour.title} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                        <div className="absolute top-2 right-2 bg-forest text-white px-2 py-0.5 rounded-full font-bold text-[9px] shadow-lg">
+                                          {tour.price}
+                                        </div>
+                                      </div>
+                                      <div className="p-3 space-y-2">
+                                        <h4 className="font-bold text-xs text-forest line-clamp-1">{tour.title}</h4>
+                                        <div className="flex items-center justify-between text-[9px] text-forest/50 font-bold uppercase">
+                                          <div className="flex items-center gap-1">
+                                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                                            {tour.rating}
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Clock className="h-3 w-3 text-terracotta" />
+                                            {tour.duration}
+                                          </div>
+                                        </div>
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="w-full h-8 rounded-full border-forest/10 text-[9px] font-black uppercase tracking-widest hover:bg-forest hover:text-white"
+                                          onClick={() => append({ role: 'user', content: `Tell me more about the ${tour.title}` })}
+                                        >
+                                          View Details
+                                        </Button>
+                                      </div>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            );
+                          }
+
+                          if (ti.toolName === 'bookingCalendar' && ti.state === 'result') {
+                            const tour = DEFAULT_TOURS.find(t => t.id === ti.result.tourId);
+                            // Simulating slots since we don't have a real DB trigger here for this specific demo
+                            const fakeSlots = [
+                              { start: '10 Jun', end: '15 Jun' },
+                              { start: '20 Jun', end: '25 Jun' },
+                              { start: '05 Jul', end: '10 Jul' }
+                            ];
+
+                            return (
+                              <motion.div 
+                                key={ti.toolCallId} 
+                                className="mt-4 p-4 bg-forest rounded-2xl border border-white/10 space-y-4 shadow-xl"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                              >
+                                <div className="flex items-center gap-2 text-white">
+                                  <Calendar className="h-4 w-4 text-terracotta" />
+                                  <span className="font-bold uppercase text-[10px] tracking-widest">Select Your Dates</span>
+                                </div>
+                                <div className="space-y-2">
+                                  {fakeSlots.map((slot, idx) => (
+                                    <button 
+                                      key={idx}
+                                      onClick={() => {
+                                        if (tour) {
+                                          addToCart({
+                                            id: `${tour.id}-chat-slot-${idx}`,
+                                            name: tour.title,
+                                            price: tour.price,
+                                            type: 'Tour',
+                                            image: tour.image,
+                                            dateRange: `${slot.start} to ${slot.end} 2026`
+                                          });
+                                          append({ role: 'assistant', content: `Great choice! I have added the ${tour.title} for ${slot.start}-${slot.end} to your Soul Cart. Would you like to proceed to checkout or look for something else?` });
+                                        }
+                                      }}
+                                      className="w-full p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white hover:text-forest transition-all text-white text-xs font-bold flex justify-between items-center group"
+                                    >
+                                      <span>{slot.start} - {slot.end}, 2026</span>
+                                      <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </button>
+                                  ))}
+                                </div>
+                                <p className="text-[9px] text-white/40 font-bold uppercase text-center tracking-widest">
+                                  Secure Booking via Soul Guide
+                                </p>
+                              </motion.div>
+                            );
+                          }
+
                           if (ti.toolName === 'showItinerary' && ti.state === 'result') {
                             return (
                               <motion.div 

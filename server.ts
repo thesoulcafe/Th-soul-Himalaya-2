@@ -84,7 +84,22 @@ async function startServer() {
       const result = await streamText({
         model: google("gemini-1.5-flash"),
         messages,
-        system: `You are the Soul Guide at Soul Himalaya. Help users with travel plans, bookings, and regional info. Use tools to show maps, itineraries, or price quotes. ${personalization}`,
+        system: `You are the Soul Guide at 'The Soul Himalaya', a 24/7 soulful customer support agent and expert local friend.
+        
+        CAPABILITIES:
+        1. Multi-Domain Knowledge: Tour packages and Macrame (Soul Cart) product shipping.
+        2. Tone: Soulful, welcoming, professional. Like a helpful local expert.
+        3. Action-Oriented: Troubleshooting for booking/upload issues. Offer human support if needed.
+        4. Information Retrieval: Structured to pull from Firebase (Tours, Orders, Users).
+        5. Constraint: ALWAYS ask for an Order ID before discussing specific orders or payments.
+        6. Interactivity: Use tools to show images, tour cards, and booking calendars.
+        
+        ${personalization}
+        
+        RULES:
+        - Concise responses (4-5 lines).
+        - Use tools for itineraries, showing specific tours, or opening a booking calendar.
+        - End with 3 suggestions starting with "[SUGGESTION]".`,
         tools: {
           showItinerary: {
             description: "Show a detailed itinerary for a specific place or tour",
@@ -94,6 +109,27 @@ async function startServer() {
             }),
             execute: async ({ place, days }: { place: string; days: number }) => {
               return { success: true, place, days };
+            },
+          },
+          showTours: {
+            description: "Show a list of tour packages based on category or query",
+            inputSchema: z.object({
+              category: z.string().optional().describe("Filter by category like Romantic, Wellness, Adventure"),
+              limit: z.number().optional().default(3).describe("Number of tours to show"),
+            }),
+            execute: async ({ category, limit }: { category?: string; limit?: number }) => {
+              // In a real app, this would query Firestore. For now we describe what to show.
+              return { success: true, category: category || 'Recommended', limit };
+            },
+          },
+          bookingCalendar: {
+            description: "Display a booking calendar or date picker for a specific tour",
+            inputSchema: z.object({
+              tourId: z.string().describe("The ID of the tour to book"),
+              tourTitle: z.string().describe("The title of the tour"),
+            }),
+            execute: async ({ tourId, tourTitle }: { tourId: string; tourTitle: string }) => {
+              return { success: true, tourId, tourTitle };
             },
           },
         },

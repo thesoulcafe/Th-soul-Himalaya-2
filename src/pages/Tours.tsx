@@ -170,11 +170,18 @@ export default function Tours() {
 
   const filteredTours = useMemo(() => {
     return tours.filter(tour => {
+      const title = String(tour.title || tour.name || '').toLowerCase();
+      const description = String(tour.description || '').toLowerCase();
+      const query = searchQuery.toLowerCase();
+
       const matchesCategory = activeCategory === 'All' || tour.category === activeCategory;
-      const matchesSearch = tour.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          tour.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = parsePrice(tour.price) <= maxPrice;
-      const matchesDuration = parseDuration(tour.duration) <= maxDuration;
+      const matchesSearch = title.includes(query) || description.includes(query);
+      
+      const priceVal = parsePrice(tour.price || '0');
+      const matchesPrice = priceVal <= maxPrice;
+      
+      const durationVal = parseDuration(tour.duration || '0');
+      const matchesDuration = durationVal <= maxDuration;
       
       return matchesCategory && matchesSearch && matchesPrice && matchesDuration;
     });
@@ -211,15 +218,23 @@ export default function Tours() {
           </div>
 
           <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative group flex-grow md:w-64">
+            <div className="relative group flex-grow md:w-72">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/30 group-focus-within:text-terracotta transition-colors" />
               <input 
                 type="text"
                 placeholder="Search journeys..."
-                value={searchQuery}
+                value={searchQuery || ''}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-forest/5 rounded-2xl text-[11px] font-bold text-forest placeholder:text-forest/30 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all uppercase tracking-widest"
+                className="w-full pl-12 pr-12 py-3 bg-white border border-forest/5 rounded-2xl text-[11px] font-bold text-forest placeholder:text-forest/30 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all uppercase tracking-widest"
               />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-forest/20 hover:text-terracotta transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
             <Button 
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -234,6 +249,23 @@ export default function Tours() {
             </Button>
           </div>
         </div>
+
+        {/* Search Status */}
+        {searchQuery && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 flex items-center gap-2"
+          >
+            <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest">Searching for:</span>
+            <Badge variant="secondary" className="bg-terracotta/10 text-terracotta border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+              {searchQuery}
+            </Badge>
+            <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest ml-auto">
+              Found {filteredTours.length} spiritual {filteredTours.length === 1 ? 'path' : 'paths'}
+            </span>
+          </motion.div>
+        )}
 
         {/* Expanded Filters */}
         <AnimatePresence>

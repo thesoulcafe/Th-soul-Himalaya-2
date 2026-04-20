@@ -7,6 +7,9 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '@/lib/AuthContext';
 import CartDrawer from './CartDrawer';
+import { ShoppingCart } from 'lucide-react';
+import { useCart } from '@/lib/CartContext';
+import { Badge } from '@/components/ui/badge';
 
 const navLinks = [
   { name: 'Tours', href: '/tours' },
@@ -17,6 +20,16 @@ const navLinks = [
   { name: 'Adventure', href: '/adventure' },
   { name: 'Shop', href: '/shop' },
 ];
+
+const CartCountBadge = () => {
+  const { totalItems } = useCart();
+  if (totalItems === 0) return null;
+  return (
+    <Badge className="absolute -top-1 -right-1 bg-terracotta text-white border-2 border-forest flex items-center justify-center rounded-full p-0 text-[10px] w-5 h-5 font-bold">
+      {totalItems}
+    </Badge>
+  );
+};
 
 export default function Navbar() {
   const location = useLocation();
@@ -76,69 +89,64 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-10">
           {navLinks.map((link) => (
             <motion.div
               key={link.name}
-              whileHover={{ y: -2 }}
+              whileHover={{ y: -1 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <Link
                 to={link.href}
                 className={cn(
-                  'text-sm font-medium transition-colors hover:text-terracotta text-white/90 relative group',
-                  location.pathname === link.href && 'text-terracotta font-bold'
+                  'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                  location.pathname === link.href && 'text-white border-b-2 border-terracotta'
                 )}
               >
                 {link.name}
                 <span className={cn(
-                  "absolute -bottom-1 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full",
-                  location.pathname === link.href && "w-full"
+                   "absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full",
+                   location.pathname === link.href && "hidden"
                 )} />
               </Link>
             </motion.div>
           ))}
           {user && (
-            <motion.div
-              whileHover={{ y: -2 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-              className="flex items-center gap-4"
-            >
+            <div className="flex items-center gap-6 border-l border-white/10 pl-6">
               <Link
                 to="/dashboard"
                 className={cn(
-                  'text-sm font-medium transition-colors hover:text-terracotta text-white/90 flex items-center gap-2',
-                  location.pathname === '/dashboard' && 'text-terracotta font-bold'
+                  'text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-2',
+                  location.pathname === '/dashboard' && 'text-white'
                 )}
               >
-                <User className="h-4 w-4" />
-                Dashboard
+                <User className="h-3.5 w-3.5" />
+                Auth
               </Link>
               {profile?.role === 'admin' && (
                 <Link
                   to="/admin"
                   className={cn(
-                    'text-sm font-medium transition-colors hover:text-terracotta text-white/90 flex items-center gap-2',
-                    location.pathname === '/admin' && 'text-terracotta font-bold'
+                    'text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-2',
+                    location.pathname === '/admin' && 'text-white'
                   )}
                 >
-                  <ShieldCheck className="h-4 w-4" />
-                  Admin Panel
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Admin
                 </Link>
               )}
-            </motion.div>
+            </div>
           )}
-          <motion.div
-            whileHover={{ y: -2 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          >
-            <CartDrawer variant="header" />
-          </motion.div>
+          <CartDrawer variant="header" />
         </div>
 
         {/* Mobile Nav */}
         <div className="md:hidden flex items-center -mr-4 gap-2">
-          <CartDrawer variant="header" />
+          {/* Mobile Cart Link - Direct Page */}
+          <Link to="/cart" className="relative h-10 w-10 flex items-center justify-center bg-white/10 rounded-full text-white">
+            <ShoppingCart className="h-5 w-5" />
+            <CartCountBadge />
+          </Link>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger
               nativeButton={true}

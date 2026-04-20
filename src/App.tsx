@@ -16,6 +16,7 @@ import Contact from './pages/Contact';
 import Services from './pages/Services';
 import TailorMade from './pages/TailorMade';
 import Admin from './pages/Admin';
+import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './lib/AuthContext';
@@ -40,6 +41,7 @@ export default function App() {
                 <Route path="meditation" element={<Meditation />} />
                 <Route path="adventure" element={<Adventure />} />
                 <Route path="shop" element={<Shop />} />
+                <Route path="cart" element={<Cart />} />
                 <Route path="blueberry" element={<Blueberry />} />
                 <Route path="about" element={<About />} />
                 <Route path="guide" element={<Guide />} />

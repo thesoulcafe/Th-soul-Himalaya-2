@@ -10,52 +10,31 @@ export default function Footer() {
     <footer className="bg-forest text-cream pt-16 pb-8 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand Info */}
-        <div className="space-y-6">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-block"
-          >
-            <ReviewsDialog 
-              serviceId="soul-himalaya-general" 
-              serviceType="brand" 
-              serviceName="The Soul Himalaya"
-              trigger={
-                <button 
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "border-terracotta text-terracotta hover:bg-terracotta hover:text-white rounded-full px-6 py-2 flex items-center gap-2 font-bold transition-all duration-300"
-                  )}
-                >
-                  <Star className="h-4 w-4 fill-current" />
-                  Reviews
-                </button>
-              }
-            />
-          </motion.div>
-          <Link to="/" className="flex items-center gap-4 group cursor-pointer">
+        <div className="space-y-8">
+          <Link to="/" className="flex flex-col gap-6 group cursor-pointer">
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="h-20 w-20 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors"
+              className="h-24 w-24 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-2xl border border-white/20 group-hover:border-terracotta/50 transition-colors"
             >
               <img 
                 src="https://i.postimg.cc/V6CDy34v/IMG-8050.jpg" 
                 alt="The Soul Himalaya Logo" 
-                className="h-16 w-auto brightness-110 contrast-110 group-hover:scale-110 transition-transform duration-500"
+                className="h-20 w-auto brightness-110 contrast-110 group-hover:scale-110 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="text-xl font-heading font-bold text-white tracking-tight group-hover:text-terracotta transition-colors">The Soul Himalaya</span>
+            <span className="text-2xl font-montserrat font-extrabold text-white tracking-tight group-hover:text-terracotta transition-colors uppercase leading-none">
+              The Soul <br /><span className="text-terracotta italic">Himalaya</span>
+            </span>
           </Link>
-          <p className="text-cream/70 text-sm leading-relaxed">
+          <p className="text-cream/60 text-[13px] leading-relaxed font-medium">
             Authentic Himalayan experiences in the heart of Parvati Valley. 
-            From soulful stays to adventurous trekks, we bring you closer to the spirit of the mountains.
+            From soulful stays to adventurous treks, we bring you closer to the eternal spirit of the mountains.
           </p>
-          <div className="flex space-x-4">
-            <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors"><Instagram className="h-5 w-5" /></a>
-            <a href="#" className="hover:text-terracotta transition-colors"><Facebook className="h-5 w-5" /></a>
-            <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer" className="hover:text-terracotta transition-colors"><Twitter className="h-5 w-5" /></a>
+          <div className="flex space-x-6 pt-2">
+            <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors"><Instagram className="h-5 w-5" /></a>
+            <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors"><Twitter className="h-5 w-5" /></a>
           </div>
         </div>
 

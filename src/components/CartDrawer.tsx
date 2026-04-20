@@ -79,30 +79,25 @@ export default function CartDrawer({ variant = 'floating' }: CartDrawerProps) {
           </button>
         }
       />
-      <SheetContent className="w-full sm:max-w-md bg-cream border-forest/10 p-0 flex flex-col">
-        <SheetHeader className="p-8 bg-forest text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-terracotta/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-          <SheetTitle className="text-3xl font-heading text-white flex items-center gap-4 relative z-10">
+      <SheetContent className="w-full sm:max-w-md bg-cream border-forest/10 p-0 flex flex-col shadow-2xl">
+        <SheetHeader className="p-10 bg-forest text-white relative overflow-hidden shrink-0">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta/10 rounded-full -mr-32 -mt-32 blur-3xl" />
+          <SheetTitle className="text-4xl font-montserrat font-extrabold text-white flex items-center gap-5 relative z-10 uppercase tracking-tighter">
             <motion.div
               animate={{ 
-                scale: [1, 1.1, 1],
                 rotate: [0, 5, -5, 0]
               }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="p-3 bg-white/10 rounded-2xl shadow-inner"
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="p-4 bg-white/10 rounded-2xl shadow-inner border border-white/10 backdrop-blur-md"
             >
-              <ShoppingBag className="h-7 w-7 text-terracotta" />
+              <ShoppingBag className="h-8 w-8 text-terracotta" />
             </motion.div>
-            <motion.span
-              animate={{ color: ['#FFFFFF', '#C4622D', '#FFFFFF'] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="font-heading font-bold"
-            >
-              Soul Cart
-            </motion.span>
+            <div className="flex flex-col">
+              <span className="text-white leading-none">Soul</span>
+              <span className="text-terracotta italic leading-none ml-4 transition-all duration-500 hover:ml-6">Cart</span>
+            </div>
           </SheetTitle>
         </SheetHeader>
-
         <div className="flex-grow overflow-hidden flex flex-col">
           {cart.length === 0 ? (
             <div className="flex-grow flex flex-col items-center justify-center p-12 text-center space-y-6">
@@ -217,7 +212,7 @@ export default function CartDrawer({ variant = 'floating' }: CartDrawerProps) {
                     <span>₹{Math.round(totalPrice * 0.05).toLocaleString()}</span>
                   </div>
                   <Separator className="my-4 bg-forest/5" />
-                  <div className="flex justify-between items-end pt-12">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end pt-12 gap-6">
                     <div>
                       <p className="text-[10px] uppercase tracking-widest font-bold text-terracotta mb-1">Total Payable</p>
                       <span className="text-3xl font-heading font-bold text-forest">₹{Math.round(totalPrice * 1.05).toLocaleString()}</span>
@@ -229,12 +224,12 @@ export default function CartDrawer({ variant = 'floating' }: CartDrawerProps) {
                         boxShadow: ["0px 0px 0px rgba(196, 98, 45, 0)", "0px 0px 25px rgba(196, 98, 45, 0.4)", "0px 0px 0px rgba(196, 98, 45, 0)"]
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="mt-6"
+                      className="mt-6 w-full sm:w-auto"
                     >
                       <Button 
                         nativeButton={false}
-                        render={<Link to="/checkout" onClick={() => setIsOpen(false)} state={{ cartItems: cart, total: Math.round(totalPrice * 1.05) }} />} 
-                        className="bg-terracotta hover:bg-terracotta/90 text-white px-6 py-5 rounded-full text-base font-bold shadow-lg shadow-terracotta/20 transition-all duration-300 hover:shadow-terracotta/40"
+                        render={<Link to="/checkout" onClick={() => setIsOpen(false)} state={{ cartItems: cart, total: Math.round(totalPrice * 1.05) }} className="w-full flex items-center justify-center" />} 
+                        className="w-full bg-terracotta hover:bg-terracotta/90 text-white px-6 py-5 rounded-full text-base font-bold shadow-lg shadow-terracotta/20 transition-all duration-300 hover:shadow-terracotta/40"
                       >
                         Checkout
                       </Button>

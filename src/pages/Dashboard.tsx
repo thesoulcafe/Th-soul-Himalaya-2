@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { auth, db } from '@/lib/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { collection, query, where, onSnapshot, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -65,12 +66,28 @@ export default function Dashboard() {
   const [difficulty, setDifficulty] = useState(profile?.trekPreferences?.difficulty || 'moderate');
   const [groupSize, setGroupSize] = useState(profile?.trekPreferences?.groupSize || 'solo');
   const [displayName, setDisplayName] = useState(user?.displayName || '');
+  const [mobile, setMobile] = useState(profile?.mobile || '');
+  const [city, setCity] = useState(profile?.city || '');
+  const [pincode, setPincode] = useState(profile?.pincode || '');
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisible: profile?.privacy?.profileVisible ?? true,
+    emailNotifications: profile?.privacy?.emailNotifications ?? true,
+    shareStats: profile?.privacy?.shareStats ?? false
+  });
 
   useEffect(() => {
     if (profile) {
       setExperienceLevel(profile.experienceLevel || 'novice');
       setDifficulty(profile.trekPreferences?.difficulty || 'moderate');
       setGroupSize(profile.trekPreferences?.groupSize || 'solo');
+      setMobile(profile.mobile || '');
+      setCity(profile.city || '');
+      setPincode(profile.pincode || '');
+      setPrivacySettings({
+        profileVisible: profile.privacy?.profileVisible ?? true,
+        emailNotifications: profile.privacy?.emailNotifications ?? true,
+        shareStats: profile.privacy?.shareStats ?? false
+      });
     }
     if (user) {
       setDisplayName(user.displayName || '');
@@ -153,9 +170,15 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-20">
       {/* Background Decor */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
-        <Mountain className="absolute -bottom-40 -left-40 w-[600px] h-[600px] text-forest" />
-        <Compass className="absolute -top-20 -right-20 w-[400px] h-[400px] text-terracotta rotate-12" />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-full h-[50vh] bg-gradient-to-b from-forest/[0.03] to-transparent" />
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-terracotta/[0.02] rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-forest/[0.02] rounded-full blur-[100px]" />
+        <Mountain className="absolute -bottom-40 -left-40 w-[600px] h-[600px] text-forest/5" />
+        <Compass className="absolute top-1/4 left-1/4 w-[800px] h-[800px] text-forest/[0.01] -rotate-12" />
+        
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#254336 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }} />
       </div>
 
       {/* Mobile Header Tabs */}
@@ -183,33 +206,50 @@ export default function Dashboard() {
 
       <div className="flex relative z-10">
         {/* Sidebar */}
-        <aside className="fixed left-0 top-20 bottom-0 w-72 bg-white border-r border-forest/5 hidden lg:flex flex-col p-8 z-20 shadow-2xl shadow-forest/[0.02]">
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className="flex flex-col items-center text-center mb-10 pb-8 border-b border-forest/5 group/profile w-full"
-          >
-            <div className="relative mb-4 group">
-              <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-forest to-forest/80 flex items-center justify-center border-4 border-white shadow-2xl overflow-hidden transform group-hover:rotate-6 transition-transform">
-                {user.photoURL ? (
-                  <img src={user.photoURL} alt={user.displayName || ''} className="h-full w-full object-cover" />
-                ) : (
-                  <User className="h-10 w-10 text-white" />
-                )}
+        <aside className="fixed left-0 top-20 bottom-0 w-72 bg-white/70 backdrop-blur-xl border-r border-forest/5 hidden lg:flex flex-col p-8 z-20 transition-all duration-500">
+          <div className="relative mb-10 pb-10 border-b border-forest/5">
+            <button 
+              onClick={() => setActiveTab('settings')}
+              className="group/profile block w-full text-left"
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-forest to-forest/80 flex items-center justify-center p-1 shadow-2xl relative z-10 overflow-hidden transform group-hover/profile:-rotate-6 transition-transform duration-500">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt={user.displayName || ''} className="h-full w-full object-cover rounded-xl" />
+                    ) : (
+                      <User className="h-8 w-8 text-white/50" />
+                    )}
+                  </div>
+                  <div className="absolute -inset-1 bg-terracotta/20 rounded-2xl blur-lg opacity-0 group-hover/profile:opacity-100 transition-opacity" />
+                  <div className="absolute -bottom-1 -right-1 bg-emerald-500 h-5 w-5 rounded-full border-4 border-white flex items-center justify-center z-20">
+                    <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <p className="font-heading font-black text-lg text-forest tracking-tight leading-none mb-1">
+                    {user.displayName?.split(' ')[0] || 'Explorer'}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest">Base Camp</span>
+                  </div>
+                </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-emerald-500 h-6 w-6 rounded-full border-4 border-white flex items-center justify-center">
-                <CheckCircle2 className="h-3 w-3 text-white" />
+            </button>
+            
+            {/* Quick Stats in Sidebar */}
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="bg-forest/[0.03] p-3 rounded-2xl">
+                <p className="text-[8px] font-black text-forest/30 uppercase tracking-[0.2em] mb-1">Soul Pts</p>
+                <p className="text-sm font-black text-forest">{bookings.length * 250}</p>
+              </div>
+              <div className="bg-terracotta/[0.03] p-3 rounded-2xl">
+                <p className="text-[8px] font-black text-terracotta/30 uppercase tracking-[0.2em] mb-1">Exp Level</p>
+                <p className="text-sm font-black text-terracotta">12</p>
               </div>
             </div>
-            <div className="group-hover/profile:opacity-80 transition-opacity">
-              <p className="font-heading font-bold text-xl text-forest tracking-tight">
-                {user.displayName || 'Explorer'}
-              </p>
-              <div className="flex items-center justify-center gap-1.5 mt-1">
-                <Badge variant="outline" className="text-[9px] border-forest/10 text-forest/40 font-black tracking-widest px-2 py-0">LEVEL 12</Badge>
-                <Badge className="bg-terracotta text-white text-[9px] font-black tracking-widest px-2 py-0">PRO</Badge>
-              </div>
-            </div>
-          </button>
+          </div>
 
           <nav className="space-y-3 flex-grow">
             {[
@@ -261,148 +301,226 @@ export default function Dashboard() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-72 p-6 lg:p-14">
+        <main className="flex-1 lg:ml-72 p-6 lg:p-14 bg-[#FAFAF9]">
           <div className="max-w-6xl mx-auto">
-            {/* Header section with stylized typography */}
-            <div className="mb-14 relative flex flex-col md:flex-row md:items-end justify-between items-start gap-8">
-              <div>
-                <motion.div 
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center gap-3 mb-6"
-                >
-                  <div className="h-px w-8 bg-terracotta" />
-                  <span className="text-xs font-black text-terracotta uppercase tracking-[0.4em]">
-                    Digital Base Camp
+            {/* Artistic Header Section */}
+            <div className="mb-16 relative">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="space-y-6 relative z-10"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-[2px] w-16 bg-terracotta" />
+                  <span className="text-[10px] font-black text-terracotta uppercase tracking-[0.5em] font-montserrat">
+                    Eternal Peak Terminal
                   </span>
-                </motion.div>
-                <h1 className="text-6xl lg:text-8xl font-heading font-black text-forest leading-[0.8] tracking-tighter">
-                  Namaste, <br />
-                  <span className="text-terracotta italic font-medium">{user.displayName?.split(' ')[0] || 'Traveler'}</span>
-                </h1>
-              </div>
-              
-              <div className="bg-white p-2 rounded-full border border-forest/5 shadow-xl flex items-center gap-1">
-                {['General', 'Business', 'Legendary'].map(mode => (
-                  <button 
-                    key={mode} 
-                    className={cn(
-                      "px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                      mode === 'General' ? "bg-forest text-white shadow-lg" : "text-forest/40 hover:text-forest"
-                    )}
-                  >
-                    {mode}
-                  </button>
-                ))}
-              </div>
-            </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <h1 className="text-6xl lg:text-8xl font-heading font-black text-forest leading-none tracking-tighter">
+                    Namaste, <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-orange-600 italic font-medium font-montserrat pr-4">
+                      {user.displayName?.split(' ')[0] || 'Traveler'}
+                    </span>
+                  </h1>
+                </div>
 
-            {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="h-32 bg-forest/5 rounded-[2.5rem] animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
-                {stats.map((stat, idx) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.1, type: 'spring', stiffness: 200 }}
-                  >
-                    <Card className="border-none bg-white shadow-2xl shadow-forest/[0.04] overflow-hidden rounded-[2.5rem] hover:-translate-y-2 transition-all duration-500 group">
-                      <CardContent className="p-8">
-                        <div className="flex items-center justify-between mb-6">
-                          <div className={cn("p-3.5 rounded-2xl group-hover:rotate-12 transition-transform", stat.color.replace('text-', 'bg-') + '/10')}>
-                            <stat.icon className={cn("h-6 w-6", stat.color)} />
-                          </div>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full ring-1 ring-emerald-100 shadow-sm">{stat.trend}</span>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-forest/30 font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                          <p className="text-3xl font-heading font-bold text-forest tracking-tighter">{stat.value}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            )}
+                <div className="flex flex-wrap items-center gap-6 pt-4">
+                  <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-sm border border-forest/5">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest">Profile Verified</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl shadow-sm border border-forest/5">
+                    <div className="h-2 w-2 rounded-full bg-terracotta" />
+                    <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest">Level 1 Voyager</span>
+                  </div>
+                </div>
+              </motion.div>
+              
+              {/* Abstract decorative element */}
+              <div className="absolute -top-20 -right-20 w-96 h-96 bg-terracotta/5 rounded-full blur-[100px] -z-10" />
+            </div>
 
             <AnimatePresence mode="wait">
               {activeTab === 'overview' && (
                 <motion.div
                   key="overview"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="space-y-12"
+                  className="space-y-16"
                 >
-                  {/* Latest Activity / Upcoming */}
+                  {/* Creative Bento Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Hero Stat - Journeys */}
+                    <div className="md:col-span-2 md:row-span-2 group">
+                      <Card className="h-full border-none bg-forest text-white overflow-hidden rounded-[3.5rem] shadow-2xl relative transition-all duration-700 hover:shadow-forest/30 hover:-translate-y-1">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-terracotta/20 to-transparent rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
+                        <CardContent className="p-12 flex flex-col justify-between h-full relative z-10">
+                          <div className="flex items-center justify-between mb-16">
+                            <div className="h-16 w-16 rounded-[2rem] bg-white/10 backdrop-blur-xl flex items-center justify-center border border-white/10">
+                              <Mountain className="h-8 w-8 text-terracotta" />
+                            </div>
+                            <Badge className="bg-emerald-500 text-white border-none px-5 py-2 rounded-full text-[10px] font-black tracking-widest shadow-lg shadow-emerald-500/20 uppercase">
+                              Active Soul
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-white/30 font-black uppercase tracking-[0.4em] mb-4 font-montserrat">Journeys Taken</p>
+                            <div className="flex items-baseline gap-4 mb-6">
+                              <h3 className="text-8xl font-heading font-black tracking-tighter">{bookings.length}</h3>
+                              <span className="text-terracotta font-black text-sm uppercase tracking-widest">Completed</span>
+                            </div>
+                            <div className="flex items-center gap-3 py-4 px-6 bg-white/5 rounded-2xl w-fit border border-white/5 group-hover:bg-white/10 transition-colors">
+                              <TrendingUp className="h-4 w-4 text-emerald-400" />
+                              <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Veteran since 2024</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Credit Stat */}
+                    <div className="md:col-span-2 group">
+                      <Card className="h-full border-none bg-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] relative transition-all duration-500 hover:shadow-forest/[0.06] hover:-translate-y-1 bg-gradient-to-br from-white to-orange-50/20">
+                        <CardContent className="p-10 flex items-center gap-10 h-full">
+                          <div className="h-20 w-20 rounded-[2rem] bg-terracotta/10 flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform">
+                            <Wallet className="h-8 w-8 text-terracotta" />
+                          </div>
+                          <div className="flex-grow">
+                            <p className="text-[10px] text-forest/30 font-black uppercase tracking-[0.3em] mb-2 font-montserrat">Soul Credits</p>
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-5xl font-heading font-black text-forest tracking-tighter">₹1,500</h3>
+                              <Button variant="ghost" className="h-10 w-10 rounded-full border border-forest/5 text-forest/40 hover:text-terracotta hover:bg-terracotta/5">
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Progress Stat */}
+                    <div className="md:col-span-1 group">
+                      <Card className="h-full border-none bg-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1 group">
+                        <CardContent className="p-10 flex flex-col justify-between h-full">
+                          <div className="h-14 w-14 rounded-2xl bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Zap className="h-6 w-6 text-amber-500" />
+                          </div>
+                          <div className="mt-12">
+                            <p className="text-[9px] text-forest/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Experience Pts</p>
+                            <h3 className="text-4xl font-heading font-black text-forest tracking-tighter">{bookings.length * 250}</h3>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Trust Stat */}
+                    <div className="md:col-span-1 group">
+                      <Card className="h-full border-none bg-[#111827] text-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1">
+                        <CardContent className="p-10 flex flex-col justify-between h-full">
+                          <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center">
+                            <ShieldCheck className="h-6 w-6 text-emerald-400" />
+                          </div>
+                          <div className="mt-12">
+                            <p className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Profile Trust</p>
+                            <h3 className="text-4xl font-heading font-black text-white tracking-tighter">100%</h3>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Active Journey Section */}
                   <section>
-                    <div className="flex items-center justify-between mb-8">
-                      <h2 className="text-3xl font-heading font-bold text-forest tracking-tight">Recent Journey</h2>
-                      <button onClick={() => setActiveTab('bookings')} className="text-terracotta text-xs font-bold uppercase tracking-widest flex items-center gap-2 group">
-                        View All <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                    <div className="flex items-center justify-between mb-10">
+                      <div className="flex items-center gap-6">
+                        <div className="h-12 w-12 rounded-[1.25rem] bg-terracotta flex items-center justify-center shadow-2xl shadow-terracotta/30">
+                          <Compass className="h-6 w-6 text-white animate-spin-slow" />
+                        </div>
+                        <h2 className="text-4xl font-heading font-black text-forest tracking-tight italic">Current Expedition</h2>
+                      </div>
+                      <button onClick={() => setActiveTab('bookings')} className="group flex items-center gap-3 text-[10px] font-black text-terracotta uppercase tracking-[0.4em] hover:gap-5 transition-all">
+                        LOGBOOK <ArrowRight className="h-3 w-3" />
                       </button>
                     </div>
 
                     {bookings.length > 0 ? (
-                      <Card className="border-none bg-white overflow-hidden shadow-2xl rounded-[3rem]">
-                        <div className="grid grid-cols-1 md:grid-cols-5 h-full min-h-[400px]">
-                          <div className="md:col-span-2 relative overflow-hidden h-64 md:h-auto">
+                      <Card className="border-none bg-white overflow-hidden shadow-2xl shadow-forest/[0.08] rounded-[4rem] group hover:shadow-forest/[0.12] transition-all duration-[1s]">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+                          <div className="lg:col-span-5 relative overflow-hidden h-96 lg:h-auto">
                             <img 
                               src={bookings[0].image || "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80"} 
                               alt={bookings[0].item}
-                              className="absolute inset-0 w-full h-full object-cover"
+                              className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-125 transition-transform duration-[3s] ease-out shadow-inner"
+                              referrerPolicy="no-referrer"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-forest/40 to-transparent" />
-                          </div>
-                          <CardContent className="md:col-span-3 p-8 lg:p-12 flex flex-col justify-between">
-                            <div>
-                              <div className="flex items-center gap-2 mb-4">
-                                <span className={cn(
-                                  "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm",
-                                  bookings[0].status === 'completed' 
-                                    ? "bg-emerald-100 text-emerald-700" 
-                                    : bookings[0].status === 'Confirmed' 
-                                      ? "bg-blue-100 text-blue-700" 
-                                      : "bg-orange-100 text-orange-700"
-                                )}>
-                                  {bookings[0].status || 'Awaiting'}
-                                </span>
-                                <span className="text-[10px] font-bold text-forest/30 uppercase tracking-widest">{bookings[0].type}</span>
+                            <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-forest/20 to-transparent" />
+                            <div className="absolute bottom-12 left-12">
+                              <Badge className="bg-terracotta text-white border-none px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 shadow-xl">
+                                {bookings[0].type.toUpperCase()}
+                              </Badge>
+                              <div className="flex items-center gap-3 text-white/90 text-xs font-black uppercase tracking-[0.3em]">
+                                <MapPin className="h-4 w-4 text-terracotta" />
+                                Base Camp: Manali
                               </div>
-                              <h3 className="text-4xl lg:text-5xl font-heading font-bold text-forest mb-6 leading-none">
+                            </div>
+                          </div>
+                          <CardContent className="lg:col-span-7 p-12 lg:p-20 flex flex-col justify-between bg-white relative">
+                            <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:rotate-45 transition-transform duration-[2s]">
+                              <Mountain className="h-64 w-64" />
+                            </div>
+                            
+                            <div className="relative z-10">
+                              <div className="flex items-center justify-between mb-12">
+                                <div className="space-y-2">
+                                  <p className="text-[10px] font-black text-forest/30 uppercase tracking-[0.5em]">Network Status</p>
+                                  <div className="flex items-center gap-3">
+                                    <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{bookings[0].status || 'EN ROUTE'}</span>
+                                  </div>
+                                </div>
+                                <div className="h-20 w-20 rounded-full border border-forest/5 flex items-center justify-center p-1">
+                                  <div className="h-full w-full rounded-full border border-dashed border-terracotta/30 flex items-center justify-center animate-spin-slow">
+                                    <Star className="h-8 w-8 text-terracotta" />
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <h3 className="text-6xl lg:text-8xl font-heading font-black text-forest mb-12 leading-[0.9] tracking-tighter">
                                 {bookings[0].item}
                               </h3>
                               
-                              <div className="grid grid-cols-2 gap-8 mb-10">
-                                <div className="space-y-1">
-                                  <p className="text-[10px] text-forest/30 uppercase tracking-widest font-bold">Planned Date</p>
-                                  <div className="flex items-center gap-2 text-forest font-bold">
-                                    <Calendar className="h-4 w-4 text-terracotta" />
-                                    {bookings[0].dateRange || bookings[0].createdAt?.toDate().toLocaleDateString() || 'Pending'}
+                              <div className="grid grid-cols-2 gap-16 mb-16">
+                                <div className="space-y-4">
+                                  <p className="text-[10px] text-forest/30 uppercase tracking-[0.5em] font-black">Departure</p>
+                                  <div className="flex items-center gap-4 text-forest font-black tracking-tight group/date">
+                                    <div className="h-12 w-12 rounded-2xl bg-forest/5 flex items-center justify-center group-hover/date:bg-forest group-hover/date:text-white transition-all">
+                                      <Calendar className="h-5 w-5 text-terracotta group-hover/date:text-white" />
+                                    </div>
+                                    <span className="text-xl">
+                                      {bookings[0].dateRange?.split(' to ')[0] || 'TBD'}
+                                    </span>
                                   </div>
                                 </div>
-                                <div className="space-y-1">
-                                  <p className="text-[10px] text-forest/30 uppercase tracking-widest font-bold">Location</p>
-                                  <div className="flex items-center gap-2 text-forest font-bold">
-                                    <MapPin className="h-4 w-4 text-terracotta" />
-                                    Parvati Valley, HP
+                                <div className="space-y-4">
+                                  <p className="text-[10px] text-forest/30 uppercase tracking-[0.5em] font-black">Expedition Goal</p>
+                                  <div className="flex items-center gap-4 text-forest font-black tracking-tight">
+                                    <div className="h-12 w-12 rounded-2xl bg-forest/5 flex items-center justify-center">
+                                      <Zap className="h-5 w-5 text-amber-500" />
+                                    </div>
+                                    <span className="text-xl italic">Peak Mastery</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-4">
-                              <Button className="rounded-full bg-forest text-white px-8 h-12 font-bold shadow-lg shadow-forest/20">
-                                View Full Itinerary
+                            <div className="flex flex-col sm:flex-row gap-6 pt-12 border-t border-forest/5 relative z-10">
+                              <Button className="rounded-full bg-forest text-white px-14 h-16 text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-forest/30 hover:scale-105 active:scale-95 transition-all">
+                                Analyze Itinerary
                               </Button>
-                              <Button variant="outline" className="rounded-full border-forest/10 text-forest h-12 font-bold hover:bg-forest/5">
-                                <MessageSquare className="h-4 w-4 mr-2" />
+                              <Button variant="outline" className="rounded-full border-forest/10 text-forest h-16 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-forest hover:text-white transition-all">
                                 Contact Guide
                               </Button>
                             </div>
@@ -410,18 +528,24 @@ export default function Dashboard() {
                         </div>
                       </Card>
                     ) : (
-                      <Card className="border-dashed border-2 border-forest/10 bg-transparent rounded-[3rem]">
-                        <CardContent className="py-24 text-center">
-                          <Mountain className="h-16 w-16 text-forest/10 mx-auto mb-6" />
-                          <h3 className="text-2xl font-heading font-bold text-forest mb-2">No active journeys</h3>
-                          <p className="text-forest/40 mb-8 max-w-sm mx-auto font-medium">
-                            The mountains are calling. Find your next soul-guided adventure in the heart of the Himalayas.
+                      <Card className="border-none bg-gradient-to-br from-forest/5 to-white rounded-[4rem] shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-1000">
+                          <Mountain className="h-64 w-64" />
+                        </div>
+                        <CardContent className="py-40 text-center relative z-10">
+                          <div className="h-32 w-32 rounded-[3.5rem] bg-white shadow-2xl flex items-center justify-center mx-auto mb-10 relative">
+                            <div className="absolute inset-0 bg-terracotta/10 rounded-[3.5rem] animate-ping" />
+                            <Star className="h-12 w-12 text-terracotta" />
+                          </div>
+                          <h3 className="text-5xl font-heading font-black text-forest mb-6 tracking-tighter">Your legend is unwritten.</h3>
+                          <p className="text-forest/40 mb-12 max-w-lg mx-auto font-medium text-lg leading-relaxed">
+                            The eternal peaks of the Himalayas are echoing for their next soulful traveler. Step into the adventure of a lifetime.
                           </p>
                           <Button 
                             onClick={() => navigate('/services')}
-                            className="bg-terracotta text-white rounded-full px-10 h-14 font-bold shadow-xl shadow-terracotta/20 hover:scale-105 transition-transform"
+                            className="bg-terracotta text-white rounded-full px-20 h-20 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-terracotta/30 hover:scale-110 transition-all active:scale-95 border-none"
                           >
-                            Discover Experiences
+                            Invoke Destiny
                           </Button>
                         </CardContent>
                       </Card>
@@ -688,15 +812,56 @@ export default function Dashboard() {
                             className="w-full p-4 bg-white rounded-2xl text-forest font-medium border border-forest/10 focus:border-terracotta/50 outline-none transition-all"
                           />
                         </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-forest/40 uppercase tracking-widest font-bold">Mobile Number</label>
+                          <input 
+                            type="tel" 
+                            value={mobile}
+                            onChange={(e) => setMobile(e.target.value)}
+                            placeholder="+91 00000 00000"
+                            className="w-full p-4 bg-white rounded-2xl text-forest font-medium border border-forest/10 focus:border-terracotta/50 outline-none transition-all"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-[10px] text-forest/40 uppercase tracking-widest font-bold">City</label>
+                            <input 
+                              type="text" 
+                              value={city}
+                              onChange={(e) => setCity(e.target.value)}
+                              placeholder="Kullu"
+                              className="w-full p-4 bg-white rounded-2xl text-forest font-medium border border-forest/10 focus:border-terracotta/50 outline-none transition-all"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] text-forest/40 uppercase tracking-widest font-bold">Pincode</label>
+                            <input 
+                              type="text" 
+                              value={pincode}
+                              onChange={(e) => setPincode(e.target.value)}
+                              placeholder="175101"
+                              className="w-full p-4 bg-white rounded-2xl text-forest font-medium border border-forest/10 focus:border-terracotta/50 outline-none transition-all"
+                            />
+                          </div>
+                        </div>
+
                         <Button 
                           onClick={async () => {
-                            if (user && displayName) {
+                            if (user) {
                               try {
                                 const docRef = doc(db, 'users', user.uid);
-                                await updateDoc(docRef, { displayName });
-                                alert("Profile updated!");
+                                await updateDoc(docRef, { 
+                                  displayName, 
+                                  mobile, 
+                                  city, 
+                                  pincode 
+                                });
+                                alert("Personal information updated successfully!");
                               } catch (err) {
                                 console.error("Profile update failed:", err);
+                                alert("Failed to update profile. Please try again.");
                               }
                             }
                           }}
@@ -724,14 +889,61 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="space-y-4 pt-4">
-                          <button className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-forest/5 transition-colors border border-transparent hover:border-forest/5">
-                            <span className="text-sm font-bold text-forest">Change Password</span>
+                          <button 
+                            onClick={async () => {
+                              if (user?.email) {
+                                try {
+                                  await sendPasswordResetEmail(auth, user.email);
+                                  alert(`Password reset link sent to ${user.email}`);
+                                } catch (err) {
+                                  console.error("Password reset failed:", err);
+                                  alert("Failed to send reset link. Please try again.");
+                                }
+                              }
+                            }}
+                            className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-forest/5 transition-colors border border-transparent hover:border-forest/5"
+                          >
+                            <span className="text-sm font-bold text-forest text-left">Change Password</span>
                             <ChevronRight className="h-4 w-4 text-forest/20" />
                           </button>
-                          <button className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-forest/5 transition-colors border border-transparent hover:border-forest/5">
-                            <span className="text-sm font-bold text-forest">Privacy Preferences</span>
-                            <ChevronRight className="h-4 w-4 text-forest/20" />
-                          </button>
+                          
+                          <div className="space-y-4 pt-4">
+                            <p className="text-[10px] text-forest/40 uppercase tracking-widest font-bold px-4">Privacy Preferences</p>
+                            
+                            <label className="flex items-center justify-between p-4 rounded-2xl hover:bg-forest/5 transition-colors cursor-pointer group">
+                              <span className="text-sm font-bold text-forest">Public Explorer Profile</span>
+                              <input 
+                                type="checkbox" 
+                                checked={privacySettings.profileVisible}
+                                onChange={async (e) => {
+                                  const newVal = e.target.checked;
+                                  setPrivacySettings(prev => ({ ...prev, profileVisible: newVal }));
+                                  if (user) {
+                                    const docRef = doc(db, 'users', user.uid);
+                                    await updateDoc(docRef, { 'privacy.profileVisible': newVal });
+                                  }
+                                }}
+                                className="h-5 w-5 accent-terracotta"
+                              />
+                            </label>
+
+                            <label className="flex items-center justify-between p-4 rounded-2xl hover:bg-forest/5 transition-colors cursor-pointer group">
+                              <span className="text-sm font-bold text-forest">Email Expedition Logs</span>
+                              <input 
+                                type="checkbox" 
+                                checked={privacySettings.emailNotifications}
+                                onChange={async (e) => {
+                                  const newVal = e.target.checked;
+                                  setPrivacySettings(prev => ({ ...prev, emailNotifications: newVal }));
+                                  if (user) {
+                                    const docRef = doc(db, 'users', user.uid);
+                                    await updateDoc(docRef, { 'privacy.emailNotifications': newVal });
+                                  }
+                                }}
+                                className="h-5 w-5 accent-terracotta"
+                              />
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </Card>

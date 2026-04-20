@@ -153,81 +153,135 @@ export default function Admin() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
-    if (isUploading) return;
+    // 0. Safety Check
+    if (isUploading) {
+      console.warn("Upload already in progress. Ignoring request.");
+      return;
+    }
 
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.warn("No file selected.");
+      return;
+    }
 
-    // 1. Client-side Validation (Type & Size)
+    console.log("--- File Upload Sequence Started ---");
+    console.log(`File: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB, Type: ${file.type}`);
+
+    // 1. Client-side Validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      setNotification({ message: 'Invalid file type. Please upload an image.', type: 'error' });
+      const msg = `Invalid file type (${file.type}). Please upload a JPEG, PNG, or WebP image.`;
+      console.error(msg);
+      setNotification({ message: msg, type: 'error' });
       e.target.value = '';
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit for cloud optimization
-      setNotification({ message: 'File too large (Max 5MB for Cloud)', type: 'error' });
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_SIZE) {
+      const msg = `File too large (${(file.size / (1024 * 1024)).toFixed(2)} MB). Max 10MB allowed.`;
+      console.error(msg);
+      setNotification({ message: msg, type: 'error' });
       e.target.value = '';
       return;
     }
 
+    // 2. Prepare Upload
     setIsUploading(true);
-    setUploadProgress(0);
+    setUploadProgress(10); // Start with some progress
     
     try {
-      // 2. Firebase Storage Upload (AWS Amplify compatible)
-      const storageRef = ref(storage, `content/${Date.now()}_${file.name}`);
+      if (!storage) {
+        throw new Error("Firebase Storage is not initialized. Please check your config.");
+      }
+
+      // Format filename to be safe for URLs
+      const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+      const storagePath = `content/${Date.now()}_${safeName}`;
+      console.log(`Uploading to path: ${storagePath}`);
+
+      const storageRef = ref(storage, storagePath);
+      
+      // We'll use a simpler upload task first for better compatibility
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.on('state_changed', 
+      // Listen for progress
+      const unsubscribe = uploadTask.on('state_changed', 
         (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
+          setUploadProgress(Math.max(10, Math.round(progress)));
+          console.log(`Upload Progress: ${Math.round(progress)}%`);
         }, 
         (error) => {
-          console.error("Firebase Storage Upload Error:", error);
-          setNotification({ message: `Upload failed: ${error.message}`, type: 'error' });
+          console.error("Firebase Storage Progress Error:", error);
+          setNotification({ 
+            message: `Upload Failed: ${error.message}`, 
+            type: 'error' 
+          });
           setIsUploading(false);
+          setUploadProgress(0);
+          unsubscribe();
         }, 
         async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setUploadProgress(100);
-          
-          setFormData(prev => {
-            const updated = { ...prev };
-            // Update the specific field in formData
-            if (fieldName === 'image') {
-              updated.image = downloadURL;
-            } else if (fieldName === 'image_gallery') {
-              const gallery = Array.isArray(updated.image_gallery) ? [...updated.image_gallery] : [];
-              if (index !== undefined) {
-                gallery[index] = downloadURL;
-              } else {
-                gallery.push(downloadURL);
+          // Success!
+          try {
+            console.log("Upload task completed successfully. Fetching download URL...");
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log("Download URL retrieved:", downloadURL);
+            
+            setUploadProgress(100);
+            
+            setFormData(prev => {
+              const updated = { ...prev };
+              if (fieldName === 'image') {
+                updated.image = downloadURL;
+              } else if (fieldName === 'images' && typeof index === 'number') {
+                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+                currentImages[index] = downloadURL;
+                updated.images = currentImages;
+              } else if (fieldName === 'new_image') {
+                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+                updated.images = [...currentImages, downloadURL];
               }
-              updated.image_gallery = gallery;
-            } else if (fieldName === 'images' && typeof index === 'number') {
-              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-              currentImages[index] = downloadURL;
-              updated.images = currentImages;
-            } else if (fieldName === 'new_image') {
-              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-              updated.images = [...currentImages, downloadURL];
-            }
-            return updated;
-          });
+              return updated;
+            });
 
-          setNotification({ message: 'Image successfully uploaded to Cloud Storage!', type: 'success' });
-          setIsUploading(false);
-          setTimeout(() => setUploadProgress(0), 1000);
-          if (e.target) e.target.value = '';
+            setNotification({ message: 'Cloud storage link synced successfully!', type: 'success' });
+            setIsUploading(false);
+            setTimeout(() => setUploadProgress(0), 1000);
+            unsubscribe();
+          } catch (urlErr: any) {
+            console.error("Critical error fetching download URL:", urlErr);
+            setNotification({ message: "Store succeeded but URL retrieval failed.", type: 'error' });
+            setIsUploading(false);
+            setUploadProgress(0);
+          }
         }
       );
+
     } catch (error: any) {
-      console.error("Upload error:", error);
-      setNotification({ message: error.message || "Failed to start upload", type: 'error' });
+      console.error("CRITICAL UPLOAD FAILURE:", error);
+      
+      // Specifically handle the "Unexpected token '<'" signature of HTML-in-JSON
+      if (error?.message?.includes?.("Unexpected token '<'")) {
+        console.error("DETECTION: Server returned HTML. Check AWS Amplify or Nginx redirection rules.");
+        setNotification({ 
+          message: "Server Configuration Error: The system returned an invalid response. Please try a smaller file or a different browser.", 
+          type: 'error' 
+        });
+      } else {
+        setNotification({ 
+          message: error.message || "Failed to connect to Cloud Storage.", 
+          type: 'error' 
+        });
+      }
+      
       setIsUploading(false);
+      setUploadProgress(0);
+    } finally {
+      // Clear the input so the same file can be selected again
+      if (e.target) e.target.value = '';
     }
   };
   const [searchTerm, setSearchTerm] = useState('');

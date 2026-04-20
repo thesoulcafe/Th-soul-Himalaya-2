@@ -1,15 +1,17 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import url('https://fonts.googleapis.com/css2?family=Acme&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,700;1,900&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: 'Acme', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
     --font-sans: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
-    --font-acme: 'Acme', sans-serif;
+    --font-outfit: 'Outfit', sans-serif;
+    --font-montserrat: 'Montserrat', sans-serif;
+    --font-playfair: 'Playfair Display', serif;
     
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -17,13 +19,14 @@
     --radius-xl: calc(var(--radius) * 1.4);
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+    --radius-4xl: calc(var(--radius) * 3.2);
 
-    /* Brand Colors */
-    --color-forest: #2D4A3E;
-    --color-terracotta: #C4622D;
-    --color-cream: #F5F0E8;
+    /* Brand Colors - Refined */
+    --color-forest: #2D3E35; /* Slightly muted/darker forest */
+    --color-terracotta: #C15A3E; /* Richer terracotta */
+    --color-cream: #F8F5F1; /* Cleaner cream */
     --color-himalayan-blue: #4A7FA5;
+    --color-slate-gray: #4A5568;
 
     /* Semantic Mappings */
     --color-background: var(--background);
