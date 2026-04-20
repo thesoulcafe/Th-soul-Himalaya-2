@@ -161,109 +161,73 @@ export default function Admin() {
     // 1. Client-side Validation (Type & Size)
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      setNotification({ message: 'Invalid file type. Please upload an image (JPG, PNG, GIF, WEBP).', type: 'error' });
+      setNotification({ message: 'Invalid file type. Please upload an image.', type: 'error' });
       e.target.value = '';
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      setNotification({ message: 'File too large (Max 10MB)', type: 'error' });
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit for cloud optimization
+      setNotification({ message: 'File too large (Max 5MB for Cloud)', type: 'error' });
       e.target.value = '';
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(0);
     
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
+      // 2. Firebase Storage Upload (AWS Amplify compatible)
+      const storageRef = ref(storage, `content/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // 2. Fetch with advanced robust error handling
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataToSend,
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-        }
-      });
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        }, 
+        (error) => {
+          console.error("Firebase Storage Upload Error:", error);
+          setNotification({ message: `Upload failed: ${error.message}`, type: 'error' });
+          setIsUploading(false);
+        }, 
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setUploadProgress(100);
+          
+          setFormData(prev => {
+            const updated = { ...prev };
+            // Update the specific field in formData
+            if (fieldName === 'image') {
+              updated.image = downloadURL;
+            } else if (fieldName === 'image_gallery') {
+              const gallery = Array.isArray(updated.image_gallery) ? [...updated.image_gallery] : [];
+              if (index !== undefined) {
+                gallery[index] = downloadURL;
+              } else {
+                gallery.push(downloadURL);
+              }
+              updated.image_gallery = gallery;
+            } else if (fieldName === 'images' && typeof index === 'number') {
+              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+              currentImages[index] = downloadURL;
+              updated.images = currentImages;
+            } else if (fieldName === 'new_image') {
+              const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+              updated.images = [...currentImages, downloadURL];
+            }
+            return updated;
+          });
 
-      const responseText = await response.text();
-      let responseData: any = null;
-      let downloadURL: string = '';
-
-      // Try to parse as JSON first
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (e) {
-        // Not JSON - check for alternative formats
-        const isUrl = (text: string) => text.startsWith('http') || text.startsWith('/');
-        
-        if (response.ok) {
-          if (!responseText || responseText.trim() === '') {
-            // Empty body fallback
-            console.warn('Server returned 200 OK but the response body was empty.');
-            setNotification({ message: 'Upload succeeded but the server returned no data. Check if your file was saved.', type: 'error' });
-            throw new Error("Empty response from server");
-          } else if (isUrl(responseText.trim())) {
-            // Plain URL string fallback
-            downloadURL = responseText.trim();
-          } else {
-            // Unexpected plain text
-            console.error(`Received non-JSON response. Status: ${response.status}. Body:`, responseText);
-            throw new Error(`Unexpected server response format. Expected JSON or URL, got: ${responseText.substring(0, 50)}...`);
-          }
-        } else {
-          // Error status with non-JSON body (likely HTML error page)
-          console.error(`Upload error. Status: ${response.status}. Body preview: ${responseText.substring(0, 200)}...`);
-          throw new Error(response.status === 404 
-            ? 'Backend upload endpoint not found (404).' 
-            : `Server error ${response.status}: The response body was not valid JSON.`);
+          setNotification({ message: 'Image successfully uploaded to Cloud Storage!', type: 'success' });
+          setIsUploading(false);
+          setTimeout(() => setUploadProgress(0), 1000);
+          if (e.target) e.target.value = '';
         }
-      }
-
-      // If we parsed JSON, extract the URL
-      if (responseData) {
-        if (!response.ok) {
-          throw new Error(responseData.error || `Upload failed with status ${response.status}`);
-        }
-        if (!responseData.url) {
-          throw new Error("Server response successfully parsed as JSON but missing 'url' field.");
-        }
-        downloadURL = responseData.url;
-      }
-      
-      if (!downloadURL) {
-        throw new Error("Could not determine the uploaded file URL from the server response.");
-      }
-
-      setUploadProgress(100);
-      
-      setFormData(prev => {
-        const updated = { ...prev };
-        if (fieldName === 'image') {
-          updated.image = downloadURL;
-        } else if (fieldName === 'images' && typeof index === 'number') {
-          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-          currentImages[index] = downloadURL;
-          updated.images = currentImages;
-        } else if (fieldName === 'new_image') {
-          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-          updated.images = [...currentImages, downloadURL];
-        }
-        return updated;
-      });
-      
-      setNotification({ message: 'Image successfully uploaded to the server!', type: 'success' });
+      );
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      setNotification({ message: error.message || "Failed to start upload", type: 'error' });
       setIsUploading(false);
-      setTimeout(() => setUploadProgress(0), 1000);
-    } catch (error) {
-      console.error('Upload failed:', error);
-      setNotification({ message: 'Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'), type: 'error' });
-      setIsUploading(false);
-      setUploadProgress(0);
-    } finally {
-      if (e.target) e.target.value = '';
     }
   };
   const [searchTerm, setSearchTerm] = useState('');
