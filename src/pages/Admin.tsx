@@ -158,41 +158,85 @@ export default function Admin() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) { // Matches server limit
+    // 1. Client-side Validation (Type & Size)
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setNotification({ message: 'Invalid file type. Please upload an image (JPG, PNG, GIF, WEBP).', type: 'error' });
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
       setNotification({ message: 'File too large (Max 10MB)', type: 'error' });
       e.target.value = '';
       return;
     }
 
     setIsUploading(true);
-    setUploadProgress(10); // Initial feedback
+    setUploadProgress(10);
     
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('file', file);
 
-      // We use the backend endpoint for more reliable uploads in this environment
+      // 2. Fetch with advanced robust error handling
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formDataToSend,
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+        }
       });
 
-      if (!response.ok) {
-        let errorMsg = 'Upload failed on server';
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.error || errorMsg;
-        } catch (e) {
-          errorMsg = `Server error: ${response.status} ${response.statusText}`;
+      const responseText = await response.text();
+      let responseData: any = null;
+      let downloadURL: string = '';
+
+      // Try to parse as JSON first
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        // Not JSON - check for alternative formats
+        const isUrl = (text: string) => text.startsWith('http') || text.startsWith('/');
+        
+        if (response.ok) {
+          if (!responseText || responseText.trim() === '') {
+            // Empty body fallback
+            console.warn('Server returned 200 OK but the response body was empty.');
+            setNotification({ message: 'Upload succeeded but the server returned no data. Check if your file was saved.', type: 'error' });
+            throw new Error("Empty response from server");
+          } else if (isUrl(responseText.trim())) {
+            // Plain URL string fallback
+            downloadURL = responseText.trim();
+          } else {
+            // Unexpected plain text
+            console.error(`Received non-JSON response. Status: ${response.status}. Body:`, responseText);
+            throw new Error(`Unexpected server response format. Expected JSON or URL, got: ${responseText.substring(0, 50)}...`);
+          }
+        } else {
+          // Error status with non-JSON body (likely HTML error page)
+          console.error(`Upload error. Status: ${response.status}. Body preview: ${responseText.substring(0, 200)}...`);
+          throw new Error(response.status === 404 
+            ? 'Backend upload endpoint not found (404).' 
+            : `Server error ${response.status}: The response body was not valid JSON.`);
         }
-        throw new Error(errorMsg);
       }
 
-      const data = await response.json();
-      if (!data.url) throw new Error("Server response missing file URL");
+      // If we parsed JSON, extract the URL
+      if (responseData) {
+        if (!response.ok) {
+          throw new Error(responseData.error || `Upload failed with status ${response.status}`);
+        }
+        if (!responseData.url) {
+          throw new Error("Server response successfully parsed as JSON but missing 'url' field.");
+        }
+        downloadURL = responseData.url;
+      }
       
-      const downloadURL = data.url;
-      
+      if (!downloadURL) {
+        throw new Error("Could not determine the uploaded file URL from the server response.");
+      }
+
       setUploadProgress(100);
       
       setFormData(prev => {
