@@ -197,7 +197,7 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mb-6 tracking-[0.2em] drop-shadow-sm"
+              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-12 md:mt-20 mb-6 tracking-[0.2em] drop-shadow-sm"
             >
               Parvati Valley & Beyond
             </motion.p>
