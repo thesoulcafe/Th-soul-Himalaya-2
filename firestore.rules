@@ -108,33 +108,35 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidBooking(data) {
-      let requiredKeys = ['userId', 'userName', 'userEmail', 'serviceType', 'serviceName', 'date', 'guests', 'status', 'totalPrice', 'createdAt'];
+      let requiredKeys = ['userId', 'userName', 'userEmail', 'status', 'totalPrice', 'createdAt'];
       let validTypes = ['tour', 'trek', 'wfh', 'yoga', 'meditation', 'adventure', 'shop', 'service'];
       return data.keys().hasAll(requiredKeys) &&
              data.userId == request.auth.uid &&
              data.userName is string && data.userName.size() <= 100 &&
              isValidEmail(data.userEmail) &&
-             data.serviceType in validTypes &&
-             data.serviceName is string && data.serviceName.size() <= 200 &&
-             data.date is string && data.date.matches("^\\d{4}-\\d{2}-\\d{2}$") &&
-             data.guests is number && data.guests >= 0 &&
              data.status in ['pending', 'confirmed', 'cancelled', 'paid'] &&
              data.totalPrice is number && data.totalPrice >= 0 &&
              data.createdAt == request.time &&
+             // Handle either multi-item cart or single-service direct booking
+             (
+               ('items' in data && data.items is list && data.items.size() > 0) ||
+               (data.keys().hasAll(['serviceType', 'serviceName', 'date', 'guests']) && 
+                data.serviceType in validTypes && 
+                data.serviceName is string && 
+                data.date.matches("^\\d{4}-\\d{2}-\\d{2}$"))
+             ) &&
              (!('phone' in data) || (data.phone is string && data.phone.size() <= 20)) &&
              (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
              (!('pincode' in data) || (data.pincode is string && data.pincode.size() <= 10)) &&
-             (!('razorpayOrderId' in data) || data.razorpayOrderId is string) &&
-             (!('razorpayPaymentId' in data) || data.razorpayPaymentId is string) &&
-             (!('paymentStatus' in data) || data.paymentStatus in ['pending', 'paid', 'failed']) &&
-             (!('items' in data) || (data.items is list && data.items.size() <= 50));
+             (!('note' in data) || (data.note is string && data.note.size() <= 1000)) &&
+             (!('ecoDonation' in data) || data.ecoDonation is bool);
     }
 
     match /bookings/{bookingId} {
       allow get: if isOwner(existing().userId) || isAdmin();
-      allow list: if isVerified() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
       
-      allow create: if isVerified() && isValidBooking(incoming()) && isValidId(bookingId);
+      allow create: if isSignedIn() && isValidBooking(incoming());
       
       allow update: if isVerified() && (
                       // Users can only cancel their own pending bookings

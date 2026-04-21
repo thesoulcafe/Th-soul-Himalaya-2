@@ -111,11 +111,19 @@ interface Booking {
   userId: string;
   userName: string;
   userEmail: string;
-  serviceType: string;
-  serviceName: string;
-  date: string;
-  guests: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  items?: {
+    id: string;
+    name: string;
+    type: string;
+    price: number;
+    quantity: number;
+  }[];
+  // Backward compatibility
+  serviceType?: string;
+  serviceName?: string;
+  date?: string;
+  guests?: number;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'paid';
   totalPrice: number;
   createdAt: any;
 }
@@ -387,13 +395,22 @@ export default function Admin() {
   // Analytics Calculations
   const stats = useMemo(() => {
     const totalRevenue = bookings.reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
-    const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+    const confirmedBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'paid').length;
     
     // Most Sold Trekk
-    const trekkBookings = bookings.filter(b => b.serviceType === 'trekk' || b.serviceType === 'trek');
+    const itemsList: any[] = [];
+    bookings.forEach(b => {
+      if (b.items && Array.isArray(b.items)) {
+        itemsList.push(...b.items);
+      } else if (b.serviceName) {
+        itemsList.push({ name: b.serviceName, type: b.serviceType });
+      }
+    });
+
+    const trekkBookings = itemsList.filter(i => i.type === 'trekk' || i.type === 'trek');
     const trekkCounts: Record<string, number> = {};
-    trekkBookings.forEach(b => {
-      trekkCounts[b.serviceName] = (trekkCounts[b.serviceName] || 0) + 1;
+    trekkBookings.forEach(i => {
+      trekkCounts[i.name] = (trekkCounts[i.name] || 0) + (i.quantity || 1);
     });
     const mostSoldTrekk = Object.entries(trekkCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
@@ -887,15 +904,21 @@ export default function Admin() {
                                     </div>
                                     <div>
                                       <p className="text-xs font-bold text-forest">{booking.userName}</p>
-                                      <p className="text-[10px] text-forest/40 font-mono">{new Date(booking.createdAt?.toDate()).toLocaleDateString()}</p>
+                                      <p className="text-[10px] text-forest/40 font-mono">
+                                        {booking.createdAt?.toDate ? new Date(booking.createdAt.toDate()).toLocaleDateString() : 'Pending Synch'}
+                                      </p>
                                     </div>
                                   </div>
                                 </td>
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs font-medium text-forest/70">{booking.serviceName}</span>
-                                    <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-forest/10 text-forest/40 font-mono">
-                                      {booking.serviceType.toUpperCase()}
+                                    <span className="text-xs font-medium text-forest/70">
+                                      {booking.items?.length 
+                                        ? (booking.items.length > 1 ? `${booking.items[0].name} +${booking.items.length - 1}` : booking.items[0].name)
+                                        : (booking.serviceName || 'N/A')}
+                                    </span>
+                                    <Badge variant="outline" className="text-[9px] h-4 px-1.5 border-forest/10 text-forest/40 font-mono uppercase">
+                                      {booking.items?.[0]?.type || booking.serviceType || 'N/A'}
                                     </Badge>
                                   </div>
                                 </td>
@@ -1895,15 +1918,19 @@ export default function Admin() {
                   <thead>
                     <tr className="bg-forest/[0.02] border-b border-forest/5">
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Customer</th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Service</th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Date</th>
+                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Packages</th>
+                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Booking Date</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-right">Amount</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-center">Status</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-forest/5">
-                    {bookings.filter(b => b.userName.toLowerCase().includes(searchTerm.toLowerCase()) || b.serviceName.toLowerCase().includes(searchTerm.toLowerCase())).map((booking, i) => (
+                    {bookings.filter(b => 
+                      b.userName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                      (b.serviceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      b.items?.some(i => i.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                    ).map((booking, i) => (
                       <motion.tr 
                         key={booking.id}
                         initial={{ opacity: 0 }}
@@ -1924,14 +1951,22 @@ export default function Admin() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
-                            <span className="text-[9px] font-bold text-terracotta uppercase tracking-widest">{booking.serviceType}</span>
-                            <p className="text-xs font-medium text-forest">{booking.serviceName}</p>
+                            <span className="text-[9px] font-bold text-terracotta uppercase tracking-widest">
+                              {booking.items?.[0]?.type || booking.serviceType || 'N/A'}
+                            </span>
+                            <p className="text-xs font-medium text-forest">
+                              {booking.items?.length 
+                                ? (booking.items.length > 1 ? `${booking.items[0].name} + ${booking.items.length - 1} more` : booking.items[0].name)
+                                : (booking.serviceName || 'N/A')}
+                            </p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-forest/40">
                             <Clock className="h-3.5 w-3.5" />
-                            <span className="text-xs font-mono">{booking.date}</span>
+                            <span className="text-xs font-mono">
+                              {booking.createdAt?.toDate ? new Date(booking.createdAt.toDate()).toLocaleDateString() : (booking.date || 'Pending')}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -1940,7 +1975,7 @@ export default function Admin() {
                         <td className="px-6 py-4 text-center">
                           <Badge className={cn(
                             "text-[9px] px-2 py-0.5 rounded border font-mono font-bold uppercase",
-                            booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                            (booking.status === 'confirmed' || booking.status === 'paid') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
                             booking.status === 'pending' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
                           )}>
                             {booking.status}
@@ -2160,22 +2195,26 @@ export default function Admin() {
                                     <div className="flex items-center gap-4">
                                       <div className={cn(
                                         "h-12 w-12 rounded-xl flex items-center justify-center shrink-0",
-                                        booking.serviceType === 'tour' ? "bg-sky-500/10 text-sky-600" :
-                                        booking.serviceType === 'trek' ? "bg-emerald-500/10 text-emerald-600" :
+                                        (booking.items?.[0]?.type || booking.serviceType) === 'tour' ? "bg-sky-500/10 text-sky-600" :
+                                        (booking.items?.[0]?.type || booking.serviceType) === 'trek' ? "bg-emerald-500/10 text-emerald-600" :
                                         "bg-indigo-500/10 text-indigo-600"
                                       )}>
-                                        {booking.serviceType === 'tour' ? <Map className="h-6 w-6" /> : <Compass className="h-6 w-6" />}
+                                        {(booking.items?.[0]?.type || booking.serviceType) === 'tour' ? <Map className="h-6 w-6" /> : <Compass className="h-6 w-6" />}
                                       </div>
                                       <div>
-                                        <h5 className="font-bold text-forest text-sm">{booking.serviceName}</h5>
+                                        <h5 className="font-bold text-forest text-sm">
+                                          {booking.items?.length 
+                                            ? (booking.items.length > 1 ? `${booking.items[0].name} +${booking.items.length - 1}` : booking.items[0].name)
+                                            : (booking.serviceName || 'N/A')}
+                                        </h5>
                                         <div className="flex items-center gap-3 text-[10px] text-forest/40 font-bold uppercase tracking-widest mt-0.5">
                                           <span className="flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
-                                            {booking.date}
+                                            {booking.createdAt?.toDate ? new Date(booking.createdAt.toDate()).toLocaleDateString() : (booking.date || 'Pending')}
                                           </span>
                                           <span className="flex items-center gap-1">
                                             <Users className="h-3 w-3" />
-                                            {booking.guests} Guests
+                                            {booking.guests || booking.items?.reduce((a, c:any) => a + (c.quantity || 1), 0) || 0} Travelers
                                           </span>
                                         </div>
                                       </div>
@@ -2184,7 +2223,7 @@ export default function Admin() {
                                       <div className="text-sm font-bold text-terracotta">₹{booking.totalPrice.toLocaleString()}</div>
                                       <Badge className={cn(
                                         "text-[8px] font-bold uppercase px-2 py-0.5 rounded-full border",
-                                        booking.status === 'confirmed' ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                                        (booking.status === 'confirmed' || booking.status === 'paid') ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
                                         booking.status === 'pending' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
                                         "bg-rose-500/10 text-rose-600 border-rose-500/20"
                                       )}>
@@ -2257,7 +2296,7 @@ export default function Admin() {
                                 {msg.status}
                               </Badge>
                               <span className="text-[10px] text-forest/30 font-mono font-bold">
-                                {msg.createdAt?.toDate().toLocaleString() || 'Just now'}
+                                {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : 'Syncing...'}
                               </span>
                             </div>
                             <h3 className="text-sm font-bold text-forest mb-1">{msg.subject}</h3>

@@ -226,7 +226,7 @@ export default function Home() {
         onClose={() => setIsAuthModalOpen(false)} 
       />
       {/* Hero Section */}
-      <section ref={heroRef} className="relative h-[110vh] w-full flex items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative h-[110vh] w-full flex items-start justify-center overflow-hidden pt-24 md:pt-28">
         <div className="absolute inset-0 z-0">
           <motion.div 
             style={{ y }}
@@ -259,12 +259,12 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-12 md:mt-16 mb-2 tracking-[0.2em] drop-shadow-sm"
+              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-0 mb-4 tracking-[0.2em] drop-shadow-sm"
             >
               Parvati Valley & Beyond
             </motion.p>
             
-            <h1 className="text-4xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-2 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
+            <h1 className="text-4xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
               <span className="opacity-90 normal-case">Find Your</span>
               <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)]">Soul</span>
             </h1>
@@ -273,7 +273,7 @@ export default function Home() {
               A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-0">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link 
                   to="/services"

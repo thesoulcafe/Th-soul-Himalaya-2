@@ -29,21 +29,21 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand Info */}
         <div className="space-y-8">
-          <Link to="/" onClick={handleLogoClick} className="flex flex-col gap-6 group cursor-pointer">
+          <Link to="/" onClick={handleLogoClick} className="flex flex-row items-center gap-4 group cursor-pointer">
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="h-24 w-24 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-2xl border border-white/20 group-hover:border-terracotta/50 transition-colors"
+              className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-2xl border border-white/20 group-hover:border-terracotta/50 transition-colors shrink-0"
             >
               <img 
                 src="https://i.postimg.cc/V6CDy34v/IMG-8050.jpg" 
                 alt="The Soul Himalaya Logo" 
-                className="h-20 w-auto brightness-110 contrast-110 group-hover:scale-110 transition-transform duration-500"
+                className="h-12 md:h-16 w-auto brightness-110 contrast-110 group-hover:scale-110 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="text-3xl font-montserrat font-extrabold text-white tracking-tighter group-hover:text-terracotta transition-colors uppercase leading-[0.95]">
-              The Soul <br /><span className="text-terracotta italic font-playfair tracking-normal normal-case">Himalaya</span>
+            <span className="text-xl md:text-2xl font-montserrat font-extrabold text-white tracking-tighter group-hover:text-terracotta transition-colors uppercase leading-none">
+              The Soul <span className="text-terracotta italic font-playfair tracking-normal normal-case">Himalaya</span>
             </span>
           </Link>
           <p className="text-cream/60 text-[13px] leading-relaxed font-medium">

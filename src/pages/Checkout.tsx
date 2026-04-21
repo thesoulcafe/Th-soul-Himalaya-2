@@ -62,7 +62,7 @@ export default function SoulCart() {
 
   const nextStep = () => {
     if (step === 'cart') setStep('details');
-    else if (step === 'details') setStep('payment');
+    else if (step === 'details') handleOrder();
   };
 
   const prevStep = () => {
@@ -76,27 +76,113 @@ export default function SoulCart() {
       return;
     }
 
+    // Basic validation
+    if (!formData.fullName || !formData.email || !formData.phone) {
+      alert("Please fill in your Full Name, Email, and Phone number to complete the booking.");
+      setStep('details');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Mock payment delay or real integration
-      await addDoc(collection(db, 'bookings'), {
-        userId: user.uid,
-        userName: formData.fullName || user.displayName,
-        userEmail: formData.email || user.email,
-        items: cart,
-        totalPrice: finalTotal,
-        note,
-        ecoDonation: plantTree,
-        status: 'confirmed',
-        createdAt: serverTimestamp(),
+      // 1. Create Razorpay Order via Server API
+      const response = await fetch('/api/razorpay/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: finalTotal,
+          currency: 'INR',
+          receipt: `rcpt_${Date.now()}`
+        })
       });
 
-      setIsSuccess(true);
-      clearCart();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to place order.');
-    } finally {
+      if (!response.ok) {
+        throw new Error('Failed to create payment order. Please try again.');
+      }
+
+      const rzpOrder = await response.json();
+
+      // 2. Open Razorpay Checktout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: rzpOrder.amount,
+        currency: rzpOrder.currency,
+        name: 'The Soul Himalaya',
+        description: `Booking for ${totalItems} items`,
+        image: 'https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png',
+        order_id: rzpOrder.id,
+        handler: async (response: any) => {
+          try {
+            // 3. Verify Payment on Server
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.status === 'success') {
+              // 4. Save Confirmed Booking to Firestore
+              await addDoc(collection(db, 'bookings'), {
+                userId: user.uid,
+                userName: formData.fullName || user.displayName || 'Guest Explorer',
+                userEmail: formData.email || user.email,
+                phone: formData.phone,
+                city: formData.city,
+                pincode: formData.pincode,
+                items: cart.map(item => ({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity,
+                  type: item.type,
+                  dateRange: item.dateRange || ''
+                })),
+                totalPrice: finalTotal,
+                note: note || '',
+                ecoDonation: plantTree,
+                status: 'paid', // Mark as paid
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                createdAt: serverTimestamp(),
+              });
+
+              setIsSuccess(true);
+              clearCart();
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (err: any) {
+            console.error('Verification error:', err);
+            alert('An error occurred while verifying the payment.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
+        },
+        theme: {
+          color: '#C15A3E' // Terracotta theme color
+        },
+        modal: {
+          ondismiss: () => setIsSubmitting(false)
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (err: any) {
+      console.error('Razorpay Error:', err);
+      alert(`Payment Initialization Failed: ${err.message || 'Check your internet connection'}`);
       setIsSubmitting(false);
     }
   };
@@ -147,8 +233,7 @@ export default function SoulCart() {
 
           <div className="flex items-center gap-3">
             {[
-              { id: 'details', label: 'Details' },
-              { id: 'payment', label: 'Payment' }
+              { id: 'details', label: 'Details' }
             ].map((s, i) => (
               <React.Fragment key={s.id}>
                 <div className="flex items-center gap-2">
@@ -205,53 +290,53 @@ export default function SoulCart() {
                         <motion.div
                           layout
                           key={item.id}
-                          className="group relative bg-white/60 backdrop-blur-md rounded-[2.5rem] p-6 border border-white/40 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-forest/5 transition-all flex flex-col sm:flex-row items-center gap-6"
+                          className="group relative bg-white/60 backdrop-blur-md rounded-[2rem] p-4 border border-white/40 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-forest/5 transition-all flex flex-col sm:flex-row items-center gap-4"
                         >
-                          <div className="h-24 w-24 rounded-3xl overflow-hidden shadow-lg shrink-0 border border-white/50">
+                          <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl overflow-hidden shadow-lg shrink-0 border border-white/50">
                             <img src={item.image} alt={item.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
                           </div>
                           <div className="flex-1 text-center sm:text-left">
-                            <div className="text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1">{item.type}</div>
-                            <h3 className="text-lg font-heading font-bold text-slate-900">{item.name}</h3>
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-2">
+                            <div className="text-[9px] font-black text-terracotta uppercase tracking-[0.2em] mb-0.5">{item.type}</div>
+                            <h3 className="text-sm font-heading font-bold text-slate-900 leading-tight">{item.name}</h3>
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1.5">
                               {item.dateRange && (
-                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                  <Calendar className="h-3 w-3" /> {item.dateRange}
+                                <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 bg-slate-50/50 px-2 py-1 rounded-full border border-slate-100">
+                                  <Calendar className="h-2.5 w-2.5" /> {item.dateRange}
                                 </div>
                               )}
                               {item.details?.guests && (
-                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-                                  <Users className="h-3 w-3" /> {item.details.guests} Travelers
+                                <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400 bg-slate-50/50 px-2 py-1 rounded-full border border-slate-100">
+                                  <Users className="h-2.5 w-2.5" /> {item.details.guests} Travelers
                                 </div>
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-4 bg-slate-50/50 p-2 rounded-2xl border border-slate-100/50">
+                          <div className="flex items-center gap-3 bg-white/80 p-1.5 rounded-xl border border-slate-100/50">
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="h-10 w-10 text-slate-400 hover:bg-forest hover:text-white rounded-xl transition-all"
+                              className="h-8 w-8 text-slate-400 hover:bg-forest hover:text-white rounded-lg transition-all"
                             >
-                              <Minus className="h-4 w-4" />
+                              <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="w-10 text-center font-black text-slate-900 font-mono text-lg">{item.quantity}</span>
+                            <span className="w-6 text-center font-black text-slate-900 font-mono text-base">{item.quantity}</span>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="h-10 w-10 text-slate-400 hover:bg-forest hover:text-white rounded-xl transition-all"
+                              className="h-8 w-8 text-slate-400 hover:bg-forest hover:text-white rounded-lg transition-all"
                             >
-                              <Plus className="h-4 w-4" />
+                              <Plus className="h-3 w-3" />
                             </Button>
                           </div>
-                          <div className="text-right sm:min-w-[100px]">
-                            <div className="text-xl font-mono font-black text-forest">{item.price}</div>
+                          <div className="text-right sm:min-w-[90px]">
+                            <div className="text-lg font-mono font-black text-forest">₹{item.price.toLocaleString()}</div>
                             <button 
                               onClick={() => removeFromCart(item.id)}
-                              className="text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-red-500 mt-1 transition-colors flex items-center gap-1 mx-auto sm:ml-auto"
+                              className="text-[8px] font-black uppercase tracking-widest text-slate-300 hover:text-rose-500 mt-1 transition-colors flex items-center gap-1 mx-auto sm:ml-auto"
                             >
-                              <Trash2 className="h-3.5 w-3.5" /> Remove
+                              <Trash2 className="h-3 w-3" /> Remove
                             </button>
                           </div>
                         </motion.div>
@@ -313,33 +398,145 @@ export default function SoulCart() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl space-y-8"
+                  className="relative bg-white/70 backdrop-blur-xl rounded-[3rem] p-10 border border-white/40 shadow-2xl space-y-10 overflow-hidden"
                 >
-                  <div>
-                    <h2 className="text-3xl font-heading font-bold text-slate-900 mb-2">Expedition Details</h2>
-                    <p className="text-slate-400 text-sm">Required for guide allocation and insurance.</p>
+                  <div className="absolute -top-12 -right-12 w-32 h-32 bg-forest/5 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-terracotta/5 rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="flex items-center gap-5 relative z-10">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-forest to-forest/80 flex items-center justify-center text-white shadow-lg shadow-forest/20">
+                      <Users className="h-7 w-7" />
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-heading font-bold text-slate-900 leading-none">Expedition Details</h2>
+                      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                        Guide Allocation & Insurance
+                      </p>
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                      <Input name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="As per ID proof" className="h-14 rounded-2xl border-slate-100 focus:ring-forest/10 focus:border-forest/30" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 relative z-10">
+                    <div className="space-y-3 group">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Explorer's Name</label>
+                      <div className="relative">
+                        <Input 
+                          name="fullName" 
+                          value={formData.fullName} 
+                          onChange={handleInputChange} 
+                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
+                        />
+                        <AnimatePresence>
+                          {!formData.fullName && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 5 }}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-[1px] opacity-40"
+                            >
+                              As per ID proof
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
-                      <Input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+91 00000 00000" className="h-14 rounded-2xl border-slate-100 focus:ring-forest/10 focus:border-forest/30" />
+
+                    <div className="space-y-3 group">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Soul Connection (Phone)</label>
+                      <div className="relative">
+                        <Input 
+                          type="tel" 
+                          name="phone" 
+                          value={formData.phone} 
+                          onChange={handleInputChange} 
+                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
+                        />
+                        <AnimatePresence>
+                          {!formData.phone && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 5 }}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-[1px] opacity-40"
+                            >
+                              +91 --- --- ----
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
-                    <div className="space-y-2 md:col-span-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                       <Input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="trekker@soulhimalaya.com" className="h-14 rounded-2xl border-slate-100 focus:ring-forest/10 focus:border-forest/30" />
+
+                    <div className="space-y-3 group md:col-span-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Digital Gateway (Email)</label>
+                       <div className="relative">
+                        <Input 
+                          type="email" 
+                          name="email" 
+                          value={formData.email} 
+                          onChange={handleInputChange} 
+                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
+                        />
+                        <AnimatePresence>
+                          {!formData.email && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 5 }}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
+                            >
+                              trekker@soulhimalaya.com
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Base City</label>
-                      <Input name="city" value={formData.city} onChange={handleInputChange} placeholder="Delhi, Mumbai..." className="h-14 rounded-2xl border-slate-100 focus:ring-forest/10 focus:border-forest/30" />
+
+                    <div className="space-y-3 group">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Ascension Base (City)</label>
+                      <div className="relative">
+                        <Input 
+                          name="city" 
+                          value={formData.city} 
+                          onChange={handleInputChange} 
+                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
+                        />
+                        <AnimatePresence>
+                          {!formData.city && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 5 }}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
+                            >
+                              Delhi, Mumbai, etc.
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pincode</label>
-                      <Input name="pincode" value={formData.pincode} onChange={handleInputChange} placeholder="000 000" className="h-14 rounded-2xl border-slate-100 focus:ring-forest/10 focus:border-forest/30" />
+
+                    <div className="space-y-3 group">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Sacred Code (Pincode)</label>
+                      <div className="relative">
+                        <Input 
+                          name="pincode" 
+                          value={formData.pincode} 
+                          onChange={handleInputChange} 
+                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
+                        />
+                        <AnimatePresence>
+                          {!formData.pincode && (
+                            <motion.span 
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 5 }}
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
+                            >
+                              Postal Code
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -383,11 +580,7 @@ export default function SoulCart() {
                     </div>
                   </div>
 
-                  <div className="p-6 bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-center">
-                    <p className="text-xs text-slate-400 font-medium max-w-sm mx-auto">
-                      By proceeding, you agree to our spiritual contract and travel insurance policies.
-                    </p>
-                  </div>
+                  {/* This step is now bypassed; logic handled by directly calling handleOrder from details */}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -440,7 +633,7 @@ export default function SoulCart() {
                     <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      {step === 'payment' ? 'Complete Booking' : 'Next Soul Step'}
+                      {step === 'details' ? 'Proceed to Payment' : 'Next Soul Step'}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}
