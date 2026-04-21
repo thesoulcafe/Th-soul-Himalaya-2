@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin, Star, ArrowRight } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { motion } from 'motion/react';
@@ -6,12 +7,29 @@ import { cn } from '@/lib/utils';
 import ReviewsDialog from './ReviewsDialog';
 
 export default function Footer() {
+  const [logoClicks, setLogoClicks] = useState({ count: 0, lastClick: 0 });
+  const navigate = useNavigate();
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    const now = Date.now();
+    const isQuick = now - logoClicks.lastClick < 2000;
+    const newCount = isQuick ? logoClicks.count + 1 : 1;
+
+    if (newCount >= 5) {
+      e.preventDefault();
+      navigate('/admin');
+      setLogoClicks({ count: 0, lastClick: 0 });
+    } else {
+      setLogoClicks({ count: newCount, lastClick: now });
+    }
+  };
+
   return (
     <footer className="bg-forest text-cream pt-16 pb-8 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand Info */}
         <div className="space-y-8">
-          <Link to="/" className="flex flex-col gap-6 group cursor-pointer">
+          <Link to="/" onClick={handleLogoClick} className="flex flex-col gap-6 group cursor-pointer">
             <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -24,8 +42,8 @@ export default function Footer() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="text-2xl font-montserrat font-extrabold text-white tracking-tight group-hover:text-terracotta transition-colors uppercase leading-none">
-              The Soul <br /><span className="text-terracotta italic">Himalaya</span>
+            <span className="text-3xl font-montserrat font-extrabold text-white tracking-tighter group-hover:text-terracotta transition-colors uppercase leading-[0.95]">
+              The Soul <br /><span className="text-terracotta italic font-playfair tracking-normal normal-case">Himalaya</span>
             </span>
           </Link>
           <p className="text-cream/60 text-[13px] leading-relaxed font-medium">
@@ -39,7 +57,7 @@ export default function Footer() {
         </div>
 
         {/* Quick Links & Services Grouped */}
-        <div className="grid grid-cols-2 gap-8 md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:col-span-2">
           {/* Quick Links */}
           <div className="space-y-6">
             <h4 className="text-lg font-bold">Quick Links</h4>
@@ -60,15 +78,22 @@ export default function Footer() {
             <h4 className="text-lg font-bold">Services</h4>
             <ul className="space-y-3 text-sm text-cream/70">
               {[
-                { name: 'Tour Packages', href: '/tours' },
-                { name: 'Trekks & Trails', href: '/trekks' },
-                { name: 'Tours & Trekks', href: '/tours' },
-                { name: 'WFH Himalaya', href: '/wfh' },
+                { name: 'Tour Packages', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
+                { name: 'Mountain Trekks', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
+                { name: 'Yoga & Wellness', href: '/yoga' },
+                { name: 'Digital Workation', href: '/wfh' },
+                { name: 'Macramé Shop', href: '/shop' },
               ].map((service) => (
                 <motion.li key={service.name} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300 }}>
-                  <Link to={service.href} className="hover:text-terracotta transition-colors">
-                    {service.name}
-                  </Link>
+                  {service.href.startsWith('http') ? (
+                    <a href={service.href} className="hover:text-terracotta transition-colors">
+                      {service.name}
+                    </a>
+                  ) : (
+                    <Link to={service.href} className="hover:text-terracotta transition-colors">
+                      {service.name}
+                    </Link>
+                  )}
                 </motion.li>
               ))}
             </ul>
@@ -95,9 +120,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-cream/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-cream/40">
+      <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-cream/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-cream/40 text-center md:text-left">
         <p>© {new Date().getFullYear()} The Soul Himalaya. All rights reserved. Crafted with soul in the mountains.</p>
-        <Link to="/admin" className="hover:text-terracotta transition-colors">Admin Access</Link>
       </div>
     </footer>
   );

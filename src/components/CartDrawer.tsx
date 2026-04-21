@@ -180,24 +180,34 @@ export default function CartDrawer({ variant = 'floating' }: CartDrawerProps) {
                             <div className="flex items-center bg-cream/30 rounded-full p-0.5 border border-forest/5 shadow-sm">
                               <button 
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="h-4.5 w-4.5 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm transition-all text-forest/60 hover:text-forest"
+                                className="h-4 w-4 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm transition-all text-forest/40 hover:text-terracotta"
                               >
                                 <Minus className="h-2 w-2" />
                               </button>
                               <span className="w-5 text-center text-[9px] font-black text-forest">{item.quantity}</span>
                               <button 
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="h-4.5 w-4.5 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm transition-all text-forest/60 hover:text-forest"
+                                className="h-4 w-4 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm transition-all text-forest/40 hover:text-terracotta"
                               >
                                 <Plus className="h-2 w-2" />
                               </button>
                             </div>
-                            <span className="font-black text-forest text-[10px] tracking-tight">{item.price}</span>
+                            <span className="font-black text-forest text-[10px] tracking-tight group-hover:text-terracotta transition-colors">{item.price}</span>
                           </div>
                         </div>
                       </motion.div>
                     ))}
                   </AnimatePresence>
+                </div>
+                <div className="px-5 py-3 bg-forest/5 flex justify-center">
+                  <Link 
+                    to="/cart" 
+                    onClick={() => setIsOpen(false)}
+                    className="text-[10px] uppercase tracking-widest font-bold text-forest/30 hover:text-terracotta transition-colors flex items-center gap-2 group/link"
+                  >
+                    View Detailed Cart 
+                    <ArrowRight className="h-3 w-3 group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
               </ScrollArea>
 

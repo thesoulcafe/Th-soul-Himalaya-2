@@ -35,7 +35,7 @@ export default function SoulCart() {
   const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
   const { user } = useAuth();
   
-  const [step, setStep] = useState<CheckoutStep>('cart');
+  const [step, setStep] = useState<CheckoutStep>('details');
   const [plantTree, setPlantTree] = useState(false);
   const [note, setNote] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -67,7 +67,6 @@ export default function SoulCart() {
 
   const prevStep = () => {
     if (step === 'payment') setStep('details');
-    else if (step === 'details') setStep('cart');
     else navigate(-1);
   };
 
@@ -148,7 +147,6 @@ export default function SoulCart() {
 
           <div className="flex items-center gap-3">
             {[
-              { id: 'cart', label: 'Cart' },
               { id: 'details', label: 'Details' },
               { id: 'payment', label: 'Payment' }
             ].map((s, i) => (
@@ -157,10 +155,10 @@ export default function SoulCart() {
                   <div className={cn(
                     "h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",
                     step === s.id ? "bg-forest text-white shadow-lg shadow-forest/20 scale-110" : 
-                    i < ['cart', 'details', 'payment'].indexOf(step) ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                    i < ['details', 'payment'].indexOf(step) ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
                     "bg-slate-100 text-slate-400"
                   )}>
-                    {i < ['cart', 'details', 'payment'].indexOf(step) ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
+                    {i < ['details', 'payment'].indexOf(step) ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                   </div>
                   <span className={cn(
                     "text-[10px] font-black uppercase tracking-widest hidden sm:block",
@@ -169,7 +167,7 @@ export default function SoulCart() {
                     {s.label}
                   </span>
                 </div>
-                {i < 2 && <div className="w-8 h-px bg-slate-100" />}
+                {i < 1 && <div className="w-8 h-px bg-slate-100" />}
               </React.Fragment>
             ))}
           </div>

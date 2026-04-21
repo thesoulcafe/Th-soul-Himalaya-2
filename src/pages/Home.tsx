@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -68,7 +68,7 @@ const HorizontalServiceRow = ({ services }: { services: any[] }) => {
 
         <div 
           ref={scrollContainerRef}
-          className="flex overflow-x-auto pb-8 gap-3 px-6 lg:px-[calc((100vw-80rem)/2+1.5rem)] no-scrollbar snap-x snap-mandatory scroll-smooth"
+          className="grid grid-cols-1 sm:grid-cols-2 md:flex md:overflow-x-auto pb-8 gap-4 px-6 lg:px-[calc((100vw-80rem)/2+1.5rem)] no-scrollbar snap-x snap-mandatory scroll-smooth"
         >
           {services.map((service, index) => (
             <motion.div
@@ -77,48 +77,95 @@ const HorizontalServiceRow = ({ services }: { services: any[] }) => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.02 }}
-              className="min-w-[110px] md:min-w-[130px] snap-center"
+              className="w-full md:min-w-[130px] snap-center"
             >
-              <Link to={service.link || '#'}>
-                <Card className={cn(
-                  "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
-                  index % 4 === 0 ? "bg-forest text-cream" : 
-                  index % 4 === 1 ? "bg-terracotta text-white" : 
-                  index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
-                  "bg-black text-white"
-                )}>
-                  <div className={cn(
-                    "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
-                    index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
-                    index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
-                    index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
-                    "bg-gradient-to-br from-gold to-transparent"
-                  )} />
-                  
-                  <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
-                    {profile?.role === 'admin' && (
-                      <Link 
-                        to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                        className="absolute top-2 right-2 bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 z-20 group/edit"
-                        title="Edit Service"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Edit2 className="h-2.5 w-2.5" />
-                      </Link>
-                    )}
+              {service.link?.startsWith('http') ? (
+                <a href={service.link}>
+                  <Card className={cn(
+                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
+                    index % 4 === 0 ? "bg-forest text-cream" : 
+                    index % 4 === 1 ? "bg-terracotta text-white" : 
+                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
+                    "bg-black text-white"
+                  )}>
                     <div className={cn(
-                      "mb-2 p-2.5 rounded-xl transition-all duration-500",
-                      index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
-                    )}>
-                      {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
-                    </div>
+                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
+                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
+                      "bg-gradient-to-br from-gold to-transparent"
+                    )} />
                     
-                    <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
-                      {service.title}
-                    </h3>
-                  </CardContent>
-                </Card>
-              </Link>
+                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
+                      {profile?.role === 'admin' && (
+                        <div className="absolute top-2 right-2 z-20">
+                          <Link 
+                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
+                            title="Edit Service"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit2 className="h-2.5 w-2.5" />
+                          </Link>
+                        </div>
+                      )}
+                      <div className={cn(
+                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
+                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
+                      )}>
+                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
+                      </div>
+                      
+                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
+                        {service.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </a>
+              ) : (
+                <Link to={service.link || '#'}>
+                  <Card className={cn(
+                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
+                    index % 4 === 0 ? "bg-forest text-cream" : 
+                    index % 4 === 1 ? "bg-terracotta text-white" : 
+                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
+                    "bg-black text-white"
+                  )}>
+                    <div className={cn(
+                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
+                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
+                      "bg-gradient-to-br from-gold to-transparent"
+                    )} />
+                    
+                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
+                      {profile?.role === 'admin' && (
+                        <div className="absolute top-2 right-2 z-20">
+                          <Link 
+                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
+                            title="Edit Service"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit2 className="h-2.5 w-2.5" />
+                          </Link>
+                        </div>
+                      )}
+                      <div className={cn(
+                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
+                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
+                      )}>
+                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
+                      </div>
+                      
+                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
+                        {service.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )}
             </motion.div>
           ))}
           <div className="min-w-[1px] md:min-w-[1rem]" />
@@ -132,6 +179,14 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { user } = useAuth();
   const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'service'));
@@ -147,6 +202,12 @@ export default function Home() {
             return !title.includes('cafe') && !title.includes('food');
           })
           .sort((a, b) => {
+            // Force Macramé Shop to the end
+            const aTitle = (a.title || '').toLowerCase();
+            const bTitle = (b.title || '').toLowerCase();
+            if (aTitle.includes('macramé') || aTitle.includes('macrame')) return 1;
+            if (bTitle.includes('macramé') || bTitle.includes('macrame')) return -1;
+
             const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
             const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
             return aOrder - bOrder;
@@ -165,9 +226,10 @@ export default function Home() {
         onClose={() => setIsAuthModalOpen(false)} 
       />
       {/* Hero Section */}
-      <section className="relative h-[110vh] w-full flex items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative h-[110vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <motion.div 
+            style={{ y }}
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
             transition={{ duration: 10, ease: "easeOut" }}
@@ -197,21 +259,21 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-12 md:mt-20 mb-6 tracking-[0.2em] drop-shadow-sm"
+              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-12 md:mt-16 mb-2 tracking-[0.2em] drop-shadow-sm"
             >
               Parvati Valley & Beyond
             </motion.p>
             
-            <h1 className="text-4xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-6 leading-none tracking-tighter drop-shadow-2xl flex flex-col items-center gap-2 md:gap-4 italic">
+            <h1 className="text-4xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-2 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
               <span className="opacity-90 normal-case">Find Your</span>
               <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)]">Soul</span>
             </h1>
 
-            <p className="text-sm md:text-base text-cream/80 mb-12 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px]">
+            <p className="text-sm md:text-base text-cream/80 mb-6 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px]">
               A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-2">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Link 
                   to="/services"
@@ -262,11 +324,11 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-20 px-4"
           >
-            <div className="max-w-2xl mx-auto">
-              <p className="text-terracotta font-bold uppercase text-xs tracking-[0.3em] mb-4">Curated Journeys</p>
-              <h2 className="text-4xl md:text-6xl font-montserrat font-extrabold text-forest leading-tight">Signature Collections</h2>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4">Curated Journeys</p>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-montserrat font-extrabold text-forest leading-[1.1] tracking-tight">Signature Collections</h2>
             </div>
           </motion.div>
 
@@ -276,9 +338,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              whileHover={{ y: -10 }}
               className="group relative h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer"
             >
-              <Link to="/tours#customize-trip" className="absolute inset-0 z-30" />
+              <Link to="/tailor-made" className="absolute inset-0 z-30" />
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest via-forest/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
               <img 
                 src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80" 
@@ -309,6 +372,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              whileHover={{ y: -10 }}
               transition={{ delay: 0.1 }}
               className="group relative h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer"
             >
@@ -350,11 +414,11 @@ export default function Home() {
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-terracotta/20 rounded-full blur-3xl opacity-50" />
           
           <div className="relative z-10">
-            <p className="text-terracotta font-bold uppercase text-xs tracking-[0.4em] mb-6">Your Journey Begins Here</p>
-            <h2 className="text-4xl md:text-7xl font-montserrat font-extrabold mb-8 leading-[0.9] tracking-tight">
-              Ready to <br />Start Your <br /><span className="text-terracotta italic">Himalayan Story?</span>
+            <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.5em] mb-8">Your Journey Begins Here</p>
+            <h2 className="text-4xl md:text-7xl lg:text-8xl font-montserrat font-extrabold mb-10 leading-[1.05] tracking-tight">
+              Ready to <br />Start Your <br /><span className="text-terracotta italic font-playfair">Himalayan Story?</span>
             </h2>
-            <p className="text-white/60 text-base md:text-lg mb-12 max-w-2xl mx-auto font-medium">
+            <p className="text-white/60 text-base md:text-lg mb-14 max-w-2xl mx-auto font-medium leading-relaxed">
               Book your soulful experience today and let the eternal mountains guide you home to your true self.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
@@ -396,32 +460,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Instagram Section (Mock) */}
+      {/* Instagram Section */}
       <section className="py-24 bg-cream overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
             <div>
               <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
-              <p className="text-forest/60">Join our community on Instagram @thesoulhimalaya</p>
+              <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
             </div>
-            <Button variant="outline" className="border-forest text-forest hover:bg-forest hover:text-white rounded-full">
+            <a 
+              href="https://www.instagram.com/thesoulhimalaya" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
+              )}
+            >
+              <Instagram className="h-4 w-4" />
               Follow Us
-            </Button>
+            </a>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=400&q=80',
-              'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=400&q=80',
-              'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=80',
-              'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=400&q=80'
-            ].map((img, i) => (
+              { url: 'https://www.instagram.com/p/DBititYyy66/', img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
+              { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', img: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
+              { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
+              { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
+            ].map((post, i) => (
               <motion.div
                 key={i}
-                whileHover={{ scale: 0.98 }}
-                className="aspect-square rounded-2xl overflow-hidden shadow-md"
+                whileHover={{ y: -8 }}
+                className="group/item relative aspect-square rounded-[2rem] overflow-hidden shadow-xl"
               >
-                <img src={img} alt="Instagram Post" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <a href={post.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                  <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/0 transition-colors duration-500 z-10" />
+                  <img src={post.img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30">
+                      <Instagram className="text-white h-6 w-6" />
+                    </div>
+                  </div>
+                </a>
               </motion.div>
             ))}
           </div>

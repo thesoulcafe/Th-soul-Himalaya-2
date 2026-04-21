@@ -124,14 +124,14 @@ export default function Trekks() {
     <div className="pt-24">
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
-        <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Trekks & Trails</h1>
+        <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Mountain Trekks</h1>
         <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Discover Wild Paths</p>
       </div>
 
       {/* Trekk Grid */}
       <section className="py-24 px-6 bg-cream">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-12">
             {trekkList.map((trekk, index) => (
               <motion.div
                 key={trekk.title}
@@ -140,8 +140,9 @@ export default function Trekks() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl">
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <Card className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl">
+                  {/* Left Side: Image */}
+                  <div className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden">
                     <ImageSlider 
                       images={[trekk.image, ...(trekk.images || [])].filter(Boolean)} 
                       alt={trekk.title}
@@ -192,12 +193,13 @@ export default function Trekks() {
                     </div>
                   </div>
 
-                  <CardContent className="p-6 flex-grow flex flex-col">
+                  {/* Right Side: Details */}
+                  <CardContent className="p-8 md:p-12 w-full md:w-1/2 flex flex-col">
                     <div className="flex-grow">
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center text-yellow-500 text-[10px] font-bold bg-yellow-500/5 px-2 py-1 rounded-full">
                           <Star className="h-3 w-3 fill-current mr-1" />
-                          4.8 (120)
+                          4.8 (120 reviews)
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-forest/40 uppercase tracking-widest">
                           <Clock className="h-3 w-3 text-terracotta" />
@@ -205,48 +207,52 @@ export default function Trekks() {
                         </div>
                       </div>
 
-                      <h3 className="text-xl font-heading font-bold text-forest leading-tight mb-4 group-hover:text-terracotta transition-colors line-clamp-2">
+                      <h3 className="text-2xl md:text-3xl font-heading font-bold text-forest leading-tight mb-6 group-hover:text-terracotta transition-colors">
                         {trekk.title}
                       </h3>
 
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center text-[11px] text-forest/60 font-medium italic">
-                          <Mountain className="h-3 w-3 text-terracotta mr-2 shrink-0" />
-                          Altitude: {trekk.altitude}
+                      <p className="text-forest/60 text-sm leading-relaxed mb-8 line-clamp-3">
+                        {trekk.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-6 mb-8 pb-8 border-b border-forest/5">
+                        <div className="flex items-center text-xs font-bold text-forest">
+                          <Mountain className="h-4 w-4 text-terracotta mr-3 shrink-0" />
+                          {trekk.altitude}
                         </div>
-                        <div className="flex items-center text-[11px] text-forest/60 font-medium">
-                          <CheckCircle2 className="h-3 w-3 text-emerald-500 mr-2 shrink-0" />
-                          Guided Professional Trekk
+                        <div className="flex items-center text-xs font-bold text-forest">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-3 shrink-0" />
+                          Expert Guides
                         </div>
                       </div>
 
                       {/* Slot Selection */}
                       {trekk.slots && trekk.slots.length > 0 && (
-                        <div className="mb-4">
+                        <div className="mb-8">
                           <button 
                             onClick={() => setActiveSlotTrekk(trekk)}
-                            className="w-full bg-forest/[0.03] border border-forest/5 rounded-xl p-3 text-[10px] text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
+                            className="w-full bg-forest/[0.03] border border-forest/5 rounded-2xl p-4 text-xs text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
                           >
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-3.5 w-3.5 text-terracotta" />
+                            <div className="flex items-center gap-3">
+                              <Calendar className="h-4 w-4 text-terracotta" />
                               {selectedSlots[trekk.id] !== undefined ? (
                                 <span>
-                                  {new Date(trekk.slots[parseInt(selectedSlots[trekk.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                                  Departure: {new Date(trekk.slots[parseInt(selectedSlots[trekk.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}
                                 </span>
                               ) : (
-                                <span className="text-forest/30">Pick Date</span>
+                                <span className="text-forest/30">Select Date</span>
                               )}
                             </div>
-                            <ChevronDown className="h-3 w-3 text-forest/20 group-hover:text-terracotta transition-colors" />
+                            <ChevronDown className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-colors" />
                           </button>
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-auto pt-4 border-t border-forest/5 flex items-center justify-between gap-3">
+                    <div className="mt-auto pt-6 flex items-center justify-between gap-6">
                       <Button 
                         variant="ghost" 
-                        className="text-forest hover:text-terracotta p-0 font-bold text-xs"
+                        className="text-forest hover:text-terracotta p-0 font-bold text-sm uppercase tracking-widest"
                         onClick={() => setSelectedTrekk(trekk)}
                       >
                         Details

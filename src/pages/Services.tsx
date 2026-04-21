@@ -40,6 +40,12 @@ export default function Services() {
             return !title.includes('cafe') && !title.includes('food');
           })
           .sort((a, b) => {
+            // Force Macramé Shop to the end
+            const aTitle = (a.title || '').toLowerCase();
+            const bTitle = (b.title || '').toLowerCase();
+            if (aTitle.includes('macramé') || aTitle.includes('macrame')) return 1;
+            if (bTitle.includes('macramé') || bTitle.includes('macrame')) return -1;
+
             const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
             const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
             if (aOrder !== bOrder) return aOrder - bOrder;

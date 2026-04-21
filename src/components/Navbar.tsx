@@ -12,8 +12,8 @@ import { useCart } from '@/lib/CartContext';
 import { Badge } from '@/components/ui/badge';
 
 const navLinks = [
-  { name: 'Tours', href: '/tours' },
-  { name: 'Trekks', href: '/trekks' },
+  { name: 'Tour Packages', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
+  { name: 'Mountain Trekks', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
   { name: 'Guide', href: '/guide' },
   { name: 'Yoga', href: '/yoga' },
   { name: 'Meditation', href: '/meditation' },
@@ -44,7 +44,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg py-1 px-6"
+      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg py-3 px-6"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -96,19 +96,35 @@ export default function Navbar() {
               whileHover={{ y: -1 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <Link
-                to={link.href}
-                className={cn(
-                  'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
-                  location.pathname === link.href && 'text-white border-b-2 border-terracotta'
-                )}
-              >
-                {link.name}
-                <span className={cn(
-                   "absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full",
-                   location.pathname === link.href && "hidden"
-                )} />
-              </Link>
+              {link.href.startsWith('http') ? (
+                <a
+                  href={link.href}
+                  className={cn(
+                    'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    location.pathname === link.href && 'text-white border-b-2 border-terracotta'
+                  )}
+                >
+                  {link.name}
+                  <span className={cn(
+                    "absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full",
+                    location.pathname === link.href && "hidden"
+                  )} />
+                </a>
+              ) : (
+                <Link
+                  to={link.href}
+                  className={cn(
+                    'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    location.pathname === link.href && 'text-white border-b-2 border-terracotta'
+                  )}
+                >
+                  {link.name}
+                  <span className={cn(
+                    "absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 group-hover:w-full",
+                    location.pathname === link.href && "hidden"
+                  )} />
+                </Link>
+              )}
             </motion.div>
           ))}
           {user && (
@@ -151,9 +167,9 @@ export default function Navbar() {
             <SheetTrigger
               nativeButton={true}
               render={
-                <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-14 w-12 p-0")}>
+                <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-10 w-10 p-0")}>
                   <motion.div whileTap={{ scale: 0.9 }} className="flex items-center justify-center">
-                    <Menu className="h-13 w-13" />
+                    <Menu className="h-8 w-8" />
                   </motion.div>
                 </button>
               }
@@ -246,18 +262,29 @@ export default function Navbar() {
                       transition={{ delay: i * 0.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <Link
-                        to={link.href}
-                        onClick={() => setIsOpen(false)}
-                        className={cn(
-                          'flex items-center justify-center w-full px-3 py-2 rounded-lg transition-all duration-200 group border border-white/5',
-                          location.pathname === link.href 
-                            ? 'text-terracotta font-bold border-terracotta/20 bg-white/5' 
-                            : 'text-cream/70 hover:text-white hover:bg-white/5'
-                        )}
-                      >
-                        <span className="text-sm font-medium tracking-wide">{link.name}</span>
-                      </Link>
+                      {link.href.startsWith('http') ? (
+                        <a
+                          href={link.href}
+                          className={cn(
+                            'flex items-center justify-center w-full px-3 py-2 rounded-lg transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
+                          )}
+                        >
+                          <span className="text-sm font-medium tracking-wide">{link.name}</span>
+                        </a>
+                      ) : (
+                        <Link
+                          to={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className={cn(
+                            'flex items-center justify-center w-full px-3 py-2 rounded-lg transition-all duration-200 group border border-white/5',
+                            location.pathname === link.href 
+                              ? 'text-terracotta font-bold border-terracotta/20 bg-white/5' 
+                              : 'text-cream/70 hover:text-white hover:bg-white/5'
+                          )}
+                        >
+                          <span className="text-sm font-medium tracking-wide">{link.name}</span>
+                        </Link>
+                      )}
                     </motion.div>
                   ))}
                 </div>
