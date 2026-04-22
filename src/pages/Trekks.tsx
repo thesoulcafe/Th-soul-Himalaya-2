@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Mountain, Compass, Map, Info, AlertTriangle, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, Sparkles, ShoppingCart, ArrowRight, Share2 } from 'lucide-react';
+import { Plus, Minus, Mountain, Compass, Map, Info, AlertTriangle, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, Sparkles, ShoppingCart, ArrowRight, Share2, X, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
@@ -425,106 +425,170 @@ export default function Trekks() {
 
       {/* Trekk Detail Modal */}
       {selectedTrekk && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/80 backdrop-blur-xl">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-white rounded-[2.5rem] shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row border border-white/20"
+            className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.3)] max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row border border-white/20 relative"
           >
-            {/* Left Side: Immersive Image/Gallery */}
-            <div className="relative w-full md:w-1/2 h-64 md:h-auto shrink-0 bg-forest overflow-hidden">
-              <img src={selectedTrekk.image} alt={selectedTrekk.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-forest/10 md:to-forest/20" />
+            {/* Background Texture Overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
+
+            {/* Left Side: Immersive Visuals */}
+            <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
+              <img src={selectedTrekk.image} alt={selectedTrekk.title} className="w-full h-full object-cover scale-105" />
               
-              <button 
-                onClick={() => setSelectedTrekk(null)}
-                className="absolute top-6 left-6 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-              >
-                <Plus className="h-5 w-5 rotate-45" />
-              </button>
+              {/* Decorative Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/20 to-transparent" />
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/40 to-transparent" />
+              
+              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="font-fluid text-3xl md:text-4xl text-terracotta drop-shadow-md mb-2 block">The Sacred</span>
+                  <h2 className="text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
+                    {selectedTrekk.title.split(' ').map((word: string, i: number) => (
+                      <span key={i} className={i === 1 ? 'text-white/40' : ''}>{word} </span>
+                    ))}
+                  </h2>
+                </motion.div>
+                
+                <div className="flex items-center gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2">
+                    <Map className="h-4 w-4 text-terracotta" />
+                    <span>Wild Frontier</span>
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-terracotta" />
+                  <span>Hidden Valleys</span>
+                </div>
+              </div>
 
-              <button 
-                onClick={() => handleShare(selectedTrekk)}
-                className="absolute top-6 left-20 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-                title="Share"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-
-              <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 text-white">
-                <Badge className="bg-terracotta text-white border-none mb-4 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg">
-                  Wild Himalayan Expedition
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-heading font-bold leading-tight mb-2 drop-shadow-2xl">{selectedTrekk.title}</h2>
-                <p className="text-white/80 text-sm font-medium tracking-wide flex items-center gap-2">
-                  <Map className="h-4 w-4 text-terracotta" /> Parvati Valley Peaks
-                </p>
+              {/* Close & Share for Mobile */}
+              <div className="absolute top-6 left-6 flex gap-3 lg:hidden z-50">
+                <button onClick={() => setSelectedTrekk(null)} className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
             </div>
 
-            {/* Right Side: Details & Booking */}
-            <div className="flex-grow p-8 md:p-12 overflow-y-auto bg-white relative">
-              <div className="absolute top-6 right-6 flex items-center gap-3">
+            {/* Right Side: Soulful Details */}
+            <div className="flex-grow flex flex-col h-full bg-[#FAF9F6] relative">
+              {/* Desktop Close/Share */}
+              <div className="absolute top-8 right-8 hidden lg:flex items-center gap-4 z-20">
                 <button 
                   onClick={() => handleShare(selectedTrekk)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
-                  title="Share Expedition"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all transform hover:rotate-12 active:scale-90"
                 >
                   <Share2 className="h-5 w-5" />
                 </button>
                 <button 
                   onClick={() => setSelectedTrekk(null)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-forest hover:text-white transition-all transform hover:-rotate-12 active:scale-90"
                 >
-                  <Plus className="h-6 w-6 rotate-45" />
+                  <X className="h-6 w-6" />
                 </button>
               </div>
 
-              {/* Quick Info Grid */}
-              <div className="grid grid-cols-3 gap-6 mb-10 pb-8 border-b border-forest/5">
-                <div className="text-center md:text-left">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Duration</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Clock className="h-4 w-4 text-terracotta" /> {selectedTrekk.duration}
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14">
+                <div className="max-w-3xl mx-auto space-y-16">
+                  
+                  {/* Stats Grid - Fluid Style */}
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { icon: Clock, label: 'Duration', value: selectedTrekk.duration, sub: 'Days & Nights' },
+                      { icon: Mountain, label: 'Altitude', value: selectedTrekk.altitude, sub: 'Above Sea Level' },
+                      { icon: Zap, label: 'Challenge', value: selectedTrekk.difficulty, sub: 'Expedition Tier' }
+                    ].map((stat, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + (i * 0.1) }}
+                        className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all"
+                      >
+                        <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                          <stat.icon className="h-5 w-5 text-terracotta" />
+                        </div>
+                        <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
+                        <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
+                        <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
+                      </motion.div>
+                    ))}
                   </div>
-                </div>
-                <div className="text-center md:text-left border-x border-forest/10 px-6">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Altitude</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Mountain className="h-4 w-4 text-terracotta" /> {selectedTrekk.altitude}
-                  </div>
-                </div>
-                <div className="text-center md:text-left">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Difficulty</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Star className="h-4 w-4 text-terracotta fill-terracotta" /> {selectedTrekk.difficulty}
-                  </div>
-                </div>
-              </div>
 
-              <div className="space-y-10">
-                {/* Description & Itinerary */}
-                <div className="space-y-8">
-                  <div>
-                    <h4 className="font-heading font-bold text-forest mb-4 text-sm uppercase tracking-widest">The Soul Journey</h4>
-                    <p className="text-forest/70 text-sm leading-relaxed font-medium">
-                      {selectedTrekk.description}
+                  {/* Soulful Description */}
+                  <section>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-px flex-grow bg-forest/5" />
+                      <span className="font-fluid text-2xl text-terracotta">The Expedition Spirit</span>
+                      <div className="h-px flex-grow bg-forest/5" />
+                    </div>
+                    <p className="text-forest/70 text-base leading-[1.8] font-medium italic">
+                      "{selectedTrekk.description}"
                     </p>
-                  </div>
+                  </section>
 
-                  {(selectedTrekk.itinerary || selectedTrekk.theExperience) && (
-                    <div className="bg-cream/20 p-6 md:p-8 rounded-[2rem] border border-forest/5">
-                      <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-terracotta" /> Day-by-Day Experience
+                  {/* Experience Split */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <h4 className="text-xs font-black text-forest uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-terracotta" /> Core Experience
                       </h4>
                       <div className="space-y-4">
+                        {[
+                          'Ancient Forest Trails',
+                          'Glacial Stream Crossing',
+                          'Traditional Village Stays',
+                          'Starlit Alpine Camps'
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-4 text-sm font-bold text-forest/60 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-terracotta group-hover:scale-150 transition-transform" />
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white/50 border border-forest/5 p-8 rounded-[2.5rem]">
+                      <h4 className="text-xs font-black text-forest uppercase tracking-[0.2em] mb-4">Inclusions</h4>
+                      <div className="grid grid-cols-1 gap-4">
+                        {[
+                          { icon: Users, label: 'Boutique Group Size' },
+                          { icon: Star, label: 'Premium Gear' },
+                          { icon: Mountain, label: 'Safety Backed' }
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-3 text-xs font-bold text-forest/40">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            {item.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Itinerary */}
+                  {(selectedTrekk.itinerary || selectedTrekk.theExperience) && (
+                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5">
+                      <div className="flex items-center justify-between mb-10">
+                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Day-to-Day Flow</h4>
+                        <Compass className="h-8 w-8 text-terracotta animate-pulse" />
+                      </div>
+                      
+                      <div className="space-y-8 relative">
+                        <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                        
                         {Array.isArray(selectedTrekk.itinerary) ? (
                           selectedTrekk.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="space-y-2">
-                              <div className="text-xs font-black text-forest mt-4 first:mt-0 uppercase tracking-tighter">Day {item.day || i + 1}</div>
-                              <div className="text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2 text-xs leading-relaxed whitespace-pre-wrap">
+                            <div key={i} className="relative pl-12 group">
+                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta border-4 border-[#FAF9F6] ring-1 ring-terracotta/20 z-10 group-hover:scale-150 transition-transform" />
+                              <div className="text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
+                              <h5 className="text-lg font-bold text-forest mb-2">Mountain Awakening</h5>
+                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
                                 {item.description}
-                              </div>
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -532,82 +596,71 @@ export default function Trekks() {
                             if (!line.trim()) return null;
                             const isDay = line.toLowerCase().startsWith('day');
                             return (
-                              <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
-                                {line.trim()}
+                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
+                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
+                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
+                                  {line.trim()}
+                                </div>
                               </div>
                             );
                           })
                         )}
                       </div>
-                    </div>
+                    </section>
                   )}
                 </div>
+              </div>
 
-                {/* Highlights/Includes */}
-                <div className="bg-cream/30 p-8 rounded-[2rem] border border-forest/5">
-                  <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest">Expedition Inclusions</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { icon: CheckCircle2, label: 'Professional Soul Guides' },
-                      { icon: Map, label: 'Traditional Route Planning' },
-                      { icon: Mountain, label: 'Premium Camping Gear' },
-                      { icon: Zap, label: 'Authentic Local Meals' }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-xs font-bold text-forest/80">
-                        <item.icon className="h-4 w-4 text-terracotta shrink-0" />
-                        {item.label}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Booking Footer */}
-                <div className="pt-8 border-t border-forest/5">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
-                    <div className="text-center sm:text-left">
-                      <div className="text-xs font-bold text-forest/40 uppercase tracking-widest mb-1">Total Expedition Fee</div>
-                      <div className="text-4xl font-black text-forest">
-                        {selectedTrekk.price}
-                        <span className="text-xs font-bold text-forest/30 ml-1">/ person</span>
-                      </div>
+              {/* Booking Footer - Creative Style */}
+              <div className="p-8 md:p-12 border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
+                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+                  <div className="text-center md:text-left">
+                    <div className="font-fluid text-2xl text-terracotta -mb-2">Energy Exchange</div>
+                    <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+                      {selectedTrekk.price}
+                      <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Wanderer</span>
                     </div>
+                  </div>
 
-                    <div className="w-full sm:w-auto flex flex-col gap-4">
-                      {selectedTrekk.slots && selectedTrekk.slots.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {selectedTrekk.slots && selectedTrekk.slots.length > 0 && (
+                      <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedTrekk.id] || ''}
                           onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTrekk.id]: e.target.value })}
-                          className="w-full sm:min-w-[200px] rounded-full border-forest/10 p-3 bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20 text-forest font-bold text-xs"
+                          className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         >
-                          <option value="">Select departure</option>
+                          <option value="">Choose Path</option>
                           {selectedTrekk.slots.map((slot: any, i: number) => (
                             <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                             </option>
                           ))}
                         </select>
-                      )}
+                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                      </div>
+                    )}
 
-                      <Button 
-                        onClick={() => {
-                          const slotIndex = selectedSlots[selectedTrekk.id];
-                          const slot = slotIndex !== undefined ? selectedTrekk.slots?.[parseInt(slotIndex)] : undefined;
-                          globalAddToCart({
-                            id: `trekk-${selectedTrekk.title.toLowerCase().replace(/\s+/g, '-')}`,
-                            name: selectedTrekk.title,
-                            price: selectedTrekk.price,
-                            type: 'Trekk',
-                            image: selectedTrekk.image,
-                            dateRange: formatDateRange(selectedDate, selectedTrekk.duration, slot)
-                          });
-                          setSelectedTrekk(null);
-                        }}
-                        disabled={selectedTrekk.slots && selectedTrekk.slots.length > 0 && selectedSlots[selectedTrekk.id] === undefined}
-                        className="w-full sm:min-w-[200px] bg-terracotta hover:bg-terracotta/90 text-white py-8 rounded-full text-base font-black shadow-2xl shadow-terracotta/20 uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 translate-y-0 hover:-translate-y-1"
-                      >
-                        Book Expedition
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={() => {
+                        const slotIndex = selectedSlots[selectedTrekk.id];
+                        const slot = slotIndex !== undefined ? selectedTrekk.slots?.[parseInt(slotIndex)] : undefined;
+                        globalAddToCart({
+                          id: `trekk-${selectedTrekk.id}`,
+                          name: selectedTrekk.title,
+                          price: selectedTrekk.price,
+                          type: 'Trekk',
+                          image: selectedTrekk.image,
+                          dateRange: formatDateRange(selectedDate, selectedTrekk.duration, slot)
+                        });
+                        setSelectedTrekk(null);
+                      }}
+                      disabled={selectedTrekk.slots && selectedTrekk.slots.length > 0 && selectedSlots[selectedTrekk.id] === undefined}
+                      className="w-full sm:min-w-[240px] h-16 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                    >
+                      <Mountain className="h-4 w-4" />
+                      Embark journey
+                    </Button>
                   </div>
                 </div>
               </div>

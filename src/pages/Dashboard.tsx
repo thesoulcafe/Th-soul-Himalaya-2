@@ -32,7 +32,8 @@ import {
   ScrollText,
   Crown,
   Plus,
-  History
+  History,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -317,13 +318,52 @@ export default function Dashboard() {
                   </span>
                 </div>
                 
-                <div className="space-y-2">
-                  <h1 className="text-6xl lg:text-8xl font-heading font-black text-forest leading-none tracking-tighter">
-                    Namaste, <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-terracotta to-orange-600 italic font-medium font-montserrat pr-4">
-                      {user.displayName?.split(' ')[0] || 'Traveler'}
-                    </span>
-                  </h1>
+                <div className="space-y-0 relative">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1, duration: 0.8 }}
+                    className="relative"
+                  >
+                    <div className="flex items-center gap-6 mb-2">
+                       <div className="h-px w-12 bg-terracotta/30" />
+                       <span className="text-xs font-black uppercase tracking-[0.6em] text-terracotta/40">Portal Access Granted</span>
+                    </div>
+                    
+                    <div className="relative group flex items-center">
+                      <h1 className="text-4xl sm:text-7xl md:text-9xl lg:text-[12rem] font-playfair font-black italic text-forest leading-[0.8] tracking-tighter uppercase relative z-20 group-hover:tracking-normal transition-all duration-1000">
+                        Welcome
+                      </h1>
+                      
+                      {/* Artistic Layer - The Ghost */}
+                      <motion.span 
+                        animate={{ opacity: [0.1, 0.2, 0.1], x: [-5, 15, -5], skewX: [-2, 2, -2] }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-0 text-4xl sm:text-7xl md:text-9xl lg:text-[12rem] font-playfair font-black italic text-terracotta leading-[0.8] tracking-tighter uppercase z-10 select-none blur-[2px]"
+                      >
+                        Welcome
+                      </motion.span>
+
+                      {/* Floating Particles */}
+                      <motion.div 
+                        animate={{ 
+                          y: [-20, 20, -20],
+                          rotate: [0, 360],
+                          scale: [1, 1.2, 1]
+                        }}
+                        transition={{ duration: 15, repeat: Infinity }}
+                        className="absolute -top-10 left-1/4 h-24 w-24 bg-terracotta/5 rounded-full blur-2xl"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-8 mt-6">
+                      <div className="h-px flex-grow bg-forest/5" />
+                      <div className="flex items-center gap-4">
+                        <Sparkles className="h-4 w-4 text-terracotta" />
+                        <span className="font-fluid text-2xl text-terracotta italic">You have arrived at your soulful destination.</span>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-6 pt-4">
@@ -355,26 +395,26 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Hero Stat - Journeys */}
                     <div className="md:col-span-2 md:row-span-2 group">
-                      <Card className="h-full border-none bg-forest text-white overflow-hidden rounded-[3.5rem] shadow-2xl relative transition-all duration-700 hover:shadow-forest/30 hover:-translate-y-1">
+                      <Card className="h-full border-none bg-forest text-white overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl relative transition-all duration-700 hover:shadow-forest/30 hover:-translate-y-1">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-terracotta/20 to-transparent rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
-                        <CardContent className="p-12 flex flex-col justify-between h-full relative z-10">
-                          <div className="flex items-center justify-between mb-16">
-                            <div className="h-16 w-16 rounded-[2rem] bg-white/10 backdrop-blur-xl flex items-center justify-center border border-white/10">
-                              <Mountain className="h-8 w-8 text-terracotta" />
+                        <CardContent className="p-8 md:p-12 flex flex-col justify-between h-full relative z-10">
+                          <div className="flex items-center justify-between mb-12 md:mb-16">
+                            <div className="h-12 w-12 md:h-16 md:w-16 rounded-[1.5rem] md:rounded-[2rem] bg-white/10 backdrop-blur-xl flex items-center justify-center border border-white/10">
+                              <Mountain className="h-6 w-6 md:h-8 md:w-8 text-terracotta" />
                             </div>
-                            <Badge className="bg-emerald-500 text-white border-none px-5 py-2 rounded-full text-[10px] font-black tracking-widest shadow-lg shadow-emerald-500/20 uppercase">
+                            <Badge className="bg-emerald-500 text-white border-none px-4 md:px-5 py-1.5 md:py-2 rounded-full text-[8px] md:text-[10px] font-black tracking-widest shadow-lg shadow-emerald-500/20 uppercase">
                               Active Soul
                             </Badge>
                           </div>
                           <div>
-                            <p className="text-[11px] text-white/30 font-black uppercase tracking-[0.4em] mb-4 font-montserrat">Journeys Taken</p>
-                            <div className="flex items-baseline gap-4 mb-6">
-                              <h3 className="text-8xl font-heading font-black tracking-tighter">{bookings.length}</h3>
-                              <span className="text-terracotta font-black text-sm uppercase tracking-widest">Completed</span>
+                            <p className="text-[9px] md:text-[11px] text-white/30 font-black uppercase tracking-[0.4em] mb-3 md:mb-4 font-montserrat">Journeys Taken</p>
+                            <div className="flex items-baseline gap-4 mb-4 md:mb-6">
+                              <h3 className="text-6xl md:text-8xl font-heading font-black tracking-tighter">{bookings.length}</h3>
+                              <span className="text-terracotta font-black text-[10px] md:text-sm uppercase tracking-widest">Completed</span>
                             </div>
-                            <div className="flex items-center gap-3 py-4 px-6 bg-white/5 rounded-2xl w-fit border border-white/5 group-hover:bg-white/10 transition-colors">
-                              <TrendingUp className="h-4 w-4 text-emerald-400" />
-                              <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Veteran since 2024</p>
+                            <div className="flex items-center gap-3 py-3 md:py-4 px-4 md:px-6 bg-white/5 rounded-2xl w-fit border border-white/5 group-hover:bg-white/10 transition-colors">
+                              <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-emerald-400" />
+                              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-white/60">Veteran since 2024</p>
                             </div>
                           </div>
                         </CardContent>
@@ -383,15 +423,15 @@ export default function Dashboard() {
 
                     {/* Credit Stat */}
                     <div className="md:col-span-2 group">
-                      <Card className="h-full border-none bg-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] relative transition-all duration-500 hover:shadow-forest/[0.06] hover:-translate-y-1 bg-gradient-to-br from-white to-orange-50/20">
-                        <CardContent className="p-10 flex items-center gap-10 h-full">
-                          <div className="h-20 w-20 rounded-[2rem] bg-terracotta/10 flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform">
-                            <Wallet className="h-8 w-8 text-terracotta" />
+                      <Card className="h-full border-none bg-white overflow-hidden rounded-[2.5rem] md:rounded-[3rem] shadow-xl shadow-forest/[0.03] relative transition-all duration-500 hover:shadow-forest/[0.06] hover:-translate-y-1 bg-gradient-to-br from-white to-orange-50/20">
+                        <CardContent className="p-8 md:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-10 h-full">
+                          <div className="h-16 w-16 md:h-20 md:w-20 rounded-[1.5rem] md:rounded-[2rem] bg-terracotta/10 flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform">
+                            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-terracotta" />
                           </div>
-                          <div className="flex-grow">
-                            <p className="text-[10px] text-forest/30 font-black uppercase tracking-[0.3em] mb-2 font-montserrat">Soul Credits</p>
+                          <div className="flex-grow w-full">
+                            <p className="text-[9px] md:text-[10px] text-forest/30 font-black uppercase tracking-[0.3em] mb-2 font-montserrat">Soul Credits</p>
                             <div className="flex items-center justify-between">
-                              <h3 className="text-5xl font-heading font-black text-forest tracking-tighter">₹1,500</h3>
+                              <h3 className="text-4xl md:text-5xl font-heading font-black text-forest tracking-tighter">₹1,500</h3>
                               <Button variant="ghost" className="h-10 w-10 rounded-full border border-forest/5 text-forest/40 hover:text-terracotta hover:bg-terracotta/5">
                                 <Plus className="h-4 w-4" />
                               </Button>
@@ -403,14 +443,14 @@ export default function Dashboard() {
 
                     {/* Progress Stat */}
                     <div className="md:col-span-1 group">
-                      <Card className="h-full border-none bg-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1 group">
-                        <CardContent className="p-10 flex flex-col justify-between h-full">
-                          <div className="h-14 w-14 rounded-2xl bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Zap className="h-6 w-6 text-amber-500" />
+                      <Card className="h-full border-none bg-white overflow-hidden rounded-[2.5rem] md:rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1 group">
+                        <CardContent className="p-8 md:p-10 flex flex-col justify-between h-full">
+                          <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Zap className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
                           </div>
-                          <div className="mt-12">
-                            <p className="text-[9px] text-forest/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Experience Pts</p>
-                            <h3 className="text-4xl font-heading font-black text-forest tracking-tighter">{bookings.length * 250}</h3>
+                          <div className="mt-8 md:mt-12">
+                            <p className="text-[8px] md:text-[9px] text-forest/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Experience Pts</p>
+                            <h3 className="text-3xl md:text-4xl font-heading font-black text-forest tracking-tighter">{bookings.length * 250}</h3>
                           </div>
                         </CardContent>
                       </Card>
@@ -418,14 +458,14 @@ export default function Dashboard() {
 
                     {/* Trust Stat */}
                     <div className="md:col-span-1 group">
-                      <Card className="h-full border-none bg-[#111827] text-white overflow-hidden rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1">
-                        <CardContent className="p-10 flex flex-col justify-between h-full">
-                          <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center">
-                            <ShieldCheck className="h-6 w-6 text-emerald-400" />
+                      <Card className="h-full border-none bg-[#111827] text-white overflow-hidden rounded-[2.5rem] md:rounded-[3rem] shadow-xl shadow-forest/[0.03] transition-all duration-500 hover:-translate-y-1">
+                        <CardContent className="p-8 md:p-10 flex flex-col justify-between h-full">
+                          <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-white/10 flex items-center justify-center">
+                            <ShieldCheck className="h-5 w-5 md:h-6 md:w-6 text-emerald-400" />
                           </div>
-                          <div className="mt-12">
-                            <p className="text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Profile Trust</p>
-                            <h3 className="text-4xl font-heading font-black text-white tracking-tighter">100%</h3>
+                          <div className="mt-8 md:mt-12">
+                            <p className="text-[8px] md:text-[9px] text-white/30 font-black uppercase tracking-[0.2em] mb-2 font-montserrat">Profile Trust</p>
+                            <h3 className="text-3xl md:text-4xl font-heading font-black text-white tracking-tighter">100%</h3>
                           </div>
                         </CardContent>
                       </Card>
@@ -434,12 +474,12 @@ export default function Dashboard() {
 
                   {/* Enhanced Active Journey Section */}
                   <section>
-                    <div className="flex items-center justify-between mb-10">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-6">
                       <div className="flex items-center gap-6">
-                        <div className="h-12 w-12 rounded-[1.25rem] bg-terracotta flex items-center justify-center shadow-2xl shadow-terracotta/30">
-                          <Compass className="h-6 w-6 text-white animate-spin-slow" />
+                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-[1.25rem] bg-terracotta flex items-center justify-center shadow-2xl shadow-terracotta/30">
+                          <Compass className="h-5 w-5 md:h-6 md:w-6 text-white animate-spin-slow" />
                         </div>
-                        <h2 className="text-4xl font-heading font-black text-forest tracking-tight italic">Current Expedition</h2>
+                        <h2 className="text-3xl md:text-4xl font-heading font-black text-forest tracking-tight italic">Current Expedition</h2>
                       </div>
                       <button onClick={() => setActiveTab('bookings')} className="group flex items-center gap-3 text-[10px] font-black text-terracotta uppercase tracking-[0.4em] hover:gap-5 transition-all">
                         LOGBOOK <ArrowRight className="h-3 w-3" />
@@ -447,9 +487,9 @@ export default function Dashboard() {
                     </div>
 
                     {bookings.length > 0 ? (
-                      <Card className="border-none bg-white overflow-hidden shadow-2xl shadow-forest/[0.08] rounded-[4rem] group hover:shadow-forest/[0.12] transition-all duration-[1s]">
-                        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
-                          <div className="lg:col-span-5 relative overflow-hidden h-96 lg:h-auto">
+                      <Card className="border-none bg-white overflow-hidden shadow-2xl shadow-forest/[0.08] rounded-[2.5rem] md:rounded-[4rem] group hover:shadow-forest/[0.12] transition-all duration-[1s]">
+                        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-fit lg:min-h-[500px]">
+                          <div className="lg:col-span-5 relative overflow-hidden h-64 sm:h-96 lg:h-auto">
                             <img 
                               src={bookings[0].image || "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80"} 
                               alt={bookings[0].item}
@@ -457,70 +497,70 @@ export default function Dashboard() {
                               referrerPolicy="no-referrer"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-forest/20 to-transparent" />
-                            <div className="absolute bottom-12 left-12">
-                              <Badge className="bg-terracotta text-white border-none px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 shadow-xl">
-                                {bookings[0].type.toUpperCase()}
+                            <div className="absolute bottom-8 md:bottom-12 left-8 md:left-12">
+                              <Badge className="bg-terracotta text-white border-none px-4 md:px-6 py-1.5 md:py-2 rounded-full text-[8px] md:text-[10px] font-black uppercase tracking-widest mb-3 md:mb-4 shadow-xl">
+                                {bookings[0].type?.toUpperCase() || 'JOURNEY'}
                               </Badge>
-                              <div className="flex items-center gap-3 text-white/90 text-xs font-black uppercase tracking-[0.3em]">
-                                <MapPin className="h-4 w-4 text-terracotta" />
+                              <div className="flex items-center gap-2 md:gap-3 text-white/90 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] md:tracking-[0.3em]">
+                                <MapPin className="h-3 w-3 md:h-4 md:w-4 text-terracotta" />
                                 Base Camp: Manali
                               </div>
                             </div>
                           </div>
-                          <CardContent className="lg:col-span-7 p-12 lg:p-20 flex flex-col justify-between bg-white relative">
-                            <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:rotate-45 transition-transform duration-[2s]">
-                              <Mountain className="h-64 w-64" />
+                          <CardContent className="lg:col-span-7 p-8 md:p-12 lg:p-20 flex flex-col justify-between bg-white relative">
+                            <div className="absolute top-0 right-0 p-8 md:p-12 opacity-[0.03] group-hover:rotate-45 transition-transform duration-[2s]">
+                              <Mountain className="h-48 w-48 md:h-64 md:w-64" />
                             </div>
                             
                             <div className="relative z-10">
-                              <div className="flex items-center justify-between mb-12">
-                                <div className="space-y-2">
-                                  <p className="text-[10px] font-black text-forest/30 uppercase tracking-[0.5em]">Network Status</p>
-                                  <div className="flex items-center gap-3">
-                                    <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{bookings[0].status || 'EN ROUTE'}</span>
+                              <div className="flex flex-row items-center justify-between mb-8 md:mb-12">
+                                <div className="space-y-1 md:space-y-2">
+                                  <p className="text-[8px] md:text-[10px] font-black text-forest/30 uppercase tracking-[0.4em] md:tracking-[0.5em]">Network Status</p>
+                                  <div className="flex items-center gap-2 md:gap-3">
+                                    <div className="h-2 w-2 md:h-3 md:w-3 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] md:text-xs font-black text-emerald-600 uppercase tracking-widest">{bookings[0].status || 'EN ROUTE'}</span>
                                   </div>
                                 </div>
-                                <div className="h-20 w-20 rounded-full border border-forest/5 flex items-center justify-center p-1">
+                                <div className="h-14 w-14 md:h-20 md:w-20 rounded-full border border-forest/5 flex items-center justify-center p-0.5 md:p-1 shrink-0">
                                   <div className="h-full w-full rounded-full border border-dashed border-terracotta/30 flex items-center justify-center animate-spin-slow">
-                                    <Star className="h-8 w-8 text-terracotta" />
+                                    <Star className="h-5 w-5 md:h-8 md:w-8 text-terracotta" />
                                   </div>
                                 </div>
                               </div>
                               
-                              <h3 className="text-6xl lg:text-8xl font-heading font-black text-forest mb-12 leading-[0.9] tracking-tighter">
-                                {bookings[0].item}
+                              <h3 className="text-4xl md:text-6xl lg:text-8xl font-heading font-black text-forest mb-8 md:mb-12 leading-[1.1] md:leading-[0.9] tracking-tighter">
+                                {bookings[0].item || 'Untitled Expedition'}
                               </h3>
                               
-                              <div className="grid grid-cols-2 gap-16 mb-16">
-                                <div className="space-y-4">
-                                  <p className="text-[10px] text-forest/30 uppercase tracking-[0.5em] font-black">Departure</p>
-                                  <div className="flex items-center gap-4 text-forest font-black tracking-tight group/date">
-                                    <div className="h-12 w-12 rounded-2xl bg-forest/5 flex items-center justify-center group-hover/date:bg-forest group-hover/date:text-white transition-all">
-                                      <Calendar className="h-5 w-5 text-terracotta group-hover/date:text-white" />
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16 mb-10 md:mb-16">
+                                <div className="space-y-3 md:space-y-4">
+                                  <p className="text-[8px] md:text-[10px] text-forest/30 uppercase tracking-[0.4em] md:tracking-[0.5em] font-black">Departure</p>
+                                  <div className="flex items-center gap-3 md:gap-4 text-forest font-black tracking-tight group/date">
+                                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-2xl bg-forest/5 flex items-center justify-center group-hover/date:bg-forest group-hover/date:text-white transition-all">
+                                      <Calendar className="h-4 w-4 md:h-5 md:w-5 text-terracotta group-hover/date:text-white" />
                                     </div>
-                                    <span className="text-xl">
+                                    <span className="text-lg md:text-xl">
                                       {bookings[0].dateRange?.split(' to ')[0] || 'TBD'}
                                     </span>
                                   </div>
                                 </div>
-                                <div className="space-y-4">
-                                  <p className="text-[10px] text-forest/30 uppercase tracking-[0.5em] font-black">Expedition Goal</p>
-                                  <div className="flex items-center gap-4 text-forest font-black tracking-tight">
-                                    <div className="h-12 w-12 rounded-2xl bg-forest/5 flex items-center justify-center">
-                                      <Zap className="h-5 w-5 text-amber-500" />
+                                <div className="space-y-3 md:space-y-4">
+                                  <p className="text-[8px] md:text-[10px] text-forest/30 uppercase tracking-[0.4em] md:tracking-[0.5em] font-black">Expedition Goal</p>
+                                  <div className="flex items-center gap-3 md:gap-4 text-forest font-black tracking-tight">
+                                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-[1rem] md:rounded-2xl bg-forest/5 flex items-center justify-center">
+                                      <Zap className="h-4 w-4 md:h-5 md:w-5 text-amber-500" />
                                     </div>
-                                    <span className="text-xl italic">Peak Mastery</span>
+                                    <span className="text-lg md:text-xl italic">Peak Mastery</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-6 pt-12 border-t border-forest/5 relative z-10">
-                              <Button className="rounded-full bg-forest text-white px-14 h-16 text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-forest/30 hover:scale-105 active:scale-95 transition-all">
+                            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-8 md:pt-12 border-t border-forest/5 relative z-10">
+                              <Button className="w-full sm:w-auto rounded-full bg-forest text-white px-8 md:px-14 h-14 md:h-16 text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-forest/30 hover:scale-105 active:scale-95 transition-all">
                                 Analyze Itinerary
                               </Button>
-                              <Button variant="outline" className="rounded-full border-forest/10 text-forest h-16 px-10 text-[10px] font-black uppercase tracking-widest hover:bg-forest hover:text-white transition-all">
+                              <Button variant="outline" className="w-full sm:w-auto rounded-full border-forest/10 text-forest h-14 md:h-16 px-8 md:px-10 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-forest hover:text-white transition-all">
                                 Contact Guide
                               </Button>
                             </div>
@@ -638,44 +678,44 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     {bookings.length > 0 ? (
                       bookings.map((booking) => (
-                        <Card key={booking.id} className="border-none bg-white rounded-3xl shadow-lg shadow-forest/[0.02] hover:shadow-xl transition-all group">
+                        <Card key={booking.id} className="border-none bg-white rounded-[1.5rem] md:rounded-3xl shadow-lg shadow-forest/[0.02] hover:shadow-xl transition-all group overflow-hidden">
                           <CardContent className="p-0">
-                            <div className="flex flex-col md:flex-row md:items-center">
-                              <div className="w-full md:w-32 h-32 relative overflow-hidden shrink-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center">
+                              <div className="w-full sm:w-32 h-32 relative overflow-hidden shrink-0">
                                 <img 
                                   src={booking.image || "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80"} 
                                   alt="" 
                                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                                 />
                               </div>
-                              <div className="flex-1 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                              <div className="flex-1 p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                 <div>
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className="text-[10px] font-bold text-forest/30 uppercase tracking-widest">{booking.type}</span>
                                     <span className="h-1 w-1 rounded-full bg-forest/10" />
                                     <span className="text-[10px] font-bold text-terracotta uppercase">{booking.status || 'Confirmed'}</span>
                                   </div>
-                                  <h3 className="font-bold text-xl text-forest font-heading">
+                                  <h3 className="font-bold text-lg md:text-xl text-forest font-heading">
                                     {booking.item}
                                   </h3>
-                                  <div className="flex items-center gap-4 text-[10px] text-forest/40 font-bold uppercase tracking-wider mt-2">
-                                    <span className="flex items-center gap-1.5">
+                                  <div className="flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-[10px] text-forest/40 font-bold uppercase tracking-wider mt-2">
+                                    <span className="flex items-center gap-1.5 whitespace-nowrap">
                                       <Calendar className="h-3 w-3 text-terracotta" />
                                       {booking.createdAt?.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                     </span>
-                                    <span className="flex items-center gap-1.5">
+                                    <span className="flex items-center gap-1.5 whitespace-nowrap">
                                       <Hash className="h-3 w-3 text-terracotta" />
-                                      Order ID: {booking.id.slice(-6).toUpperCase()}
+                                      ID: {booking.id.slice(-6).toUpperCase()}
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4 justify-between md:justify-end">
+                                <div className="flex items-center gap-4 justify-between md:justify-end border-t md:border-none pt-4 md:pt-0">
                                   <div className="text-right">
-                                    <p className="text-2xl font-bold text-forest">{booking.price}</p>
-                                    <p className="text-[10px] text-forest/30 uppercase tracking-widest font-bold">Total Paid</p>
+                                    <p className="text-xl md:text-2xl font-bold text-forest">{booking.price}</p>
+                                    <p className="text-[9px] md:text-[10px] text-forest/30 uppercase tracking-widest font-bold">Total Paid</p>
                                   </div>
-                                  <Button size="icon" variant="ghost" className="h-12 w-12 rounded-full border border-forest/5 hover:bg-forest/5">
-                                    <Download className="h-5 w-5 text-forest/40" />
+                                  <Button size="icon" variant="ghost" className="h-10 w-10 md:h-12 md:w-12 rounded-full border border-forest/5 hover:bg-forest/5">
+                                    <Download className="h-4 w-4 md:h-5 md:w-5 text-forest/40" />
                                   </Button>
                                 </div>
                               </div>

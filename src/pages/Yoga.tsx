@@ -414,113 +414,148 @@ export default function Yoga() {
 
       {/* Yoga Detail Modal */}
       {selectedPackage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/80 backdrop-blur-xl">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-white rounded-[2.5rem] shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row border border-white/20"
+            className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.3)] max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row border border-white/20 relative"
           >
-            {/* Left Side: Immersive Image */}
-            <div className="relative w-full md:w-1/2 h-64 md:h-auto shrink-0 bg-forest overflow-hidden">
-              <img src={selectedPackage.image} alt={selectedPackage.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-forest/10 md:to-forest/20" />
+            {/* Background Texture Overlay */}
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
+
+            {/* Left Side: Immersive Img */}
+            <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
+              <img src={selectedPackage.image} alt={selectedPackage.title} className="w-full h-full object-cover scale-105" />
               
-              <button 
-                onClick={() => setSelectedPackage(null)}
-                className="absolute top-6 left-6 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-              >
-                <Plus className="h-5 w-5 rotate-45" />
-              </button>
+              {/* Decorative Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/20 to-transparent" />
+              
+              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="font-fluid text-3xl md:text-4xl text-terracotta drop-shadow-md mb-2 block">Sacred Space</span>
+                  <h2 className="text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
+                    {selectedPackage.title.split(' ').map((word: string, i: number) => (
+                      <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
+                    ))}
+                  </h2>
+                </motion.div>
+                
+                <div className="flex items-center gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2">
+                    <Flower2 className="h-4 w-4 text-terracotta" />
+                    <span>Pure Presence</span>
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-terracotta" />
+                  <span>{selectedPackage.focus}</span>
+                </div>
+              </div>
 
-              <button 
-                onClick={() => handleShare(selectedPackage)}
-                className="absolute top-6 left-20 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-                title="Share"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-
-              <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 text-white">
-                <Badge className="bg-forest text-white border-white/20 mb-4 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg">
-                  Authentic Spiritual Retreat
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-heading font-bold leading-tight mb-2 drop-shadow-2xl">{selectedPackage.title}</h2>
-                <p className="text-white/80 text-sm font-medium tracking-wide flex items-center gap-2 italic">
-                  <Flower2 className="h-4 w-4 text-terracotta" /> {selectedPackage.focus}
-                </p>
+              {/* Close for Mobile */}
+              <div className="absolute top-6 left-6 flex gap-3 lg:hidden z-50">
+                <button onClick={() => setSelectedPackage(null)} className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all">
+                  <Plus className="h-5 w-5 rotate-45" />
+                </button>
               </div>
             </div>
 
             {/* Right Side: Details */}
-            <div className="flex-grow p-8 md:p-12 overflow-y-auto bg-white relative">
-              <div className="absolute top-6 right-6 flex items-center gap-3">
+            <div className="flex-grow flex flex-col h-full bg-[#FAF9F6] relative">
+              {/* Desktop Close/Share */}
+              <div className="absolute top-8 right-8 hidden lg:flex items-center gap-4 z-20">
                 <button 
                   onClick={() => handleShare(selectedPackage)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
-                  title="Share Retreat"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all transform hover:rotate-12"
                 >
                   <Share2 className="h-5 w-5" />
                 </button>
                 <button 
                   onClick={() => setSelectedPackage(null)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-forest hover:text-white transition-all transform hover:-rotate-12"
                 >
                   <Plus className="h-6 w-6 rotate-45" />
                 </button>
               </div>
 
-              {/* Quick Info Grid */}
-              <div className="grid grid-cols-2 gap-6 mb-10 pb-8 border-b border-forest/5">
-                <div className="text-center md:text-left">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Retreat Duration</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Clock className="h-4 w-4 text-terracotta" /> {selectedPackage.duration}
-                  </div>
-                </div>
-                <div className="text-center md:text-left border-l border-forest/10 pl-6">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Difficulty Level</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Sparkles className="h-4 w-4 text-terracotta" /> All Levels Welcome
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-10">
-                {/* Highlights/Features */}
-                <div>
-                  <h4 className="font-heading font-bold text-forest mb-4 text-sm uppercase tracking-widest">Retreat Inclusions</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {selectedPackage.features.map((f: string) => (
-                      <div key={f} className="flex items-center text-xs font-bold text-forest/70 bg-cream/30 p-4 rounded-2xl border border-forest/5">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-3 shrink-0" />
-                        {f}
-                      </div>
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14">
+                <div className="max-w-3xl mx-auto space-y-16">
+                  
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { icon: Clock, label: 'Respite', value: selectedPackage.duration, sub: 'Days of Peace' },
+                      { icon: Wind, label: 'Energy', value: 'Restorative', sub: 'Yoga & Meditation' }
+                    ].map((stat, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + (i * 0.1) }}
+                        className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all"
+                      >
+                        <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                          <stat.icon className="h-5 w-5 text-terracotta" />
+                        </div>
+                        <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
+                        <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
+                        <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
 
-                {/* Description & Itinerary */}
-                <div className="space-y-8">
-                  <div>
-                    <h4 className="font-heading font-bold text-forest mb-4 text-sm uppercase tracking-widest">The Soul Journey</h4>
-                    <p className="text-forest/70 text-sm leading-relaxed font-medium">
-                      {selectedPackage.description || "Immerse yourself in the ancient practice of yoga amidst the serene beauty of the Himalayas. Our retreats offer a holistic approach to wellness, combining physical postures, breathwork, and meditation."}
-                    </p>
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedPackage.features.map((f: string, i: number) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
+                      >
+                        <Sparkles className="h-4 w-4 text-terracotta mr-4 shrink-0" />
+                        {f}
+                      </motion.div>
+                    ))}
                   </div>
 
+                  {/* Description */}
+                  <section>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-px flex-grow bg-forest/5" />
+                      <span className="font-fluid text-2xl text-terracotta">Internal Balance</span>
+                      <div className="h-px flex-grow bg-forest/5" />
+                    </div>
+                    <p className="text-forest/70 text-base leading-[1.8] font-medium italic">
+                       "{selectedPackage.description || "Heal your soul in the divine silence of the high peaks."}"
+                    </p>
+                  </section>
+
+                  {/* Itinerary */}
                   {(selectedPackage.itinerary || selectedPackage.theExperience) && (
-                    <div className="bg-cream/20 p-6 md:p-8 rounded-[2rem] border border-forest/5">
-                      <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-terracotta" /> Day-by-Day Experience
-                      </h4>
-                      <div className="space-y-4">
+                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
+                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="flex items-center justify-between mb-10">
+                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Daily Rhythm</h4>
+                        <Sun className="h-8 w-8 text-terracotta animate-spin-slow" />
+                      </div>
+                      
+                      <div className="space-y-8 relative">
+                        <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                        
                         {Array.isArray(selectedPackage.itinerary) ? (
                           selectedPackage.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="space-y-2">
-                              <div className="text-xs font-black text-forest mt-4 first:mt-0 uppercase tracking-tighter">Day {item.day || i + 1}</div>
-                              <div className="text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2 text-xs leading-relaxed whitespace-pre-wrap">
+                            <div key={i} className="relative pl-12 group">
+                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-emerald-500/20 border-4 border-[#FAF9F6] ring-1 ring-emerald-500/10 z-10" />
+                              <div className="text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.2em] mb-1">Session {item.day || i + 1}</div>
+                              <h5 className="text-lg font-bold text-forest mb-2">Morning Pranayama</h5>
+                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
                                 {item.description}
-                              </div>
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -528,64 +563,71 @@ export default function Yoga() {
                             if (!line.trim()) return null;
                             const isDay = line.toLowerCase().startsWith('day');
                             return (
-                              <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
-                                {line.trim()}
+                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
+                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
+                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
+                                  {line.trim()}
+                                </div>
                               </div>
                             );
                           })
                         )}
                       </div>
-                    </div>
+                    </section>
                   )}
                 </div>
+              </div>
 
-                {/* Booking Footer */}
-                <div className="pt-8 border-t border-forest/5">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
-                    <div className="text-center sm:text-left">
-                      <div className="text-xs font-bold text-forest/40 uppercase tracking-widest mb-1">Retreat Investment</div>
-                      <div className="text-4xl font-black text-forest">
-                        {selectedPackage.price}
-                        <span className="text-xs font-bold text-forest/30 ml-1">/ person</span>
-                      </div>
+              {/* Footer */}
+              <div className="p-8 md:p-12 border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
+                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+                  <div className="text-center md:text-left">
+                    <div className="font-fluid text-2xl text-terracotta -mb-2">Spiritual Investment</div>
+                    <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+                      {selectedPackage.price}
+                      <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                     </div>
+                  </div>
 
-                    <div className="w-full sm:w-auto flex flex-col gap-4">
-                      {selectedPackage.slots && selectedPackage.slots.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {selectedPackage.slots && selectedPackage.slots.length > 0 && (
+                      <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedPackage.id] || ''}
                           onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
-                          className="w-full sm:min-w-[200px] rounded-full border-forest/10 p-3 bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20 text-forest font-bold text-xs"
+                          className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         >
-                          <option value="">Select departure</option>
+                          <option value="">Choose Slot</option>
                           {selectedPackage.slots.map((slot: any, i: number) => (
                             <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                             </option>
                           ))}
                         </select>
-                      )}
+                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                      </div>
+                    )}
 
-                      <Button 
-                        onClick={() => {
-                          const slotIndex = selectedSlots[selectedPackage.id];
-                          const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
-                          globalAddToCart({
-                            id: `yoga-${selectedPackage.title.toLowerCase().replace(/\s+/g, '-')}`,
-                            name: selectedPackage.title,
-                            price: selectedPackage.price,
-                            type: 'Yoga Retreat',
-                            image: selectedPackage.image,
-                            dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
-                          });
-                          setSelectedPackage(null);
-                        }}
-                        disabled={selectedPackage.slots && selectedPackage.slots.length > 0 && selectedSlots[selectedPackage.id] === undefined}
-                        className="w-full sm:min-w-[200px] bg-forest hover:bg-forest/90 text-white py-8 rounded-full text-base font-black shadow-2xl shadow-forest/20 uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 translate-y-0 hover:-translate-y-1"
-                      >
-                        Enroll Now
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={() => {
+                        const slotIndex = selectedSlots[selectedPackage.id];
+                        const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
+                        globalAddToCart({
+                          id: `yoga-${selectedPackage.title.toLowerCase().replace(/\s+/g, '-')}`,
+                          name: selectedPackage.title,
+                          price: selectedPackage.price,
+                          type: 'Yoga Retreat',
+                          image: selectedPackage.image,
+                          dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
+                        });
+                        setSelectedPackage(null);
+                      }}
+                      disabled={selectedPackage.slots && selectedPackage.slots.length > 0 && selectedSlots[selectedPackage.id] === undefined}
+                      className="w-full sm:min-w-[240px] h-16 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                    >
+                      <Zap className="h-4 w-4" />
+                      Begin Retreat
+                    </Button>
                   </div>
                 </div>
               </div>

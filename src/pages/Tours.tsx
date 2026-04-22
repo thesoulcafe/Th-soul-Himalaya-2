@@ -207,69 +207,79 @@ export default function Tours() {
   }, [tours, activeCategory, searchQuery, maxPrice, maxDuration]);
 
   return (
-    <div className="pt-24 px-4 sm:px-6">
+    <div className="pt-20 px-4 sm:px-6">
       {seo && <SEO title={seo.title || "Tour Packages"} description={seo.description || "Handpicked mountain journeys."} keywords={seo.keyword} />}
-      {/* Tagline */}
-      <div className="max-w-7xl mx-auto mb-12 text-center">
-        <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Tour Packages</h1>
-        <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Handpicked Mountain Journeys</p>
-      </div>
-
-      {/* Categories & Search */}
-      <div className="max-w-7xl mx-auto mb-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-          <div className="flex-grow overflow-x-auto custom-scrollbar w-full md:w-auto">
-            <div className="flex gap-2 min-w-max pb-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={cn(
-                    "px-4 sm:px-6 py-2 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-all duration-300 border",
-                    activeCategory === category
-                      ? "bg-forest text-white border-forest shadow-lg shadow-forest/20"
-                      : "bg-white text-forest/60 border-forest/10 hover:border-forest/40"
-                  )}
-                >
-                  {category}
-                </button>
-              ))}
+      
+      {/* Search & Filter Header (Sticky) */}
+      <div className="sticky top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
+            {/* Page Identity - Elegant & Compact */}
+            <div className="flex flex-col items-center md:items-start shrink-0">
+              <h1 className="text-sm md:text-base font-heading font-black text-forest leading-none tracking-tight uppercase">Tour Packages</h1>
+              <p className="hidden md:block text-[8px] text-terracotta font-black tracking-[0.3em] uppercase mt-1">Handpicked Journeys</p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative group flex-grow md:w-72">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/30 group-focus-within:text-terracotta transition-colors" />
-              <input 
-                type="text"
-                placeholder="Search journeys..."
-                value={searchQuery || ''}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-3 bg-white border border-forest/5 rounded-2xl text-[11px] font-bold text-forest placeholder:text-forest/30 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all uppercase tracking-widest"
-              />
-              {searchQuery && (
-                <button 
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-forest/20 hover:text-terracotta transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+            {/* Middle Section: Integrated Search & Categories */}
+            <div className="flex items-center gap-2 md:gap-4 flex-grow w-full md:w-auto">
+              {/* Search input - Sleek */}
+              <div className="relative group flex-grow md:max-w-xs transition-all duration-300">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-forest/20 group-focus-within:text-terracotta transition-colors" />
+                <input 
+                  type="text"
+                  placeholder="FIND YOUR PATH..."
+                  value={searchQuery || ''}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-8 py-2 bg-white/50 border border-forest/5 rounded-full text-[9px] font-black text-forest placeholder:text-forest/20 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all tracking-widest uppercase"
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-forest/20 hover:text-terracotta transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+
+              {/* Categories - Minimal Pill Scroller */}
+              <div className="flex-grow overflow-x-auto scrollbar-none pb-0.5 md:pb-0">
+                <div className="flex items-center gap-1.5 min-w-max px-1">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      className={cn(
+                        "px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest transition-all duration-500 border-2 whitespace-nowrap",
+                        activeCategory === category
+                          ? "bg-forest text-white border-forest shadow-lg shadow-forest/10 scale-105"
+                          : "bg-white/40 text-forest/40 border-forest/5 hover:border-forest/20 hover:text-forest"
+                      )}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Filter Action */}
+              <Button 
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                variant="outline"
+                className={cn(
+                  "rounded-full border-forest/5 h-8 md:h-10 px-3 md:px-4 flex items-center gap-2 font-black text-[8px] md:text-[9px] uppercase tracking-widest transition-all shrink-0",
+                  isFilterOpen ? "bg-forest text-white border-forest" : "bg-white/80 text-forest hover:bg-forest/5"
+                )}
+              >
+                <SlidersHorizontal className="h-3 md:h-3.5 w-3 md:w-3.5" />
+                <span className="hidden sm:inline">{isFilterOpen ? 'HIDE' : 'FILTERS'}</span>
+              </Button>
             </div>
-            <Button 
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              variant="outline"
-              className={cn(
-                "rounded-2xl border-forest/5 h-12 px-6 flex items-center gap-2 font-black text-[10px] uppercase tracking-widest transition-all",
-                isFilterOpen ? "bg-forest text-white border-forest" : "bg-white text-forest hover:bg-forest/5"
-              )}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {isFilterOpen ? 'Hide Filters' : 'Filters'}
-            </Button>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto mb-12 px-4 sm:px-6">
         {/* Search Status */}
         {searchQuery && (
           <motion.div 
@@ -630,113 +640,149 @@ export default function Tours() {
 
       {/* Tour Detail Modal */}
       {selectedTour && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-forest/80 backdrop-blur-xl">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-white rounded-[2.5rem] shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row border border-white/20"
+            className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.3)] max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row border border-white/20 relative"
           >
-            {/* Left Side: Immersive Image */}
-            <div className="relative w-full md:w-1/2 h-64 md:h-auto shrink-0 bg-forest overflow-hidden">
-              <img src={selectedTour.image} alt={selectedTour.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-forest/10 md:to-forest/20" />
+            {/* Background Texture Overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
+
+            {/* Left Side: Immersive Visuals */}
+            <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
+              <img src={selectedTour.image} alt={selectedTour.title} className="w-full h-full object-cover scale-105" />
               
-              <button 
-                onClick={() => setSelectedTour(null)}
-                className="absolute top-6 left-6 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-              >
-                <Plus className="h-5 w-5 rotate-45" />
-              </button>
+              {/* Decorative Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/20 to-transparent" />
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-black/40 to-transparent" />
+              
+              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="font-fluid text-3xl md:text-4xl text-terracotta drop-shadow-md mb-2 block">The Curated</span>
+                  <h2 className="text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
+                    {selectedTour.title.split(' ').map((word: string, i: number) => (
+                      <span key={i} className={i === 1 ? 'text-white/40' : ''}>{word} </span>
+                    ))}
+                  </h2>
+                </motion.div>
+                
+                <div className="flex items-center gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-terracotta" />
+                    <span>Sacred Paths</span>
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-terracotta" />
+                  <span>Cultural Wonders</span>
+                </div>
+              </div>
 
-              <button 
-                onClick={() => handleShare(selectedTour)}
-                className="absolute top-6 left-20 bg-white/20 backdrop-blur-xl p-2.5 rounded-full shadow-2xl hover:bg-white transition-all text-white hover:text-forest md:hidden z-50 border border-white/40"
-                title="Share"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-
-              <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-12 text-white">
-                <Badge className="bg-forest text-white border-white/20 mb-4 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg">
-                  Curated Himalayan Journey
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-heading font-bold leading-tight mb-2 drop-shadow-2xl">{selectedTour.title}</h2>
-                <p className="text-white/80 text-sm font-medium tracking-wide flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-terracotta" /> Discovering Hidden Gems
-                </p>
+              {/* Close & Share for Mobile */}
+              <div className="absolute top-6 left-6 flex gap-3 lg:hidden z-50">
+                <button onClick={() => setSelectedTour(null)} className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
             </div>
 
-            {/* Right Side: Details */}
-            <div className="flex-grow p-8 md:p-12 overflow-y-auto bg-white relative">
-              <div className="absolute top-6 right-6 flex items-center gap-3">
+            {/* Right Side: Soulful Details */}
+            <div className="flex-grow flex flex-col h-full bg-[#FAF9F6] relative">
+              {/* Desktop Close/Share */}
+              <div className="absolute top-8 right-8 hidden lg:flex items-center gap-4 z-20">
                 <button 
                   onClick={() => handleShare(selectedTour)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
-                  title="Share Journey"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all transform hover:rotate-12 active:scale-90"
                 >
                   <Share2 className="h-5 w-5" />
                 </button>
                 <button 
                   onClick={() => setSelectedTour(null)}
-                  className="bg-forest/5 p-3 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all hidden md:flex active:scale-90"
+                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-forest hover:text-white transition-all transform hover:-rotate-12 active:scale-90"
                 >
-                  <Plus className="h-6 w-6 rotate-45" />
+                  <X className="h-6 w-6" />
                 </button>
               </div>
 
-              {/* Quick Info Grid */}
-              <div className="grid grid-cols-2 gap-6 mb-10 pb-8 border-b border-forest/5">
-                <div className="text-center md:text-left">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Package Duration</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Clock className="h-4 w-4 text-terracotta" /> {selectedTour.duration}
-                  </div>
-                </div>
-                <div className="text-center md:text-left border-l border-forest/10 pl-6">
-                  <div className="text-[9px] uppercase tracking-widest text-forest/40 font-bold mb-2">Guest Rating</div>
-                  <div className="flex items-center justify-center md:justify-start gap-1.5 font-bold text-forest text-sm italic">
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" /> {selectedTour.rating} ({selectedTour.reviews} Reviews)
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-10">
-                {/* Highlights */}
-                <div>
-                  <h4 className="font-heading font-bold text-forest mb-4 text-sm uppercase tracking-widest">Journey Highlights</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {selectedTour.highlights.map((h: string) => (
-                      <div key={h} className="flex items-center text-xs font-bold text-forest/70 bg-cream/30 p-4 rounded-2xl border border-forest/5">
-                        <CheckCircle2 className="h-4 w-4 text-terracotta mr-3 shrink-0" />
-                        {h}
-                      </div>
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14">
+                <div className="max-w-3xl mx-auto space-y-16">
+                  
+                  {/* Stats Grid - Fluid Style */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { icon: Clock, label: 'Duration', value: selectedTour.duration, sub: 'Days & Nights' },
+                      { icon: Star, label: 'Rating', value: `${selectedTour.rating} Stars`, sub: `${selectedTour.reviews} Soulful Reviews` }
+                    ].map((stat, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + (i * 0.1) }}
+                        className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all"
+                      >
+                        <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                          <stat.icon className="h-5 w-5 text-terracotta" />
+                        </div>
+                        <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
+                        <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
+                        <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
 
-                {/* Description & Itinerary */}
-                <div className="space-y-8">
-                  <div>
-                    <h4 className="font-heading font-bold text-forest mb-4 text-sm uppercase tracking-widest">The Soul Journey</h4>
-                    <p className="text-forest/70 text-sm leading-relaxed font-medium">
-                      {selectedTour.description || "Experience the magic of the Himalayas with our curated expedition. This journey takes you through ancient villages, lush forests, and breathtaking mountain passes. Includes professional guides, comfortable stays, and authentic local meals."}
-                    </p>
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedTour.highlights.map((h: string, i: number) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-terracotta mr-4 shrink-0" />
+                        {h}
+                      </motion.div>
+                    ))}
                   </div>
 
+                  {/* Soulful Description */}
+                  <section>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="h-px flex-grow bg-forest/5" />
+                      <span className="font-fluid text-2xl text-terracotta">The Journey's Soul</span>
+                      <div className="h-px flex-grow bg-forest/5" />
+                    </div>
+                    <p className="text-forest/70 text-base leading-[1.8] font-medium italic">
+                      "{selectedTour.description}"
+                    </p>
+                  </section>
+
+                  {/* Detailed Itinerary */}
                   {(selectedTour.itinerary || selectedTour.theExperience) && (
-                    <div className="bg-cream/20 p-6 md:p-8 rounded-[2rem] border border-forest/5">
-                      <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-terracotta" /> Day-by-Day Experience
-                      </h4>
-                      <div className="space-y-4">
+                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
+                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="flex items-center justify-between mb-10">
+                        <h4 className="font-playfair text-3xl font-black italic text-forest">Chronicle of Wonder</h4>
+                        <Sparkles className="h-8 w-8 text-terracotta animate-pulse" />
+                      </div>
+                      
+                      <div className="space-y-8 relative">
+                        <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                        
                         {Array.isArray(selectedTour.itinerary) ? (
                           selectedTour.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="space-y-2">
-                              <div className="text-xs font-black text-forest mt-4 first:mt-0 uppercase tracking-tighter">Day {item.day || i + 1}</div>
-                              <div className="text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2 text-xs leading-relaxed whitespace-pre-wrap">
+                            <div key={i} className="relative pl-12 group">
+                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta border-4 border-[#FAF9F6] ring-1 ring-terracotta/20 z-10 group-hover:scale-150 transition-transform" />
+                              <div className="text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
+                              <h5 className="text-lg font-bold text-forest mb-2">Morning Discovery</h5>
+                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
                                 {item.description}
-                              </div>
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -744,64 +790,71 @@ export default function Tours() {
                             if (!line.trim()) return null;
                             const isDay = line.toLowerCase().startsWith('day');
                             return (
-                              <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
-                                {line.trim()}
+                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
+                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
+                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
+                                  {line.trim()}
+                                </div>
                               </div>
                             );
                           })
                         )}
                       </div>
-                    </div>
+                    </section>
                   )}
                 </div>
+              </div>
 
-                {/* Booking Footer */}
-                <div className="pt-8 border-t border-forest/5">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
-                    <div className="text-center sm:text-left">
-                      <div className="text-xs font-bold text-forest/40 uppercase tracking-widest mb-1">Starting From</div>
-                      <div className="text-4xl font-black text-forest">
-                        {selectedTour.price}
-                        <span className="text-xs font-bold text-forest/30 ml-1">/ person</span>
-                      </div>
+              {/* Booking Footer - Creative Style */}
+              <div className="p-8 md:p-12 border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
+                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+                  <div className="text-center md:text-left">
+                    <div className="font-fluid text-2xl text-terracotta -mb-2">Energy Exchange</div>
+                    <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+                      {selectedTour.price}
+                      <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Traveler</span>
                     </div>
+                  </div>
 
-                    <div className="w-full sm:w-auto flex flex-col gap-4">
-                      {selectedTour.slots && selectedTour.slots.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {selectedTour.slots && selectedTour.slots.length > 0 && (
+                      <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedTour.id] || ''}
                           onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTour.id]: e.target.value })}
-                          className="w-full sm:min-w-[200px] rounded-full border-forest/10 p-3 bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/20 text-forest font-bold text-xs"
+                          className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         >
-                          <option value="">Select departure</option>
+                          <option value="">Choose Path</option>
                           {selectedTour.slots.map((slot: any, i: number) => (
                             <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                             </option>
                           ))}
                         </select>
-                      )}
+                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                      </div>
+                    )}
 
-                      <Button 
-                        onClick={() => {
-                          const slotIndex = selectedSlots[selectedTour.id];
-                          const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
-                          globalAddToCart({
-                            id: `tour-${selectedTour.id}`,
-                            name: selectedTour.title,
-                            price: selectedTour.price,
-                            type: 'Tour',
-                            image: selectedTour.image,
-                            dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
-                          });
-                          setSelectedTour(null);
-                        }}
-                        disabled={selectedTour.slots && selectedTour.slots.length > 0 && selectedSlots[selectedTour.id] === undefined}
-                        className="w-full sm:min-w-[200px] bg-forest hover:bg-forest/90 text-white py-8 rounded-full text-base font-black shadow-2xl shadow-forest/20 uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 translate-y-0 hover:-translate-y-1"
-                      >
-                        Book Journey
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={() => {
+                        const slotIndex = selectedSlots[selectedTour.id];
+                        const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
+                        globalAddToCart({
+                          id: `tour-${selectedTour.id}`,
+                          name: selectedTour.title,
+                          price: selectedTour.price,
+                          type: 'Tour',
+                          image: selectedTour.image,
+                          dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
+                        });
+                        setSelectedTour(null);
+                      }}
+                      disabled={selectedTour.slots && selectedTour.slots.length > 0 && selectedSlots[selectedTour.id] === undefined}
+                      className="w-full sm:min-w-[240px] h-16 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Reserve Seat
+                    </Button>
                   </div>
                 </div>
               </div>

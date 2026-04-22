@@ -62,13 +62,13 @@ export default function Navbar() {
                 />
               </div>
               <span className="flex items-baseline gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
-                <span className="text-[18px] md:text-[22px] font-fluid text-white">
+                <span className="text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
                   The
                 </span>
-                <span className="text-[22px] md:text-[28px] font-fluid text-terracotta drop-shadow-sm px-1">
+                <span className="text-[26px] md:text-[34px] font-fluid text-terracotta drop-shadow-sm px-1">
                   Soul
                 </span>
-                <span className="text-[18px] md:text-[22px] font-fluid text-white">
+                <span className="text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
                   Himalaya
                 </span>
               </span>

@@ -6,7 +6,8 @@ import {
   CheckCircle2, Clock, AlertCircle, Search, Filter, ChevronRight,
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
-  ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles
+  ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
+  Share2, Send
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -656,6 +657,45 @@ export default function Admin() {
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `bookings/${id}`);
     }
+  };
+
+  const deleteBooking = async (id: string) => {
+    setConfirmModal({
+      message: 'Are you sure you want to permanently delete this reservation? It will be removed from all reports and dashboards. This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await deleteDoc(doc(db, 'bookings', id));
+          setNotification({ message: 'Reservation deleted globally', type: 'success' });
+        } catch (error) {
+          handleFirestoreError(error, OperationType.DELETE, `bookings/${id}`);
+        }
+        setConfirmModal(null);
+      }
+    });
+  };
+
+  const handleShareBooking = (booking: Booking) => {
+    const userProfile = users.find(u => u.uid === booking.userId);
+    const phone = userProfile?.phone || '';
+    
+    const itemsText = booking.items?.map(i => i.name).join(', ') || booking.serviceName || 'Package';
+    const message = `Namaste ${booking.userName}! 🙏 Your booking with The Soul Himalaya is ${booking.status.toUpperCase()}.\n\nBooking ID: ${booking.id}\nExpedition: ${itemsText}\nTotal: ₹${booking.totalPrice.toLocaleString()}\n\nWarm regards,\nThe Soul Himalaya Team 🏔️`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodedMessage}`;
+    const emailUrl = `mailto:${booking.userEmail}?subject=Expedition Confirmation - Soul Himalaya&body=${encodedMessage}`;
+
+    setConfirmModal({
+      message: `Send confirmation to ${booking.userName} via WhatsApp & Email?`,
+      onConfirm: () => {
+        // Open WhatsApp in new tab
+        window.open(whatsappUrl, '_blank');
+        // Trigger Email
+        window.location.href = emailUrl;
+        setConfirmModal(null);
+        setNotification({ message: 'Communication channels initialized', type: 'success' });
+      }
+    });
   };
 
   const toggleBlockUser = async (uid: string, currentStatus: boolean) => {
@@ -2151,6 +2191,16 @@ export default function Admin() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
+                              title="Share & Notify"
+                              className="h-8 w-8 rounded-lg text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50"
+                              onClick={() => handleShareBooking(booking)}
+                            >
+                              <Share2 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              title="Update Status"
                               className="h-8 w-8 rounded-lg text-forest/40 hover:text-forest hover:bg-forest/5"
                               onClick={() => {
                                 setConfirmModal({
@@ -2171,6 +2221,15 @@ export default function Admin() {
                               }}
                             >
                               <RefreshCw className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              title="Delete Globally"
+                              className="h-8 w-8 rounded-lg text-rose-400 hover:text-rose-500 hover:bg-rose-50"
+                              onClick={() => deleteBooking(booking.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </td>

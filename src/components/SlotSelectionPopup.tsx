@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { 
   Dialog, 
   DialogContent, 
@@ -38,82 +39,113 @@ export default function SlotSelectionPopup({
 }: SlotSelectionPopupProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[450px] bg-white rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden">
-        <div className="bg-forest p-8 text-white relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 opacity-10">
-            <Calendar className="h-32 w-32" />
+      <DialogContent className="sm:max-w-[480px] bg-[#FAF9F6] rounded-[3rem] border-none shadow-[0_0_80px_rgba(45,62,53,0.2)] p-0 overflow-hidden relative">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
+
+        <div className="bg-forest p-10 text-white relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute -right-10 -top-10 opacity-10 blur-2xl">
+            <Calendar className="h-64 w-64" />
           </div>
-          <DialogHeader className="relative z-10">
-            <DialogTitle className="text-2xl font-heading font-bold text-white">Select a Slot</DialogTitle>
-            <DialogDescription className="text-white/60">
-              Choose your preferred dates for {title}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative z-10"
+          >
+            <span className="font-fluid text-2xl text-terracotta mb-2 block">Choose your Path</span>
+            <DialogTitle className="text-3xl font-playfair font-black italic tracking-tight text-white mb-2">{title}</DialogTitle>
+            <DialogDescription className="text-white/50 text-xs font-bold uppercase tracking-widest leading-loose">
+              Seize the Moment. Selective departures.
             </DialogDescription>
-          </DialogHeader>
+          </motion.div>
         </div>
 
-        <div className="p-8 space-y-4 max-h-[400px] overflow-y-auto">
+        <div className="p-8 space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
           {slots.map((slot, i) => {
             const isSelected = selectedSlotIndex === i.toString();
             const startDate = new Date(slot.startDate);
             const endDate = new Date(slot.endDate);
             
             return (
-              <button
+              <motion.button
                 key={i}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
                 onClick={() => {
                   onSelectSlot(i.toString());
                   onClose();
                 }}
                 className={cn(
-                  "w-full p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group",
+                  "w-full p-6 rounded-[2rem] border-2 transition-all duration-500 flex items-center justify-between group relative overflow-hidden",
                   isSelected 
-                    ? "border-terracotta bg-terracotta/5 shadow-md" 
-                    : "border-forest/5 bg-cream/30 hover:border-terracotta/30 hover:bg-white"
+                    ? "border-terracotta bg-white shadow-xl scale-[1.02]" 
+                    : "border-forest/5 bg-white/40 hover:border-terracotta/30 hover:bg-white"
                 )}
               >
-                <div className="flex items-center gap-4">
+                {isSelected && (
+                  <motion.div 
+                    layoutId="active-bg"
+                    className="absolute inset-0 bg-terracotta/[0.03] pointer-events-none" 
+                  />
+                )}
+                
+                <div className="flex items-center gap-6 relative z-10">
                   <div className={cn(
-                    "h-10 w-10 rounded-xl flex items-center justify-center transition-colors",
-                    isSelected ? "bg-terracotta text-white" : "bg-forest/5 text-forest/40 group-hover:bg-terracotta/10 group-hover:text-terracotta"
+                    "h-14 w-14 rounded-2xl flex items-center justify-center transition-all duration-500",
+                    isSelected ? "bg-terracotta text-white shadow-lg shadow-terracotta/20 rotate-6" : "bg-forest/5 text-forest/20 group-hover:bg-terracotta/10 group-hover:text-terracotta group-hover:rotate-6"
                   )}>
-                    <Calendar className="h-5 w-5" />
+                    <Calendar className="h-6 w-6" />
                   </div>
                   <div className="text-left">
-                    <div className="text-sm font-bold text-forest">
-                      {startDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    <div className="text-sm font-black text-forest tracking-tight">
+                      {startDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} — {endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-                    <div className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">
-                      {slot.available !== false ? 'Available' : 'Limited Slots'}
+                    <div className={cn(
+                      "text-[9px] font-bold uppercase tracking-[0.2em] mt-1",
+                      isSelected ? "text-terracotta" : "text-forest/30"
+                    )}>
+                      {slot.available !== false ? 'Available Seat' : 'Last few spots'}
                     </div>
                   </div>
                 </div>
                 {isSelected ? (
-                  <CheckCircle2 className="h-5 w-5 text-terracotta" />
+                  <CheckCircle2 className="h-6 w-6 text-terracotta relative z-10" />
                 ) : (
-                  <ArrowRight className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-transform group-hover:translate-x-1" />
+                  <div className="bg-forest/5 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                    <ArrowRight className="h-4 w-4 text-terracotta" />
+                  </div>
                 )}
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
-        <div className="p-8 pt-0">
-          <div className="bg-forest rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => { onCustomize(); onClose(); }}>
-            <div className="absolute -right-4 -bottom-4 opacity-10 transition-transform group-hover:scale-110">
-              <Zap className="h-24 w-24" />
+        <div className="p-8 pb-10">
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-forest/[0.03] border border-forest/10 rounded-[2.5rem] p-8 text-forest relative overflow-hidden group cursor-pointer" 
+            onClick={() => { onCustomize(); onClose(); }}
+          >
+            <div className="absolute -right-6 -bottom-6 opacity-[0.05] transition-transform group-hover:scale-125 duration-700">
+              <Zap className="h-32 w-32" />
             </div>
             <div className="relative z-10">
-              <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
-                Customize Trip <Zap className="h-4 w-4 text-terracotta" />
-              </h4>
-              <p className="text-white/60 text-xs mb-4">None of these work? Tell us your preferred dates and we'll craft a perfect trip for you.</p>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="font-fluid text-2xl text-terracotta">Custom Path</span>
+                <div className="h-px flex-grow bg-forest/5" />
+              </div>
+              <p className="text-forest/50 text-[10px] uppercase font-bold tracking-[0.15em] mb-6 leading-relaxed">
+                Dates don't align? Let us weave a journey unique to your rhythm.
+              </p>
               <Button 
-                className="w-full h-10 rounded-xl bg-terracotta hover:bg-terracotta/90 text-white font-bold border-none"
+                className="w-full h-14 rounded-full bg-forest hover:bg-[#1a2f26] text-white font-black text-[10px] uppercase tracking-[0.3em] border-none shadow-xl transition-all active:scale-95 group"
               >
-                Get Started
+                Craft My Journey
+                <ArrowRight className="ml-2 h-3 w-3 transition-transform group-hover:translate-x-2 mr-0" />
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </DialogContent>
     </Dialog>

@@ -43,13 +43,13 @@ export default function Footer() {
               />
             </motion.div>
             <span className="flex flex-wrap items-baseline gap-2 md:gap-4 leading-none transition-all duration-700">
-              <span className="text-4xl md:text-6xl font-fluid text-cream">
+              <span className="text-3xl md:text-5xl font-playfair italic font-medium text-cream/90">
                 The
               </span>
-              <span className="text-6xl md:text-9xl font-fluid text-terracotta px-2">
+              <span className="text-6xl md:text-8xl font-fluid text-terracotta px-2 drop-shadow-lg">
                 Soul
               </span>
-              <span className="text-4xl md:text-6xl font-fluid text-cream">
+              <span className="text-3xl md:text-5xl font-playfair italic font-medium text-cream/90">
                 Himalaya
               </span>
             </span>
