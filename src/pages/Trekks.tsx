@@ -490,21 +490,32 @@ export default function Trekks() {
                     </p>
                   </div>
 
-                  {selectedTrekk.theExperience && (
+                  {(selectedTrekk.itinerary || selectedTrekk.theExperience) && (
                     <div className="bg-cream/20 p-6 md:p-8 rounded-[2rem] border border-forest/5">
                       <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-terracotta" /> Day-by-Day Experience
                       </h4>
                       <div className="space-y-4">
-                        {selectedTrekk.theExperience.split('\n').map((line: string, i: number) => {
-                          if (!line.trim()) return null;
-                          const isDay = line.toLowerCase().startsWith('day');
-                          return (
-                            <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
-                              {line.trim()}
+                        {Array.isArray(selectedTrekk.itinerary) ? (
+                          selectedTrekk.itinerary.map((item: any, i: number) => (
+                            <div key={i} className="space-y-2">
+                              <div className="text-xs font-black text-forest mt-4 first:mt-0 uppercase tracking-tighter">Day {item.day || i + 1}</div>
+                              <div className="text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2 text-xs leading-relaxed whitespace-pre-wrap">
+                                {item.description}
+                              </div>
                             </div>
-                          );
-                        })}
+                          ))
+                        ) : (
+                          selectedTrekk.theExperience.split('\n').map((line: string, i: number) => {
+                            if (!line.trim()) return null;
+                            const isDay = line.toLowerCase().startsWith('day');
+                            return (
+                              <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
+                                {line.trim()}
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   )}

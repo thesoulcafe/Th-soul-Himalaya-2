@@ -89,7 +89,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center space-x-10">
+        <div className="hidden lg:flex items-center space-x-6 xl:space-x-10">
           {navLinks.map((link) => (
             <motion.div
               key={link.name}
@@ -100,7 +100,7 @@ export default function Navbar() {
                 <a
                   href={link.href}
                   className={cn(
-                    'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    'text-[12px] xl:text-[13px] font-montserrat font-bold uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
                     location.pathname === link.href && 'text-white border-b-2 border-terracotta'
                   )}
                 >
@@ -114,7 +114,7 @@ export default function Navbar() {
                 <Link
                   to={link.href}
                   className={cn(
-                    'text-[13px] font-montserrat font-bold uppercase tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    'text-[12px] xl:text-[13px] font-montserrat font-bold uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
                     location.pathname === link.href && 'text-white border-b-2 border-terracotta'
                   )}
                 >
@@ -128,26 +128,26 @@ export default function Navbar() {
             </motion.div>
           ))}
           {user && (
-            <div className="flex items-center gap-6 border-l border-white/10 pl-6">
+            <div className="flex items-center gap-4 xl:gap-6 border-l border-white/10 pl-4 xl:pl-6">
               <Link
                 to="/dashboard"
                 className={cn(
-                  'text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-2',
+                  'text-[10px] xl:text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-1.5 xl:gap-2',
                   location.pathname === '/dashboard' && 'text-white'
                 )}
               >
-                <User className="h-3.5 w-3.5" />
+                <User className="h-3 w-3 xl:h-3.5 xl:w-3.5" />
                 Auth
               </Link>
               {profile?.role === 'admin' && (
                 <Link
                   to="/admin"
                   className={cn(
-                    'text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-2',
+                    'text-[10px] xl:text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-1.5 xl:gap-2',
                     location.pathname === '/admin' && 'text-white'
                   )}
                 >
-                  <ShieldCheck className="h-3.5 w-3.5" />
+                  <ShieldCheck className="h-3 w-3 xl:h-3.5 xl:w-3.5" />
                   Admin
                 </Link>
               )}
@@ -156,8 +156,8 @@ export default function Navbar() {
           <CartDrawer variant="header" />
         </div>
 
-        {/* Mobile Nav */}
-        <div className="md:hidden flex items-center -mr-4 gap-2">
+        {/* Mobile/Tablet Nav */}
+        <div className="lg:hidden flex items-center -mr-4 gap-2">
           {/* Mobile Cart Link - Direct Page */}
           <Link to="/cart" className="relative h-10 w-10 flex items-center justify-center bg-white/10 rounded-full text-white">
             <ShoppingCart className="h-5 w-5" />

@@ -6,7 +6,7 @@ import {
   CheckCircle2, Clock, AlertCircle, Search, Filter, ChevronRight,
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
-  ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload
+  ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -85,7 +85,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
-type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages';
+type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager';
 type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'config' | 'all';
 
 interface ContentItem {
@@ -302,6 +302,7 @@ export default function Admin() {
   // Custom Notifications & Confirmations
   const [isSyncing, setIsSyncing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [seoFormData, setSeoFormData] = useState({ path: '', keyword: '', title: '', description: '' });
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void | Promise<void> } | null>(null);
 
@@ -573,6 +574,10 @@ export default function Admin() {
         processedData.images = processedData.images.filter((img: string) => img && img.trim() !== '');
       }
 
+      if (Array.isArray(processedData.itinerary)) {
+        processedData.itinerary = processedData.itinerary.filter((item: any) => item && item.description && item.description.trim() !== '');
+      }
+
       if (isEditing === 'new') {
         await addDoc(collection(db, 'content'), {
           type: activeContentTab,
@@ -748,6 +753,7 @@ export default function Admin() {
               { id: 'bookings', label: 'Reservations', icon: History },
               { id: 'users', label: 'User Directory', icon: Users },
               { id: 'messages', label: 'Direct Messages', icon: MessageCircleIcon },
+              { id: 'seo_manager', label: 'SEO Manager', icon: Search },
             ].map((item) => (
               <button
                 key={item.id}
@@ -1505,6 +1511,91 @@ export default function Admin() {
                           />
                         </div>
 
+                        {/* Day-by-Day Experience Editor */}
+                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
+                          <div className="md:col-span-2 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Day-by-Day Experience</label>
+                              <Button 
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newItinerary = Array.isArray(formData.itinerary) ? [...formData.itinerary] : [];
+                                  newItinerary.push({ day: newItinerary.length + 1, description: '' });
+                                  setFormData({ ...formData, itinerary: newItinerary });
+                                }}
+                                className="h-8 rounded-lg border-forest/10 text-forest/60 hover:text-forest"
+                              >
+                                <Plus className="h-4 w-4 mr-1" /> Add Day
+                              </Button>
+                            </div>
+                            <div className="space-y-4">
+                              {Array.isArray(formData.itinerary) && formData.itinerary.map((item: any, index: number) => (
+                                <div key={index} className="bg-white/50 border border-forest/5 p-6 rounded-2xl space-y-4 group">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <div className="h-8 w-8 rounded-lg bg-terracotta/10 text-terracotta flex items-center justify-center font-bold text-xs ring-1 ring-terracotta/20">
+                                        {index + 1}
+                                      </div>
+                                      <span className="text-xs font-black text-forest uppercase tracking-widest">Day {index + 1} Editor</span>
+                                    </div>
+                                    <Button 
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => {
+                                        const newItinerary = formData.itinerary.filter((_: any, i: number) => i !== index);
+                                        const reindexed = newItinerary.map((it: any, i: number) => ({ ...it, day: i + 1 }));
+                                        setFormData({ ...formData, itinerary: reindexed });
+                                      }}
+                                      className="text-rose-400 hover:text-rose-500 hover:bg-rose-500/5 h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <Input
+                                    value={item.title || ''}
+                                    onChange={(e) => {
+                                      const newItinerary = [...formData.itinerary];
+                                      newItinerary[index] = { ...item, title: e.target.value };
+                                      setFormData({ ...formData, itinerary: newItinerary });
+                                    }}
+                                    placeholder="Title for the day (e.g., Arrival in Tosh)..."
+                                    className="w-full rounded-xl bg-white border-forest/10"
+                                  />
+                                  <textarea 
+                                    value={item.description || ''} 
+                                    onChange={(e) => {
+                                      const newItinerary = [...formData.itinerary];
+                                      newItinerary[index] = { ...item, description: e.target.value };
+                                      setFormData({ ...formData, itinerary: newItinerary });
+                                    }}
+                                    className="w-full min-h-[100px] rounded-xl bg-forest/[0.02] border border-forest/5 focus:ring-2 focus:ring-terracotta/20 font-medium p-4 outline-none resize-none text-sm placeholder:text-forest/20"
+                                    placeholder={`Describe the highlights and activities for Day ${index + 1}...`}
+                                  />
+                                </div>
+                              ))}
+                              {(!formData.itinerary || !Array.isArray(formData.itinerary) || formData.itinerary.length === 0) && (
+                                <div className="text-center py-10 border-2 border-dashed border-forest/5 rounded-3xl bg-forest/[0.01]">
+                                  <Sparkles className="h-8 w-8 text-forest/10 mx-auto mb-3" />
+                                  <p className="text-xs text-forest/30 font-medium italic">No itinerary defined yet. Start building the journey day by day.</p>
+                                  <Button 
+                                    type="button"
+                                    variant="ghost" 
+                                    onClick={() => {
+                                      setFormData({ ...formData, itinerary: [{ day: 1, description: '' }] });
+                                    }}
+                                    className="mt-4 text-[10px] font-black uppercase tracking-widest text-terracotta hover:bg-terracotta/5"
+                                  >
+                                    Initialize Itinerary
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Slots Management */}
                         {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'wfh' || activeContentTab === 'adventure') && (
                           <div className="md:col-span-2 space-y-4">
@@ -2245,6 +2336,47 @@ export default function Admin() {
         )}
 
         {/* Direct Messages Tab */}
+        {activeMainTab === 'seo_manager' && (
+          <motion.div
+            key="seo_manager"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-10"
+          >
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-forest tracking-tight">SEO Manager</h2>
+              <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">
+                Optimize content for high-intent traffic
+              </p>
+            </div>
+            
+            <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
+              <form 
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    await addDoc(collection(db, 'seo_settings'), {
+                      ...seoFormData,
+                      updatedAt: serverTimestamp()
+                    });
+                    setNotification({ message: 'SEO data saved successfully', type: 'success' });
+                    setSeoFormData({ path: '', keyword: '', title: '', description: '' });
+                  } catch (error) {
+                    handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
+                  }
+                }}
+                className="space-y-4"
+              >
+                <Input placeholder="Page Path or Slug (e.g., /tours)" value={seoFormData.path} onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} className="h-12 rounded-lg" required />
+                <Input placeholder="Target Keyword" value={seoFormData.keyword} onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} className="h-12 rounded-lg" />
+                <Input placeholder="SEO Title" value={seoFormData.title} onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} className="h-12 rounded-lg" required />
+                <Textarea placeholder="Meta Description" value={seoFormData.description} onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} className="rounded-lg" required />
+                <Button type="submit" className="bg-terracotta hover:bg-terracotta/90 text-white font-bold h-10 w-full">Save SEO Data</Button>
+              </form>
+            </Card>
+          </motion.div>
+        )}
         {activeMainTab === 'messages' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

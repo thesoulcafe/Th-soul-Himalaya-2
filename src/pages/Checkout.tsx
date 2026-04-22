@@ -85,6 +85,18 @@ export default function SoulCart() {
 
     setIsSubmitting(true);
     try {
+      // Safety check for Razorpay script and Key ID
+      if (!(window as any).Razorpay) {
+        throw new Error("Razorpay SDK not loaded. Please refresh the page or check your internet connection.");
+      }
+      
+      const key_id = import.meta.env.VITE_RAZORPAY_KEY_ID;
+      if (!key_id) {
+        throw new Error("Razorpay Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID in your environment.");
+      }
+
+      console.log("[Razorpay] Initializing order creation...");
+      
       // 1. Create Razorpay Order via Server API
       const response = await fetch('/api/razorpay/order', {
         method: 'POST',
@@ -96,15 +108,18 @@ export default function SoulCart() {
         })
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create payment order. Please try again.');
+        throw new Error(result.error || 'Failed to create payment order. Please try again.');
       }
 
-      const rzpOrder = await response.json();
+      const rzpOrder = result;
+      console.log(`[Razorpay] Order received from server: ${rzpOrder.id}`);
 
       // 2. Open Razorpay Checktout
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key: key_id,
         amount: rzpOrder.amount,
         currency: rzpOrder.currency,
         name: 'The Soul Himalaya',
@@ -112,6 +127,7 @@ export default function SoulCart() {
         image: 'https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png',
         order_id: rzpOrder.id,
         handler: async (response: any) => {
+          console.log("[Razorpay] Payment captured, verifying...");
           try {
             // 3. Verify Payment on Server
             const verifyRes = await fetch('/api/razorpay/verify', {
@@ -127,6 +143,7 @@ export default function SoulCart() {
             const verifyData = await verifyRes.json();
 
             if (verifyData.status === 'success') {
+              console.log("[Razorpay] Payment verified! Saving booking...");
               // 4. Save Confirmed Booking to Firestore
               await addDoc(collection(db, 'bookings'), {
                 userId: user.uid,
@@ -155,11 +172,11 @@ export default function SoulCart() {
               setIsSuccess(true);
               clearCart();
             } else {
-              alert('Payment verification failed. Please contact support.');
+              throw new Error(verifyData.message || 'Payment verification failed.');
             }
           } catch (err: any) {
-            console.error('Verification error:', err);
-            alert('An error occurred while verifying the payment.');
+            console.error('[Razorpay] Verification error:', err);
+            alert(`Payment Verification Error: ${err.message || 'An error occurred while verifying the payment.'}`);
           } finally {
             setIsSubmitting(false);
           }
@@ -173,11 +190,19 @@ export default function SoulCart() {
           color: '#C15A3E' // Terracotta theme color
         },
         modal: {
-          ondismiss: () => setIsSubmitting(false)
+          ondismiss: () => {
+            console.log("[Razorpay] Payment modal dismissed");
+            setIsSubmitting(false);
+          }
         }
       };
 
       const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        console.error("[Razorpay] Payment failed:", response.error);
+        alert(`Payment Failed: ${response.error.description}`);
+        setIsSubmitting(false);
+      });
       rzp.open();
 
     } catch (err: any) {
@@ -432,7 +457,7 @@ export default function SoulCart() {
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-[1px] opacity-40"
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-sm opacity-40"
                             >
                               As per ID proof
                             </motion.span>
@@ -457,7 +482,7 @@ export default function SoulCart() {
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-[1px] opacity-40"
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-sm opacity-40"
                             >
                               +91 --- --- ----
                             </motion.span>
@@ -660,6 +685,11 @@ export default function SoulCart() {
                    variant="outline" 
                    size="sm" 
                    className="w-full h-12 rounded-full border-white/20 text-white hover:bg-white hover:text-slate-900 font-bold transition-all"
+                   onClick={() => {
+                     const cartItemsText = cart.map(item => `${item.name} (${item.quantity})`).join(', ');
+                     const whatsappMessage = encodeURIComponent(`Hi! I need guidance for these experiences in my Soul Cart: ${cartItemsText}. Can you help me?`);
+                     window.open(`https://wa.me/917878200632?text=${whatsappMessage}`, '_blank');
+                   }}
                  >
                    Talk to a Guide
                  </Button>

@@ -198,9 +198,14 @@ async function startServer() {
   app.post("/api/razorpay/order", async (req, res) => {
     try {
       const { amount, currency = "INR", receipt } = req.body;
+      console.log(`[Razorpay] Creating order: Amount=${amount}, Currency=${currency}, Receipt=${receipt}`);
 
-      if (!amount) {
-        return res.status(400).json({ error: "Amount is required" });
+      if (!amount || isNaN(amount)) {
+        return res.status(400).json({ error: "Valid amount is required" });
+      }
+
+      if (amount < 1) {
+        return res.status(400).json({ error: "Amount must be at least ₹1.00" });
       }
 
       const razorpay = getRazorpay();
@@ -211,9 +216,10 @@ async function startServer() {
       };
 
       const order = await razorpay.orders.create(options);
+      console.log(`[Razorpay] Order created successfully: ID=${order.id}`);
       res.json(order);
     } catch (error) {
-      console.error("Razorpay order creation failed:", error);
+      console.error("[Razorpay] Order creation failed:", error);
       res.status(500).json({ error: error instanceof Error ? error.message : "Failed to create Razorpay order" });
     }
   });
@@ -222,9 +228,12 @@ async function startServer() {
   app.post("/api/razorpay/verify", (req, res) => {
     try {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+      console.log(`[Razorpay] Verifying payment: OrderId=${razorpay_order_id}, PaymentId=${razorpay_payment_id}`);
+      
       const secret = process.env.RAZORPAY_KEY_SECRET;
 
       if (!secret) {
+        console.error("[Razorpay] Verification failed: RAZORPAY_KEY_SECRET is missing");
         return res.status(500).json({ error: "RAZORPAY_KEY_SECRET is missing" });
       }
 
@@ -235,12 +244,14 @@ async function startServer() {
         .digest("hex");
 
       if (expectedSignature === razorpay_signature) {
+        console.log("[Razorpay] Verification successful");
         res.json({ status: "success", message: "Payment verified successfully" });
       } else {
+        console.warn("[Razorpay] Verification failed: Signature mismatch");
         res.status(400).json({ status: "failure", message: "Invalid signature" });
       }
     } catch (error) {
-      console.error("Razorpay verification failed:", error);
+      console.error("[Razorpay] Verification failed:", error);
       res.status(500).json({ error: "Verification failed" });
     }
   });

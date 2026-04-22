@@ -57,14 +57,14 @@ export default function Footer() {
         </div>
 
         {/* Quick Links & Services Grouped */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:col-span-2">
+        <div className="grid grid-cols-2 gap-8 md:col-span-2">
           {/* Quick Links */}
           <div className="space-y-6">
             <h4 className="text-lg font-bold">Quick Links</h4>
             <ul className="space-y-3 text-sm text-cream/70">
               {['Home', 'About', 'Gallery', 'Contact', 'Blueberry'].map((item) => (
                 <motion.li key={item} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300 }}>
-                  <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="hover:text-terracotta transition-colors flex items-center gap-2">
+                  <Link to={item === 'Home' ? '/' : item === 'Gallery' ? '/#follow-our-journey' : `/${item.toLowerCase()}`} className="hover:text-terracotta transition-colors flex items-center gap-2">
                     <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {item === 'Blueberry' ? 'Blueberry Farm' : item === 'Contact' ? 'Contact Us' : item === 'About' ? 'Our Story' : item}
                   </Link>
@@ -110,7 +110,7 @@ export default function Footer() {
             </li>
             <li className="flex items-center space-x-3">
               <Phone className="h-5 w-5 text-terracotta shrink-0" />
-              <span>+91 70232 07620</span>
+              <span>+91 78782 00632</span>
             </li>
             <li className="flex items-center space-x-3">
               <Mail className="h-5 w-5 text-terracotta shrink-0" />

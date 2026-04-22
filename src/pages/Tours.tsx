@@ -35,6 +35,7 @@ import { useCart } from '@/lib/CartContext';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
+import { SEO } from '@/components/SEO';
 
 import { DEFAULT_TOURS } from '@/constants';
 
@@ -46,6 +47,7 @@ export default function Tours() {
   const [searchParams] = useSearchParams();
   const [tours, setTours] = useState<any[]>(DEFAULT_TOURS);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [seo, setSeo] = useState<any>(null); // Added SEO state
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedTour, setSelectedTour] = useState<any>(null);
@@ -60,6 +62,14 @@ export default function Tours() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/tours'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleShare = async (tour: any) => {
     const shareData = {
@@ -188,15 +198,16 @@ export default function Tours() {
   }, [tours, activeCategory, searchQuery, maxPrice, maxDuration]);
 
   return (
-    <div className="pt-24">
+    <div className="pt-24 px-4 sm:px-6">
+      {seo && <SEO title={seo.title || "Tour Packages"} description={seo.description || "Handpicked mountain journeys."} keywords={seo.keyword} />}
       {/* Tagline */}
-      <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+      <div className="max-w-7xl mx-auto mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Tour Packages</h1>
         <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Handpicked Mountain Journeys</p>
       </div>
 
       {/* Categories & Search */}
-      <div className="max-w-7xl mx-auto px-6 mb-12">
+      <div className="max-w-7xl mx-auto mb-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
           <div className="flex-grow overflow-x-auto custom-scrollbar w-full md:w-auto">
             <div className="flex gap-2 min-w-max pb-2">
@@ -205,7 +216,7 @@ export default function Tours() {
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={cn(
-                    "px-6 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all duration-300 border",
+                    "px-4 sm:px-6 py-2 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-all duration-300 border",
                     activeCategory === category
                       ? "bg-forest text-white border-forest shadow-lg shadow-forest/20"
                       : "bg-white text-forest/60 border-forest/10 hover:border-forest/40"
@@ -689,21 +700,32 @@ export default function Tours() {
                     </p>
                   </div>
 
-                  {selectedTour.theExperience && (
+                  {(selectedTour.itinerary || selectedTour.theExperience) && (
                     <div className="bg-cream/20 p-6 md:p-8 rounded-[2rem] border border-forest/5">
                       <h4 className="font-heading font-bold text-forest mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-terracotta" /> Day-by-Day Experience
                       </h4>
                       <div className="space-y-4">
-                        {selectedTour.theExperience.split('\n').map((line: string, i: number) => {
-                          if (!line.trim()) return null;
-                          const isDay = line.toLowerCase().startsWith('day');
-                          return (
-                            <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
-                              {line.trim()}
+                        {Array.isArray(selectedTour.itinerary) ? (
+                          selectedTour.itinerary.map((item: any, i: number) => (
+                            <div key={i} className="space-y-2">
+                              <div className="text-xs font-black text-forest mt-4 first:mt-0 uppercase tracking-tighter">Day {item.day || i + 1}</div>
+                              <div className="text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2 text-xs leading-relaxed whitespace-pre-wrap">
+                                {item.description}
+                              </div>
                             </div>
-                          );
-                        })}
+                          ))
+                        ) : (
+                          selectedTour.theExperience.split('\n').map((line: string, i: number) => {
+                            if (!line.trim()) return null;
+                            const isDay = line.toLowerCase().startsWith('day');
+                            return (
+                              <div key={i} className={cn("text-xs leading-relaxed", isDay ? "font-black text-forest mt-4 first:mt-0" : "text-forest/60 font-medium pl-4 border-l border-forest/10 ml-2")}>
+                                {line.trim()}
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   )}

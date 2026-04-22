@@ -12,6 +12,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Card, CardContent } from '@/components/ui/card';
 import { DEFAULT_SERVICES } from '@/constants';
 import Leaderboard from '@/components/Leaderboard';
+import { SEO } from '@/components/SEO';
 
 const HorizontalServiceRow = ({ services }: { services: any[] }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -177,6 +178,13 @@ const HorizontalServiceRow = ({ services }: { services: any[] }) => {
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [seo, setSeo] = useState<any>(null);
+  const [posts, setPosts] = useState([
+    { url: 'https://www.instagram.com/p/DBititYyy66/', img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
+    { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', img: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
+    { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
+    { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
+  ]);
   const { user } = useAuth();
   const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
   const heroRef = useRef<HTMLElement>(null);
@@ -187,6 +195,14 @@ export default function Home() {
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'service'));
@@ -220,13 +236,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
+      {seo && <SEO title={seo.title || "The Soul Himalaya"} description={seo.description || "Discover curated retreats, adventures, and artisan crafts in the Himalayas."} keywords={seo.keyword} />}
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
       />
       {/* Hero Section */}
-      <section ref={heroRef} className="relative h-[110vh] w-full flex items-start justify-center overflow-hidden pt-24 md:pt-28">
+      <section ref={heroRef} className="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <motion.div 
             style={{ y }}
@@ -240,6 +257,7 @@ export default function Home() {
               alt="Himalayan Mountains"
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
+              loading="lazy"
             />
           </motion.div>
           {/* Advanced Layered Overlays */}
@@ -248,7 +266,7 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-forest to-transparent" />
         </div>
 
-        <div className="relative z-10 w-full max-w-7xl px-6 flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -264,35 +282,35 @@ export default function Home() {
               Parvati Valley & Beyond
             </motion.p>
             
-            <h1 className="text-4xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
-              <span className="opacity-90 normal-case">Find Your</span>
-              <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)]">Soul</span>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
+              <span className="opacity-90 normal-case uppercase tracking-tight pr-1">FIND YOUR</span>
+              <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
             </h1>
 
-            <p className="text-sm md:text-base text-cream/80 mb-6 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px]">
+            <p className="text-sm md:text-base text-cream/80 mb-8 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px]">
               A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-0">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-0">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                 <Link 
                   to="/services"
                   className={cn(
                     buttonVariants({ size: "lg" }),
-                    "group relative px-10 py-8 bg-white text-forest hover:text-white overflow-hidden rounded-full transition-all duration-500 shadow-2xl"
+                    "group relative px-8 sm:px-10 py-6 sm:py-8 bg-white text-forest hover:text-white overflow-hidden rounded-full transition-all duration-500 shadow-2xl w-full sm:w-auto"
                   )}
                 >
-                  <span className="relative z-10 font-bold text-lg">Start Your Journey</span>
+                  <span className="relative z-10 font-bold text-base sm:text-lg">Start Your Journey</span>
                   <div className="absolute inset-0 bg-terracotta translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </Link>
               </motion.div>
               
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                 <Link 
                   to="/about"
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
-                    "px-10 py-8 text-white border-white/20 hover:border-white hover:bg-white/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-lg"
+                    "px-8 sm:px-10 py-6 sm:py-8 text-white border-white/20 hover:border-white hover:bg-white/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
                   )}
                 >
                   Our Philosophy
@@ -308,7 +326,7 @@ export default function Home() {
           transition={{ duration: 1.5, repeat: Infinity }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30"
         >
-          <span className="text-[10px] text-white font-bold uppercase tracking-widest">Scroll</span>
+          <span className="text-[10px] text-white font-bold uppercase tracking-widest hidden sm:block">Scroll</span>
           <div className="w-px h-12 bg-gradient-to-b from-white to-transparent" />
         </motion.div>
       </section>
@@ -443,7 +461,7 @@ export default function Home() {
                 className="w-full sm:w-auto"
               >
                 <a 
-                  href="https://wa.me/917023207620"
+                  href="https://wa.me/917878200632"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
@@ -461,15 +479,28 @@ export default function Home() {
       </section>
 
       {/* Instagram Section */}
-      <section className="py-24 bg-cream overflow-hidden">
+      <section id="follow-our-journey" className="py-24 bg-cream overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
-            <div>
-              <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
-              <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
+            <div className="flex items-center gap-4">
+              <div>
+                <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
+                <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-10 w-10 text-forest hover:bg-forest/5"
+                onClick={() => {
+                  setPosts(prev => [...prev.slice(1), prev[0]]);
+                }}
+              >
+                <Zap className="h-5 w-5" />
+              </Button>
             </div>
             <a 
               href="https://www.instagram.com/thesoulhimalaya" 
+
               target="_blank" 
               rel="noopener noreferrer" 
               className={cn(
@@ -483,12 +514,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { url: 'https://www.instagram.com/p/DBititYyy66/', img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
-              { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', img: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
-              { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
-              { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
-            ].map((post, i) => (
+            {posts.map((post, i) => (
               <motion.div
                 key={i}
                 whileHover={{ y: -8 }}

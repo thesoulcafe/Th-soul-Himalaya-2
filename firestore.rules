@@ -200,12 +200,17 @@ service cloud.firestore {
              (!('userId' in data) || (data.userId is string && data.userId == request.auth.uid));
     }
 
-    match /messages/{messageId} {
+     match /messages/{messageId} {
       allow get: if isAdmin();
       allow list: if isAdmin();
       allow create: if isValidMessage(incoming()) && isValidId(messageId);
       allow update: if isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
       allow delete: if isAdmin();
+    }
+
+    match /seo_settings/{seoId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

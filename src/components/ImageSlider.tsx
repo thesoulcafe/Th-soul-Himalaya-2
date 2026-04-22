@@ -19,16 +19,17 @@ export default function ImageSlider({
   interval = 2500 
 }: ImageSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (!autoSwipe || images.length <= 1) return;
+    if (!autoSwipe || images.length <= 1 || isPaused) return;
 
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, interval);
 
     return () => clearInterval(timer);
-  }, [autoSwipe, images.length, interval]);
+  }, [autoSwipe, images.length, interval, isPaused]);
 
   if (!images || images.length === 0) {
     return (
@@ -49,33 +50,41 @@ export default function ImageSlider({
     );
   }
 
-  const next = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const next = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
-  const prev = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const prev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
-    <div className={cn("relative group overflow-hidden", className)}>
-      <AnimatePresence mode="wait">
+    <div 
+      className={cn("relative group overflow-hidden touch-none", className)}
+      onMouseDown={() => setIsPaused(true)}
+      onMouseUp={() => setIsPaused(false)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+    >
+      <AnimatePresence initial={false}>
         <motion.img
           key={currentIndex}
           src={images[currentIndex]}
           alt={`${alt} - ${currentIndex + 1}`}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="w-full h-full object-cover"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
+          style={{ position: 'absolute' }}
         />
       </AnimatePresence>
 
-      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
       <button
         onClick={prev}
