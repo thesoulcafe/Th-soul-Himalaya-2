@@ -157,6 +157,57 @@ export default function Admin() {
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState<any>({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const parseExperienceToItinerary = (exp: string) => {
+    if (!exp || typeof exp !== 'string') return [];
+    
+    // Split by newlines and handle various "Day X:" headers
+    const segments = exp.split(/\n/).filter(l => l.trim() !== '');
+    
+    return segments.map((segment, index) => {
+      const trimmed = segment.trim();
+      // Match patterns like "Day 1:", "Day 1 Experience:", etc.
+      const match = trimmed.match(/^((?:Day|Week|Morning|Afternoon|Evening)\s*(\d*|))\s*:\s*(.*)/i);
+      
+      if (match) {
+        const header = match[1];
+        const content = match[3];
+        // Try to split title and description by the first period
+        const firstPeriod = content.indexOf('.');
+        let title = '';
+        let description = content;
+        
+        if (firstPeriod !== -1 && firstPeriod < 50) {
+          title = content.substring(0, firstPeriod).trim();
+          description = content.substring(firstPeriod + 1).trim();
+        }
+
+        return {
+          day: index + 1,
+          title: title || header,
+          description: description || content
+        };
+      }
+      
+      return {
+        day: index + 1,
+        title: '',
+        description: trimmed
+      };
+    });
+  };
+
+  const startEditing = (item: ContentItem) => {
+    setIsEditing(item.id);
+    let data = { ...item.data };
+    
+    // Auto-convert legacy 'theExperience' string to 'itinerary' array if itinerary is missing
+    if ((!data.itinerary || !Array.isArray(data.itinerary) || data.itinerary.length === 0) && data.theExperience) {
+      data.itinerary = parseExperienceToItinerary(data.theExperience);
+    }
+    
+    setFormData(data);
+  };
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -382,8 +433,7 @@ export default function Admin() {
       if (editId) {
         const item = contentItems.find(i => i.id === editId);
         if (item) {
-          setIsEditing(editId);
-          setFormData(item.data);
+          startEditing(item);
           // Clear the param so it doesn't reopen on refresh
           const newParams = new URLSearchParams(searchParams);
           newParams.delete('edit');
@@ -669,9 +719,15 @@ export default function Admin() {
               );
               
               if (!existing) {
+                const itemData = { ...item } as any;
+                // Auto-convert string experience to itinerary array during bootstrap
+                if (itemData.theExperience && !itemData.itinerary) {
+                  itemData.itinerary = parseExperienceToItinerary(itemData.theExperience);
+                }
+
                 await addDoc(collection(db, 'content'), {
                   type: mapping.type,
-                  data: item,
+                  data: itemData,
                   updatedAt: serverTimestamp()
                 });
                 addedCount++;
@@ -1512,17 +1568,20 @@ export default function Admin() {
                         </div>
 
                         {/* Day-by-Day Experience Editor */}
-                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
-                          <div className="md:col-span-2 space-y-4">
+                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'trekk' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
+                          <div className="md:col-span-2 space-y-4 border-t border-forest/5 pt-8 mt-4">
                             <div className="flex items-center justify-between">
-                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Day-by-Day Experience</label>
+                              <div>
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Day-by-Day Experience</label>
+                                <p className="text-[10px] text-forest/20 font-medium italic mt-0.5">Define for packages correctly</p>
+                              </div>
                               <Button 
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
                                   const newItinerary = Array.isArray(formData.itinerary) ? [...formData.itinerary] : [];
-                                  newItinerary.push({ day: newItinerary.length + 1, description: '' });
+                                  newItinerary.push({ day: newItinerary.length + 1, title: '', description: '' });
                                   setFormData({ ...formData, itinerary: newItinerary });
                                 }}
                                 className="h-8 rounded-lg border-forest/10 text-forest/60 hover:text-forest"
@@ -1538,7 +1597,7 @@ export default function Admin() {
                                       <div className="h-8 w-8 rounded-lg bg-terracotta/10 text-terracotta flex items-center justify-center font-bold text-xs ring-1 ring-terracotta/20">
                                         {index + 1}
                                       </div>
-                                      <span className="text-xs font-black text-forest uppercase tracking-widest">Day {index + 1} Editor</span>
+                                      <span className="text-xs font-black text-forest uppercase tracking-widest">Day {index + 1} Experience</span>
                                     </div>
                                     <Button 
                                       type="button"
@@ -1584,7 +1643,7 @@ export default function Admin() {
                                     type="button"
                                     variant="ghost" 
                                     onClick={() => {
-                                      setFormData({ ...formData, itinerary: [{ day: 1, description: '' }] });
+                                      setFormData({ ...formData, itinerary: [{ day: 1, title: '', description: '' }] });
                                     }}
                                     className="mt-4 text-[10px] font-black uppercase tracking-widest text-terracotta hover:bg-terracotta/5"
                                   >
@@ -1823,7 +1882,7 @@ export default function Admin() {
                         <Button 
                           size="sm"
                           className="w-32 rounded-full bg-white text-forest font-bold hover:bg-terracotta hover:text-white transition-all transform scale-90 group-hover:scale-100"
-                          onClick={() => { setIsEditing(item.id); setFormData(item.data); }}
+                          onClick={() => startEditing(item)}
                         >
                           <Edit2 className="h-4 w-4 mr-2" /> Edit
                         </Button>
@@ -1907,7 +1966,7 @@ export default function Admin() {
                             size="sm"
                             variant="ghost"
                             className="h-7 px-2 rounded-lg text-forest/40 hover:text-terracotta hover:bg-terracotta/5 transition-all font-bold text-[9px] uppercase tracking-widest"
-                            onClick={() => { setIsEditing(item.id); setFormData(item.data); }}
+                            onClick={() => startEditing(item)}
                           >
                             <Edit2 className="h-3 w-3 mr-1" /> Edit
                           </Button>

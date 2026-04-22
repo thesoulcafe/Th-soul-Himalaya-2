@@ -42,7 +42,7 @@ export default function About() {
               <Heart className="h-12 w-12 text-terracotta mx-auto mb-6" />
               <h2 className="text-3xl md:text-5xl font-heading font-bold text-forest mb-8">More Than Just Travel</h2>
               <p>
-                The Soul Himalaya isn't just a business; it's a dream that took root in the high-altitude village of Tosh. 
+                THE SOUL HIMALAYA isn't just a business; it's a dream that took root in the high-altitude village of Tosh. 
                 Our founder, a local resident of the Parvati Valley, envisioned a brand that would showcase the authentic 
                 beauty of the Himalayas while preserving its sacred spirit and supporting the local community.
               </p>

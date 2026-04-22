@@ -42,8 +42,8 @@ export default function Footer() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="text-xl md:text-2xl font-montserrat font-extrabold text-white tracking-tighter group-hover:text-terracotta transition-colors uppercase leading-none">
-              The Soul <span className="text-terracotta italic font-playfair tracking-normal normal-case">Himalaya</span>
+            <span className="text-xl md:text-2xl font-montserrat font-black text-white tracking-tighter group-hover:text-terracotta transition-colors uppercase leading-none">
+              THE SOUL <span className="text-terracotta italic font-playfair tracking-normal normal-case">HIMALAYA</span>
             </span>
           </Link>
           <p className="text-cream/60 text-[13px] leading-relaxed font-medium">
@@ -121,7 +121,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-cream/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-cream/40 text-center md:text-left">
-        <p>© {new Date().getFullYear()} The Soul Himalaya. All rights reserved. Crafted with soul in the mountains.</p>
+        <p>© {new Date().getFullYear()} THE SOUL HIMALAYA. All rights reserved. Crafted with soul in the mountains.</p>
       </div>
     </footer>
   );

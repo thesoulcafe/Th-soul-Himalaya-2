@@ -457,7 +457,7 @@ export default function SoulCart() {
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-sm opacity-40"
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-[8px] opacity-30 select-none transition-all duration-700"
                             >
                               As per ID proof
                             </motion.span>
@@ -482,7 +482,7 @@ export default function SoulCart() {
                               initial={{ opacity: 0, x: -5 }}
                               animate={{ opacity: 1, x: 0 }}
                               exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-sm opacity-40"
+                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-[8px] opacity-30 select-none transition-all duration-700"
                             >
                               +91 --- --- ----
                             </motion.span>

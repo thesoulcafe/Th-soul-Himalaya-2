@@ -124,7 +124,7 @@ export default function Shop() {
         transition={{ delay: 1 }}
         className="mt-24"
       >
-        <span className="text-[10px] font-montserrat font-extrabold uppercase tracking-[0.6em] text-forest">The Soul Himalaya</span>
+        <span className="text-[10px] font-montserrat font-black uppercase tracking-[0.6em] text-forest">THE SOUL HIMALAYA</span>
       </motion.div>
     </div>
   );

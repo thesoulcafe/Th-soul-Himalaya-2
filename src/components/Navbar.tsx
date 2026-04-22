@@ -48,34 +48,11 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {location.pathname !== '/' && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              whileTap={{ scale: 0.85 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  if (window.history.length > 2) {
-                    navigate(-1);
-                  } else {
-                    navigate('/');
-                  }
-                }}
-                className="text-white hover:bg-white/10 h-10 w-10 md:h-12 md:w-12 rounded-full active:bg-white/20"
-                title="Go Back"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-            </motion.div>
-          )}
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.9 }}
           >
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center group gap-3">
               <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors">
                 <img 
                   src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
@@ -84,6 +61,9 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
+              <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-tighter text-white">
+                THE SOUL <span className="text-terracotta italic font-playfair normal-case">HIMALAYA</span>
+              </span>
             </Link>
           </motion.div>
         </div>
