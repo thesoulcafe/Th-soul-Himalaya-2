@@ -15,7 +15,14 @@ import {
   X,
   CheckCircle2,
   Calendar,
-  Users
+  Users,
+  Sparkles,
+  Zap,
+  Mountain,
+  MapPin,
+  Home as HomeIcon,
+  Info,
+  Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -281,49 +288,52 @@ export default function SoulCart() {
       
       <div className="max-w-7xl mx-auto">
         {/* Progress Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-10">
+          <div className="flex items-center gap-6">
             <button 
               onClick={prevStep}
-              className="p-3 rounded-2xl bg-white border border-slate-100 text-slate-400 hover:text-forest hover:border-forest/20 transition-all shadow-sm group"
+              className="group p-4 rounded-full bg-white border border-forest/10 text-forest shadow-lg shadow-forest/5 hover:bg-forest hover:text-white transition-all transform hover:-rotate-12 active:scale-90"
             >
-              <X className="h-5 w-5 group-hover:rotate-90 transition-transform" />
+              <X className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-3xl font-heading font-bold text-slate-900 tracking-tight">Your Soul Cart</h1>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Adventure Awaits</p>
+              <div className="flex items-center gap-2 mb-1">
+                <Leaf className="h-4 w-4 text-emerald-500 animate-bounce" />
+                <span className="text-[10px] font-black text-terracotta uppercase tracking-[0.4em]">Eco-Expedition</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-playfair font-black italic text-forest leading-none tracking-tighter uppercase whitespace-nowrap">Your Soul Cart</h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-3 rounded-full flex items-center gap-2 shadow-xl shadow-forest/5">
             {[
-              { id: 'details', label: 'Details' },
-              { id: 'payment', label: 'Payment' }
+              { id: 'details', label: 'Identity' },
+              { id: 'payment', label: 'Energy' }
             ].map((s, i) => (
               <React.Fragment key={s.id}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 px-4">
                   <div className={cn(
-                    "h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",
-                    step === s.id ? "bg-forest text-white shadow-lg shadow-forest/20 scale-110" : 
-                    i < ['details', 'payment'].indexOf(step) ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
-                    "bg-slate-100 text-slate-400"
+                    "h-10 w-10 rounded-full flex items-center justify-center text-xs font-black transition-all duration-700",
+                    step === s.id ? "bg-forest text-white shadow-xl shadow-forest/20 scale-110 rotate-[360deg]" : 
+                    i < ['details', 'payment'].indexOf(step) ? "bg-emerald-500 text-white" :
+                    "bg-forest/5 text-forest/20"
                   )}>
-                    {i < ['details', 'payment'].indexOf(step) ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
+                    {i < ['details', 'payment'].indexOf(step) ? <CheckCircle2 className="h-5 w-5" /> : `0${i + 1}`}
                   </div>
                   <span className={cn(
-                    "text-[10px] font-black uppercase tracking-widest hidden sm:block",
-                    step === s.id ? "text-forest" : "text-slate-300"
+                    "text-[10px] font-black uppercase tracking-[0.2em] hidden sm:block",
+                    step === s.id ? "text-forest" : "text-forest/20"
                   )}>
                     {s.label}
                   </span>
                 </div>
-                {i < 1 && <div className="w-8 h-px bg-slate-100" />}
+                {i < 1 && <div className="w-12 h-px bg-forest/5" />}
               </React.Fragment>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
           {/* Main Context Area */}
           <div className="lg:col-span-2 space-y-6">
             <AnimatePresence mode="wait">
@@ -460,147 +470,140 @@ export default function SoulCart() {
               {step === 'details' && (
                 <motion.div
                   key="details"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="relative bg-white/70 backdrop-blur-xl rounded-[3rem] p-10 border border-white/40 shadow-2xl space-y-10 overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: -10 }}
+                  className="relative bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-white/60 shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden"
                 >
-                  <div className="absolute -top-12 -right-12 w-32 h-32 bg-forest/5 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-terracotta/5 rounded-full blur-3xl pointer-events-none" />
+                  {/* Thematic Background Elements */}
+                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
+                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-forest/5 rounded-full blur-[100px] pointer-events-none" />
+                  <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-terracotta/5 rounded-full blur-[120px] pointer-events-none" />
 
-                  <div className="flex items-center gap-5 relative z-10">
-                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-forest to-forest/80 flex items-center justify-center text-white shadow-lg shadow-forest/20">
-                      <Users className="h-7 w-7" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-heading font-bold text-slate-900 leading-none">Expedition Details</h2>
-                      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                        Guide Allocation & Insurance
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 relative z-10">
-                    <div className="space-y-3 group">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Explorer's Name</label>
-                      <div className="relative">
-                        <Input 
-                          name="fullName" 
-                          value={formData.fullName} 
-                          onChange={handleInputChange} 
-                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
-                        />
-                        <AnimatePresence>
-                          {!formData.fullName && (
-                            <motion.span 
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm italic font-medium tracking-tight blur-[8px] opacity-30 select-none transition-all duration-700"
-                            >
-                              As per ID proof
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
+                  <div className="p-8 md:p-14 relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center text-white shadow-lg shadow-forest/20">
+                            <Compass className="h-6 w-6 animate-pulse" />
+                          </div>
+                          <span className="font-fluid text-2xl text-terracotta">Manifest your</span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-playfair font-black italic text-forest leading-none tracking-tighter uppercase">Expedition Details</h2>
+                      </div>
+                      
+                      <div className="bg-white/60 backdrop-blur-md border border-white/80 p-4 rounded-3xl flex items-center gap-5 shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="text-[9px] font-black text-forest/40 uppercase tracking-widest mb-1">Safety Protocols</div>
+                          <div className="text-[10px] font-bold text-forest uppercase">Guide Allocation & Insurance Active</div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-3 group">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Soul Connection (Phone)</label>
-                      <div className="relative">
-                        <Input 
-                          type="tel" 
-                          name="phone" 
-                          value={formData.phone} 
-                          onChange={handleInputChange} 
-                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
-                        />
-                        <AnimatePresence>
-                          {!formData.phone && (
-                            <motion.span 
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium tracking-[0.1em] blur-[8px] opacity-30 select-none transition-all duration-700"
-                            >
-                              +91 --- --- ----
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+                      {/* Name Field */}
+                      <div className="space-y-4 group">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Explorer's Identity</label>
+                          <Leaf className="h-3 w-3 text-forest/10" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                            <Users className="h-full w-full" />
+                          </div>
+                          <Input 
+                            name="fullName" 
+                            placeholder="Full name as per ID"
+                            value={formData.fullName} 
+                            onChange={handleInputChange} 
+                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10 placeholder:italic" 
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-3 group md:col-span-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Digital Gateway (Email)</label>
-                       <div className="relative">
-                        <Input 
-                          type="email" 
-                          name="email" 
-                          value={formData.email} 
-                          onChange={handleInputChange} 
-                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
-                        />
-                        <AnimatePresence>
-                          {!formData.email && (
-                            <motion.span 
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
-                            >
-                              trekker@soulhimalaya.com
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                       </div>
-                    </div>
-
-                    <div className="space-y-3 group">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Ascension Base (City)</label>
-                      <div className="relative">
-                        <Input 
-                          name="city" 
-                          value={formData.city} 
-                          onChange={handleInputChange} 
-                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
-                        />
-                        <AnimatePresence>
-                          {!formData.city && (
-                            <motion.span 
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
-                            >
-                              Delhi, Mumbai, etc.
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
+                      {/* Phone Field */}
+                      <div className="space-y-4 group">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Soul Link (Phone)</label>
+                          <Zap className="h-3 w-3 text-forest/10" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                            <CreditCard className="h-full w-full rotate-12" />
+                          </div>
+                          <Input 
+                            type="tel" 
+                            name="phone" 
+                            placeholder="+91 ---- ----"
+                            value={formData.phone} 
+                            onChange={handleInputChange} 
+                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-3 group">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-forest transition-colors">Sacred Code (Pincode)</label>
-                      <div className="relative">
-                        <Input 
-                          name="pincode" 
-                          value={formData.pincode} 
-                          onChange={handleInputChange} 
-                          className="h-14 rounded-2xl border-white/60 bg-white/40 backdrop-blur-md px-6 text-slate-900 font-medium transition-all focus:bg-white focus:shadow-xl focus:shadow-forest/10 focus:border-forest/40" 
-                        />
-                        <AnimatePresence>
-                          {!formData.pincode && (
-                            <motion.span 
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: 5 }}
-                              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-sm font-medium blur-[1px] opacity-40"
-                            >
-                              Postal Code
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
+                      {/* Email Field */}
+                      <div className="space-y-4 group md:col-span-2">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Digital Gateway (Email Address)</label>
+                          <Sparkles className="h-3 w-3 text-forest/10" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                            <Map className="h-full w-full" />
+                          </div>
+                          <Input 
+                            type="email" 
+                            name="email" 
+                            placeholder="where should we send your itinerary?"
+                            value={formData.email} 
+                            onChange={handleInputChange} 
+                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                          />
+                        </div>
+                      </div>
+
+                      {/* City Field */}
+                      <div className="space-y-4 group">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Ascension Base (City)</label>
+                          <HomeIcon className="h-3 w-3 text-forest/10" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                            <Mountain className="h-full w-full" />
+                          </div>
+                          <Input 
+                            name="city" 
+                            placeholder="Your current base camp"
+                            value={formData.city} 
+                            onChange={handleInputChange} 
+                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pincode Field */}
+                      <div className="space-y-4 group">
+                        <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Sacred Code (Pincode)</label>
+                          <Info className="h-3 w-3 text-forest/10" />
+                        </div>
+                        <div className="relative">
+                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                            <MapPin className="h-full w-full" />
+                          </div>
+                          <Input 
+                            name="pincode" 
+                            placeholder="Postal delivery zone"
+                            value={formData.pincode} 
+                            onChange={handleInputChange} 
+                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -670,39 +673,61 @@ export default function SoulCart() {
           </div>
 
           {/* Quick Summary Sidebar */}
-          <div className="space-y-6 lg:sticky lg:top-28">
-            <Card className="border-none shadow-2xl rounded-[3rem] bg-white overflow-hidden group">
-              <div className="bg-forest p-8 text-white relative overflow-hidden">
+          <div className="space-y-8 lg:sticky lg:top-28">
+            <Card className="border-none shadow-[0_30px_60px_-15px_rgba(30,58,47,0.1)] rounded-[3rem] bg-white overflow-hidden group transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(30,58,47,0.15)]">
+              <div className="bg-forest p-10 text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
                 <div className="absolute top-0 right-0 p-8 opacity-10">
                   <Compass className="h-32 w-32 animate-spin-slow" />
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-heading font-bold mb-1">Soul Summary</h3>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{totalItems} Experiences</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-terracotta" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Journey Totals</span>
+                  </div>
+                  <h3 className="text-4xl font-playfair font-black italic mb-1">Soul Summary</h3>
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-terracotta animate-pulse" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{totalItems} Experiences Secured</p>
+                  </div>
                 </div>
               </div>
-              <CardContent className="p-8 space-y-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm font-bold text-slate-500">
-                    <span>Base Fare</span>
-                    <span className="font-mono text-slate-900">₹{subtotal.toLocaleString()}</span>
+              
+              <CardContent className="p-10 space-y-8 bg-gradient-to-b from-white to-forest/[0.02]">
+                <div className="space-y-5">
+                  <div className="flex justify-between items-center group/row">
+                    <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest group-hover/row:text-forest transition-colors">Base Energy Exchange</span>
+                    <span className="font-mono font-black text-forest">₹{subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-sm font-bold text-slate-500">
-                    <span>GST (5%)</span>
-                    <span className="font-mono text-slate-900">₹{taxes.toLocaleString()}</span>
+                  <div className="flex justify-between items-center group/row">
+                    <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest group-hover/row:text-forest transition-colors">Abundance Tax (5%)</span>
+                    <span className="font-mono font-black text-forest">₹{taxes.toLocaleString()}</span>
                   </div>
                   {plantTree && (
-                    <div className="flex justify-between text-sm font-bold text-emerald-600">
-                      <span className="flex items-center gap-2 italic"><Leaf className="h-3.5 w-3.5" /> Eco-Soul Addon</span>
-                      <span className="font-mono">₹100</span>
-                    </div>
+                    <motion.div 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex justify-between items-center p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10"
+                    >
+                      <span className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                        <Leaf className="h-4 w-4" /> Cedar Contribution
+                      </span>
+                      <span className="font-mono font-black text-emerald-600">₹100</span>
+                    </motion.div>
                   )}
-                  <Separator className="bg-slate-100" />
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-lg font-heading font-bold text-slate-900">Soul Total</span>
+                  
+                  <div className="h-px bg-forest/5 relative">
+                    <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[8px] font-black text-forest/10 uppercase tracking-[0.5em]">The Balance</div>
+                  </div>
+
+                  <div className="flex justify-between items-end pt-4">
+                    <div className="space-y-1">
+                      <span className="text-sm font-fluid text-terracotta">Total</span>
+                      <h4 className="text-xl font-playfair font-black italic text-forest leading-none">Investment</h4>
+                    </div>
                     <div className="text-right">
-                      <div className="text-3xl font-mono font-black text-forest tracking-tighter">₹{finalTotal.toLocaleString()}</div>
-                      <div className="text-[9px] font-black uppercase tracking-widest text-slate-300 mt-1">Inclusive of Taxes</div>
+                      <div className="text-4xl font-mono font-black text-forest tracking-tighter leading-none">₹{finalTotal.toLocaleString()}</div>
+                      <div className="text-[9px] font-black uppercase tracking-widest text-forest/20 mt-2 italic">Divine Balance Secured</div>
                     </div>
                   </div>
                 </div>
@@ -710,50 +735,57 @@ export default function SoulCart() {
                 <Button 
                   onClick={step === 'payment' ? handleOrder : nextStep}
                   disabled={cart.length === 0 || isSubmitting}
-                  className="w-full h-16 bg-terracotta hover:bg-terracotta/90 text-white rounded-full text-lg font-black shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
+                  className="w-full h-20 bg-forest hover:bg-forest/95 text-white rounded-full text-sm font-black uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4 group"
                 >
                   {isSubmitting ? (
                     <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      {step === 'details' ? 'Next Soul Step' : paymentMethod === 'online' ? 'Pay Now' : 'Confirm Spot'}
-                      <ArrowRight className="h-5 w-5" />
+                      {step === 'details' ? 'Next Soul Stage' : paymentMethod === 'online' ? 'Initiate Payment' : 'Claim Your Spot'}
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
                     </>
                   )}
                 </Button>
 
-                <div className="flex items-center justify-center gap-4">
-                  <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                    <ShieldCheck className="h-3 w-3 text-emerald-500" /> Secure
+                <div className="flex items-center justify-center gap-6">
+                  <div className="flex items-center gap-2 group/tip cursor-help">
+                    <ShieldCheck className="h-4 w-4 text-emerald-500 group-hover/tip:scale-125 transition-transform" />
+                    <span className="text-[9px] font-black text-forest/20 uppercase tracking-widest group-hover/tip:text-forest transition-colors">Sanctified</span>
                   </div>
-                  <Separator orientation="vertical" className="h-3 bg-slate-100" />
-                  <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                    <Leaf className="h-3 w-3 text-emerald-500" /> Ethical
+                  <div className="w-1 h-1 rounded-full bg-forest/5" />
+                  <div className="flex items-center gap-2 group/tip cursor-help">
+                    <Leaf className="h-4 w-4 text-emerald-500 group-hover/tip:scale-125 transition-transform" />
+                    <span className="text-[9px] font-black text-forest/20 uppercase tracking-widest group-hover/tip:text-forest transition-colors">Conscious</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Support Tooltip Card */}
-            <Card className="border-none shadow-xl rounded-[2.5rem] bg-slate-900 p-8 text-white relative overflow-hidden group">
+            <Card className="border-none shadow-2xl rounded-[3rem] bg-slate-900 p-10 text-white relative overflow-hidden group">
+               <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
                <div className="relative z-10">
-                 <h4 className="font-heading font-bold text-lg mb-2">Need Guidance?</h4>
-                 <p className="text-xs text-white/50 mb-6 font-medium leading-relaxed">Our Soul Guides are active 24/7 to help you refine your journey.</p>
+                 <div className="flex items-center gap-3 mb-4">
+                   <div className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center">
+                     <Compass className="h-5 w-5 text-terracotta" />
+                   </div>
+                   <h4 className="font-playfair text-xl font-black italic">Seeking Path?</h4>
+                 </div>
+                 <p className="text-xs text-white/50 mb-8 font-medium leading-relaxed italic">"Our Soul Guides roam these digital peaks 24/7. Connect for personalized wisdom."</p>
                  <Button 
                    variant="outline" 
-                   size="sm" 
-                   className="w-full h-12 rounded-full border-white/20 text-white hover:bg-white hover:text-slate-900 font-bold transition-all"
+                   className="w-full h-14 rounded-full border-white/10 text-white hover:bg-white hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-all shadow-xl"
                    onClick={() => {
                      const cartItemsText = cart.map(item => `${item.name} (${item.quantity})`).join(', ');
-                     const whatsappMessage = encodeURIComponent(`Hi! I need guidance for these experiences in my Soul Cart: ${cartItemsText}. Can you help me?`);
+                     const whatsappMessage = encodeURIComponent(`Namaste Soul Guide! I need wisdom for these paths in my cart: ${cartItemsText}.`);
                      window.open(`https://wa.me/917878200632?text=${whatsappMessage}`, '_blank');
                    }}
                  >
-                   Talk to a Guide
+                   Summon a Guide
                  </Button>
                </div>
-               <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-1000">
-                 <Compass className="h-32 w-32" />
+               <div className="absolute -bottom-12 -right-12 opacity-5 group-hover:scale-150 transition-transform duration-[3000ms]">
+                 <Mountain className="h-48 w-48" />
                </div>
             </Card>
           </div>
