@@ -45,7 +45,8 @@ export default function Tours() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [tours, setTours] = useState<any[]>(DEFAULT_TOURS);
+  const [tours, setTours] = useState<any[]>([]); // Initialize empty to avoid default flash
+  const [hasLoaded, setHasLoaded] = useState(false); // Track initial load
   const [activeCategory, setActiveCategory] = useState('All');
   const [seo, setSeo] = useState<any>(null); // Added SEO state
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
@@ -151,7 +152,15 @@ export default function Tours() {
           return 0;
         });
         setTours(dbTours);
+      } else {
+        // Fallback to defaults only if DB is truly empty, but sort them too
+        setTours([...DEFAULT_TOURS].sort((a, b) => {
+          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
+          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
+          return aOrder - bOrder;
+        }));
       }
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -359,9 +368,23 @@ export default function Tours() {
       <section className="py-20 px-6 bg-cream">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <AnimatePresence mode="popLayout">
-                {filteredTours.map((tour, index) => (
+            {!hasLoaded ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white rounded-[2rem] h-[500px] animate-pulse border border-forest/5 shadow-sm p-0 overflow-hidden">
+                    <div className="h-2/3 bg-forest/5" />
+                    <div className="p-6 space-y-4">
+                      <div className="h-4 bg-forest/5 rounded w-1/4" />
+                      <div className="h-8 bg-forest/5 rounded w-3/4" />
+                      <div className="h-4 bg-forest/5 rounded w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <AnimatePresence mode="popLayout">
+                  {filteredTours.map((tour, index) => (
                   <motion.div
                     key={tour.id}
                     layout
@@ -586,7 +609,8 @@ export default function Tours() {
                 ))}
               </AnimatePresence>
             </div>
-          </div>
+          )}
+        </div>
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1" id="customize-trip">

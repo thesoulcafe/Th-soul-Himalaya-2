@@ -18,7 +18,8 @@ import { DEFAULT_WFH } from '@/constants';
 export default function WFH() {
   const { profile } = useAuth();
   const navigate = useNavigate();
-  const [packages, setPackages] = useState<any[]>(DEFAULT_WFH);
+  const [packages, setPackages] = useState<any[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
@@ -95,7 +96,15 @@ export default function WFH() {
           return 0;
         });
         setPackages(dbItems);
+      } else {
+        // Fallback to defaults
+        setPackages([...DEFAULT_WFH].sort((a, b) => {
+          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
+          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
+          return aOrder - bOrder;
+        }));
       }
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -154,9 +163,20 @@ export default function WFH() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {packages.map((pkg, i) => (
-              <motion.div
-                key={pkg.title}
+            {!hasLoaded ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-[2.5rem] h-[400px] animate-pulse border-none shadow-xl p-0 overflow-hidden flex flex-col">
+                  <div className="p-8 space-y-6">
+                    <div className="h-4 bg-forest/5 rounded w-1/4" />
+                    <div className="h-10 bg-forest/5 rounded w-1/2" />
+                    <div className="h-24 bg-forest/5 rounded w-full" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              packages.map((pkg, i) => (
+                <motion.div
+                  key={pkg.id || pkg.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -336,7 +356,8 @@ export default function WFH() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            ))
+          )}
           </div>
         </div>
       </section>

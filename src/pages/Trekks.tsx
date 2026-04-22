@@ -20,7 +20,8 @@ import { DEFAULT_TREKKS } from '@/constants';
 export default function Trekks() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
-  const [trekkList, setTrekkList] = useState<any[]>(DEFAULT_TREKKS);
+  const [trekkList, setTrekkList] = useState<any[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedTrekk, setSelectedTrekk] = useState<any>(null);
@@ -100,7 +101,15 @@ export default function Trekks() {
           return 0;
         });
         setTrekkList(dbTrekks);
+      } else {
+        // Fallback to defaults
+        setTrekkList([...DEFAULT_TREKKS].sort((a, b) => {
+          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
+          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
+          return aOrder - bOrder;
+        }));
       }
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -132,9 +141,21 @@ export default function Trekks() {
       <section className="py-24 px-6 bg-cream">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 gap-12">
-            {trekkList.map((trekk, index) => (
-              <motion.div
-                key={trekk.title}
+            {!hasLoaded ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-[2rem] h-[400px] animate-pulse border border-forest/5 shadow-sm p-0 overflow-hidden flex flex-col md:flex-row">
+                  <div className="w-full md:w-1/2 bg-forest/5" />
+                  <div className="p-12 w-full md:w-1/2 space-y-6">
+                    <div className="h-4 bg-forest/5 rounded w-1/4" />
+                    <div className="h-10 bg-forest/5 rounded w-3/4" />
+                    <div className="h-20 bg-forest/5 rounded w-full" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              trekkList.map((trekk, index) => (
+                <motion.div
+                  key={trekk.id || trekk.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -360,7 +381,8 @@ export default function Trekks() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            ))
+          )}
           </div>
         </div>
       </section>

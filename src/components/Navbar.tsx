@@ -12,13 +12,13 @@ import { useCart } from '@/lib/CartContext';
 import { Badge } from '@/components/ui/badge';
 
 const navLinks = [
-  { name: 'Tour Packages', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
-  { name: 'Mountain Trekks', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
-  { name: 'Guide', href: '/guide' },
-  { name: 'Yoga', href: '/yoga' },
-  { name: 'Meditation', href: '/meditation' },
-  { name: 'Adventure', href: '/adventure' },
-  { name: 'Shop', href: '/shop' },
+  { name: 'TOUR PACKAGES', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
+  { name: 'MOUNTAIN TREKKS', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
+  { name: 'GUIDE', href: '/guide' },
+  { name: 'YOGA', href: '/yoga' },
+  { name: 'MEDITATION', href: '/meditation' },
+  { name: 'ADVENTURE', href: '/adventure' },
+  { name: 'SHOP', href: '/shop' },
 ];
 
 const CartCountBadge = () => {
@@ -61,8 +61,16 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-tighter text-white">
-                THE SOUL <span className="text-terracotta italic font-playfair normal-case">HIMALAYA</span>
+              <span className="flex items-center gap-1 leading-none group-hover:scale-105 transition-all duration-500">
+                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-cream">
+                  THE
+                </span>
+                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-terracotta px-0.5">
+                  SOUL
+                </span>
+                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-cream">
+                  HIMALAYA
+                </span>
               </span>
             </Link>
           </motion.div>

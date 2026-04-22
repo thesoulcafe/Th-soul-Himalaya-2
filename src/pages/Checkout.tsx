@@ -36,6 +36,7 @@ export default function SoulCart() {
   const { user } = useAuth();
   
   const [step, setStep] = useState<CheckoutStep>('details');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'reserve'>('online');
   const [plantTree, setPlantTree] = useState(false);
   const [note, setNote] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -62,7 +63,14 @@ export default function SoulCart() {
 
   const nextStep = () => {
     if (step === 'cart') setStep('details');
-    else if (step === 'details') handleOrder();
+    else if (step === 'details') {
+      if (!formData.fullName || !formData.email || !formData.phone) {
+        alert("Please fill in your Full Name, Email, and Phone number.");
+        return;
+      }
+      setStep('payment');
+    }
+    else if (step === 'payment') handleOrder();
   };
 
   const prevStep = () => {
@@ -76,14 +84,45 @@ export default function SoulCart() {
       return;
     }
 
-    // Basic validation
-    if (!formData.fullName || !formData.email || !formData.phone) {
-      alert("Please fill in your Full Name, Email, and Phone number to complete the booking.");
-      setStep('details');
+    setIsSubmitting(true);
+
+    // If Reserve Spot, save as pending/reserved without Razorpay
+    if (paymentMethod === 'reserve') {
+      try {
+        console.log("[Checkout] Processing 'Reserve Spot' booking...");
+        await addDoc(collection(db, 'bookings'), {
+          userId: user.uid,
+          userName: formData.fullName || user.displayName || 'Guest Explorer',
+          userEmail: formData.email || user.email,
+          phone: formData.phone,
+          city: formData.city,
+          pincode: formData.pincode,
+          items: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            type: item.type,
+            dateRange: item.dateRange || ''
+          })),
+          totalPrice: finalTotal,
+          note: note || '',
+          ecoDonation: plantTree,
+          status: 'reserved', // Mark as reserved
+          paymentMethod: 'reserve',
+          createdAt: serverTimestamp(),
+        });
+        setIsSuccess(true);
+        clearCart();
+      } catch (err: any) {
+        console.error('Reservation Error:', err);
+        alert(`Reservation Failed: ${err.message}`);
+      } finally {
+        setIsSubmitting(false);
+      }
       return;
     }
 
-    setIsSubmitting(true);
     try {
       // Safety check for Razorpay script and Key ID
       if (!(window as any).Razorpay) {
@@ -258,7 +297,8 @@ export default function SoulCart() {
 
           <div className="flex items-center gap-3">
             {[
-              { id: 'details', label: 'Details' }
+              { id: 'details', label: 'Details' },
+              { id: 'payment', label: 'Payment' }
             ].map((s, i) => (
               <React.Fragment key={s.id}>
                 <div className="flex items-center gap-2">
@@ -584,23 +624,41 @@ export default function SoulCart() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-6 rounded-3xl border-2 border-forest bg-forest/[0.03] flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <CreditCard className="h-6 w-6 text-forest" />
-                        <div>
-                          <div className="font-bold text-slate-900">Online Payment</div>
-                          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">UPI, Cards, Netbanking</div>
+                    <div 
+                      onClick={() => setPaymentMethod('online')}
+                      className={cn(
+                        "p-6 rounded-3xl border-2 transition-all cursor-pointer",
+                        paymentMethod === 'online' ? "border-forest bg-forest/[0.03]" : "border-slate-50 bg-slate-50/50 grayscale hover:grayscale-0 hover:border-forest/20"
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <CreditCard className={cn("h-6 w-6", paymentMethod === 'online' ? "text-forest" : "text-slate-400")} />
+                          <div>
+                            <div className={cn("font-bold", paymentMethod === 'online' ? "text-slate-900" : "text-slate-400")}>Online Payment</div>
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">UPI, Cards, Netbanking</div>
+                          </div>
                         </div>
+                        {paymentMethod === 'online' && <CheckCircle2 className="h-5 w-5 text-forest" />}
                       </div>
-                      <CheckCircle2 className="h-5 w-5 text-forest" />
                     </div>
-                    <div className="p-6 rounded-3xl border-2 border-slate-50 bg-slate-50/50 flex items-center justify-between opacity-50 cursor-not-allowed">
-                       <div className="flex items-center gap-4">
-                        <Compass className="h-6 w-6 text-slate-300" />
-                        <div>
-                          <div className="font-bold text-slate-300">Reserve Spot</div>
-                          <div className="text-[10px] text-slate-200 font-bold uppercase tracking-wider">Coming Soon</div>
+
+                    <div 
+                      onClick={() => setPaymentMethod('reserve')}
+                      className={cn(
+                        "p-6 rounded-3xl border-2 transition-all cursor-pointer",
+                        paymentMethod === 'reserve' ? "border-terracotta bg-terracotta/[0.03]" : "border-slate-50 bg-slate-50/50 grayscale hover:grayscale-0 hover:border-terracotta/20"
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Compass className={cn("h-6 w-6", paymentMethod === 'reserve' ? "text-terracotta" : "text-slate-400")} />
+                          <div>
+                            <div className={cn("font-bold", paymentMethod === 'reserve' ? "text-slate-900" : "text-slate-400")}>Reserve Spot</div>
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pay Later / Token</div>
+                          </div>
                         </div>
+                        {paymentMethod === 'reserve' && <CheckCircle2 className="h-5 w-5 text-terracotta" />}
                       </div>
                     </div>
                   </div>
@@ -658,7 +716,7 @@ export default function SoulCart() {
                     <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      {step === 'details' ? 'Proceed to Payment' : 'Next Soul Step'}
+                      {step === 'details' ? 'Next Soul Step' : paymentMethod === 'online' ? 'Pay Now' : 'Confirm Spot'}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}

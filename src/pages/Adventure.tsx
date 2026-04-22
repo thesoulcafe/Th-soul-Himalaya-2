@@ -19,7 +19,8 @@ import { DEFAULT_ADVENTURE } from '@/constants';
 export default function Adventure() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
-  const [activities, setActivities] = useState<any[]>(DEFAULT_ADVENTURE);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
@@ -67,7 +68,15 @@ export default function Adventure() {
           return 0;
         });
         setActivities(dbItems);
+      } else {
+        // Fallback to defaults
+        setActivities([...DEFAULT_ADVENTURE].sort((a, b) => {
+          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
+          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
+          return aOrder - bOrder;
+        }));
       }
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -134,9 +143,21 @@ export default function Adventure() {
       <section className="py-24 px-6 bg-cream">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {activities.map((activity, i) => (
-              <motion.div
-                key={activity.title}
+            {!hasLoaded ? (
+              [1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-[2.5rem] h-[600px] animate-pulse border-none shadow-2xl p-0 overflow-hidden flex flex-col">
+                  <div className="h-80 bg-forest/5" />
+                  <div className="p-10 space-y-6">
+                    <div className="h-4 bg-forest/5 rounded w-1/4" />
+                    <div className="h-10 bg-forest/5 rounded w-3/4" />
+                    <div className="h-32 bg-forest/5 rounded w-full" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              activities.map((activity, i) => (
+                <motion.div
+                  key={activity.id || activity.title}
                 initial={{ opacity: 0, x: i === 0 ? -30 : 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -359,7 +380,8 @@ export default function Adventure() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
+            ))
+          )}
           </div>
         </div>
       </section>

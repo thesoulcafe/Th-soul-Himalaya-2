@@ -14,7 +14,7 @@ import { DEFAULT_SERVICES } from '@/constants';
 import Leaderboard from '@/components/Leaderboard';
 import { SEO } from '@/components/SEO';
 
-const HorizontalServiceRow = ({ services }: { services: any[] }) => {
+const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[], hasLoadedServices: boolean }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { profile } = useAuth();
 
@@ -71,9 +71,14 @@ const HorizontalServiceRow = ({ services }: { services: any[] }) => {
           ref={scrollContainerRef}
           className="grid grid-cols-1 sm:grid-cols-2 md:flex md:overflow-x-auto pb-8 gap-4 px-6 lg:px-[calc((100vw-80rem)/2+1.5rem)] no-scrollbar snap-x snap-mandatory scroll-smooth"
         >
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
+          {!hasLoadedServices ? (
+            [1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="w-full md:min-w-[130px] h-[120px] md:h-[140px] bg-forest/5 rounded-[1.5rem] animate-pulse shrink-0" />
+            ))
+          ) : (
+            services.map((service, index) => (
+              <motion.div
+                key={service.id || service.title}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -168,8 +173,9 @@ const HorizontalServiceRow = ({ services }: { services: any[] }) => {
                 </Link>
               )}
             </motion.div>
-          ))}
-          <div className="min-w-[1px] md:min-w-[1rem]" />
+          ))
+        )}
+        <div className="min-w-[1px] md:min-w-[1rem]" />
         </div>
       </div>
     </section>
@@ -186,7 +192,8 @@ export default function Home() {
     { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
   ]);
   const { user } = useAuth();
-  const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
+  const [services, setServices] = useState<any[]>([]);
+  const [hasLoadedServices, setHasLoadedServices] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -229,6 +236,10 @@ export default function Home() {
             return aOrder - bOrder;
           });
         setServices(dbServices);
+        setHasLoadedServices(true);
+      } else {
+        setServices(DEFAULT_SERVICES);
+        setHasLoadedServices(true);
       }
     });
 
@@ -283,7 +294,7 @@ export default function Home() {
             </motion.p>
             
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
-              <span className="opacity-90 normal-case uppercase tracking-tight pr-1">FIND YOUR</span>
+              <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
               <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
             </h1>
 
@@ -332,7 +343,7 @@ export default function Home() {
       </section>
 
       {/* Mini Services Scroll (Above Final CTA) */}
-      <HorizontalServiceRow services={services} />
+      <HorizontalServiceRow services={services} hasLoadedServices={hasLoadedServices} />
 
       {/* Special Packages Section */}
       <section className="py-32 px-6 bg-[#FDFCFB] relative overflow-hidden">

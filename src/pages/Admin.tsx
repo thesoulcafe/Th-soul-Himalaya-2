@@ -86,7 +86,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager';
-type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'config' | 'all';
+type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'all';
 
 interface ContentItem {
   id: string;
@@ -1097,6 +1097,7 @@ export default function Admin() {
                   { id: 'meditation', label: 'Meditation', icon: Star, color: 'text-purple-500', bg: 'bg-purple-500/10' },
                   { id: 'adventure', label: 'Adventure', icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10' },
                   { id: 'wfh', label: 'WFH', icon: Laptop, color: 'text-slate-500', bg: 'bg-slate-500/10' },
+                  { id: 'itinerary', label: 'Itineraries', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-600/10' },
                   { id: 'config', label: 'Config', icon: Settings, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                   { id: 'all', label: 'All Assets', icon: LayoutDashboard, color: 'text-forest', bg: 'bg-forest/10' },
                 ].map((tab) => (
@@ -1814,10 +1815,15 @@ export default function Admin() {
               </motion.div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {contentItems
-                .filter(i => activeContentTab === 'all' ? true : (activeContentTab === 'trekk' ? (i.type === 'trekk' || i.type === 'trek') : i.type === activeContentTab))
-                .filter(i => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {contentItems
+                  .filter(i => {
+                    if (activeContentTab === 'all') return true;
+                    if (activeContentTab === 'itinerary') return (i.data.itinerary && i.data.itinerary.length > 0) || i.data.theExperience;
+                    if (activeContentTab === 'trekk') return i.type === 'trekk' || i.type === 'trek';
+                    return i.type === activeContentTab;
+                  })
+                  .filter(i => {
                   const title = (i.data.title || i.data.name || '').toLowerCase();
                   return !title.includes('cafe') && !title.includes('food');
                 })
@@ -1873,6 +1879,12 @@ export default function Admin() {
                         {item.data.isAvailable === false && (
                           <Badge className="bg-rose-500 text-white border-none px-2 py-0.5 rounded-md font-bold text-[8px] uppercase tracking-widest shadow-lg shadow-rose-500/20">
                             Offline
+                          </Badge>
+                        )}
+                        {(item.data.itinerary?.length > 0 || item.data.theExperience) && (
+                          <Badge className="bg-emerald-500/90 backdrop-blur shadow-sm text-white border-none px-2 py-0.5 rounded-md font-bold text-[8px] uppercase tracking-widest flex items-center gap-1">
+                            <Clock className="h-2 w-2" />
+                            Itinerary
                           </Badge>
                         )}
                       </div>
@@ -2126,10 +2138,13 @@ export default function Admin() {
                           <Badge className={cn(
                             "text-[9px] px-2 py-0.5 rounded border font-mono font-bold uppercase",
                             (booking.status === 'confirmed' || booking.status === 'paid') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
-                            booking.status === 'pending' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                            (booking.status === 'pending' || booking.status === 'reserved') ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
                           )}>
                             {booking.status}
                           </Badge>
+                          {booking.paymentMethod === 'reserve' && (
+                            <p className="text-[8px] font-bold text-terracotta uppercase tracking-tighter mt-1">Reserve Option</p>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
