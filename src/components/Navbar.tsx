@@ -61,15 +61,15 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <span className="flex items-center gap-1 leading-none group-hover:scale-105 transition-all duration-500">
-                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-cream">
-                  THE
+              <span className="flex items-baseline gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
+                <span className="text-[18px] md:text-[22px] font-fluid text-white">
+                  The
                 </span>
-                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-terracotta px-0.5">
-                  SOUL
+                <span className="text-[22px] md:text-[28px] font-fluid text-terracotta drop-shadow-sm px-1">
+                  Soul
                 </span>
-                <span className="text-[15px] md:text-[18px] font-outfit font-black uppercase tracking-tighter text-cream">
-                  HIMALAYA
+                <span className="text-[18px] md:text-[22px] font-fluid text-white">
+                  Himalaya
                 </span>
               </span>
             </Link>

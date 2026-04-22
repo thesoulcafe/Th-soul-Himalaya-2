@@ -635,8 +635,8 @@ export default function SoulCart() {
                         <div className="flex items-center gap-4">
                           <CreditCard className={cn("h-6 w-6", paymentMethod === 'online' ? "text-forest" : "text-slate-400")} />
                           <div>
-                            <div className={cn("font-bold", paymentMethod === 'online' ? "text-slate-900" : "text-slate-400")}>Online Payment</div>
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">UPI, Cards, Netbanking</div>
+                            <div className={cn("text-xl md:text-2xl font-fluid", paymentMethod === 'online' ? "text-forest" : "text-slate-400")}>Online Payment</div>
+                            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest -mt-1">UPI, Cards, Netbanking</div>
                           </div>
                         </div>
                         {paymentMethod === 'online' && <CheckCircle2 className="h-5 w-5 text-forest" />}
@@ -654,8 +654,8 @@ export default function SoulCart() {
                         <div className="flex items-center gap-4">
                           <Compass className={cn("h-6 w-6", paymentMethod === 'reserve' ? "text-terracotta" : "text-slate-400")} />
                           <div>
-                            <div className={cn("font-bold", paymentMethod === 'reserve' ? "text-slate-900" : "text-slate-400")}>Reserve Spot</div>
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pay Later / Token</div>
+                            <div className={cn("text-xl md:text-2xl font-fluid", paymentMethod === 'reserve' ? "text-terracotta" : "text-slate-400")}>Reserve Spot</div>
+                            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest -mt-1">Pay Later / Token</div>
                           </div>
                         </div>
                         {paymentMethod === 'reserve' && <CheckCircle2 className="h-5 w-5 text-terracotta" />}

@@ -42,15 +42,15 @@ export default function Footer() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="flex flex-wrap items-baseline gap-2 md:gap-4 leading-none transition-all duration-700 group-hover:gap-1 md:group-hover:gap-2">
-              <span className="text-3xl md:text-6xl font-outfit font-black uppercase tracking-tighter text-cream drop-shadow-2xl">
-                THE
+            <span className="flex flex-wrap items-baseline gap-2 md:gap-4 leading-none transition-all duration-700">
+              <span className="text-4xl md:text-6xl font-fluid text-cream">
+                The
               </span>
-              <span className="text-3xl md:text-6xl font-outfit font-black uppercase tracking-tighter text-terracotta drop-shadow-lg">
-                SOUL
+              <span className="text-6xl md:text-9xl font-fluid text-terracotta px-2">
+                Soul
               </span>
-              <span className="text-3xl md:text-6xl font-outfit font-black uppercase tracking-tighter text-cream drop-shadow-2xl">
-                HIMALAYA
+              <span className="text-4xl md:text-6xl font-fluid text-cream">
+                Himalaya
               </span>
             </span>
           </Link>
