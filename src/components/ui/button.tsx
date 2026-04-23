@@ -44,16 +44,28 @@ function Button({
   className,
   variant = "default",
   size = "default",
-  nativeButton,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { nativeButton?: boolean }) {
+}: any) {
+  // Extract asChild/aschild and map it to Base UI's render prop
+  const { asChild, aschild, children, render, nativeButton, ...rest } = props;
+  const isAsChild = !!(asChild || aschild);
+  
+  // If asChild is used, nativeButton should be false. Otherwise use passed or undefined.
+  const resolvedNativeButton = isAsChild ? false : nativeButton;
+  
+  // If asChild is true, we use children as the element to render.
+  const resolvedRender = isAsChild ? children : render;
+  
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...(nativeButton !== undefined ? { nativeButton } : {})}
-      {...props}
-    />
+      {...(resolvedNativeButton !== undefined ? { nativeButton: resolvedNativeButton } : {})}
+      {...rest}
+      render={resolvedRender}
+    >
+      {!resolvedRender && children}
+    </ButtonPrimitive>
   )
 }
 

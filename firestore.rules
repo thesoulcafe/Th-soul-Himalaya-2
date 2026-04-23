@@ -114,7 +114,7 @@ service cloud.firestore {
              data.userId == request.auth.uid &&
              data.userName is string && data.userName.size() <= 100 &&
              isValidEmail(data.userEmail) &&
-             data.status in ['pending', 'confirmed', 'cancelled', 'paid'] &&
+             data.status in ['pending', 'confirmed', 'cancelled', 'paid', 'reserved'] &&
              data.totalPrice is number && data.totalPrice >= 0 &&
              data.createdAt == request.time &&
              // Handle either multi-item cart or single-service direct booking
@@ -129,7 +129,10 @@ service cloud.firestore {
              (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
              (!('pincode' in data) || (data.pincode is string && data.pincode.size() <= 10)) &&
              (!('note' in data) || (data.note is string && data.note.size() <= 1000)) &&
-             (!('ecoDonation' in data) || data.ecoDonation is bool);
+             (!('ecoDonation' in data) || data.ecoDonation is bool) &&
+             (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
+             (!('razorpayOrderId' in data) || (data.razorpayOrderId is string && data.razorpayOrderId.size() <= 100)) &&
+             (!('razorpayPaymentId' in data) || (data.razorpayPaymentId is string && data.razorpayPaymentId.size() <= 100));
     }
 
     match /bookings/{bookingId} {

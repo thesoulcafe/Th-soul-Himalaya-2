@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Map, Coffee, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2 } from 'lucide-react';
+import { ArrowRight, Map, Coffee, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -16,13 +16,14 @@ export default function Services() {
   const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
 
   const getIcon = (title: string) => {
-    if (title.toLowerCase().includes('tour')) return Map;
-    if (title.toLowerCase().includes('wfh')) return HomeIcon;
-    if (title.toLowerCase().includes('yoga')) return Flower2;
-    if (title.toLowerCase().includes('meditation')) return Flower2;
-    if (title.toLowerCase().includes('trekk')) return Compass;
-    if (title.toLowerCase().includes('shop')) return ShoppingBag;
-    if (title.toLowerCase().includes('adventure')) return Wind;
+    const t = title.toLowerCase();
+    if (t.includes('tour')) return Map;
+    if (t.includes('wfh') || t.includes('workation')) return HomeIcon;
+    if (t.includes('meditation')) return Sparkles;
+    if (t.includes('yoga')) return Flower2;
+    if (t.includes('trekk')) return Compass;
+    if (t.includes('shop')) return ShoppingBag;
+    if (t.includes('adventure')) return Wind;
     return Compass;
   };
 
@@ -43,18 +44,19 @@ export default function Services() {
             // Force Macramé Shop to the end
             const aTitle = (a.title || '').toLowerCase();
             const bTitle = (b.title || '').toLowerCase();
-            if (aTitle.includes('macramé') || aTitle.includes('macrame')) return 1;
-            if (bTitle.includes('macramé') || bTitle.includes('macrame')) return -1;
-
-            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-            if (aOrder !== bOrder) return aOrder - bOrder;
+            const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
+            const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
+            if (aIsMacrame && !bIsMacrame) return 1;
+            if (!aIsMacrame && bIsMacrame) return -1;
 
             const aAvail = a.isAvailable !== false;
             const bAvail = b.isAvailable !== false;
             if (aAvail && !bAvail) return -1;
             if (!aAvail && bAvail) return 1;
-            return 0;
+
+            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+            return aOrder - bOrder;
           });
         setServices(dbServices);
       }

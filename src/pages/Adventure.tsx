@@ -57,15 +57,14 @@ export default function Adventure() {
           id: doc.id,
           ...doc.data().data
         })).sort((a, b) => {
-          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-          if (aOrder !== bOrder) return aOrder - bOrder;
-
           const aAvail = a.isAvailable !== false;
           const bAvail = b.isAvailable !== false;
           if (aAvail && !bAvail) return -1;
           if (!aAvail && bAvail) return 1;
-          return 0;
+
+          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+          return aOrder - bOrder;
         });
         setActivities(dbItems);
       } else {

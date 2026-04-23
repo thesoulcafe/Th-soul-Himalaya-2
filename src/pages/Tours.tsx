@@ -37,7 +37,11 @@ import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
 import { SEO } from '@/components/SEO';
 
-import { DEFAULT_TOURS } from '@/constants';
+import { 
+  DEFAULT_TOURS, 
+  DEFAULT_YOGA, 
+  DEFAULT_MEDITATION 
+} from '@/constants';
 
 import { useAuth } from '@/lib/AuthContext';
 
@@ -134,32 +138,51 @@ export default function Tours() {
   }, [searchParams]);
 
   useEffect(() => {
-    const q = query(collection(db, 'content'), where('type', '==', 'tour'));
+    const q = query(collection(db, 'content'), where('type', 'in', ['tour', 'yoga', 'meditation']));
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      let combinedItems: any[] = [];
+      
       if (!snapshot.empty) {
-        const dbTours = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data().data
-        })).sort((a, b) => {
-          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-          if (aOrder !== bOrder) return aOrder - bOrder;
-
-          const aAvail = a.isAvailable !== false;
-          const bAvail = b.isAvailable !== false;
-          if (aAvail && !bAvail) return -1;
-          if (!aAvail && bAvail) return 1;
-          return 0;
+        combinedItems = snapshot.docs.map(doc => {
+          const type = doc.data().type;
+          const data = doc.data().data;
+          return {
+            id: doc.id,
+            ...data,
+            originalType: type,
+            category: (type === 'yoga' || type === 'meditation') ? 'Wellness' : (data.category || 'All'),
+            highlights: data.highlights || data.features || []
+          };
         });
-        setTours(dbTours);
-      } else {
-        // Fallback to defaults only if DB is truly empty, but sort them too
-        setTours([...DEFAULT_TOURS].sort((a, b) => {
-          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
-          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
-          return aOrder - bOrder;
-        }));
       }
+
+      // If DB items are missing some types or totally empty, fill with defaults
+      const hasTours = combinedItems.some(i => i.originalType === 'tour');
+      const hasYoga = combinedItems.some(i => i.originalType === 'yoga');
+      const hasMeditation = combinedItems.some(i => i.originalType === 'meditation');
+
+      if (!hasTours) {
+        combinedItems = [...combinedItems, ...DEFAULT_TOURS.map(t => ({ ...t, originalType: 'tour' }))];
+      }
+      if (!hasYoga) {
+        combinedItems = [...combinedItems, ...DEFAULT_YOGA.map(y => ({ ...y, originalType: 'yoga', category: 'Wellness', highlights: y.features || [] }))];
+      }
+      if (!hasMeditation) {
+        combinedItems = [...combinedItems, ...DEFAULT_MEDITATION.map(m => ({ ...m, originalType: 'meditation', category: 'Wellness', highlights: m.features || [] }))];
+      }
+
+      const sortedItems = combinedItems.sort((a, b) => {
+        const aAvail = a.isAvailable !== false;
+        const bAvail = b.isAvailable !== false;
+        if (aAvail && !bAvail) return -1;
+        if (!aAvail && bAvail) return 1;
+
+        const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+        const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+        return aOrder - bOrder;
+      });
+
+      setTours(sortedItems);
       setHasLoaded(true);
     });
 
@@ -176,7 +199,10 @@ export default function Tours() {
     return () => unsubscribe();
   }, []);
 
-  const categories = ['All', 'Romantic', 'Wellness', 'Corporate', 'Backpacker', 'Adventure', 'Mix-up'];
+  const categories = useMemo(() => {
+    const list = config?.tourCategories || ['Romantic', 'Wellness', 'Corporate', 'Backpacker', 'Adventure', 'Mix-up'];
+    return ['All', ...list];
+  }, [config]);
 
   const parsePrice = (priceStr: string) => {
     return parseInt(priceStr.replace(/[₹,]/g, '')) || 0;
@@ -412,7 +438,7 @@ export default function Tours() {
                       />
                       <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                         <Badge className="bg-white/90 backdrop-blur-md text-forest border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                          Best Seller
+                          {tour.focus || 'Best Seller'}
                         </Badge>
                       </div>
                       
@@ -425,13 +451,13 @@ export default function Tours() {
                       )}
 
                       {profile?.role === 'admin' && (
-                        <Link 
-                          to={tour.id ? `/admin?tab=content&type=tour&edit=${tour.id}` : `/admin?tab=content&type=tour`}
-                          className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
-                          title={tour.id ? "Edit Tour" : "Sync defaults to edit"}
-                        >
-                          <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
-                        </Link>
+                          <Link 
+                            to={tour.id ? `/admin?tab=content&type=${tour.originalType || 'tour'}&edit=${tour.id}` : `/admin?tab=content&type=${tour.originalType || 'tour'}`}
+                            className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
+                            title={tour.id ? `Edit ${tour.originalType || 'Tour'}` : "Sync defaults to edit"}
+                          >
+                            <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
+                          </Link>
                       )}
 
                       <button 
@@ -516,7 +542,10 @@ export default function Tours() {
                         <div className="flex flex-col gap-3">
                           {(() => {
                             const slotIndex = selectedSlots[tour.id];
-                            const currentItemId = `tour-${tour.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
+                            const baseId = tour.originalType && tour.originalType !== 'tour' 
+                              ? `${tour.originalType}-${tour.title.toLowerCase().replace(/\s+/g, '-')}`
+                              : `tour-${tour.id}`;
+                            const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
                             const quantity = getItemQuantity(currentItemId);
                             
                             const handleBookAction = () => {
@@ -526,7 +555,7 @@ export default function Tours() {
                                   id: currentItemId,
                                   name: tour.title,
                                   price: tour.price,
-                                  type: 'Tour',
+                                  type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
                                   image: tour.image,
                                   dateRange: formatDateRange(selectedDate, tour.duration, slotIndex !== undefined ? tour.slots?.[parseInt(slotIndex)] : undefined)
                                 });
@@ -545,7 +574,7 @@ export default function Tours() {
                                 id: currentItemId,
                                 name: tour.title,
                                 price: tour.price,
-                                type: 'Tour',
+                                type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
                                 image: tour.image,
                                 dateRange: formatDateRange(selectedDate, tour.duration, slot)
                               });

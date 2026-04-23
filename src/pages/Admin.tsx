@@ -87,7 +87,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager';
-type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'all';
+type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'page_parvati' | 'all';
 
 interface ContentItem {
   id: string;
@@ -124,7 +124,7 @@ interface Booking {
   serviceName?: string;
   date?: string;
   guests?: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'paid';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'paid' | 'reserved';
   totalPrice: number;
   createdAt: any;
 }
@@ -150,6 +150,8 @@ export default function Admin() {
   const [activeContentTab, setActiveContentTab] = useState<ContentType>((searchParams.get('type') as ContentType) || 'tour');
   
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [tourCategories, setTourCategories] = useState<string[]>(['Romantic', 'Wellness', 'Corporate', 'Backpacker', 'Adventure', 'Mix-up']);
+  const [newCategory, setNewCategory] = useState('');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -398,7 +400,14 @@ export default function Admin() {
     // Content Listener
     const contentQuery = query(collection(db, 'content'), orderBy('updatedAt', 'desc'));
     const unsubscribeContent = onSnapshot(contentQuery, (snapshot) => {
-      setContentItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ContentItem[]);
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ContentItem[];
+      setContentItems(items);
+      
+      // Sync categories from config if exists
+      const configItem = items.find(i => i.type === 'config');
+      if (configItem?.data?.tourCategories) {
+        setTourCategories(configItem.data.tourCategories);
+      }
     });
 
     // Bookings Listener
@@ -447,7 +456,7 @@ export default function Admin() {
   // Analytics Calculations
   const stats = useMemo(() => {
     const totalRevenue = bookings.reduce((acc, curr) => acc + (curr.totalPrice || 0), 0);
-    const confirmedBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'paid').length;
+    const confirmedBookings = bookings.filter(b => ['confirmed', 'paid', 'reserved'].includes(b.status)).length;
     
     // Most Sold Trekk
     const itemsList: any[] = [];
@@ -744,7 +753,8 @@ export default function Admin() {
               places: ['Tosh', 'Kasol', 'Malana', 'Manikaran', 'Pulga', 'Kalga'],
               trekks: ['Kheerganga', 'Bunbuni Pass', 'Sar Pass', 'Pin Parvati'],
               yoga: ['Hatha Yoga', 'Vinyasa Flow', 'Ashtanga', 'Yin Yoga'],
-              meditation: ['Vipassana', 'Guided Meditation', 'Sound Healing', 'Zen']
+              meditation: ['Vipassana', 'Guided Meditation', 'Sound Healing', 'Zen'],
+              tourCategories: ['Romantic', 'Wellness', 'Corporate', 'Backpacker', 'Adventure', 'Mix-up']
             }] },
           ];
 
@@ -1030,8 +1040,8 @@ export default function Admin() {
                                 <td className="px-6 py-4 text-center">
                                   <Badge className={cn(
                                     "text-[9px] px-2 py-0.5 rounded border font-mono font-bold uppercase",
-                                    booking.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
-                                    booking.status === 'pending' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                                    (booking.status === 'confirmed' || booking.status === 'paid') ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                                    (booking.status === 'pending' || booking.status === 'reserved') ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
                                   )}>
                                     {booking.status}
                                   </Badge>
@@ -1139,6 +1149,7 @@ export default function Admin() {
                   { id: 'wfh', label: 'WFH', icon: Laptop, color: 'text-slate-500', bg: 'bg-slate-500/10' },
                   { id: 'itinerary', label: 'Itineraries', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-600/10' },
                   { id: 'config', label: 'Config', icon: Settings, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                  { id: 'page_parvati', label: 'Parvati Page', icon: Sparkles, color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10' },
                   { id: 'all', label: 'All Assets', icon: LayoutDashboard, color: 'text-forest', bg: 'bg-forest/10' },
                 ].map((tab) => (
                   <button
@@ -1223,7 +1234,7 @@ export default function Admin() {
                             onChange={(e) => setFormData({...formData, price: e.target.value})}
                             className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                             placeholder="e.g. ₹14,999"
-                            required={activeContentTab !== 'service'}
+                            required={activeContentTab !== 'service' && activeContentTab !== 'page_parvati'}
                           />
                         </div>
                         <div className="space-y-3">
@@ -1398,6 +1409,61 @@ export default function Admin() {
                         </div>
 
                         {/* Type Specific Fields */}
+                        {activeContentTab === 'page_parvati' && (
+                          <div className="md:col-span-2 space-y-6">
+                            <h4 className="font-bold text-forest border-b border-forest/10 pb-2">Parvati Section Images</h4>
+                            <p className="text-xs text-forest/60 mb-4">Note: The "Cover Image" above controls the main Hero Banner. "Additional Gallery" controls the image gallery on the Parvati page.</p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Divinity Narrative Image</label>
+                                <Input 
+                                  value={formData.narrativeImage || ''} 
+                                  onChange={(e) => setFormData({...formData, narrativeImage: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="Image URL"
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Malana Image</label>
+                                <Input 
+                                  value={formData.malanaImage || ''} 
+                                  onChange={(e) => setFormData({...formData, malanaImage: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="Image URL"
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Tosh Image</label>
+                                <Input 
+                                  value={formData.toshImage || ''} 
+                                  onChange={(e) => setFormData({...formData, toshImage: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="Image URL"
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Pulga Image</label>
+                                <Input 
+                                  value={formData.pulgaImage || ''} 
+                                  onChange={(e) => setFormData({...formData, pulgaImage: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="Image URL"
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Kheerganga Image</label>
+                                <Input 
+                                  value={formData.kheergangaImage || ''} 
+                                  onChange={(e) => setFormData({...formData, kheergangaImage: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="Image URL"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         {activeContentTab === 'config' && (
                           <div className="md:col-span-2 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1474,6 +1540,63 @@ export default function Admin() {
                                 className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                 placeholder="124"
                               />
+                            </div>
+                            <div className="md:col-span-2 space-y-4 bg-forest/[0.02] p-6 rounded-[2rem] border border-forest/5">
+                              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                  <label className="text-xs font-black text-forest uppercase tracking-widest">Journey Category</label>
+                                  <p className="text-[10px] text-forest/40 font-medium italic">Tag this tour for better discovery</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {tourCategories.map(cat => (
+                                    <button
+                                      key={cat}
+                                      type="button"
+                                      onClick={() => setFormData({ ...formData, category: cat })}
+                                      className={cn(
+                                        "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                                        formData.category === cat 
+                                          ? "bg-terracotta text-white shadow-lg shadow-terracotta/20 scale-105" 
+                                          : "bg-white text-forest/40 border border-forest/5 hover:border-forest/20"
+                                      )}
+                                    >
+                                      {cat}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="pt-4 border-t border-forest/5 flex items-center gap-3">
+                                <Input 
+                                  placeholder="Add New Collection Name..."
+                                  value={newCategory}
+                                  onChange={(e) => setNewCategory(e.target.value)}
+                                  className="h-10 rounded-xl bg-white border-forest/10 text-xs font-bold uppercase tracking-widest max-w-[240px]"
+                                />
+                                <Button
+                                  type="button"
+                                  onClick={async () => {
+                                    if (!newCategory.trim()) return;
+                                    const updatedCats = [...new Set([...tourCategories, newCategory.trim()])];
+                                    setTourCategories(updatedCats);
+                                    
+                                    // Also sync to global config in DB if it exists
+                                    const configItem = contentItems.find(i => i.type === 'config');
+                                    if (configItem) {
+                                      await updateDoc(doc(db, 'content', configItem.id), {
+                                        "data.tourCategories": updatedCats,
+                                        updatedAt: serverTimestamp()
+                                      });
+                                    }
+                                    
+                                    setFormData({ ...formData, category: newCategory.trim() });
+                                    setNewCategory('');
+                                    setNotification({ message: 'New collection category added!', type: 'success' });
+                                  }}
+                                  className="h-10 px-4 bg-forest text-white rounded-xl text-[10px] font-black uppercase tracking-wider"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" /> Add Category
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         )}
@@ -2448,7 +2571,7 @@ export default function Admin() {
                                       <Badge className={cn(
                                         "text-[8px] font-bold uppercase px-2 py-0.5 rounded-full border",
                                         (booking.status === 'confirmed' || booking.status === 'paid') ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
-                                        booking.status === 'pending' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                                        (booking.status === 'pending' || booking.status === 'reserved') ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
                                         "bg-rose-500/10 text-rose-600 border-rose-500/20"
                                       )}>
                                         {booking.status}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
-import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram } from 'lucide-react';
+import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -21,9 +21,9 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
   const getIcon = (title: string) => {
     const t = (title || '').toLowerCase();
     if (t.includes('tour')) return Map;
-    if (t.includes('wfh')) return HomeIcon;
+    if (t.includes('wfh') || t.includes('workation')) return HomeIcon;
+    if (t.includes('meditation')) return Sparkles;
     if (t.includes('yoga')) return Flower2;
-    if (t.includes('meditation')) return Flower2;
     if (t.includes('trekk')) return Compass;
     if (t.includes('shop')) return ShoppingBag;
     if (t.includes('adventure')) return Wind;
@@ -228,8 +228,15 @@ export default function Home() {
             // Force Macramé Shop to the end
             const aTitle = (a.title || '').toLowerCase();
             const bTitle = (b.title || '').toLowerCase();
-            if (aTitle.includes('macramé') || aTitle.includes('macrame')) return 1;
-            if (bTitle.includes('macramé') || bTitle.includes('macrame')) return -1;
+            const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
+            const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
+            if (aIsMacrame && !bIsMacrame) return 1;
+            if (!aIsMacrame && bIsMacrame) return -1;
+
+            const aAvail = a.isAvailable !== false;
+            const bAvail = b.isAvailable !== false;
+            if (aAvail && !bAvail) return -1;
+            if (!aAvail && bAvail) return 1;
 
             const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
             const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
@@ -430,6 +437,47 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </div>
+
+        {/* Parvati Valley Spotlight - Glassmorphism Card Integration */}
+        <div className="max-w-7xl mx-auto mt-32 px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-16 p-8 md:p-16 rounded-[4rem] bg-forest/5 border border-forest/10 overflow-hidden relative group">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[100px] -mr-64 -mt-64" />
+            
+            <div className="flex-1 space-y-8 relative z-10 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/5 text-forest text-[10px] font-black uppercase tracking-widest">
+                <Zap className="h-4 w-4 text-terracotta" /> Regional Spotlight
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-extrabold text-forest tracking-tighter leading-[1.1]">The Valley of <br />Shadows & Light</h2>
+              <p className="text-forest/60 text-lg leading-relaxed max-w-xl font-medium">
+                Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
+              </p>
+            </div>
+
+            <div className="flex justify-center relative z-10">
+              <motion.div 
+                whileHover={{ scale: 1.05, rotate: -2 }}
+                className="w-[280px] h-[360px] md:w-[350px] md:h-[450px] relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] group/pv"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
+                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2670&auto=format&fit=crop)' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">
+                  <div>
+                    <h4 className="text-xl md:text-3xl font-heading font-bold text-white tracking-tighter">Parvati Deep Dive</h4>
+                    <p className="text-white/60 text-[9px] md:text-[10px] font-black mt-1 uppercase tracking-[0.2em]">A Spiritual Odyssey</p>
+                  </div>
+                  <Button asChild className="w-full h-10 md:h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-md shadow-xl shadow-terracotta/20 border-none transition-all">
+                    <Link to="/parvati-valley">
+                      Explore the Valley
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

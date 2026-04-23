@@ -94,7 +94,7 @@
       "description": "Website content items like tours, treks, and services.",
       "type": "object",
       "properties": {
-        "type": { "type": "string", "enum": ["tour", "trek", "shop_item", "service", "yoga", "meditation", "adventure", "wfh"] },
+        "type": { "type": "string", "enum": ["tour", "trek", "shop_item", "service", "yoga", "meditation", "adventure", "wfh", "page_parvati"] },
         "data": { 
           "type": "object",
           "properties": {

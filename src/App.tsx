@@ -19,6 +19,8 @@ import Admin from './pages/Admin';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
+import ParvatiValley from './pages/ParvatiValley';
+import CosmicManifestation from './pages/CosmicManifestation';
 import { AuthProvider } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -52,6 +54,8 @@ export default function App() {
                 <Route path="admin" element={<Admin />} />
                 <Route path="checkout" element={<Checkout />} />
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="parvati-valley" element={<ParvatiValley />} />
+                <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
               </Route>
             </Routes>
           </Router>

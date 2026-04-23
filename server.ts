@@ -194,66 +194,13 @@ async function startServer() {
     });
   });
 
-  // Razorpay Create Order
-  app.post("/api/razorpay/order", async (req, res) => {
-    try {
-      const { amount, currency = "INR", receipt } = req.body;
-      console.log(`[Razorpay] Creating order: Amount=${amount}, Currency=${currency}, Receipt=${receipt}`);
-
-      if (!amount || isNaN(amount)) {
-        return res.status(400).json({ error: "Valid amount is required" });
-      }
-
-      if (amount < 1) {
-        return res.status(400).json({ error: "Amount must be at least ₹1.00" });
-      }
-
-      const razorpay = getRazorpay();
-      const options = {
-        amount: Math.round(amount * 100), // Razorpay expects amount in paise
-        currency,
-        receipt,
-      };
-
-      const order = await razorpay.orders.create(options);
-      console.log(`[Razorpay] Order created successfully: ID=${order.id}`);
-      res.json(order);
-    } catch (error) {
-      console.error("[Razorpay] Order creation failed:", error);
-      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to create Razorpay order" });
-    }
+  // Razorpay remains defined in dependencies for future use but endpoints are disabled for "Reserve Only" version.
+  app.post("/api/razorpay/order", (req, res) => {
+    res.status(403).json({ error: "Online payments are currently disabled. Please use the 'Reserve Spot' option." });
   });
 
-  // Razorpay Verify Signature
   app.post("/api/razorpay/verify", (req, res) => {
-    try {
-      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-      console.log(`[Razorpay] Verifying payment: OrderId=${razorpay_order_id}, PaymentId=${razorpay_payment_id}`);
-      
-      const secret = process.env.RAZORPAY_KEY_SECRET;
-
-      if (!secret) {
-        console.error("[Razorpay] Verification failed: RAZORPAY_KEY_SECRET is missing");
-        return res.status(500).json({ error: "RAZORPAY_KEY_SECRET is missing" });
-      }
-
-      const body = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSignature = crypto
-        .createHmac("sha256", secret)
-        .update(body.toString())
-        .digest("hex");
-
-      if (expectedSignature === razorpay_signature) {
-        console.log("[Razorpay] Verification successful");
-        res.json({ status: "success", message: "Payment verified successfully" });
-      } else {
-        console.warn("[Razorpay] Verification failed: Signature mismatch");
-        res.status(400).json({ status: "failure", message: "Invalid signature" });
-      }
-    } catch (error) {
-      console.error("[Razorpay] Verification failed:", error);
-      res.status(500).json({ error: "Verification failed" });
-    }
+    res.status(403).json({ error: "Online payments are currently disabled." });
   });
 
   // Mock Bookings API

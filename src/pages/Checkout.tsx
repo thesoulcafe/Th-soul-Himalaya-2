@@ -35,7 +35,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import AuthModal from '@/components/AuthModal';
 
-type CheckoutStep = 'cart' | 'details' | 'payment';
+type CheckoutStep = 'cart' | 'details';
 
 export default function SoulCart() {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export default function SoulCart() {
   const { user } = useAuth();
   
   const [step, setStep] = useState<CheckoutStep>('details');
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'reserve'>('online');
+  const [paymentMethod] = useState<'online' | 'reserve'>('reserve');
   const [plantTree, setPlantTree] = useState(false);
   const [note, setNote] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -65,24 +65,30 @@ export default function SoulCart() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // Pincode validation: only numbers allowed
+    if (name === 'pincode' && value !== '' && !/^\d+$/.test(value)) {
+      return;
+    }
+    
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const nextStep = () => {
     if (step === 'cart') setStep('details');
     else if (step === 'details') {
-      if (!formData.fullName || !formData.email || !formData.phone) {
-        alert("Please fill in your Full Name, Email, and Phone number.");
+      const { fullName, email, phone, city, pincode } = formData;
+      if (!fullName || !email || !phone || !city || !pincode) {
+        alert("Please fill in all expedition details (Name, Email, Phone, City, and Pincode).");
         return;
       }
-      setStep('payment');
+      handleOrder();
     }
-    else if (step === 'payment') handleOrder();
   };
 
   const prevStep = () => {
-    if (step === 'payment') setStep('details');
-    else navigate(-1);
+    if (step === 'details') navigate(-1);
+    else setStep('details');
   };
 
   const handleOrder = async () => {
@@ -93,167 +99,36 @@ export default function SoulCart() {
 
     setIsSubmitting(true);
 
-    // If Reserve Spot, save as pending/reserved without Razorpay
-    if (paymentMethod === 'reserve') {
-      try {
-        console.log("[Checkout] Processing 'Reserve Spot' booking...");
-        await addDoc(collection(db, 'bookings'), {
-          userId: user.uid,
-          userName: formData.fullName || user.displayName || 'Guest Explorer',
-          userEmail: formData.email || user.email,
-          phone: formData.phone,
-          city: formData.city,
-          pincode: formData.pincode,
-          items: cart.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            type: item.type,
-            dateRange: item.dateRange || ''
-          })),
-          totalPrice: finalTotal,
-          note: note || '',
-          ecoDonation: plantTree,
-          status: 'reserved', // Mark as reserved
-          paymentMethod: 'reserve',
-          createdAt: serverTimestamp(),
-        });
-        setIsSuccess(true);
-        clearCart();
-      } catch (err: any) {
-        console.error('Reservation Error:', err);
-        alert(`Reservation Failed: ${err.message}`);
-      } finally {
-        setIsSubmitting(false);
-      }
-      return;
-    }
-
     try {
-      // Safety check for Razorpay script and Key ID
-      if (!(window as any).Razorpay) {
-        throw new Error("Razorpay SDK not loaded. Please refresh the page or check your internet connection.");
-      }
-      
-      const key_id = import.meta.env.VITE_RAZORPAY_KEY_ID;
-      if (!key_id) {
-        throw new Error("Razorpay Key ID is missing. Please configure VITE_RAZORPAY_KEY_ID in your environment.");
-      }
-
-      console.log("[Razorpay] Initializing order creation...");
-      
-      // 1. Create Razorpay Order via Server API
-      const response = await fetch('/api/razorpay/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: finalTotal,
-          currency: 'INR',
-          receipt: `rcpt_${Date.now()}`
-        })
+      console.log("[Checkout] Processing 'Reserve Spot' booking...");
+      await addDoc(collection(db, 'bookings'), {
+        userId: user.uid,
+        userName: formData.fullName || user.displayName || 'Guest Explorer',
+        userEmail: formData.email || user.email,
+        phone: formData.phone,
+        city: formData.city,
+        pincode: formData.pincode,
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          type: item.type,
+          dateRange: item.dateRange || ''
+        })),
+        totalPrice: finalTotal,
+        note: note || '',
+        ecoDonation: plantTree,
+        status: 'reserved', // Mark as reserved
+        paymentMethod: 'reserve',
+        createdAt: serverTimestamp(),
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create payment order. Please try again.');
-      }
-
-      const rzpOrder = result;
-      console.log(`[Razorpay] Order received from server: ${rzpOrder.id}`);
-
-      // 2. Open Razorpay Checktout
-      const options = {
-        key: key_id,
-        amount: rzpOrder.amount,
-        currency: rzpOrder.currency,
-        name: 'The Soul Himalaya',
-        description: `Booking for ${totalItems} items`,
-        image: 'https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png',
-        order_id: rzpOrder.id,
-        handler: async (response: any) => {
-          console.log("[Razorpay] Payment captured, verifying...");
-          try {
-            // 3. Verify Payment on Server
-            const verifyRes = await fetch('/api/razorpay/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
-              })
-            });
-
-            const verifyData = await verifyRes.json();
-
-            if (verifyData.status === 'success') {
-              console.log("[Razorpay] Payment verified! Saving booking...");
-              // 4. Save Confirmed Booking to Firestore
-              await addDoc(collection(db, 'bookings'), {
-                userId: user.uid,
-                userName: formData.fullName || user.displayName || 'Guest Explorer',
-                userEmail: formData.email || user.email,
-                phone: formData.phone,
-                city: formData.city,
-                pincode: formData.pincode,
-                items: cart.map(item => ({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price,
-                  quantity: item.quantity,
-                  type: item.type,
-                  dateRange: item.dateRange || ''
-                })),
-                totalPrice: finalTotal,
-                note: note || '',
-                ecoDonation: plantTree,
-                status: 'paid', // Mark as paid
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                createdAt: serverTimestamp(),
-              });
-
-              setIsSuccess(true);
-              clearCart();
-            } else {
-              throw new Error(verifyData.message || 'Payment verification failed.');
-            }
-          } catch (err: any) {
-            console.error('[Razorpay] Verification error:', err);
-            alert(`Payment Verification Error: ${err.message || 'An error occurred while verifying the payment.'}`);
-          } finally {
-            setIsSubmitting(false);
-          }
-        },
-        prefill: {
-          name: formData.fullName,
-          email: formData.email,
-          contact: formData.phone
-        },
-        theme: {
-          color: '#C15A3E' // Terracotta theme color
-        },
-        modal: {
-          ondismiss: () => {
-            console.log("[Razorpay] Payment modal dismissed");
-            setIsSubmitting(false);
-          }
-        }
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', function (response: any) {
-        console.error("[Razorpay] Payment failed:", response.error);
-        alert(`Payment Failed: ${response.error.description}`);
-        setIsSubmitting(false);
-      });
-      rzp.open();
-
+      setIsSuccess(true);
+      clearCart();
     } catch (err: any) {
-      console.error('Razorpay Error:', err);
-      alert(`Payment Initialization Failed: ${err.message || 'Check your internet connection'}`);
+      console.error('Reservation Error:', err);
+      alert(`Reservation Failed: ${err.message}`);
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -262,21 +137,44 @@ export default function SoulCart() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white rounded-[3rem] p-12 text-center shadow-2xl border border-emerald-50"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-xl w-full bg-white rounded-[3.5rem] p-12 text-center shadow-[0_40px_100px_-20px_rgba(30,58,47,0.1)] border border-emerald-50 relative overflow-hidden"
         >
-          <div className="h-24 w-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-emerald-100">
-            <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+          <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
+          
+          <div className="h-28 w-28 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-10 border border-emerald-100 shadow-inner">
+            <CheckCircle2 className="h-14 w-14 text-emerald-600 animate-pulse" />
           </div>
-          <h1 className="text-3xl font-heading font-bold text-slate-900 mb-4 tracking-tight">Booking Confirmed!</h1>
-          <p className="text-slate-500 mb-8 leading-relaxed">Your soulful journey is officially scheduled. We've sent the details to your email.</p>
-          <Button 
-            onClick={() => navigate('/dashboard')}
-            className="w-full bg-forest text-white h-14 rounded-full font-bold hover:bg-forest/90 transition-all hover:scale-[1.02]"
-          >
-            Explore Dashboard
-          </Button>
+          
+          <h1 className="text-3xl md:text-4xl font-playfair font-black italic text-forest mb-6 tracking-tight">
+            Your Reservation Request Sent Successfully
+          </h1>
+          
+          <div className="space-y-4 mb-12">
+            <p className="text-slate-600 text-lg font-medium">
+              Our expert they will contact you as soon possible
+            </p>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+              Thanks For Your patience
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+              className="flex-1 h-16 rounded-full font-black uppercase tracking-widest border-forest/10 text-forest hover:bg-forest/5"
+            >
+              Back to Home
+            </Button>
+            <Button 
+              onClick={() => navigate('/dashboard')}
+              className="flex-1 bg-forest text-white h-16 rounded-full font-black uppercase tracking-widest hover:bg-forest/90 shadow-xl shadow-forest/20 transition-all hover:scale-[1.02]"
+            >
+              View My Requests
+            </Button>
+          </div>
         </motion.div>
       </div>
     );
@@ -307,18 +205,18 @@ export default function SoulCart() {
 
           <div className="bg-white/60 backdrop-blur-xl border border-white/80 p-3 rounded-full flex items-center gap-2 shadow-xl shadow-forest/5">
             {[
-              { id: 'details', label: 'Identity' },
-              { id: 'payment', label: 'Energy' }
+              { id: 'cart', label: 'Cart' },
+              { id: 'details', label: 'Identity' }
             ].map((s, i) => (
               <React.Fragment key={s.id}>
                 <div className="flex items-center gap-3 px-4">
                   <div className={cn(
                     "h-10 w-10 rounded-full flex items-center justify-center text-xs font-black transition-all duration-700",
                     step === s.id ? "bg-forest text-white shadow-xl shadow-forest/20 scale-110 rotate-[360deg]" : 
-                    i < ['details', 'payment'].indexOf(step) ? "bg-emerald-500 text-white" :
+                    (s.id === 'cart' && step === 'details') ? "bg-emerald-500 text-white" :
                     "bg-forest/5 text-forest/20"
                   )}>
-                    {i < ['details', 'payment'].indexOf(step) ? <CheckCircle2 className="h-5 w-5" /> : `0${i + 1}`}
+                    {(s.id === 'cart' && step === 'details') ? <CheckCircle2 className="h-5 w-5" /> : `0${i + 1}`}
                   </div>
                   <span className={cn(
                     "text-[10px] font-black uppercase tracking-[0.2em] hidden sm:block",
@@ -470,203 +368,105 @@ export default function SoulCart() {
               {step === 'details' && (
                 <motion.div
                   key="details"
-                  initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.98, y: -10 }}
-                  className="relative bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-white/60 shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  className="bg-white rounded-[1.5rem] border border-slate-100 shadow-[0_8px_30px_-12px_rgba(30,58,47,0.06)] overflow-hidden"
                 >
-                  {/* Thematic Background Elements */}
-                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
-                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-forest/5 rounded-full blur-[100px] pointer-events-none" />
-                  <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-terracotta/5 rounded-full blur-[120px] pointer-events-none" />
-
-                  <div className="p-8 md:p-14 relative z-10">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3">
-                          <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center text-white shadow-lg shadow-forest/20">
-                            <Compass className="h-6 w-6 animate-pulse" />
-                          </div>
-                          <span className="font-fluid text-2xl text-terracotta">Manifest your</span>
-                        </div>
-                        <h2 className="text-4xl md:text-5xl font-playfair font-black italic text-forest leading-none tracking-tighter uppercase">Expedition Details</h2>
+                  <div className="p-6 md:p-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                      <div className="space-y-0.5">
+                        <span className="text-[9px] font-black text-terracotta uppercase tracking-[0.3em] block mb-1">Secure Booking</span>
+                        <h2 className="text-2xl font-heading font-bold text-forest leading-tight uppercase tracking-tight">Expedition Details</h2>
                       </div>
                       
-                      <div className="bg-white/60 backdrop-blur-md border border-white/80 p-4 rounded-3xl flex items-center gap-5 shadow-sm">
-                        <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                          <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                        </div>
+                      <div className="flex items-center gap-3 py-1.5 px-3 bg-emerald-50 rounded-xl border border-emerald-100/50">
+                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
                         <div>
-                          <div className="text-[9px] font-black text-forest/40 uppercase tracking-widest mb-1">Safety Protocols</div>
-                          <div className="text-[10px] font-bold text-forest uppercase">Guide Allocation & Insurance Active</div>
+                          <div className="text-[9px] font-bold text-emerald-700 uppercase leading-none">Guard Active</div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                       {/* Name Field */}
-                      <div className="space-y-4 group">
-                        <div className="flex items-center justify-between px-1">
-                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Explorer's Identity</label>
-                          <Leaf className="h-3 w-3 text-forest/10" />
-                        </div>
+                      <div className="space-y-1.5 group">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Full Identity</label>
                         <div className="relative">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                            <Users className="h-full w-full" />
-                          </div>
+                          <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
                             name="fullName" 
-                            placeholder="Full name as per ID"
+                            placeholder="Name as per Govt. ID"
                             value={formData.fullName} 
                             onChange={handleInputChange} 
-                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10 placeholder:italic" 
+                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
                         </div>
                       </div>
 
                       {/* Phone Field */}
-                      <div className="space-y-4 group">
-                        <div className="flex items-center justify-between px-1">
-                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Soul Link (Phone)</label>
-                          <Zap className="h-3 w-3 text-forest/10" />
-                        </div>
+                      <div className="space-y-1.5 group">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Contact Number</label>
                         <div className="relative">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                            <CreditCard className="h-full w-full rotate-12" />
-                          </div>
+                          <Zap className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
                             type="tel" 
                             name="phone" 
                             placeholder="+91 ---- ----"
                             value={formData.phone} 
                             onChange={handleInputChange} 
-                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
                         </div>
                       </div>
 
                       {/* Email Field */}
-                      <div className="space-y-4 group md:col-span-2">
-                        <div className="flex items-center justify-between px-1">
-                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Digital Gateway (Email Address)</label>
-                          <Sparkles className="h-3 w-3 text-forest/10" />
-                        </div>
+                      <div className="space-y-1.5 group md:col-span-2">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Email Archive</label>
                         <div className="relative">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                            <Map className="h-full w-full" />
-                          </div>
+                          <Map className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
                             type="email" 
                             name="email" 
-                            placeholder="where should we send your itinerary?"
+                            placeholder="email@example.com"
                             value={formData.email} 
                             onChange={handleInputChange} 
-                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
                         </div>
                       </div>
 
                       {/* City Field */}
-                      <div className="space-y-4 group">
-                        <div className="flex items-center justify-between px-1">
-                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Ascension Base (City)</label>
-                          <HomeIcon className="h-3 w-3 text-forest/10" />
-                        </div>
+                      <div className="space-y-1.5 group">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Base (City)</label>
                         <div className="relative">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                            <Mountain className="h-full w-full" />
-                          </div>
+                          <Mountain className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
                             name="city" 
-                            placeholder="Your current base camp"
+                            placeholder="E.g. Manali"
                             value={formData.city} 
                             onChange={handleInputChange} 
-                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
                         </div>
                       </div>
 
                       {/* Pincode Field */}
-                      <div className="space-y-4 group">
-                        <div className="flex items-center justify-between px-1">
-                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-[0.2em] group-focus-within:text-terracotta transition-colors">Sacred Code (Pincode)</label>
-                          <Info className="h-3 w-3 text-forest/10" />
-                        </div>
+                      <div className="space-y-1.5 group">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Postal Code</label>
                         <div className="relative">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                            <MapPin className="h-full w-full" />
-                          </div>
+                          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
                             name="pincode" 
-                            placeholder="Postal delivery zone"
+                            placeholder="6-digit PIN"
                             value={formData.pincode} 
                             onChange={handleInputChange} 
-                            className="h-16 rounded-2xl border-white/60 bg-white/50 backdrop-blur-md pl-14 pr-6 text-forest font-bold transition-all focus:bg-white focus:shadow-2xl focus:shadow-forest/5 focus:border-terracotta/30 placeholder:text-forest/10" 
+                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              )}
-
-              {step === 'payment' && (
-                <motion.div
-                  key="payment"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-xl space-y-10"
-                >
-                  <div className="text-center">
-                    <div className="h-20 w-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <ShieldCheck className="h-10 w-10 text-emerald-600" />
-                    </div>
-                    <h2 className="text-3xl font-heading font-bold text-slate-900 mb-2">Secure Payment</h2>
-                    <p className="text-slate-400 text-sm">Your data is soulfully protected with SSL encryption.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div 
-                      onClick={() => setPaymentMethod('online')}
-                      className={cn(
-                        "p-6 rounded-3xl border-2 transition-all cursor-pointer",
-                        paymentMethod === 'online' ? "border-forest bg-forest/[0.03]" : "border-slate-50 bg-slate-50/50 grayscale hover:grayscale-0 hover:border-forest/20"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <CreditCard className={cn("h-6 w-6", paymentMethod === 'online' ? "text-forest" : "text-slate-400")} />
-                          <div>
-                            <div className={cn("text-xl md:text-2xl font-fluid", paymentMethod === 'online' ? "text-forest" : "text-slate-400")}>Online Payment</div>
-                            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest -mt-1">UPI, Cards, Netbanking</div>
-                          </div>
-                        </div>
-                        {paymentMethod === 'online' && <CheckCircle2 className="h-5 w-5 text-forest" />}
-                      </div>
-                    </div>
-
-                    <div 
-                      onClick={() => setPaymentMethod('reserve')}
-                      className={cn(
-                        "p-6 rounded-3xl border-2 transition-all cursor-pointer",
-                        paymentMethod === 'reserve' ? "border-terracotta bg-terracotta/[0.03]" : "border-slate-50 bg-slate-50/50 grayscale hover:grayscale-0 hover:border-terracotta/20"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <Compass className={cn("h-6 w-6", paymentMethod === 'reserve' ? "text-terracotta" : "text-slate-400")} />
-                          <div>
-                            <div className={cn("text-xl md:text-2xl font-fluid", paymentMethod === 'reserve' ? "text-terracotta" : "text-slate-400")}>Reserve Spot</div>
-                            <div className="text-[9px] text-slate-400 font-bold uppercase tracking-widest -mt-1">Pay Later / Token</div>
-                          </div>
-                        </div>
-                        {paymentMethod === 'reserve' && <CheckCircle2 className="h-5 w-5 text-terracotta" />}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* This step is now bypassed; logic handled by directly calling handleOrder from details */}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -733,7 +533,7 @@ export default function SoulCart() {
                 </div>
 
                 <Button 
-                  onClick={step === 'payment' ? handleOrder : nextStep}
+                  onClick={nextStep}
                   disabled={cart.length === 0 || isSubmitting}
                   className="w-full h-20 bg-forest hover:bg-forest/95 text-white rounded-full text-sm font-black uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4 group"
                 >
@@ -741,10 +541,10 @@ export default function SoulCart() {
                     <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      {step === 'details' ? 'Next Soul Stage' : paymentMethod === 'online' ? 'Initiate Payment' : 'Claim Your Spot'}
+                      {step === 'cart' ? 'Next Soul Stage' : 'Claim Your Spot'}
                       <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
                     </>
-                  )}
+                  ) }
                 </Button>
 
                 <div className="flex items-center justify-center gap-6">

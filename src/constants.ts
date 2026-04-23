@@ -671,7 +671,9 @@ export const DEFAULT_WFH = [
 export const DEFAULT_SERVICES = [
   { id: 'service-1', title: 'Tour Packages', description: 'Romantic, Backpacker & Corporate portfolios.', link: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
   { id: 'service-3', title: 'Mountain Trekks', description: 'From easy waterfalls to challenging glaciers.', link: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
-  { id: 'service-2', title: 'Yoga & Wellness', description: 'Immersive retreats in Kalga & Pulga.', link: '/yoga' },
+  { id: 'service-yoga', title: 'Yoga Retreats', description: 'Hatha, Vinyasa and Sadhana in Kalga hamlets.', link: '/yoga' },
+  { id: 'service-meditation', title: 'Meditation Retreats', description: 'Deep silence and mindfulness in Kutla meadows.', link: '/meditation' },
+  { id: 'service-meditation-packages', title: 'Meditation Packages', description: 'Curated spiritual and healing journeys across the valley.', link: '/meditation' },
   { id: 'service-4', title: 'Digital Workation', description: 'Productive stays for the modern nomad.', link: '/wfh' },
   { id: 'service-5', title: 'Macramé Shop', description: 'Handcrafted art from the heart of the valley.', link: '/shop' }
 ];
