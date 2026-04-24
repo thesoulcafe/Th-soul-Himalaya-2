@@ -248,7 +248,15 @@ async function startServer() {
         
         // Inject dynamic tags
         const finalHtml = await injectMetaTags(req, transformedHtml);
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+        
+        // Ensure no cache for meta tags while debugging
+        res.status(200).set({ 
+          'Content-Type': 'text/html',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        }).end(finalHtml);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);
         next(e);
@@ -283,7 +291,8 @@ async function startServer() {
 
 async function injectMetaTags(req: express.Request, html: string) {
   try {
-    const constants = await import('./src/constants.ts');
+    // Import constants dynamically
+    const constants = await import('./src/constants.js');
     const { 
       DEFAULT_TOURS = [], 
       DEFAULT_TREKKS = [], 
@@ -291,13 +300,13 @@ async function injectMetaTags(req: express.Request, html: string) {
       DEFAULT_MEDITATION = [], 
       DEFAULT_ADVENTURE = [], 
       DEFAULT_WFH = [] 
-    } = constants;
+    } = constants as any;
 
     const urlStr = req.originalUrl;
     const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
     const id = url.searchParams.get('id');
     
-    // Get protocol and host dynamically
+    // Get protocol and host dynamically for absolute URLs
     const protocol = req.headers['x-forwarded-proto'] || 'https';
     const host = req.headers.host || 'thesoulhimalaya.com';
     const absoluteUrl = `${protocol}://${host}${urlStr}`;
@@ -317,6 +326,11 @@ async function injectMetaTags(req: express.Request, html: string) {
 
     let pkg = allPackages.find(p => p.id === id) as any;
 
+    // Fallback search if id format varies
+    if (!pkg && id) {
+      pkg = allPackages.find(p => (p.id || '').includes(id)) as any;
+    }
+
     if (!pkg && id) {
       try {
         const docRef = doc(db, "content", id);
@@ -326,7 +340,7 @@ async function injectMetaTags(req: express.Request, html: string) {
           pkg = { id, ...docData.data };
         }
       } catch (e) {
-        console.error("Firestore lookup failed:", e);
+        // Silently fail firestore lookup
       }
     }
 
@@ -336,20 +350,21 @@ async function injectMetaTags(req: express.Request, html: string) {
       
       let highlightsStr = "";
       if (pkg.highlights && Array.isArray(pkg.highlights)) {
-        highlightsStr = " Highlights: " + pkg.highlights.join(", ") + ".";
+        highlightsStr = " Highlights: " + pkg.highlights.slice(0, 3).join(", ") + ".";
       } else if (pkg.features && Array.isArray(pkg.features)) {
-        highlightsStr = " Features: " + pkg.features.join(", ") + ".";
+        highlightsStr = " Features: " + pkg.features.slice(0, 3).join(", ") + ".";
       }
 
-      description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
-                    ` Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.` + 
-                    highlightsStr;
-
-      // Special case for med-1 as per user request
       if (id === 'med-1') {
-        description = `Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla. ${absoluteUrl}`;
-      } else if (description.length > 200) {
-        description = description.substring(0, 197) + "...";
+        description = "Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla.";
+      } else {
+        description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
+                      ` Duration: ${pkg.duration || 'Flexible'}.` + 
+                      highlightsStr;
+      }
+      
+      if (description.length > 250) {
+        description = description.substring(0, 247) + "...";
       }
 
       image = pkg.image || image;
@@ -357,22 +372,23 @@ async function injectMetaTags(req: express.Request, html: string) {
       // Optimize unsplash image for share preview (1200x630)
       if (image.includes('unsplash.com')) {
         image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
+        if (!image.includes('&w=')) image += '&w=1200';
         if (!image.includes('&h=')) image += '&h=630';
       }
     }
 
+    // Ensure image is absolute
     if (image.startsWith('/')) {
       image = `${protocol}://${host}${image}`;
     }
 
     const metaTags = `
-    <!-- Dynamic Social Meta Tags -->
+    <!-- HTML Meta Tags -->
     <meta name="description" content="${description}">
-    <link rel="canonical" href="${absoluteUrl}">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
+
+    <!-- Facebook Meta Tags -->
     <meta property="og:url" content="${absoluteUrl}">
+    <meta property="og:type" content="website">
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${image}">
@@ -380,9 +396,10 @@ async function injectMetaTags(req: express.Request, html: string) {
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="The Soul Himalaya">
 
-    <!-- Twitter -->
+    <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="${absoluteUrl}">
+    <meta property="twitter:domain" content="${host}">
+    <meta property="twitter:url" content="${absoluteUrl}">
     <meta name="twitter:title" content="${title}">
     <meta name="twitter:description" content="${description}">
     <meta name="twitter:image" content="${image}">
@@ -393,9 +410,10 @@ async function injectMetaTags(req: express.Request, html: string) {
       .replace(/<title>.*?<\/title>/gi, '')
       .replace(/<meta name="description".*?>/gi, '')
       .replace(/<meta property="og:.*?".*?>/gi, '')
-      .replace(/<meta name="twitter:.*?".*?>/gi, '');
+      .replace(/<meta name="twitter:.*?".*?>/gi, '')
+      .replace(/<meta property="twitter:.*?".*?>/gi, '');
 
-    // Inject tags immediately after <head>
+    // Inject tags immediately after <head> - critical for WhatsApp
     return cleanedHtml
       .replace('<head>', `<head>\n<title>${title}</title>${metaTags}`);
   } catch (error) {
