@@ -25,6 +25,7 @@ import { AuthProvider } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
+import SmoothScroll from './components/SmoothScroll';
 import { Toaster } from 'sonner';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
+          <SmoothScroll />
           <Toaster position="top-center" richColors />
           <Router>
             <ScrollToTop />

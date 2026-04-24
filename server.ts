@@ -7,6 +7,8 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 dotenv.config();
 
@@ -20,6 +22,11 @@ import { z } from "zod";
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
+
+// Initialize Firebase for server-side meta tags
+const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf-8'));
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 async function startServer() {
   const app = express();
@@ -224,7 +231,13 @@ async function startServer() {
     
     // Custom middleware to inject meta tags in development
     app.use(async (req, res, next) => {
-      if (req.method !== 'GET' || req.headers.accept?.indexOf('text/html') === -1) {
+      // Check if it's a browser/crawler request for a page
+      const isHtml = req.headers.accept?.includes('text/html') || 
+                     !req.url.includes('.') || 
+                     req.headers['user-agent']?.includes('WhatsApp') ||
+                     req.headers['user-agent']?.includes('facebookexternalhit');
+
+      if (req.method !== 'GET' || !isHtml) {
         return next();
       }
 
@@ -234,7 +247,7 @@ async function startServer() {
         const transformedHtml = await vite.transformIndexHtml(url, html);
         
         // Inject dynamic tags
-        const finalHtml = await injectMetaTags(url, transformedHtml);
+        const finalHtml = await injectMetaTags(req, transformedHtml);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);
@@ -250,7 +263,7 @@ async function startServer() {
     app.get('*', async (req, res) => {
       try {
         const html = await fs.promises.readFile(path.join(distPath, 'index.html'), 'utf-8');
-        const finalHtml = await injectMetaTags(req.originalUrl, html);
+        const finalHtml = await injectMetaTags(req, html);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
         console.error("Failed to serve index.html:", e);
@@ -268,20 +281,27 @@ async function startServer() {
 // Dynamic Meta Tag Injection Helper
 // -----------------------------------------------------------------------------
 
-async function injectMetaTags(urlStr: string, html: string) {
+async function injectMetaTags(req: express.Request, html: string) {
   try {
+    const constants = await import('./src/constants.ts');
     const { 
-      DEFAULT_TOURS, 
-      DEFAULT_TREKKS, 
-      DEFAULT_YOGA, 
-      DEFAULT_MEDITATION, 
-      DEFAULT_ADVENTURE, 
-      DEFAULT_WFH 
-    } = await import('./src/constants.js');
+      DEFAULT_TOURS = [], 
+      DEFAULT_TREKKS = [], 
+      DEFAULT_YOGA = [], 
+      DEFAULT_MEDITATION = [], 
+      DEFAULT_ADVENTURE = [], 
+      DEFAULT_WFH = [] 
+    } = constants;
 
-    const url = new URL(urlStr, 'http://localhost');
+    const urlStr = req.originalUrl;
+    const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
     const id = url.searchParams.get('id');
     
+    // Get protocol and host dynamically
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'thesoulhimalaya.com';
+    const absoluteUrl = `${protocol}://${host}${urlStr}`;
+
     let title = "Soul Himalaya - Soulful Travel in Kullu & Parvati Valley";
     let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
     let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
@@ -295,34 +315,86 @@ async function injectMetaTags(urlStr: string, html: string) {
       ...DEFAULT_WFH
     ];
 
-    const pkg = allPackages.find(p => p.id === id) as any;
+    let pkg = allPackages.find(p => p.id === id) as any;
+
+    if (!pkg && id) {
+      try {
+        const docRef = doc(db, "content", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const docData = docSnap.data();
+          pkg = { id, ...docData.data };
+        }
+      } catch (e) {
+        console.error("Firestore lookup failed:", e);
+      }
+    }
 
     if (pkg) {
       const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
       title = `The Soul Himalaya - ${pkgTitle}`;
-      description = pkg.description || `Experience ${pkgTitle} in the Parvati Valley. Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.`;
+      
+      let highlightsStr = "";
+      if (pkg.highlights && Array.isArray(pkg.highlights)) {
+        highlightsStr = " Highlights: " + pkg.highlights.join(", ") + ".";
+      } else if (pkg.features && Array.isArray(pkg.features)) {
+        highlightsStr = " Features: " + pkg.features.join(", ") + ".";
+      }
+
+      description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
+                    ` Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.` + 
+                    highlightsStr;
+      
+      if (description.length > 200) {
+        description = description.substring(0, 197) + "...";
+      }
+
       image = pkg.image || image;
+      
+      // Optimize unsplash image for share preview (1200x630)
+      if (image.includes('unsplash.com')) {
+        image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
+        if (!image.includes('&h=')) image += '&h=630';
+      }
+    }
+
+    if (image.startsWith('/')) {
+      image = `${protocol}://${host}${image}`;
     }
 
     const metaTags = `
-    <!-- Dynamic Meta Tags -->
-    <title>${title}</title>
+    <!-- Dynamic Social Meta Tags -->
     <meta name="description" content="${description}">
+    <link rel="canonical" href="${absoluteUrl}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="${absoluteUrl}">
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${description}">
     <meta property="og:image" content="${image}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://thesoulhimalaya.com${urlStr}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="The Soul Himalaya">
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="${absoluteUrl}">
     <meta name="twitter:title" content="${title}">
     <meta name="twitter:description" content="${description}">
     <meta name="twitter:image" content="${image}">
     `;
 
-    // Replace default title and insert before </head>
-    return html
-      .replace(/<title>.*<\/title>/, '')
-      .replace('</head>', `${metaTags}\n</head>`);
+    // Strip existing common meta tags and title to avoid duplicates
+    let cleanedHtml = html
+      .replace(/<title>.*?<\/title>/gi, '')
+      .replace(/<meta name="description".*?>/gi, '')
+      .replace(/<meta property="og:.*?".*?>/gi, '')
+      .replace(/<meta name="twitter:.*?".*?>/gi, '');
+
+    // Inject tags immediately after <head>
+    return cleanedHtml
+      .replace('<head>', `<head>\n<title>${title}</title>${metaTags}`);
   } catch (error) {
     console.error("Meta injection failed:", error);
     return html;
