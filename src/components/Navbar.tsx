@@ -44,7 +44,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg py-3 px-6"
+      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg py-3 px-4 sm:px-6"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -52,8 +52,8 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.9 }}
           >
-            <Link to="/" className="flex items-center group gap-3">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors">
+            <Link to="/" className="flex items-center group gap-2 xs:gap-3">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors shrink-0">
                 <img 
                   src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
                   alt="The Soul Himalaya Logo" 
@@ -61,14 +61,14 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <span className="flex items-baseline gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
-                <span className="text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
+              <span className="flex items-baseline gap-1 xs:gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
+                <span className="text-[12px] xs:text-[14px] sm:text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
                   The
                 </span>
-                <span className="text-[26px] md:text-[34px] font-fluid text-terracotta drop-shadow-sm px-1">
+                <span className="text-[18px] xs:text-[22px] sm:text-[26px] md:text-[34px] font-fluid text-terracotta drop-shadow-sm px-0.5 sm:px-1">
                   Soul
                 </span>
-                <span className="text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
+                <span className="text-[12px] xs:text-[14px] sm:text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
                   Himalaya
                 </span>
               </span>
@@ -145,19 +145,19 @@ export default function Navbar() {
         </div>
 
         {/* Mobile/Tablet Nav */}
-        <div className="lg:hidden flex items-center -mr-4 gap-2">
+        <div className="lg:hidden flex items-center -mr-2 sm:-mr-4 gap-1 sm:gap-2">
           {/* Mobile Cart Link - Direct Page */}
-          <Link to="/cart" className="relative h-10 w-10 flex items-center justify-center bg-white/10 rounded-full text-white">
-            <ShoppingCart className="h-5 w-5" />
+          <Link to="/cart" className="relative h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center bg-white/10 rounded-full text-white">
+            <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
             <CartCountBadge />
           </Link>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger
               nativeButton={true}
               render={
-                <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-10 w-10 p-0")}>
+                <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-9 w-9 sm:h-10 sm:w-10 p-0")}>
                   <motion.div whileTap={{ scale: 0.9 }} className="flex items-center justify-center">
-                    <Menu className="h-8 w-8" />
+                    <Menu className="h-7 w-7 sm:h-8 sm:w-8" />
                   </motion.div>
                 </button>
               }
@@ -176,16 +176,16 @@ export default function Navbar() {
                       to="/"
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        'flex items-center justify-center w-full px-3 py-3 rounded-lg transition-all duration-200 group border border-forest/10 bg-white/5 text-cream',
+                        'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-white/5 bg-white/5 text-cream',
                         location.pathname === '/' && 'text-terracotta font-bold border-terracotta/20 bg-white/10'
                       )}
                     >
-                      <HomeIcon className="h-4 w-4 mr-2" />
-                      <span className="text-sm font-bold tracking-wide uppercase">Home</span>
+                      <HomeIcon className="h-5 w-5 mr-4 text-terracotta/40" />
+                      <span className="text-sm font-black tracking-widest uppercase">Home</span>
                     </Link>
                   </motion.div>
                   {user && (
-                    <div className="flex flex-col gap-2 mb-2">
+                    <div className="flex flex-col gap-3 mb-3">
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -195,12 +195,12 @@ export default function Navbar() {
                           to="/dashboard"
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            'flex items-center justify-center w-full px-3 py-3 rounded-lg transition-all duration-200 group border border-terracotta/30 bg-terracotta text-white shadow-lg shadow-terracotta/20',
+                            'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-terracotta/30 bg-terracotta text-white shadow-xl shadow-terracotta/20',
                             location.pathname === '/dashboard' && 'ring-2 ring-white/50'
                           )}
                         >
-                          <User className="h-4 w-4 mr-2" />
-                          <span className="text-sm font-bold tracking-wide uppercase">Dashboard</span>
+                          <User className="h-5 w-5 mr-4" />
+                          <span className="text-sm font-black tracking-widest uppercase">Dashboard</span>
                         </Link>
                       </motion.div>
                       {profile?.role === 'admin' && (
@@ -213,12 +213,12 @@ export default function Navbar() {
                             to="/admin"
                             onClick={() => setIsOpen(false)}
                             className={cn(
-                              'flex items-center justify-center w-full px-3 py-3 rounded-lg transition-all duration-200 group border border-white/10 bg-forest text-white shadow-lg',
+                              'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-white/10 bg-forest text-white shadow-lg',
                               location.pathname === '/admin' && 'ring-2 ring-white/50'
                             )}
                           >
-                            <ShieldCheck className="h-4 w-4 mr-2" />
-                            <span className="text-sm font-bold tracking-wide uppercase">Admin Panel</span>
+                            <ShieldCheck className="h-5 w-5 mr-4 text-terracotta" />
+                            <span className="text-sm font-black tracking-widest uppercase">Admin Panel</span>
                           </Link>
                         </motion.div>
                       )}
@@ -228,16 +228,16 @@ export default function Navbar() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mb-4"
+                      className="mb-6"
                     >
                       <Button 
                         onClick={() => {
                           login();
                           setIsOpen(false);
                         }}
-                        className="w-full bg-terracotta hover:bg-terracotta/90 text-white rounded-lg py-3 font-bold shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2 group"
+                        className="w-full bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl h-14 font-black uppercase tracking-widest shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2 group"
                       >
-                        <User className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                        <User className="h-5 w-5 group-hover:scale-110 transition-transform" />
                         Customer Login
                       </Button>
                     </motion.div>
@@ -254,23 +254,28 @@ export default function Navbar() {
                         <a
                           href={link.href}
                           className={cn(
-                            'flex items-center justify-center w-full px-3 py-2 rounded-lg transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
+                            'flex items-center w-full px-6 py-4 rounded-xl transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
                           )}
                         >
-                          <span className="text-sm font-medium tracking-wide">{link.name}</span>
+                          <ArrowRight className="h-4 w-4 mr-4 text-terracotta opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <span className="text-sm font-bold tracking-widest uppercase">{link.name}</span>
                         </a>
                       ) : (
                         <Link
                           to={link.href}
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            'flex items-center justify-center w-full px-3 py-2 rounded-lg transition-all duration-200 group border border-white/5',
+                            'flex items-center w-full px-6 py-4 rounded-xl transition-all duration-200 group border border-white/5',
                             location.pathname === link.href 
                               ? 'text-terracotta font-bold border-terracotta/20 bg-white/5' 
                               : 'text-cream/70 hover:text-white hover:bg-white/5'
                           )}
                         >
-                          <span className="text-sm font-medium tracking-wide">{link.name}</span>
+                          <ArrowRight className={cn(
+                            "h-4 w-4 mr-4 text-terracotta transition-opacity",
+                            location.pathname === link.href ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                          )} />
+                          <span className="text-sm font-bold tracking-widest uppercase">{link.name}</span>
                         </Link>
                       )}
                     </motion.div>

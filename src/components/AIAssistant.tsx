@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { DEFAULT_TOURS } from '@/constants';
 import { Link } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
+import { toast } from 'sonner';
 
 // Phase 3: React 2026 'Activity' hook simulation
 // This hook preserves the chat history even if the component is visually hidden/unmounted in some flows.
@@ -240,7 +241,9 @@ export default function AIAssistant() {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(shareData.url);
-        alert("Link copied to clipboard! Share it with your fellow explorers.");
+        toast.success("Spirit Shared", {
+          description: "Link copied to clipboard! Share it with your fellow explorers.",
+        });
       }
     } catch (err) {
       console.log("Sharing failed:", err);

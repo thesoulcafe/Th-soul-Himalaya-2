@@ -34,13 +34,14 @@ import { cn } from '@/lib/utils';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import AuthModal from '@/components/AuthModal';
+import { toast } from 'sonner';
 
 type CheckoutStep = 'cart' | 'details';
 
 export default function SoulCart() {
   const navigate = useNavigate();
   const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   const [step, setStep] = useState<CheckoutStep>('details');
   const [paymentMethod] = useState<'online' | 'reserve'>('reserve');
@@ -51,12 +52,26 @@ export default function SoulCart() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    city: '',
-    pincode: ''
+    fullName: profile?.displayName || user?.displayName || '',
+    email: profile?.email || user?.email || '',
+    phone: profile?.phone || '',
+    city: profile?.city || '',
+    pincode: profile?.pincode || ''
   });
+
+  // Effect to sync profile data when it loads
+  React.useEffect(() => {
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: prev.fullName || profile.displayName || user?.displayName || '',
+        email: prev.email || profile.email || user?.email || '',
+        phone: prev.phone || profile.phone || '',
+        city: prev.city || profile.city || '',
+        pincode: prev.pincode || profile.pincode || ''
+      }));
+    }
+  }, [profile, user]);
 
   const subtotal = totalPrice;
   const ecoFee = plantTree ? 100 : 0;
@@ -79,7 +94,17 @@ export default function SoulCart() {
     else if (step === 'details') {
       const { fullName, email, phone, city, pincode } = formData;
       if (!fullName || !email || !phone || !city || !pincode) {
-        alert("Please fill in all expedition details (Name, Email, Phone, City, and Pincode).");
+        toast.error("Vessel Incomplete", {
+          description: (
+            <div className="flex flex-col gap-2">
+              <p className="font-bold text-forest">The path remains hidden.</p>
+              <p className="text-xs text-forest/60">Please manifest your details: Name, Email, Phone, City, and Pincode to continue.</p>
+            </div>
+          ),
+          icon: <Info className="h-6 w-6 text-terracotta" />,
+          duration: 6000,
+          className: "rounded-3xl border-terracotta/20 bg-white shadow-2xl",
+        });
         return;
       }
       handleOrder();
@@ -127,7 +152,9 @@ export default function SoulCart() {
       clearCart();
     } catch (err: any) {
       console.error('Reservation Error:', err);
-      alert(`Reservation Failed: ${err.message}`);
+      toast.error("Spirit Guide Blocked", {
+        description: `Reservation Failed: ${err.message}`,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -473,7 +500,7 @@ export default function SoulCart() {
           </div>
 
           {/* Quick Summary Sidebar */}
-          <div className="space-y-8 lg:sticky lg:top-28">
+          <div className="space-y-8 lg:top-28">
             <Card className="border-none shadow-[0_30px_60px_-15px_rgba(30,58,47,0.1)] rounded-[3rem] bg-white overflow-hidden group transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(30,58,47,0.15)]">
               <div className="bg-forest p-10 text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-5 pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />

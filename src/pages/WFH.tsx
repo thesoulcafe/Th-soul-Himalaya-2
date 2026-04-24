@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
+import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
@@ -39,7 +40,9 @@ export default function WFH() {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(shareData.url);
-        alert("Link copied to clipboard!");
+        toast.success("Spirit Shared", {
+          description: "Link copied to clipboard!",
+        });
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {

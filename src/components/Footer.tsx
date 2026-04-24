@@ -25,7 +25,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-forest text-cream pt-16 pb-8 px-6">
+    <footer className="bg-forest text-cream pt-16 pb-8 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         {/* Brand Info */}
         <div className="space-y-8">
@@ -42,14 +42,14 @@ export default function Footer() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <span className="flex flex-wrap items-baseline gap-2 md:gap-4 leading-none transition-all duration-700">
-              <span className="text-3xl md:text-5xl font-playfair italic font-medium text-cream/90">
+            <span className="flex flex-wrap items-baseline gap-1 md:gap-3 leading-none transition-all duration-700">
+              <span className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-playfair italic font-medium text-cream/90">
                 The
               </span>
-              <span className="text-6xl md:text-8xl font-fluid text-terracotta px-2 drop-shadow-lg">
+              <span className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-fluid text-terracotta px-1 md:px-2 drop-shadow-lg">
                 Soul
               </span>
-              <span className="text-3xl md:text-5xl font-playfair italic font-medium text-cream/90">
+              <span className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-playfair italic font-medium text-cream/90">
                 Himalaya
               </span>
             </span>
@@ -65,7 +65,7 @@ export default function Footer() {
         </div>
 
         {/* Quick Links & Services Grouped */}
-        <div className="grid grid-cols-2 gap-8 md:col-span-2">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-8 md:col-span-2">
           {/* Quick Links */}
           <div className="space-y-6">
             <h4 className="text-lg font-bold">Quick Links</h4>

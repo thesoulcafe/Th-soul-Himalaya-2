@@ -11,6 +11,7 @@ import { useCart } from '@/lib/CartContext';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
+import { toast } from 'sonner';
 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -30,6 +31,18 @@ export default function Meditation() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
+  // Scroll lock when modal is open
+  useEffect(() => {
+    if (selectedPackage || activeSlotPackage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPackage, activeSlotPackage]);
+
   const handleShare = async (pkg: any) => {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
@@ -42,7 +55,9 @@ export default function Meditation() {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(shareData.url);
-        alert("Link copied to clipboard!");
+        toast.success("Zen Shared", {
+          description: "Link copied to clipboard!",
+        });
       }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') {
@@ -266,7 +281,7 @@ export default function Meditation() {
                         >
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5 text-terracotta" />
-                            {selectedSlots[pkg.id] !== undefined ? (
+                            {selectedSlots[pkg.id] !== undefined && pkg.slots && pkg.slots[parseInt(selectedSlots[pkg.id])] ? (
                               <span>
                                 {new Date(pkg.slots[parseInt(selectedSlots[pkg.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(pkg.slots[parseInt(selectedSlots[pkg.id])].endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </span>
@@ -407,22 +422,29 @@ export default function Meditation() {
       </section>
 
       {/* Meditation Detail Modal */}
-      {selectedPackage && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-8 bg-forest/80 backdrop-blur-xl">
+      <AnimatePresence>
+        {selectedPackage && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.3)] max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col lg:flex-row border border-white/20 relative"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-forest/90 backdrop-blur-2xl"
           >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 40 }}
+              className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
+            >
             {/* Background Texture Overlay */}
             <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
 
-            {/* Left Side: Immersive Img */}
-            <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
-              <img src={selectedPackage.image} alt={selectedPackage.title} className="w-full h-full object-cover scale-105" />
+            {/* Immersive Img - Now part of scroll flow */}
+            <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
+              <img src={selectedPackage.image} alt={selectedPackage.title} className="w-full h-full object-cover scale-100" />
               
               {/* Decorative Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
               
               <div className="absolute bottom-10 left-10 right-10 text-white z-10">
                 <motion.div
@@ -430,15 +452,15 @@ export default function Meditation() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <span className="font-fluid text-3xl md:text-4xl text-terracotta drop-shadow-md mb-2 block">Divine Silence</span>
-                  <h2 className="text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
+                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Divine Silence</span>
+                  <h2 className="text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
                     {selectedPackage.title.split(' ').map((word: string, i: number) => (
                       <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
                     ))}
                   </h2>
                 </motion.div>
                 
-                <div className="flex items-center gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
                   <div className="flex items-center gap-2">
                     <Moon className="h-4 w-4 text-terracotta" />
                     <span>Inner Light</span>
@@ -448,33 +470,26 @@ export default function Meditation() {
                 </div>
               </div>
 
-              {/* Close for Mobile */}
-              <div className="absolute top-6 left-6 flex gap-3 lg:hidden z-50">
-                <button onClick={() => setSelectedPackage(null)} className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all">
+              {/* Close & Share */}
+              <div className="absolute top-6 right-6 flex gap-3 z-50">
+                <button 
+                  onClick={() => handleShare(selectedPackage)}
+                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-terracotta transition-all"
+                >
+                  <Share2 className="h-5 w-5" />
+                </button>
+                <button 
+                  onClick={() => setSelectedPackage(null)} 
+                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
+                >
                   <Plus className="h-5 w-5 rotate-45" />
                 </button>
               </div>
             </div>
 
-            {/* Right Side: Details */}
-            <div className="flex-grow flex flex-col h-full bg-[#FAF9F6] relative">
-              {/* Desktop Close/Share */}
-              <div className="absolute top-8 right-8 hidden lg:flex items-center gap-4 z-20">
-                <button 
-                  onClick={() => handleShare(selectedPackage)}
-                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all transform hover:rotate-12"
-                >
-                  <Share2 className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={() => setSelectedPackage(null)}
-                  className="bg-forest/5 p-4 rounded-full text-forest hover:bg-forest hover:text-white transition-all transform hover:-rotate-12"
-                >
-                  <Plus className="h-6 w-6 rotate-45" />
-                </button>
-              </div>
-
-              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14">
+            {/* Details - Scroll continues */}
+            <div className="flex-grow bg-[#FAF9F6] relative">
+              <div className="p-8 md:p-16">
                 <div className="max-w-3xl mx-auto space-y-16">
                   
                   {/* Stats Grid */}
@@ -534,7 +549,7 @@ export default function Meditation() {
                       <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
                       
                       <div className="flex items-center justify-between mb-10">
-                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Silent Rhythm</h4>
+                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Day-by-Day Experience</h4>
                         <Moon className="h-8 w-8 text-terracotta animate-pulse" />
                       </div>
                       
@@ -545,7 +560,7 @@ export default function Meditation() {
                           selectedPackage.itinerary.map((item: any, i: number) => (
                             <div key={i} className="relative pl-12 group">
                               <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-emerald-500/20 border-4 border-[#FAF9F6] ring-1 ring-emerald-500/10 z-10" />
-                              <div className="text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.2em] mb-1">State {item.day || i + 1}</div>
+                              <div className="text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
                               <h5 className="text-lg font-bold text-forest mb-2">Deep Contemplation</h5>
                               <p className="text-xs text-forest/50 font-medium leading-relaxed">
                                 {item.description}
@@ -569,11 +584,9 @@ export default function Meditation() {
                       </div>
                     </section>
                   )}
-                </div>
-              </div>
 
-              {/* Footer */}
-              <div className="p-8 md:p-12 border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
+                  {/* Footer */}
+                  <div className="border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)] -mx-8 md:-mx-16 p-8 md:p-14">
                 <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
                   <div className="text-center md:text-left">
                     <div className="font-fluid text-2xl text-terracotta -mb-2">Spiritual Gift</div>
@@ -584,21 +597,35 @@ export default function Meditation() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                    {selectedPackage.slots && selectedPackage.slots.length > 0 && (
+                    {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
                       <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedPackage.id] || ''}
                           onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
                           className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         >
-                          <option value="">Select Opening</option>
+                          <option value="">Pick Date Slot</option>
                           {selectedPackage.slots.map((slot: any, i: number) => (
                             <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </option>
                           ))}
                         </select>
                         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                      </div>
+                    ) : (
+                      <div className="relative group w-full sm:w-auto">
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <input
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          onChange={(e) => {
+                            setSelectedDate(e.target.value);
+                          }}
+                          className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] pl-14 pr-8 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                        />
                       </div>
                     )}
 
@@ -615,20 +642,26 @@ export default function Meditation() {
                           dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
                         });
                         setSelectedPackage(null);
+                        toast.success("Added to Cart", {
+                           description: `${selectedPackage.title} has been added to your soul cart.`
+                        });
                       }}
                       disabled={selectedPackage.slots && selectedPackage.slots.length > 0 && selectedSlots[selectedPackage.id] === undefined}
-                      className="w-full sm:min-w-[240px] h-16 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                      className="w-full sm:min-w-[240px] h-16 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-terracotta/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
                     >
                       <Sparkles className="h-4 w-4" />
-                      Find Presence
+                      Book Now & Secure Spot
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      )}
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
       {/* Customize Section */}
       <section className="py-24 bg-cream/30">
         <div className="container mx-auto px-4">

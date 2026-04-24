@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Sparkles, Mail, ArrowRight, Flower2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export default function Blueberry() {
   const [email, setEmail] = useState('');
@@ -53,7 +54,9 @@ export default function Blueberry() {
               <Button 
                 onClick={() => {
                   if (email) {
-                    alert(`Thank you! We will notify you at ${email} when the season begins.`);
+                    toast.success("Manifestation Registered", {
+                      description: `Thank you! We will notify you at ${email} when the season begins.`,
+                    });
                     setEmail('');
                   }
                 }}

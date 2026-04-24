@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CustomizeTripCardProps {
   places?: string[];
@@ -58,7 +59,9 @@ export default function CustomizeTripCard({
       <div className="p-8 pt-0">
         <form className="space-y-6" onSubmit={(e) => {
           e.preventDefault();
-          alert(`Thank you ${fullName}! Your request for ${selectedPlaces.join(', ') || 'Himalayas'} has been received.`);
+          toast.success("Request Received", {
+            description: `Thank you ${fullName}! Your request for ${selectedPlaces.join(', ') || 'Himalayas'} has been received. Our guides will contact you soon.`,
+          });
         }}>
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>

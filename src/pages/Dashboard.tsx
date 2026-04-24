@@ -26,6 +26,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/AuthContext';
+import { toast } from 'sonner';
 
 interface Booking {
   id: string;
@@ -41,6 +42,9 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'history' | 'profile'>('history');
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newCity, setNewCity] = useState('');
+  const [newPincode, setNewPincode] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +54,9 @@ export default function Dashboard() {
   useEffect(() => {
     if (profile) {
       setNewName(profile.displayName || '');
+      setNewPhone(profile.phone || '');
+      setNewCity(profile.city || '');
+      setNewPincode(profile.pincode || '');
     }
   }, [profile]);
 
@@ -59,12 +66,20 @@ export default function Dashboard() {
     try {
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, {
-        displayName: newName
+        displayName: newName,
+        phone: newPhone,
+        city: newCity,
+        pincode: newPincode
+      });
+      toast.success("Identity Manifested", {
+        description: "Your soul profile has been updated successfully.",
       });
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Please try again.");
+      toast.error("Manifestation Failed", {
+        description: "Failed to update profile. Please try again.",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -319,6 +334,9 @@ export default function Dashboard() {
                                onClick={() => {
                                  setIsEditing(false);
                                  setNewName(profile?.displayName || '');
+                                  setNewPhone(profile?.phone || '');
+                                  setNewCity(profile?.city || '');
+                                  setNewPincode(profile?.pincode || '');
                                }} 
                                size="icon" 
                                variant="ghost" 
@@ -357,14 +375,39 @@ export default function Dashboard() {
                       <label className="text-[10px] font-black text-forest/20 uppercase tracking-widest">Account Details</label>
                       <div className="space-y-4">
                         {[
-                          { label: 'Display Name', value: profile?.displayName || user.displayName || 'Not Set' },
-                          { label: 'Email Address', value: user.email },
-                          { label: 'Account Level', value: profile?.role?.toUpperCase() || 'STANDARD' },
-                          { label: 'Member Since', value: profile?.createdAt?.toDate ? profile.createdAt.toDate().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Recent' }
+                          { label: 'Display Name', value: profile?.displayName || user.displayName || 'Not Set', field: 'displayName' },
+                          { label: 'Mobile Number', value: profile?.phone || 'Not Set', field: 'phone' },
+                          { label: 'City', value: profile?.city || 'Not Set', field: 'city' },
+                          { label: 'Pincode', value: profile?.pincode || 'Not Set', field: 'pincode' },
+                          { label: 'Email Address', value: user.email, field: 'email' },
+                          { label: 'Account Level', value: profile?.role?.toUpperCase() || 'STANDARD', field: 'role' },
+                          { label: 'Member Since', value: profile?.createdAt?.toDate ? profile.createdAt.toDate().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Recent', field: 'createdAt' }
                         ].map((item) => (
-                          <div key={item.label} className="p-5 rounded-2xl bg-forest/[0.02] border border-forest/5 hover:border-terracotta/20 transition-all group">
+                          <div key={item.label} className="p-5 rounded-2xl bg-forest/[0.02] border border-forest/5 hover:border-terracotta/20 transition-all group relative">
                             <p className="text-[8px] font-black text-forest/30 uppercase tracking-tight mb-1">{item.label}</p>
-                            <p className="text-sm font-bold text-forest">{item.value}</p>
+                            {isEditing && (item.field === 'displayName' || item.field === 'phone' || item.field === 'city' || item.field === 'pincode') ? (
+                              <input
+                                value={
+                                  item.field === 'displayName' ? newName : 
+                                  item.field === 'phone' ? newPhone :
+                                  item.field === 'city' ? newCity :
+                                  newPincode
+                                }
+                                onChange={(e) => {
+                                  if (item.field === 'displayName') setNewName(e.target.value);
+                                  else if (item.field === 'phone') setNewPhone(e.target.value);
+                                  else if (item.field === 'city') setNewCity(e.target.value);
+                                  else if (item.field === 'pincode') {
+                                    const val = e.target.value.replace(/\D/g, '');
+                                    if (val.length <= 6) setNewPincode(val);
+                                  }
+                                }}
+                                className="bg-transparent border-none p-0 text-sm font-bold text-forest focus:ring-0 w-full"
+                                placeholder={`Enter your ${item.label.toLowerCase()}`}
+                              />
+                            ) : (
+                              <p className="text-sm font-bold text-forest">{item.value}</p>
+                            )}
                           </div>
                         ))}
                       </div>
