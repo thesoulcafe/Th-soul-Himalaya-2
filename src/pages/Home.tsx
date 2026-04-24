@@ -76,104 +76,57 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
               <div key={i} className="w-full md:min-w-[130px] h-[120px] md:h-[140px] bg-forest/5 rounded-[1.5rem] animate-pulse shrink-0" />
             ))
           ) : (
-            services.map((service, index) => (
-              <motion.div
-                key={service.id || service.title}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.02 }}
-              className="w-full md:min-w-[130px] snap-center"
-            >
-              {service.link?.startsWith('http') ? (
-                <a href={service.link}>
-                  <Card className={cn(
-                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
-                    index % 4 === 0 ? "bg-forest text-cream" : 
-                    index % 4 === 1 ? "bg-terracotta text-white" : 
-                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
-                    "bg-black text-white"
-                  )}>
-                    <div className={cn(
-                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
-                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
-                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
-                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
-                      "bg-gradient-to-br from-gold to-transparent"
-                    )} />
-                    
-                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
+            services.map((service, index) => {
+              const IconComponent = getIcon(service.title);
+              const isExternal = service.link?.startsWith('http');
+              const ContentWrapper = isExternal ? 'a' : Link;
+              const wrapperProps = isExternal 
+                ? { href: service.link, target: "_blank", rel: "noopener noreferrer" } 
+                : { to: service.link || '#' };
+
+              return (
+                <motion.div
+                  key={service.id || service.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="w-full md:min-w-[170px] snap-center"
+                >
+                  <ContentWrapper {...(wrapperProps as any)} className="block h-full group/card">
+                    <Card className="relative overflow-hidden bg-white/40 backdrop-blur-xl hover:bg-white/80 border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_25px_60px_rgba(45,62,53,0.15)] transition-all duration-700 rounded-[2.5rem] h-[150px] md:h-[180px] flex flex-col items-center justify-center p-5 border-0 group-hover/card:-translate-y-2">
+                      <div className="absolute inset-0 bg-gradient-to-br from-forest/10 via-transparent to-terracotta/10 opacity-0 group-hover/card:opacity-100 transition-opacity duration-700" />
+                      
                       {profile?.role === 'admin' && (
-                        <div className="absolute top-2 right-2 z-20">
-                          <Link 
-                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
-                            title="Edit Service"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Edit2 className="h-2.5 w-2.5" />
-                          </Link>
+                          <div className="absolute top-4 right-4 z-20">
+                            <Link 
+                              to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                              className="bg-white/95 backdrop-blur shadow-sm p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300"
+                              title="Edit Service"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Edit2 className="h-3 w-3" />
+                            </Link>
+                          </div>
+                        )}
+
+                      <div className="mb-4 relative">
+                        <div className="absolute inset-0 bg-forest/20 blur-2xl opacity-0 group-hover/card:opacity-40 transition-opacity duration-700 scale-150" />
+                        <div className="bg-white/50 p-4 md:p-5 rounded-2xl group-hover/card:bg-forest group-hover/card:text-white transition-all duration-500 shadow-sm relative z-10 border border-white/20">
+                          <IconComponent className="h-6 w-6 md:h-8 md:w-8 transition-transform duration-500 group-hover/card:scale-110" />
                         </div>
-                      )}
-                      <div className={cn(
-                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
-                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
-                      )}>
-                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
                       </div>
                       
-                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
+                      <h3 className="text-[10px] md:text-[12px] font-heading font-black text-forest uppercase tracking-[0.15em] text-center px-2 relative z-10 leading-tight">
                         {service.title}
                       </h3>
-                    </CardContent>
-                  </Card>
-                </a>
-              ) : (
-                <Link to={service.link || '#'}>
-                  <Card className={cn(
-                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
-                    index % 4 === 0 ? "bg-forest text-cream" : 
-                    index % 4 === 1 ? "bg-terracotta text-white" : 
-                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
-                    "bg-black text-white"
-                  )}>
-                    <div className={cn(
-                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
-                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
-                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
-                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
-                      "bg-gradient-to-br from-gold to-transparent"
-                    )} />
-                    
-                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
-                      {profile?.role === 'admin' && (
-                        <div className="absolute top-2 right-2 z-20">
-                          <Link 
-                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
-                            title="Edit Service"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Edit2 className="h-2.5 w-2.5" />
-                          </Link>
-                        </div>
-                      )}
-                      <div className={cn(
-                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
-                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
-                      )}>
-                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
-                      </div>
                       
-                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
-                        {service.title}
-                      </h3>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )}
-            </motion.div>
-          ))
+                      <div className="mt-3 w-0 group-hover/card:w-10 h-[3px] bg-terracotta transition-all duration-700 rounded-full" />
+                    </Card>
+                  </ContentWrapper>
+                </motion.div>
+              );
+            })
         )}
         <div className="min-w-[1px] md:min-w-[1rem]" />
         </div>
@@ -380,7 +333,7 @@ export default function Home() {
               <Link to="/tailor-made" className="absolute inset-0 z-30" />
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest via-forest/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
               <img 
-                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80" 
+                src="https://images.unsplash.com/photo-1522158633396-880a67116743?auto=format&fit=crop&w=1200&q=80" 
                 alt="Corporate Retreat"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 referrerPolicy="no-referrer"
@@ -415,7 +368,7 @@ export default function Home() {
               <Link to="/tours?category=Romantic" className="absolute inset-0 z-30" />
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-terracotta via-terracotta/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
               <img 
-                src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80" 
+                src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=1200&q=80" 
                 alt="Romantic Escape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 referrerPolicy="no-referrer"
@@ -462,7 +415,7 @@ export default function Home() {
               >
                 <div 
                   className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2670&auto=format&fit=crop)' }}
+                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1614749363690-34907106041c?q=80&w=2670&auto=format&fit=crop)' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">
