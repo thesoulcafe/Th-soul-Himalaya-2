@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
+import { useMemo } from 'react';
 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -21,6 +23,7 @@ import { DEFAULT_TREKKS } from '@/constants';
 export default function Trekks() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [trekkList, setTrekkList] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
@@ -143,8 +146,36 @@ export default function Trekks() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  useEffect(() => {
+    const trekkId = searchParams.get('id');
+    if (trekkId && trekkList.length > 0) {
+      const trekk = trekkList.find(t => t.id === trekkId);
+      if (trekk) setSelectedTrekk(trekk);
+    }
+  }, [searchParams, trekkList]);
+
+  const currentSEO = useMemo(() => {
+    if (selectedTrekk) {
+      return {
+        title: selectedTrekk.title,
+        description: selectedTrekk.description || `Discover the wild with ${selectedTrekk.title}.`,
+        image: selectedTrekk.image,
+      };
+    }
+    return {
+      title: "Himalayan Trekking",
+      description: "High-altitude journeys and wild paths curated for the soulful adventurer."
+    };
+  }, [selectedTrekk]);
+
   return (
     <div className="pt-24">
+      <SEO 
+        title={currentSEO.title} 
+        description={currentSEO.description} 
+        image={currentSEO.image}
+        canonicalUrl={window.location.href}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Mountain Trekks</h1>

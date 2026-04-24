@@ -6,13 +6,15 @@ import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as Home
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
+import { SEO } from '@/components/SEO';
+import { useMemo } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { DEFAULT_ADVENTURE } from '@/constants';
@@ -20,6 +22,7 @@ import { DEFAULT_ADVENTURE } from '@/constants';
 export default function Adventure() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activities, setActivities] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -117,6 +120,30 @@ export default function Adventure() {
     return Zap;
   };
 
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+
+  useEffect(() => {
+    const activityId = searchParams.get('id');
+    if (activityId && activities.length > 0) {
+      const act = activities.find(a => a.id === activityId);
+      if (act) setSelectedActivity(act);
+    }
+  }, [searchParams, activities]);
+
+  const currentSEO = useMemo(() => {
+    if (selectedActivity) {
+      return {
+        title: selectedActivity.title,
+        description: selectedActivity.description || `Feel the adrenaline with ${selectedActivity.title}.`,
+        image: selectedActivity.image,
+      };
+    }
+    return {
+      title: "Himalayan Adventures",
+      description: "Experience the thrill of the Himalayas with paragliding, rafting, and more."
+    };
+  }, [selectedActivity]);
+
   const formatDateRange = (startDateStr: string, durationStr: string, slot?: any) => {
     if (slot && slot.startDate && slot.endDate) {
       try {
@@ -148,6 +175,12 @@ export default function Adventure() {
 
   return (
     <div className="pt-24">
+      <SEO 
+        title={currentSEO.title} 
+        description={currentSEO.description} 
+        image={currentSEO.image}
+        canonicalUrl={window.location.href}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Adventure Sports</h1>

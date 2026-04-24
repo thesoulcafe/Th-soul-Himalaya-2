@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Minus, Flower2, Sun, Moon, Wind, Heart, Sparkles, CheckCircle2, Edit2, Clock, Zap, Calendar, ChevronDown, Star, ShoppingCart, ArrowRight, Share2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +12,8 @@ import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
+import { useMemo } from 'react';
 
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -21,6 +23,7 @@ import { DEFAULT_MEDITATION } from '@/constants';
 export default function Meditation() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [packageList, setPackageList] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
@@ -141,8 +144,36 @@ export default function Meditation() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  useEffect(() => {
+    const pkgId = searchParams.get('id');
+    if (pkgId && packageList.length > 0) {
+      const pkg = packageList.find(p => p.id === pkgId);
+      if (pkg) setSelectedPackage(pkg);
+    }
+  }, [searchParams, packageList]);
+
+  const currentSEO = useMemo(() => {
+    if (selectedPackage) {
+      return {
+        title: selectedPackage.title,
+        description: selectedPackage.description || `Inner stillness with ${selectedPackage.title}.`,
+        image: selectedPackage.image,
+      };
+    }
+    return {
+      title: "Meditation Retreats",
+      description: "Find your inner peace with soulful meditation retreats in the Himalayas."
+    };
+  }, [selectedPackage]);
+
   return (
     <div className="pt-24">
+      <SEO 
+        title={currentSEO.title} 
+        description={currentSEO.description} 
+        image={currentSEO.image}
+        canonicalUrl={window.location.href}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Meditation Retreats</h1>
