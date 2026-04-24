@@ -251,9 +251,29 @@ export default function Tours() {
     });
   }, [tours, activeCategory, searchQuery, maxPrice, maxDuration]);
 
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id && tours.length > 0) {
+      const tour = tours.find(t => t.id === id);
+      if (tour) {
+        setSeo({
+          title: tour.title || tour.name,
+          description: tour.description,
+          image: tour.image || tour.images?.[0],
+          path: `/tours?id=${id}`
+        });
+      }
+    }
+  }, [searchParams, tours]);
+
   return (
     <div className="pt-20 px-4 sm:px-6">
-      {seo && <SEO title={seo.title || "Tour Packages"} description={seo.description || "Handpicked mountain journeys."} keywords={seo.keyword} />}
+      {seo && <SEO 
+        title={seo.title || "Tour Packages"} 
+        description={seo.description || "Handpicked mountain journeys."} 
+        keywords={seo.keyword} 
+        image={seo.image}
+      />}
       
       {/* Search & Filter Header (Sticky) */}
       <div className="top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">

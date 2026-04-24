@@ -283,16 +283,6 @@ async function startServer() {
 
 async function injectMetaTags(req: express.Request, html: string) {
   try {
-    const constants = await import('./src/constants.ts');
-    const { 
-      DEFAULT_TOURS = [], 
-      DEFAULT_TREKKS = [], 
-      DEFAULT_YOGA = [], 
-      DEFAULT_MEDITATION = [], 
-      DEFAULT_ADVENTURE = [], 
-      DEFAULT_WFH = [] 
-    } = constants;
-
     const urlStr = req.originalUrl;
     const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
     const id = url.searchParams.get('id');
@@ -306,33 +296,46 @@ async function injectMetaTags(req: express.Request, html: string) {
     let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
     let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
-    const allPackages = [
-      ...DEFAULT_TOURS,
-      ...DEFAULT_TREKKS,
-      ...DEFAULT_YOGA,
-      ...DEFAULT_MEDITATION,
-      ...DEFAULT_ADVENTURE,
-      ...DEFAULT_WFH
-    ];
+    let pkg: any = null;
 
-    let pkg = allPackages.find(p => p.id === id) as any;
-
-    if (!pkg && id) {
+    // 1. Try Firestore First (Most up to date)
+    if (id) {
       try {
         const docRef = doc(db, "content", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const docData = docSnap.data();
           pkg = { id, ...docData.data };
+          console.log(`[Meta] Found package in Firestore: ${id}`);
         }
       } catch (e) {
-        console.error("Firestore lookup failed:", e);
+        console.error("[Meta] Firestore lookup failed:", e);
+      }
+    }
+
+    // 2. Try Constants Fallback (If not in Firestore)
+    if (!pkg && id) {
+      try {
+        const constants = await import('./src/constants.ts');
+        const allPackages = [
+          ...(constants.DEFAULT_TOURS || []),
+          ...(constants.DEFAULT_TREKKS || []),
+          ...(constants.DEFAULT_YOGA || []),
+          ...(constants.DEFAULT_MEDITATION || []),
+          ...(constants.DEFAULT_ADVENTURE || []),
+          ...(constants.DEFAULT_WFH || [])
+        ];
+        pkg = allPackages.find(p => p.id === id);
+        if (pkg) console.log(`[Meta] Found package in Constants: ${id}`);
+      } catch (e) {
+        // This might fail in production if .ts files aren't pre-compiled
+        console.warn("[Meta] Could not import constants.ts, skipping local fallback.");
       }
     }
 
     if (pkg) {
       const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
-      title = `The Soul Himalaya - ${pkgTitle}`;
+      title = `${pkgTitle} | Soul Himalaya`;
       
       let highlightsStr = "";
       if (pkg.highlights && Array.isArray(pkg.highlights)) {
@@ -342,7 +345,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
 
       description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
-                    ` Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.` + 
+                    ` Duration: ${pkg.duration || 'Flexible'}.` + 
                     highlightsStr;
       
       if (description.length > 200) {
@@ -351,10 +354,11 @@ async function injectMetaTags(req: express.Request, html: string) {
 
       image = pkg.image || image;
       
-      // Optimize unsplash image for share preview (1200x630)
+      // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
       if (image.includes('unsplash.com')) {
         image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
         if (!image.includes('&h=')) image += '&h=630';
+        if (!image.includes('&fit=crop')) image += '&fit=crop';
       }
     }
 
@@ -363,7 +367,7 @@ async function injectMetaTags(req: express.Request, html: string) {
     }
 
     const metaTags = `
-    <!-- Dynamic Social Meta Tags -->
+    <title>${title}</title>
     <meta name="description" content="${description}">
     <link rel="canonical" href="${absoluteUrl}">
     
@@ -385,16 +389,8 @@ async function injectMetaTags(req: express.Request, html: string) {
     <meta name="twitter:image" content="${image}">
     `;
 
-    // Strip existing common meta tags and title to avoid duplicates
-    let cleanedHtml = html
-      .replace(/<title>.*?<\/title>/gi, '')
-      .replace(/<meta name="description".*?>/gi, '')
-      .replace(/<meta property="og:.*?".*?>/gi, '')
-      .replace(/<meta name="twitter:.*?".*?>/gi, '');
-
-    // Inject tags immediately after <head>
-    return cleanedHtml
-      .replace('<head>', `<head>\n<title>${title}</title>${metaTags}`);
+    // Inject before </head> to override defaults if any
+    return html.replace('</head>', `${metaTags}\n</head>`);
   } catch (error) {
     console.error("Meta injection failed:", error);
     return html;

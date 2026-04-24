@@ -13,6 +13,8 @@ import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
 import { toast } from 'sonner';
 
+import { SEO } from '@/components/SEO';
+import { useSearchParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
@@ -21,7 +23,9 @@ import { DEFAULT_TREKKS } from '@/constants';
 export default function Trekks() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [trekkList, setTrekkList] = useState<any[]>([]);
+  const [seo, setSeo] = useState<any>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
@@ -143,8 +147,28 @@ export default function Trekks() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id && trekkList.length > 0) {
+      const trekk = trekkList.find(t => t.id === id);
+      if (trekk) {
+        setSeo({
+          title: trekk.title,
+          description: trekk.description,
+          image: trekk.image,
+          path: `/trekks?id=${id}`
+        });
+      }
+    }
+  }, [searchParams, trekkList]);
+
   return (
     <div className="pt-24">
+      {seo && <SEO 
+        title={seo.title || "Mountain Trekks"} 
+        description={seo.description || "Discover wild paths."} 
+        image={seo.image}
+      />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Mountain Trekks</h1>

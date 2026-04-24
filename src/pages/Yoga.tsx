@@ -13,6 +13,8 @@ import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
 import { toast } from 'sonner';
 
+import { SEO } from '@/components/SEO';
+import { useSearchParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
@@ -21,7 +23,9 @@ import { DEFAULT_YOGA } from '@/constants';
 export default function Yoga() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [packageList, setPackageList] = useState<any[]>([]);
+  const [seo, setSeo] = useState<any>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
@@ -141,8 +145,28 @@ export default function Yoga() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id && packageList.length > 0) {
+      const pkg = packageList.find(p => p.id === id);
+      if (pkg) {
+        setSeo({
+          title: pkg.title,
+          description: pkg.description,
+          image: pkg.image,
+          path: `/yoga?id=${id}`
+        });
+      }
+    }
+  }, [searchParams, packageList]);
+
   return (
     <div className="pt-24">
+      {seo && <SEO 
+        title={seo.title || "Yoga Retreats"} 
+        description={seo.description || "Heal your soul."} 
+        image={seo.image}
+      />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Yoga Retreats</h1>
