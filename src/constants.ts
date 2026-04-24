@@ -426,19 +426,7 @@ export const DEFAULT_TOURS = [
     description: 'A rugged off-road drive through the gateway of Spiti, crossing the majestic Kunzum Pass.',
     theExperience: 'Day 1: Drive from Manali to Chhatru via Atal Tunnel.\nDay 2: Chhatru to Chandratal Lake. Evening lake-side camping.\nDay 3: Return drive through Kunzum Pass and return to Manali.\nDay 4: Rest and departure.'
   },
-  {
-    id: 'tour-33',
-    title: 'Photography & Cafe Narrative',
-    duration: '3 Days',
-    price: '₹7,500',
-    rating: 4.8,
-    reviews: 56,
-    category: 'Mix-up',
-    image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80',
-    highlights: ['Instagram Storytelling', 'Cinematic Drone shots', 'Hidden Cafe Portraits'],
-    description: 'A specialized tour for content creators and photographers focusing on the valley\'s unique cafe aesthetic.',
-    theExperience: 'Day 1: Kasol cafe cinematography. Evening portraits.\nDay 2: Tosh and Kalga rustic cafe series. Sunset drone shots (where permitted).\nDay 3: Narrative workshop and return.'
-  },
+
   {
     id: 'tour-34',
     title: 'Sikh Heritage & Hot Springs',

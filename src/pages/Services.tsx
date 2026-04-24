@@ -38,7 +38,7 @@ export default function Services() {
           }))
           .filter(service => {
             const title = (service.title || '').toLowerCase();
-            return !title.includes('cafe') && !title.includes('food');
+            return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
           })
           .sort((a, b) => {
             // Force Macramé Shop to the end

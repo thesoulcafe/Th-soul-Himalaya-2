@@ -169,6 +169,9 @@ export default function Tours() {
             category: (type === 'yoga' || type === 'meditation') ? 'Wellness' : (data.category || 'All'),
             highlights: data.highlights || data.features || []
           };
+        }).filter(item => {
+          const title = (item.title || item.name || '').toLowerCase();
+          return !title.includes('photography & cafe narrative');
         });
       }
 
