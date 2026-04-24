@@ -1,0 +1,352 @@
+{
+  "tour-1": {
+    "id": "tour-1",
+    "title": "The Riverside Romance (Kasol & Chalal)",
+    "description": "A curated escape for couples seeking intimacy by the turquoise waters of the Parvati River.",
+    "image": "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days / 2 Nights"
+  },
+  "tour-2": {
+    "id": "tour-2",
+    "title": "The Last Village Escape (Tosh & Kutla)",
+    "description": "Venture to the very edge of the valley where the road ends and the romance begins.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days / 2 Nights"
+  },
+  "tour-3": {
+    "id": "tour-3",
+    "title": "Manali-Kasol Luxury Duo",
+    "description": "The best of both worlds: the vibrant energy of Manali and the soulful calm of Parvati.",
+    "image": "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days / 4 Nights"
+  },
+  "tour-4": {
+    "id": "tour-4",
+    "title": "Fairy Forest Intimacy (Pulga Retreat)",
+    "description": "Lose yourselves in the mystical ",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-5": {
+    "id": "tour-5",
+    "title": "Hidden Valley Secret (Jibhi & Parvati)",
+    "description": "Explore the untouched beauty of Tirthan Valley alongside the Parvati corridor.",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    "duration": "6 Days"
+  },
+  "tour-6": {
+    "id": "tour-6",
+    "title": "Back to the Roots (Kalga Yoga)",
+    "description": "A deep immersion into the traditional yogic lifestyle in the quiet village of Kalga.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "7 Days"
+  },
+  "tour-7": {
+    "id": "tour-7",
+    "title": "Fairy Forest Mindfulness (Pulga)",
+    "description": "A dedicated mindfulness retreat focusing on presence and connection with the natural world.",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    "duration": "7 Days"
+  },
+  "tour-8": {
+    "id": "tour-8",
+    "title": "Manali Holistic Detox (Rishibhumi)",
+    "description": "A comprehensive detox and rejuvenation program in the serene environment of Manali.",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    "duration": "10 Days"
+  },
+  "tour-9": {
+    "id": "tour-9",
+    "title": "Silent Glacier Meditation (Kutla)",
+    "description": "Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla.",
+    "image": "https://images.unsplash.com/photo-1528319725582-ddc096101511?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-10": {
+    "id": "tour-10",
+    "title": "Spiritual Heritage & Healing",
+    "description": "Explore the sacred heritage of the valley through visit to temples and natural healing springs.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "6 Days"
+  },
+  "tour-11": {
+    "id": "tour-11",
+    "title": "Peak Performance Summit (Manali)",
+    "description": "Professional conferences at high-capacity venues with modern support and stunning views.",
+    "image": "https://images.unsplash.com/photo-1533387558684-6297b785d177?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days / 3 Nights"
+  },
+  "tour-12": {
+    "id": "tour-12",
+    "title": "Adventure Team-Building (Kasol)",
+    "description": "Strengthen bonds through thrilling outdoor activities in the heart of Parvati.",
+    "image": "https://images.unsplash.com/photo-1530866495547-08497ff13ee2?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days"
+  },
+  "tour-13": {
+    "id": "tour-13",
+    "title": "Executive Strategy Retreat (Tosh)",
+    "description": "Focus on your long-term vision in the inspiring isolation of Tosh Village.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-14": {
+    "id": "tour-14",
+    "title": "Wellness & Productivity Bridge",
+    "description": "A balanced approach to corporate work: high-focus sessions blended with restorative wellness practices.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-15": {
+    "id": "tour-15",
+    "title": "CSR & Cultural Immersion",
+    "description": "Engage in ethical tourism and give back to the local community through meaningful CSR projects.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-16": {
+    "id": "tour-16",
+    "title": "The Parvati Loop (Backpacker)",
+    "description": "The definitive circuit for those who want to experience the complete essence of the Parvati Valley.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "6 Days / 5 Nights"
+  },
+  "tour-17": {
+    "id": "tour-17",
+    "title": "Manali-Sissu-Kasol Traverse",
+    "description": "Cross the engineering marvel of Atal Tunnel and explore the lunar landscapes of Lahaul.",
+    "image": "https://images.unsplash.com/photo-1530866495547-08497ff13ee2?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-18": {
+    "id": "tour-18",
+    "title": "Kheerganga & Tosh Special",
+    "description": "Experience the two most iconic backpacking destinations in the valley in one trip.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-19": {
+    "id": "tour-19",
+    "title": "Weekend Warrior (Delhi-to-Delhi)",
+    "description": "The perfect quick escape for city dwellers looking for a mountain refresh.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days / 2 Nights"
+  },
+  "tour-20": {
+    "id": "tour-20",
+    "title": "Mini Israel Culinary tour",
+    "description": "A culinary journey through the famous ",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-21": {
+    "id": "tour-21",
+    "title": "Tosh to Kutla Glacier Expedition",
+    "description": "A high-altitude adventure taking you beyond the village into the realm of ancient ice.",
+    "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-22": {
+    "id": "tour-22",
+    "title": "Grahan Village Forest Trail",
+    "description": "An offbeat trek through dense deodar forests, away from the commercialized centers.",
+    "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days"
+  },
+  "tour-23": {
+    "id": "tour-23",
+    "title": "Malana Heritage & Waichin Valley",
+    "description": "Dive deep into the unique heritage of Malana and the profound silence of Waichin.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-24": {
+    "id": "tour-24",
+    "title": "Rasol Steep Ascent Challenge",
+    "description": "One of the more physically demanding day-treks starting from Chalal. Famous for its steep climb.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days"
+  },
+  "tour-25": {
+    "id": "tour-25",
+    "title": "Pin Parvati Pass Preparation",
+    "description": "A dedicated preparation camp for those aiming to cross the challenging Pin Parvati Pass.",
+    "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-26": {
+    "id": "tour-26",
+    "title": "The Parvati Mosaic (All-in-One)",
+    "description": "The ultimate mosaic of Parvati: spiritual centers, cafe culture, and village hikes.",
+    "image": "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days / 4 Nights"
+  },
+  "tour-27": {
+    "id": "tour-27",
+    "title": "Winter Snowscape Specialist",
+    "description": "Experience the magical winter wonderland of the Parvati Valley in safety and comfort.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-28": {
+    "id": "tour-28",
+    "title": "Solang Adventure & Paragliding",
+    "description": "Soar high above the mountains with a professional paragliding experience in Solang.",
+    "image": "https://images.unsplash.com/photo-1533387558684-6297b785d177?auto=format&fit=crop&w=800&q=80",
+    "duration": "Full Day"
+  },
+  "tour-29": {
+    "id": "tour-29",
+    "title": "Himalayan Culture Loop",
+    "description": "Immerse yourself in the rich tapestry of Himalayan village culture and traditions.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-30": {
+    "id": "tour-30",
+    "title": "Digital Nomad Workation (Pulga)",
+    "description": "A month-long stay designed for the modern remote worker who needs peace and connectivity.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "30 Days"
+  },
+  "tour-31": {
+    "id": "tour-31",
+    "title": "Spiritual Naggar & Castle Tour",
+    "description": "A cultural dive into the ancient capital of Kullu, Naggar, featuring heritage architecture and art.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days"
+  },
+  "tour-32": {
+    "id": "tour-32",
+    "title": "Spiti-Manali Gateway Drive",
+    "description": "A rugged off-road drive through the gateway of Spiti, crossing the majestic Kunzum Pass.",
+    "image": "https://images.unsplash.com/photo-1530866495547-08497ff13ee2?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-34": {
+    "id": "tour-34",
+    "title": "Sikh Heritage & Hot Springs",
+    "description": "A spiritual journey to the holy site of Manikaran Sahib, famous for its hot springs and langar.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "2 Days"
+  },
+  "tour-35": {
+    "id": "tour-35",
+    "title": "Student Nature & Survival Camp",
+    "description": "An educational camping experience teaching youth about wilderness survival and ecological responsibility.",
+    "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    "duration": "7 Days"
+  },
+  "tour-36": {
+    "id": "tour-36",
+    "title": "Trout & Trails (Tirthan-Parvati)",
+    "description": "A unique combination of trout fishing in the Tirthan River and exploration of the Parvati valley.",
+    "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "tour-37": {
+    "id": "tour-37",
+    "title": "Atal Tunnel & Sissu Express",
+    "description": "A quick day-trip from Manali to explore the stunning Lahaul Valley via the world\\",
+    "image": "https://images.unsplash.com/photo-1530866495547-08497ff13ee2?auto=format&fit=crop&w=800&q=80",
+    "duration": "1 Day"
+  },
+  "tour-38": {
+    "id": "tour-38",
+    "title": "Solo Traveler Valley Connection",
+    "description": "A social trip designed for solo travelers to connect and explore the valley together safely.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 Days"
+  },
+  "tour-39": {
+    "id": "tour-39",
+    "title": "Budget Parvati Loop (Barshaini)",
+    "description": "A budget-conscious loop for travelers who want to see the best of Parvati without breaking the bank.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "3 Days"
+  },
+  "tour-40": {
+    "id": "tour-40",
+    "title": "Elite Himalayan Boutique Exp",
+    "description": "The pinnacle of luxury in the Parvati corridor. Exclusive, refined, and deeply soulful.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "trekk-1": {
+    "id": "trekk-1",
+    "title": "Kutla Glacier Expedition",
+    "description": "Extending beyond Tosh to reach the alpine meadows and ice tongues of the upper valley. Requires high physical fitness.",
+    "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    "duration": "6 - 8 Hours"
+  },
+  "trekk-2": {
+    "id": "trekk-2",
+    "title": "Rasol Steep Ascent",
+    "description": "One of the more physically demanding day-treks starting from Chalal. Famous for its steep climb and traditional Rasol village stay.",
+    "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Hours"
+  },
+  "trekk-3": {
+    "id": "trekk-3",
+    "title": "Grahan Village Forest Trail",
+    "description": "An offbeat trek through dense deodar forests, away from the commercialized centers. Experience the authentic culture of Grahan.",
+    "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+    "duration": "4 - 5 Hours"
+  },
+  "trekk-4": {
+    "id": "trekk-4",
+    "title": "Malana Heritage & Waichin Valley",
+    "description": "Exploring the isolation of Malana (the oldest democracy) and the even deeper Waichin valley.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80",
+    "duration": "2 Days"
+  },
+  "yoga-1": {
+    "id": "yoga-1",
+    "title": "Back to the Roots (Kalga Yoga Immersion)",
+    "description": "A deep immersion into the traditional yogic lifestyle in the quiet village of Kalga.",
+    "image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80",
+    "duration": "7 Days"
+  },
+  "yoga-2": {
+    "id": "yoga-2",
+    "title": "Fairy Forest Mindfulness (Pulga)",
+    "description": "",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    "duration": "7 Days"
+  },
+  "med-1": {
+    "id": "med-1",
+    "title": "Silent Glacier Meditation (Kutla)",
+    "description": "Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla.",
+    "image": "https://images.unsplash.com/photo-1528319725582-ddc096101511?auto=format&fit=crop&w=800&q=80",
+    "duration": "5 Days"
+  },
+  "med-2": {
+    "id": "med-2",
+    "title": "Chakra Awareness & Himalayan Healing",
+    "description": "",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+    "duration": "10 Days"
+  },
+  "adv-1": {
+    "id": "adv-1",
+    "title": "Solang Adventure & Paragliding",
+    "description": "The ultimate thrill package in Manali. Soar high and feel the Himalayan wind.",
+    "image": "https://images.unsplash.com/photo-1533387558684-6297b785d177?auto=format&fit=crop&w=800&q=80",
+    "duration": "Full Day"
+  },
+  "adv-2": {
+    "id": "adv-2",
+    "title": "Atal Tunnel & Sissu Express",
+    "description": "A quick, scenic drive from Manali to the rugged landscape of Lahaul.",
+    "image": "https://images.unsplash.com/photo-1530866495547-08497ff13ee2?auto=format&fit=crop&w=800&q=80",
+    "duration": "1 Day"
+  },
+  "wfh-1": {
+    "id": "wfh-1",
+    "title": "Digital Nomad Workation (Pulga)",
+    "description": "A month-long stay designed for the modern remote worker who needs peace and connectivity.",
+    "image": "",
+    "duration": "30 Days"
+  }
+}

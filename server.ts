@@ -291,17 +291,6 @@ async function startServer() {
 
 async function injectMetaTags(req: express.Request, html: string) {
   try {
-    // Import constants dynamically
-    const constants = await import('./src/constants.js');
-    const { 
-      DEFAULT_TOURS = [], 
-      DEFAULT_TREKKS = [], 
-      DEFAULT_YOGA = [], 
-      DEFAULT_MEDITATION = [], 
-      DEFAULT_ADVENTURE = [], 
-      DEFAULT_WFH = [] 
-    } = constants as any;
-
     const urlStr = req.originalUrl;
     const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
     const id = url.searchParams.get('id');
@@ -315,16 +304,18 @@ async function injectMetaTags(req: express.Request, html: string) {
     let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
     let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
-    const allPackages = [
-      ...DEFAULT_TOURS,
-      ...DEFAULT_TREKKS,
-      ...DEFAULT_YOGA,
-      ...DEFAULT_MEDITATION,
-      ...DEFAULT_ADVENTURE,
-      ...DEFAULT_WFH
-    ];
+    // Read metadata from generated JSON
+    let flatMetadata: Record<string, any> = {};
+    try {
+      const metadataPath = path.join(process.cwd(), 'package-metadata-ssr.json');
+      if (fs.existsSync(metadataPath)) {
+        flatMetadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+      }
+    } catch (e) {
+      console.warn("Could not read package-metadata-ssr.json, falling back to defaults.");
+    }
 
-    let pkg = allPackages.find(p => p.id === id) as any;
+    let pkg = flatMetadata[id || ''] as any;
 
     // Fallback search if id format varies
     if (!pkg && id) {
