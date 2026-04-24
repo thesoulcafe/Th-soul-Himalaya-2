@@ -695,7 +695,7 @@ export default function Trekks() {
                           className="w-full sm:min-w-[240px] h-16 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-terracotta/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
                         >
                           <Sparkles className="h-4 w-4" />
-                          Book Now & Secure Spot
+                          Book Now
                         </Button>
                   </div>
                 </div>
