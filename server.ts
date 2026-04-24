@@ -221,18 +221,112 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: "spa",
     });
+    
+    // Custom middleware to inject meta tags in development
+    app.use(async (req, res, next) => {
+      if (req.method !== 'GET' || req.headers.accept?.indexOf('text/html') === -1) {
+        return next();
+      }
+
+      try {
+        const url = req.originalUrl;
+        const html = await fs.promises.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
+        const transformedHtml = await vite.transformIndexHtml(url, html);
+        
+        // Inject dynamic tags
+        const finalHtml = await injectMetaTags(url, transformedHtml);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.use(express.static(distPath, { index: false }));
+    
+    app.get('*', async (req, res) => {
+      try {
+        const html = await fs.promises.readFile(path.join(distPath, 'index.html'), 'utf-8');
+        const finalHtml = await injectMetaTags(req.originalUrl, html);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      } catch (e) {
+        console.error("Failed to serve index.html:", e);
+        res.status(500).send("Internal Server Error");
+      }
     });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
+}
+
+// -----------------------------------------------------------------------------
+// Dynamic Meta Tag Injection Helper
+// -----------------------------------------------------------------------------
+
+async function injectMetaTags(urlStr: string, html: string) {
+  try {
+    const { 
+      DEFAULT_TOURS, 
+      DEFAULT_TREKKS, 
+      DEFAULT_YOGA, 
+      DEFAULT_MEDITATION, 
+      DEFAULT_ADVENTURE, 
+      DEFAULT_WFH 
+    } = await import('./src/constants.js');
+
+    const url = new URL(urlStr, 'http://localhost');
+    const id = url.searchParams.get('id');
+    
+    let title = "Soul Himalaya - Soulful Travel in Kullu & Parvati Valley";
+    let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
+    let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
+
+    const allPackages = [
+      ...DEFAULT_TOURS,
+      ...DEFAULT_TREKKS,
+      ...DEFAULT_YOGA,
+      ...DEFAULT_MEDITATION,
+      ...DEFAULT_ADVENTURE,
+      ...DEFAULT_WFH
+    ];
+
+    const pkg = allPackages.find(p => p.id === id) as any;
+
+    if (pkg) {
+      const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
+      title = `The Soul Himalaya - ${pkgTitle}`;
+      description = pkg.description || `Experience ${pkgTitle} in the Parvati Valley. Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.`;
+      image = pkg.image || image;
+    }
+
+    const metaTags = `
+    <!-- Dynamic Meta Tags -->
+    <title>${title}</title>
+    <meta name="description" content="${description}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${image}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thesoulhimalaya.com${urlStr}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${title}">
+    <meta name="twitter:description" content="${description}">
+    <meta name="twitter:image" content="${image}">
+    `;
+
+    // Replace default title and insert before </head>
+    return html
+      .replace(/<title>.*<\/title>/, '')
+      .replace('</head>', `${metaTags}\n</head>`);
+  } catch (error) {
+    console.error("Meta injection failed:", error);
+    return html;
+  }
 }
 
 startServer();
