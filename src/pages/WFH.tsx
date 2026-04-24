@@ -5,15 +5,13 @@ import { Plus, Minus, Wifi, Coffee, Laptop, Mountain, CheckCircle2, ShieldCheck,
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
-import { SEO } from '@/components/SEO';
-import { useMemo } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { DEFAULT_WFH } from '@/constants';
@@ -21,7 +19,6 @@ import { DEFAULT_WFH } from '@/constants';
 export default function WFH() {
   const { profile } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [packages, setPackages] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState('2026-06-10');
@@ -129,36 +126,8 @@ export default function WFH() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
-  useEffect(() => {
-    const pkgId = searchParams.get('id');
-    if (pkgId && packages.length > 0) {
-      const pkg = packages.find(p => p.id === pkgId);
-      if (pkg) setSelectedPackage(pkg);
-    }
-  }, [searchParams, packages]);
-
-  const currentSEO = useMemo(() => {
-    if (selectedPackage) {
-      return {
-        title: selectedPackage.title,
-        description: selectedPackage.description || `Elevate your work with ${selectedPackage.title}.`,
-        image: selectedPackage.image,
-      };
-    }
-    return {
-      title: "Work From Himalaya",
-      description: "Work, live, and explore curated staycations in the heart of the Himalayas."
-    };
-  }, [selectedPackage]);
-
   return (
     <div className="pt-24">
-      <SEO 
-        title={currentSEO.title} 
-        description={currentSEO.description} 
-        image={currentSEO.image}
-        canonicalUrl={window.location.href}
-      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Work From Himalaya</h1>

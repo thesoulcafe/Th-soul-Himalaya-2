@@ -27,14 +27,12 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import SmoothScroll from './components/SmoothScroll';
 import { Toaster } from 'sonner';
-import { HelmetProvider } from 'react-helmet-async';
 
 export default function App() {
   return (
-    <HelmetProvider>
-      <ErrorBoundary>
-        <AuthProvider>
-          <CartProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
           <SmoothScroll />
           <Toaster position="top-center" richColors />
           <Router>
@@ -68,6 +66,5 @@ export default function App() {
         </CartProvider>
       </AuthProvider>
     </ErrorBoundary>
-    </HelmetProvider>
   );
 }

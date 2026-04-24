@@ -116,7 +116,7 @@ export const DEFAULT_TOURS = [
     category: 'Wellness',
     image: 'https://images.unsplash.com/photo-1528319725582-ddc096101511?auto=format&fit=crop&w=800&q=80',
     highlights: ['Remote Motor-free Zone', 'Sustained Silence', 'Glacier View Energy'],
-    description: 'Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla.',
+    description: 'Experience deep stillness in the high-altitude motor-free wilderness of Kutla.',
     theExperience: 'Day 1: Ascent to Kutla Glacier camp.\nDay 2-4: Structured silent meditation sessions with panoramic glacier views.\nDay 5: Integration, descent, and return.'
   },
   {
@@ -607,7 +607,7 @@ export const DEFAULT_MEDITATION = [
     focus: 'Advanced Practice',
     image: 'https://images.unsplash.com/photo-1528319725582-ddc096101511?auto=format&fit=crop&w=800&q=80',
     features: ['Remote Motor-free Kutla', 'Sustained Silence', 'Glacier View Meditation', 'Inner Exploration'],
-    description: 'Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla.',
+    description: 'Experience deep stillness in the high-altitude motor-free wilderness of Kutla.',
     theExperience: 'Day 1: Ascent to Kutla Glacier camp.\nDay 2-4: Structured silent meditation sessions with panoramic glacier views.\nDay 5: Integration, descent, and return.'
   },
   {

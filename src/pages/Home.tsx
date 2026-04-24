@@ -41,21 +41,19 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
   };
 
   return (
-    <section className="py-24 bg-cream/50 overflow-hidden relative border-y border-forest/5">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-gradient-to-r from-transparent via-forest/5 to-transparent blur-3xl pointer-events-none" />
-      
-      <div className="max-w-7xl mx-auto px-6 mb-16 text-center relative z-10">
+    <section className="py-12 bg-cream overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
         >
-          <span className="text-terracotta font-bold tracking-[0.4em] uppercase text-[10px] mb-4 block">The Essentials</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-black text-forest tracking-tighter">Explore Our <br/><span className="text-terracotta italic font-playfair font-normal">Himalayan Offerings</span></h2>
+          <h2 className="text-xl md:text-2xl font-heading font-bold text-forest mb-1">Our Himalayan Experiences</h2>
+          <p className="text-terracotta font-medium tracking-[0.2em] uppercase text-[9px]">Curated for your Soul</p>
         </motion.div>
       </div>
 
-      <div className="relative group/scroll z-10">
+      <div className="relative group/scroll">
         <button 
           onClick={() => scroll('left')}
           className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg text-forest opacity-0 group-hover/scroll:opacity-100 transition-all hover:bg-white active:scale-90 hidden md:block"
@@ -78,57 +76,104 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
               <div key={i} className="w-full md:min-w-[130px] h-[120px] md:h-[140px] bg-forest/5 rounded-[1.5rem] animate-pulse shrink-0" />
             ))
           ) : (
-            services.map((service, index) => {
-              const IconComponent = getIcon(service.title);
-              const isExternal = service.link?.startsWith('http');
-              const ContentWrapper = isExternal ? 'a' : Link;
-              const wrapperProps = isExternal 
-                ? { href: service.link, target: "_blank", rel: "noopener noreferrer" } 
-                : { to: service.link || '#' };
-
-              return (
-                <motion.div
-                  key={service.id || service.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  className="w-full md:min-w-[170px] snap-center"
-                >
-                  <ContentWrapper {...(wrapperProps as any)} className="block h-full group/card">
-                    <Card className="relative overflow-hidden bg-white/40 backdrop-blur-xl hover:bg-white/80 border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_25px_60px_rgba(45,62,53,0.15)] transition-all duration-700 rounded-[2.5rem] h-[150px] md:h-[180px] flex flex-col items-center justify-center p-5 border-0 group-hover/card:-translate-y-2">
-                      <div className="absolute inset-0 bg-gradient-to-br from-forest/10 via-transparent to-terracotta/10 opacity-0 group-hover/card:opacity-100 transition-opacity duration-700" />
-                      
+            services.map((service, index) => (
+              <motion.div
+                key={service.id || service.title}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.02 }}
+              className="w-full md:min-w-[130px] snap-center"
+            >
+              {service.link?.startsWith('http') ? (
+                <a href={service.link}>
+                  <Card className={cn(
+                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
+                    index % 4 === 0 ? "bg-forest text-cream" : 
+                    index % 4 === 1 ? "bg-terracotta text-white" : 
+                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
+                    "bg-black text-white"
+                  )}>
+                    <div className={cn(
+                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
+                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
+                      "bg-gradient-to-br from-gold to-transparent"
+                    )} />
+                    
+                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
                       {profile?.role === 'admin' && (
-                          <div className="absolute top-4 right-4 z-20">
-                            <Link 
-                              to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                              className="bg-white/95 backdrop-blur shadow-sm p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300"
-                              title="Edit Service"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Edit2 className="h-3 w-3" />
-                            </Link>
-                          </div>
-                        )}
-
-                      <div className="mb-4 relative">
-                        <div className="absolute inset-0 bg-forest/20 blur-2xl opacity-0 group-hover/card:opacity-40 transition-opacity duration-700 scale-150" />
-                        <div className="bg-white/50 p-4 md:p-5 rounded-2xl group-hover/card:bg-forest group-hover/card:text-white transition-all duration-500 shadow-sm relative z-10 border border-white/20">
-                          <IconComponent className="h-6 w-6 md:h-8 md:w-8 transition-transform duration-500 group-hover/card:scale-110" />
+                        <div className="absolute top-2 right-2 z-20">
+                          <Link 
+                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
+                            title="Edit Service"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit2 className="h-2.5 w-2.5" />
+                          </Link>
                         </div>
+                      )}
+                      <div className={cn(
+                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
+                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
+                      )}>
+                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
                       </div>
                       
-                      <h3 className="text-[10px] md:text-[12px] font-heading font-black text-forest uppercase tracking-[0.15em] text-center px-2 relative z-10 leading-tight">
+                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
                         {service.title}
                       </h3>
+                    </CardContent>
+                  </Card>
+                </a>
+              ) : (
+                <Link to={service.link || '#'}>
+                  <Card className={cn(
+                    "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
+                    index % 4 === 0 ? "bg-forest text-cream" : 
+                    index % 4 === 1 ? "bg-terracotta text-white" : 
+                    index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
+                    "bg-black text-white"
+                  )}>
+                    <div className={cn(
+                      "absolute inset-0 opacity-5 group-hover/card:opacity-15 transition-opacity duration-500",
+                      index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
+                      index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
+                      "bg-gradient-to-br from-gold to-transparent"
+                    )} />
+                    
+                    <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full relative z-10 transition-transform duration-500 group-hover/card:scale-105">
+                      {profile?.role === 'admin' && (
+                        <div className="absolute top-2 right-2 z-20">
+                          <Link 
+                            to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                            className="bg-white/95 backdrop-blur shadow-lg p-1.5 rounded-full border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 group/edit"
+                            title="Edit Service"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Edit2 className="h-2.5 w-2.5" />
+                          </Link>
+                        </div>
+                      )}
+                      <div className={cn(
+                        "mb-2 p-2.5 rounded-xl transition-all duration-500",
+                        index % 4 === 2 ? "bg-forest/5" : "bg-white/10"
+                      )}>
+                        {React.createElement(getIcon(service.title), { className: "h-4 w-4 md:h-5 md:w-5" })}
+                      </div>
                       
-                      <div className="mt-3 w-0 group-hover/card:w-10 h-[3px] bg-terracotta transition-all duration-700 rounded-full" />
-                    </Card>
-                  </ContentWrapper>
-                </motion.div>
-              );
-            })
+                      <h3 className="text-[10px] md:text-[11px] leading-tight font-heading font-bold tracking-tight line-clamp-2">
+                        {service.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )}
+            </motion.div>
+          ))
         )}
         <div className="min-w-[1px] md:min-w-[1rem]" />
         </div>
@@ -307,144 +352,132 @@ export default function Home() {
       {/* Mini Services Scroll (Above Final CTA) */}
       <HorizontalServiceRow services={services} hasLoadedServices={hasLoadedServices} />
 
-      {/* Our Himalayan Experiences (Artistic Bento Design) */}
-      <section className="py-24 md:py-32 px-6 bg-cream/30 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-cream to-transparent pointer-events-none" />
-        
+      {/* Special Packages Section */}
+      <section className="py-32 px-6 bg-[#FDFCFB] relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-forest/10 to-transparent" />
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="text-center mb-20 px-4"
           >
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
-              <div className="max-w-2xl">
-                <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.5em] mb-4">Our Himalayan Experiences</p>
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-montserrat font-black text-forest leading-[0.95] tracking-tighter">
-                  Signature <br/><span className="text-terracotta italic font-playfair font-normal">Collections</span>
-                </h2>
-              </div>
-              <p className="text-forest/60 max-w-sm text-sm md:text-base font-medium leading-relaxed">
-                Handpicked journeys that blend the raw power of the mountains with deep moments of inner connection.
-              </p>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4">Curated Journeys</p>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-montserrat font-extrabold text-forest leading-[1.1] tracking-tight">Signature Collections</h2>
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-auto md:h-[1000px] lg:h-[800px]">
-            {/* Corporate Package - Artistic Tall Card */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Corporate Package */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="md:col-span-7 lg:col-span-8 group relative overflow-hidden rounded-[3rem] shadow-2xl cursor-pointer"
+              whileHover={{ y: -10 }}
+              className="group relative h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer"
             >
               <Link to="/tailor-made" className="absolute inset-0 z-30" />
-              <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest via-forest/30 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-700" />
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest via-forest/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
               <img 
-                src="https://images.unsplash.com/photo-1522158633396-880a67116743?auto=format&fit=crop&w=1600&q=80" 
+                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80" 
                 alt="Corporate Retreat"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 referrerPolicy="no-referrer"
               />
-              
-              <div className="absolute inset-0 z-20 p-8 md:p-16 flex flex-col justify-end items-start">
-                <div className="space-y-6 max-w-xl">
-                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[10px] font-bold tracking-[0.3em] uppercase">
-                    <Briefcase className="h-3 w-3" /> Professional Reset
+              <div className="absolute inset-0 z-20 p-10 md:p-16 flex flex-col justify-end">
+                <div className="mb-6 flex items-center gap-4">
+                  <div className="bg-white/10 backdrop-blur-xl w-14 h-14 rounded-2xl flex items-center justify-center border border-white/20">
+                    <Briefcase className="text-white h-6 w-6" />
                   </div>
-                  <h3 className="text-4xl md:text-6xl font-montserrat font-black text-white leading-none tracking-tighter">
-                    Corporate <br/>Spirit Retreats
-                  </h3>
-                  <p className="text-white/70 text-sm md:text-lg leading-relaxed">
-                    Transform your workplace culture amidst the silent peaks. Custom-designed for visionary teams ready to reconnect with purpose.
-                  </p>
-                  <div className="flex items-center gap-4 text-white font-bold uppercase text-[10px] tracking-[0.4em] group-hover:gap-6 transition-all duration-500">
-                    <div className="h-px w-12 bg-white/40" />
-                    Bespoke Planning
-                  </div>
+                  <span className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Professional Retreats</span>
+                </div>
+                <h3 className="text-4xl md:text-5xl font-montserrat font-extrabold text-white mb-4 leading-tight">Corporate <br />Tour Package</h3>
+                <p className="text-white/70 text-sm md:text-base mb-8 max-w-sm leading-relaxed">
+                  Elevate your team's spirit in the lap of the Himalayas. Tailor-made retreats for visionary companies looking to reset and reconnect.
+                </p>
+                <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[11px] tracking-widest">
+                  <span className="w-12 h-[1px] bg-white/30 group-hover/btn:w-20 transition-all duration-500" />
+                  Customize Your Trip
                 </div>
               </div>
             </motion.div>
 
-            {/* Couple Package - Artistic Square Card */}
+            {/* Couple Package */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="md:col-span-5 lg:col-span-4 group relative overflow-hidden rounded-[3rem] shadow-2xl cursor-pointer"
-            >
-              <Link to="/tours?category=Romantic" className="absolute inset-0 z-30" />
-              <div className="absolute inset-0 z-10 bg-gradient-to-t from-terracotta via-terracotta/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
-              <img 
-                src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80" 
-                alt="Romantic Escape"
-                className="absolute inset-0 w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 z-20 p-10 flex flex-col justify-end text-center items-center">
-                <div className="bg-white/10 backdrop-blur-xl p-4 rounded-full border border-white/20 mb-6 scale-75 group-hover:scale-100 transition-transform duration-700">
-                  <Heart className="text-white h-6 w-6" />
-                </div>
-                <h3 className="text-3xl md:text-4xl font-montserrat font-black text-white mb-4 uppercase tracking-tighter">Romantic <br/>Sanctuary</h3>
-                <p className="text-white/80 text-xs md:text-sm tracking-widest uppercase mb-8">Ethereal Bonds in Nature</p>
-                <button className="px-8 py-3 bg-white text-terracotta rounded-full font-bold text-[10px] tracking-widest uppercase hover:bg-terracotta hover:text-white transition-all transform group-hover:translate-y-0 translate-y-4 opacity-0 group-hover:opacity-100 duration-500">
-                  Explore Now
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Regional Spotlight - Full Width Artistic Break */}
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="md:col-span-12 relative rounded-[4rem] overflow-hidden group/spotlight bg-forest"
+              whileHover={{ y: -10 }}
+              transition={{ delay: 0.1 }}
+              className="group relative h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer"
             >
-              <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] pointer-events-none" />
-              
-              <div className="flex flex-col lg:flex-row items-stretch min-h-[500px]">
-                {/* Content Side */}
-                <div className="flex-1 p-10 md:p-20 flex flex-col justify-center relative z-10">
-                  <div className="w-16 h-px bg-terracotta mb-8" />
-                  <span className="text-terracotta font-bold tracking-[0.5em] uppercase text-[10px] mb-4">Regional Spotlight</span>
-                  <h3 className="text-5xl md:text-7xl font-montserrat font-extrabold text-cream mb-8 leading-none tracking-tighter">
-                    The Valley of <br/><span className="text-terracotta/80 italic font-playfair font-normal">Shadows & Light</span>
-                  </h3>
-                  <p className="text-cream/60 text-lg md:text-xl leading-relaxed max-w-xl font-medium mb-12">
-                    A deep dive into the Parvati Valley—a place where emerald forests meet sacred mists. Experience our new signature narrative through hidden retreats and wild rituals.
-                  </p>
-                  <Button asChild className="w-fit h-16 px-12 bg-cream text-forest hover:bg-terracotta hover:text-white rounded-full font-black text-sm tracking-[0.2em] uppercase shadow-2xl transition-all border-none">
+              <Link to="/tours?category=Romantic" className="absolute inset-0 z-30" />
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-terracotta via-terracotta/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+              <img 
+                src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80" 
+                alt="Romantic Escape"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 z-20 p-10 md:p-16 flex flex-col justify-end">
+                <div className="mb-6 flex items-center gap-4">
+                  <div className="bg-white/10 backdrop-blur-xl w-14 h-14 rounded-2xl flex items-center justify-center border border-white/20">
+                    <Heart className="text-white h-6 w-6" />
+                  </div>
+                  <span className="text-white/60 font-bold uppercase tracking-widest text-[10px]">Soulful Connections</span>
+                </div>
+                <h3 className="text-4xl md:text-5xl font-montserrat font-extrabold text-white mb-4 leading-tight">Couple <br />Packages</h3>
+                <p className="text-white/70 text-sm md:text-base mb-8 max-w-sm leading-relaxed">
+                  Romantic getaways amidst pristine valleys and starlit skies. Curated experiences for timeless bonds in nature's most intimate settings.
+                </p>
+                <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[11px] tracking-widest">
+                  <span className="w-12 h-[1px] bg-white/30 group-hover/btn:w-20 transition-all duration-500" />
+                  Explore Romantic Packages
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Parvati Valley Spotlight - Glassmorphism Card Integration */}
+        <div className="max-w-7xl mx-auto mt-32 px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-16 p-8 md:p-16 rounded-[4rem] bg-forest/5 border border-forest/10 overflow-hidden relative group">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[100px] -mr-64 -mt-64" />
+            
+            <div className="flex-1 space-y-8 relative z-10 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/5 text-forest text-[10px] font-black uppercase tracking-widest">
+                <Zap className="h-4 w-4 text-terracotta" /> Regional Spotlight
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-extrabold text-forest tracking-tighter leading-[1.1]">The Valley of <br />Shadows & Light</h2>
+              <p className="text-forest/60 text-lg leading-relaxed max-w-xl font-medium">
+                Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
+              </p>
+            </div>
+
+            <div className="flex justify-center relative z-10">
+              <motion.div 
+                whileHover={{ scale: 1.05, rotate: -2 }}
+                className="w-[280px] h-[360px] md:w-[350px] md:h-[450px] relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] group/pv"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
+                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2670&auto=format&fit=crop)' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">
+                  <div>
+                    <h4 className="text-xl md:text-3xl font-heading font-bold text-white tracking-tighter">Parvati Deep Dive</h4>
+                    <p className="text-white/60 text-[9px] md:text-[10px] font-black mt-1 uppercase tracking-[0.2em]">A Spiritual Odyssey</p>
+                  </div>
+                  <Button asChild className="w-full h-10 md:h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-md shadow-xl shadow-terracotta/20 border-none transition-all">
                     <Link to="/parvati-valley">
-                      Explore the Deep Dive
+                      Explore the Valley
                     </Link>
                   </Button>
                 </div>
-
-                {/* Visual Side */}
-                <div className="w-full lg:w-2/5 relative h-[300px] lg:h-auto overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-forest to-transparent z-10 hidden lg:block" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-forest to-transparent z-10 lg:hidden" />
-                  <img 
-                    src="https://images.unsplash.com/photo-1589136140230-2766371c4c8b?auto=format&fit=crop&w=1600&q=80" 
-                    alt="Parvati Valley"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] group-hover/spotlight:scale-110"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      className="w-32 h-32 md:w-48 md:h-48 border border-white/10 rounded-full flex items-center justify-center backdrop-blur-sm"
-                    >
-                      <div className="w-24 h-24 md:w-36 md:h-36 border border-white/20 rounded-full flex items-center justify-center">
-                        <Sparkles className="text-white/40 h-8 w-8" />
-                      </div>
-                    </motion.div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

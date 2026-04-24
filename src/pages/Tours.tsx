@@ -251,38 +251,9 @@ export default function Tours() {
     });
   }, [tours, activeCategory, searchQuery, maxPrice, maxDuration]);
 
-  useEffect(() => {
-    const tourId = searchParams.get('id');
-    if (tourId && tours.length > 0) {
-      const tour = tours.find(t => t.id === tourId);
-      if (tour) setSelectedTour(tour);
-    }
-  }, [searchParams, tours]);
-
-  const currentSEO = useMemo(() => {
-    if (selectedTour) {
-      return {
-        title: selectedTour.title,
-        description: selectedTour.description || `Explore ${selectedTour.title} with The Soul Himalaya.`,
-        image: selectedTour.image,
-      };
-    }
-    return {
-      title: seo?.title || "Tour Packages",
-      description: seo?.description || "Handpicked mountain journeys.",
-      keyword: seo?.keyword
-    };
-  }, [selectedTour, seo]);
-
   return (
     <div className="pt-20 px-4 sm:px-6">
-      <SEO 
-        title={currentSEO.title} 
-        description={currentSEO.description} 
-        keywords={currentSEO.keyword}
-        image={currentSEO.image}
-        canonicalUrl={window.location.href}
-      />
+      {seo && <SEO title={seo.title || "Tour Packages"} description={seo.description || "Handpicked mountain journeys."} keywords={seo.keyword} />}
       
       {/* Search & Filter Header (Sticky) */}
       <div className="top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
