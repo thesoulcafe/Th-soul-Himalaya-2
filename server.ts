@@ -369,7 +369,7 @@ async function injectMetaTags(req: express.Request, html: string) {
 
       image = pkg.image || image;
       
-      // Optimize unsplash image for share preview (1200x630)
+      // Force high-res for social preview
       if (image.includes('unsplash.com')) {
         image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
         if (!image.includes('&w=')) image += '&w=1200';
@@ -377,7 +377,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
     }
 
-    // Ensure image is absolute
+    // Use absolute URL for the image
     if (image.startsWith('/')) {
       image = `${protocol}://${host}${image}`;
     }
@@ -394,6 +394,7 @@ async function injectMetaTags(req: express.Request, html: string) {
     <meta property="og:image" content="${image}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:site_name" content="The Soul Himalaya">
 
     <!-- Twitter Meta Tags -->
