@@ -344,8 +344,11 @@ async function injectMetaTags(req: express.Request, html: string) {
       description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
                     ` Duration: ${pkg.duration || 'Flexible'}. Price: ${pkg.price || 'Contact for details'}.` + 
                     highlightsStr;
-      
-      if (description.length > 200) {
+
+      // Special case for med-1 as per user request
+      if (id === 'med-1') {
+        description = `Experience deep stillness in the high-altitude motor-free wilderness of Tosh toKutla. ${absoluteUrl}`;
+      } else if (description.length > 200) {
         description = description.substring(0, 197) + "...";
       }
 
