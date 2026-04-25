@@ -27,11 +27,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, storage } from '@/lib/firebase';
 import { 
   collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, 
   query, where, serverTimestamp, orderBy, limit, getDoc
 } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { cn } from '@/lib/utils';
 
 enum OperationType {
@@ -253,51 +254,72 @@ export default function Admin() {
     setUploadProgress(10); // Start with some progress
     
     try {
-      console.log("Uploading to server /api/upload...");
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: uploadFormData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: `Upload failed with status ${response.status}` }));
-        throw new Error(errorData.error || `Upload failed with status ${response.status}`);
+      if (!storage) {
+        throw new Error("Firebase Storage is not initialized.");
       }
 
-      const result = await response.json();
-      const downloadURL = result.url;
-      
-      console.log("File uploaded successfully:", downloadURL);
-      setUploadProgress(100);
-      
-      setFormData(prev => {
-        const updated = { ...prev };
-        if (fieldName === 'image') {
-          updated.image = downloadURL;
-        } else if (fieldName === 'tempLink') {
-          updated.tempLink = downloadURL;
-        } else if (fieldName === 'images' && typeof index === 'number') {
-          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-          currentImages[index] = downloadURL;
-          updated.images = currentImages;
-        } else if (fieldName === 'new_image') {
-          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-          updated.images = [...currentImages, downloadURL];
-        }
-        return updated;
-      });
+      // Format filename to be safe
+      const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+      const storagePath = `content/${Date.now()}_${safeName}`;
+      console.log(`Uploading to path: ${storagePath}`);
 
-      setNotification({ message: 'Media synced successfully!', type: 'success' });
-      setIsUploading(false);
-      setTimeout(() => setUploadProgress(0), 1000);
+      const storageRef = ref(storage, storagePath);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      // Listen for progress
+      const unsubscribe = uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.max(10, Math.round(progress)));
+        }, 
+        (error) => {
+          console.error("Firebase Storage Error:", error);
+          setNotification({ message: `Upload Failed: ${error.message}`, type: 'error' });
+          setIsUploading(false);
+          setUploadProgress(0);
+          unsubscribe();
+        }, 
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log("File uploaded to Storage:", downloadURL);
+            
+            setUploadProgress(100);
+            
+            setFormData(prev => {
+              const updated = { ...prev };
+              if (fieldName === 'image') {
+                updated.image = downloadURL;
+              } else if (fieldName === 'tempLink') {
+                updated.tempLink = downloadURL;
+              } else if (fieldName === 'images' && typeof index === 'number') {
+                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+                currentImages[index] = downloadURL;
+                updated.images = currentImages;
+              } else if (fieldName === 'new_image') {
+                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+                updated.images = [...currentImages, downloadURL];
+              }
+              return updated;
+            });
+
+            setNotification({ message: 'Media synced to Cloud!', type: 'success' });
+            setIsUploading(false);
+            setTimeout(() => setUploadProgress(0), 1000);
+            unsubscribe();
+          } catch (urlErr: any) {
+            console.error("Error fetching URL:", urlErr);
+            setNotification({ message: "Store succeeded but URL retrieval failed.", type: 'error' });
+            setIsUploading(false);
+            setUploadProgress(0);
+          }
+        }
+      );
     } catch (error: any) {
       console.error("UPLOAD FAILURE:", error);
       
       setNotification({ 
-        message: error.message || "Failed to upload file to server.", 
+        message: error.message || "Failed to upload file.", 
         type: 'error' 
       });
       
@@ -1283,16 +1305,18 @@ export default function Admin() {
                             />
                           </div>
                         )}
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Display Order (Lower = First)</label>
-                          <Input 
-                            type="number"
-                            value={formData.order || ''} 
-                            onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
-                            className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
-                            placeholder="e.g. 1"
-                          />
-                        </div>
+                        {activeContentTab !== 'instagram' && (
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Display Order (Lower = First)</label>
+                            <Input 
+                              type="number"
+                              value={formData.order || ''} 
+                              onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
+                              className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                              placeholder="e.g. 1"
+                            />
+                          </div>
+                        )}
                         <div className="space-y-3 md:col-span-2">
                           <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
                             {activeContentTab === 'instagram' ? 'Post Image (Required)' : 'Cover Image (URL or Upload)'}
@@ -1968,28 +1992,30 @@ export default function Admin() {
                           </div>
                         )}
 
-                        <div className="md:col-span-2 p-6 rounded-2xl bg-forest/[0.03] flex items-center justify-between">
-                          <div>
-                            <h4 className="text-sm font-bold text-forest mb-1">Service Availability</h4>
-                            <p className="text-xs text-forest/40 font-medium">Toggle whether this service is visible and bookable by guests.</p>
+                        {activeContentTab !== 'instagram' && (
+                          <div className="md:col-span-2 p-6 rounded-2xl bg-forest/[0.03] flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-bold text-forest mb-1">Service Availability</h4>
+                              <p className="text-xs text-forest/40 font-medium">Toggle whether this service is visible and bookable by guests.</p>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, isAvailable: formData.isAvailable === false ? true : false })}
+                              className={cn(
+                                "h-12 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300",
+                                formData.isAvailable !== false 
+                                  ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20" 
+                                  : "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20"
+                              )}
+                            >
+                              {formData.isAvailable !== false ? (
+                                <><Eye className="mr-2 h-4 w-4" /> Available</>
+                              ) : (
+                                <><EyeOff className="mr-2 h-4 w-4" /> Unavailable</>
+                              )}
+                            </Button>
                           </div>
-                          <Button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, isAvailable: formData.isAvailable === false ? true : false })}
-                            className={cn(
-                              "h-12 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-300",
-                              formData.isAvailable !== false 
-                                ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20" 
-                                : "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20"
-                            )}
-                          >
-                            {formData.isAvailable !== false ? (
-                              <><Eye className="mr-2 h-4 w-4" /> Available</>
-                            ) : (
-                              <><EyeOff className="mr-2 h-4 w-4" /> Unavailable</>
-                            )}
-                          </Button>
-                        </div>
+                        )}
                       </div>
                     </div>
 
