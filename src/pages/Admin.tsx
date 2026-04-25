@@ -1305,18 +1305,16 @@ export default function Admin() {
                             />
                           </div>
                         )}
-                        {activeContentTab !== 'instagram' && (
-                          <div className="space-y-3">
-                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Display Order (Lower = First)</label>
-                            <Input 
-                              type="number"
-                              value={formData.order || ''} 
-                              onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
-                              className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
-                              placeholder="e.g. 1"
-                            />
-                          </div>
-                        )}
+                        <div className="space-y-3">
+                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Display Order (Lower = First)</label>
+                          <Input 
+                            type="number"
+                            value={formData.order || ''} 
+                            onChange={(e) => setFormData({...formData, order: parseInt(e.target.value) || 0})}
+                            className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                            placeholder="e.g. 1"
+                          />
+                        </div>
                         <div className="space-y-3 md:col-span-2">
                           <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
                             {activeContentTab === 'instagram' ? 'Post Image (Required)' : 'Cover Image (URL or Upload)'}

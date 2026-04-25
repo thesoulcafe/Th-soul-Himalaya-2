@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useTransform, useInView, LayoutGroup } from 'motion/react';
 import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -182,6 +182,87 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
   );
 };
 
+const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
+  const [displayPosts, setDisplayPosts] = useState<any[]>(initialPosts);
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, { amount: 0.1 });
+
+  useEffect(() => {
+    setDisplayPosts(initialPosts);
+  }, [initialPosts]);
+
+  useEffect(() => {
+    if (!isInView || displayPosts.length < 2) return;
+
+    const interval = setInterval(() => {
+      setDisplayPosts(prev => {
+        const next = [...prev];
+        const last = next.pop();
+        if (last) next.unshift(last);
+        return next;
+      });
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isInView, displayPosts.length]);
+
+  return (
+    <div ref={containerRef} className="max-w-7xl mx-auto px-6">
+      <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+        <div>
+          <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
+          <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
+        </div>
+        <a 
+          href="https://www.instagram.com/thesoulhimalaya" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
+          )}
+        >
+          <Instagram className="h-4 w-4" />
+          Follow Us
+        </a>
+      </div>
+
+      <LayoutGroup>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {displayPosts.map((post, i) => (
+              <motion.div
+                key={post.id || post.url || i}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{
+                  layout: { duration: 0.8, ease: "easeInOut" },
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.4 }
+                }}
+                whileHover={{ y: -8 }}
+                className="group/item relative aspect-square rounded-[2rem] overflow-hidden shadow-xl"
+              >
+                <a href={post.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                  <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/0 transition-colors duration-500 z-10" />
+                  <img src={post.image || (post as any).img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30">
+                      <Instagram className="text-white h-6 w-6" />
+                    </div>
+                  </div>
+                </a>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </LayoutGroup>
+    </div>
+  );
+};
+
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [seo, setSeo] = useState<any>(null);
@@ -198,13 +279,13 @@ export default function Home() {
         setPosts(snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data().data
-        })));
+        })).sort((a, b) => (a.order || 0) - (b.order || 0)));
       } else {
         setPosts([
-          { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
-          { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
-          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
-          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
+          { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80', order: 1 },
+          { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80', order: 2 },
+          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80', order: 3 },
+          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80', order: 4 }
         ]);
       }
     });
@@ -555,59 +636,7 @@ export default function Home() {
 
       {/* Instagram Section */}
       <section id="follow-our-journey" className="py-24 bg-cream overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
-                <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-10 w-10 text-forest hover:bg-forest/5"
-                onClick={() => {
-                  setPosts(prev => [...prev.slice(1), prev[0]]);
-                }}
-              >
-                <Zap className="h-5 w-5" />
-              </Button>
-            </div>
-            <a 
-              href="https://www.instagram.com/thesoulhimalaya" 
-
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
-              )}
-            >
-              <Instagram className="h-4 w-4" />
-              Follow Us
-            </a>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {posts.map((post, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ y: -8 }}
-                className="group/item relative aspect-square rounded-[2rem] overflow-hidden shadow-xl"
-              >
-                <a href={post.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                  <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/0 transition-colors duration-500 z-10" />
-                  <img src={post.image || (post as any).img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 z-20">
-                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30">
-                      <Instagram className="text-white h-6 w-6" />
-                    </div>
-                  </div>
-                </a>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        <InstagramSection posts={posts} />
       </section>
     </div>
   );
