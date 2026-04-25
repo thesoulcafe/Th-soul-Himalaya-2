@@ -58,7 +58,7 @@ const PARVATI_DATA = {
       history: "The site where Kartikeya, the god of war and son of Shiva, is said to have meditated. The milky-white waters of the hot springs remain a site of ritual purification for spiritual seekers.",
       vibe: "#SpiritualPeak",
       icon: <Droplets className="h-5 w-5" />,
-      image: "https://images.unsplash.com/photo-1623492701902-47dc207df5dc?q=80&w=2000&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=1530&auto=format&fit=crop"
     }
   ],
   materialCulture: {
