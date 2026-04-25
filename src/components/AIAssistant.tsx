@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
-import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind, Star, Clock, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind, Star, Clock, CheckCircle2, ShoppingBag, Edit2, Zap, Heart } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { cn } from '@/lib/utils';
@@ -36,7 +36,7 @@ export default function AIAssistant() {
 
   // Manual chat state management for client-side Gemini
   const [messages, setMessages] = useActivityState<any[]>('soul_guide_messages', [
-    { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide. How can I help you plan your spiritual or adventurous retreat today?' }
+    { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide, here to assist you with customer care. How can I help you with your bookings, orders, or policies today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -152,16 +152,16 @@ export default function AIAssistant() {
   const safeInput = (input || '').toString();
 
   const ALL_STARTER_QUESTIONS = [
-    { text: "Find a peaceful yoga retreat", icon: Flower2 },
-    { text: "Top hidden spots in Kasol", icon: Map },
-    { text: "Best time for Kheerganga trek", icon: Compass },
-    { text: "Curate a 3-day itinerary", icon: Calendar },
-    { text: "Spiritual cafes in Malana", icon: Flower2 },
-    { text: "Luxury stays in Tosh", icon: HomeIcon },
-    { text: "Guided meditation near Parvati river", icon: Wind },
-    { text: "Best sunrise points in Pulga", icon: Map },
-    { text: "Beginner friendly treks in Himachal", icon: Compass },
-    { text: "Weather update for Manikaran", icon: Wind }
+    { text: "Track my macrame order", icon: ShoppingBag },
+    { text: "Cancellation & Refund policy", icon: CheckCircle2 },
+    { text: "How to book a customized trip?", icon: Edit2 },
+    { text: "Contact customer support", icon: MessageSquare },
+    { text: "Check my booking status", icon: Clock },
+    { text: "Payment options for tours", icon: Star },
+    { text: "Shipping time for products", icon: Wind },
+    { text: "Group discount query", icon: User },
+    { text: "Report a technical issue", icon: Zap },
+    { text: "Talk to a human friend", icon: Heart }
   ];
 
   const [currentStarters, setCurrentStarters] = useState(ALL_STARTER_QUESTIONS.slice(0, 4));
@@ -259,7 +259,7 @@ export default function AIAssistant() {
             if (nextOpen) {
               // Reset chat when opening for a fresh experience
               setMessages([
-                { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide. How can I help you plan your spiritual or adventurous retreat today?' }
+                { id: 'welcome', role: 'assistant', content: 'Namaste! I am your Soul Guide, here to assist you with customer care. How can I help you with your bookings, orders, or policies today?' }
               ]);
               setShowStarters(true);
               setSuggestedQuestions([]);
@@ -317,7 +317,7 @@ export default function AIAssistant() {
                   </motion.div>
                   <div>
                     <h3 className="font-heading font-bold text-lg">Soul Guide</h3>
-                    <p className="text-[10px] text-white/50 uppercase tracking-widest font-black">2026 Generative Engine</p>
+                    <p className="text-[10px] text-white/50 uppercase tracking-widest font-black">Customer Care Support</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 relative z-10">
