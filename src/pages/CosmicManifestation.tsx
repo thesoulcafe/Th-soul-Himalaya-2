@@ -8,7 +8,7 @@ const COSMIC_SECTIONS = [
     id: "mantalai",
     title: "Parvati Mata Janma Bhoomi",
     subtitle: "The Source of the Divine River",
-    image: "https://images.unsplash.com/photo-1652501834567-937de29c4533?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://i.postimg.cc/63Qg07Xh/IMG-8098.jpg",
     paragraphs: [
       "While much of the valley is sacred, Mantalai Lake, situated at approximately 4,100 meters, holds a unique position as the source of the Parvati River and the legendary birthplace of the Goddess herself. Known as the Parvati Janma Bhoomi, Mantalai is a secluded glacial lake that serves as a site of pilgrimage for the most devout seekers.",
       "Local folklore suggests that the area surrounding the lake served as the homa kund (sacrificial fire pit) for the divine wedding of Shiva and Parvati. A small, ancient temple dedicated to Shiva as Aparneswar stands near the lake, containing idols of Parvati as a young girl (Kanya) alongside the divine couple and Lord Ganesha.",
@@ -21,7 +21,7 @@ const COSMIC_SECTIONS = [
     id: "manikaran",
     title: "God Shiva meditate 3000 Year in valley",
     subtitle: "The Boiling Waters of Legend",
-    image: "https://images.unsplash.com/photo-1626621341517-bbf3d626b1f7?q=80&w=2000&auto=format&fit=crop",
+    image: "https://i.postimg.cc/bJtyTF8k/IMG-8099.jpg",
     paragraphs: [
       "Manikaran, located on the right bank of the roaring Parvati River, is perhaps the most significant pilgrimage site in the region.",
       "For Hindus, the origin of the hot springs is tied to the Mani (jewel) legend. It is said that while Shiva and Parvati were residing in the valley, the Goddess lost a precious stone in the river. When Shiva’s attendants failed to find it, he opened his third eye in a rage that threatened to destroy the universe. To appease him, the serpent god Sheshnag hissed, causing boiling water to gush from the earth, bringing with it thousands of jewels. This pacified the deity and created the healing springs that define the town today.",
@@ -34,7 +34,7 @@ const COSMIC_SECTIONS = [
     id: "kheerganga",
     title: "God Kartikey Meditation Spot",
     subtitle: "The Milky River of Knowledge",
-    image: "https://images.unsplash.com/photo-1623492701902-47dc207df5dc?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     paragraphs: [
       "Kheerganga, located at the end of a popular 13-kilometer trek from Barshaini, is a site of deep mythological significance. The name, which translates to \"the Ganges of Rice Pudding,\" refers to the legend of Kartikeya, the son of Shiva and Parvati, who chose this serene meadow for his long meditation.",
       "It is believed that Goddess Parvati, out of maternal love, created a stream of kheer (rice pudding) to sustain him. While the river is said to have turned into water in the current age of Kali Yuga, the greyish-white, milky appearance of the water persists, and the hot springs at the summit remain a primary draw for pilgrims.",
