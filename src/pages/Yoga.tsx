@@ -680,9 +680,7 @@ export default function Yoga() {
                           dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
                         });
                         setSelectedPackage(null);
-                        toast.success("Added to Cart", {
-                           description: `${selectedPackage.title} has been added to your soul cart.`
-                        });
+                        navigate('/checkout');
                       }}
                       disabled={
                         selectedPackage.isAvailable === false || 

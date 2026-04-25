@@ -720,9 +720,7 @@ export default function Trekks() {
                               dateRange: formatDateRange(selectedDate, selectedTrekk.duration, slot)
                             });
                             setSelectedTrekk(null);
-                            toast.success("Added to Cart", {
-                               description: `${selectedTrekk.title} has been added to your soul cart.`
-                            });
+                            navigate('/checkout');
                           }}
                           disabled={
                             selectedTrekk.isAvailable === false || 
@@ -782,6 +780,7 @@ export default function Trekks() {
               dateRange: formatDateRange(selectedDate, activeSlotTrekk.duration, slot)
             });
             setActiveSlotTrekk(null);
+            navigate('/checkout');
           }}
           onCustomize={() => navigate('/contact')}
           title={activeSlotTrekk.title}

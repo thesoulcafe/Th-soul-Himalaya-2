@@ -680,9 +680,7 @@ export default function Adventure() {
                               dateRange: formatDateRange(selectedDate, activeSlotActivity.duration, slot)
                             });
                             setActiveSlotActivity(null);
-                            toast.success("Added to Cart", {
-                               description: `${activeSlotActivity.title} has been added to your soul cart.`
-                            });
+                            navigate('/checkout');
                           }}
                           disabled={
                             activeSlotActivity.isAvailable === false || 

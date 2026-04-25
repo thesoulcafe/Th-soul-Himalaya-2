@@ -108,86 +108,98 @@ const ParvatiValley = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 selection:bg-terracotta/20 font-sans overflow-x-hidden pt-24">
-      {/* 1. Cosmic Ardhnarishwar */}
-      <section className="px-6 max-w-4xl mx-auto mb-16 relative">
-        <Link to="/cosmic-manifestation" className="block relative group/cosmic cursor-pointer overflow-visible">
+      {/* 1. Cosmic Ardhnarishwar Card - Enhanced Visuals */}
+      <section className="px-6 max-w-5xl mx-auto mb-20 relative">
+        <Link to="/cosmic-manifestation" className="block relative group/cosmic cursor-pointer">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            whileHover={{ y: -4 }}
-            className="relative rounded-[2.5rem] min-h-[380px] flex items-center justify-center overflow-hidden bg-[#0a0502] shadow-[0_20px_60px_rgba(0,0,0,0.3)] border border-white/5"
+            className="relative rounded-[3rem] min-h-[450px] flex items-center justify-center overflow-hidden bg-[#0c0603] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
           >
-            {/* Immersive Atmospheric Background */}
-            <div className="absolute inset-0 overflow-hidden">
+            {/* Split Background Effect (Shiva/Shakti) */}
+            <div className="absolute inset-0 flex">
+              <div className="w-1/2 h-full bg-[#0a1a2f]" /> {/* Shiva Side */}
+              <div className="w-1/2 h-full bg-[#2d0a1a]" /> {/* Shakti Side */}
+            </div>
+
+            {/* Immersive Background Images with Mix Blend */}
+            <div className="absolute inset-0">
               <div 
-                className="absolute inset-0 opacity-40 mix-blend-screen transition-transform duration-[4s] group-hover/cosmic:scale-110"
+                className="absolute inset-0 opacity-40 mix-blend-overlay transition-transform duration-[6s] group-hover/cosmic:scale-110"
                 style={{
-                  backgroundImage: `url('https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg')`,
+                  backgroundImage: `url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop')`, // Cosmic/Texture
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
               />
-              {/* Layered Cosmic Glows */}
+              
+              {/* Shiva Facet */}
               <motion.div 
-                animate={{ 
-                  scale: [1, 1.15, 1],
-                  opacity: [0.3, 0.45, 0.3]
-                }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-terracotta/30 rounded-full blur-[80px] mix-blend-soft-light" 
+                animate={{ opacity: [0.3, 0.5, 0.3] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#4A7FA5]/20 to-transparent pointer-events-none" 
               />
+              
+              {/* Shakti Facet */}
               <motion.div 
-                animate={{ 
-                  scale: [1.15, 1, 1.15],
-                  opacity: [0.2, 0.35, 0.2]
-                }}
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#4A7FA5]/20 rounded-full blur-[100px] mix-blend-screen" 
+                animate={{ opacity: [0.3, 0.5, 0.3] }}
+                transition={{ duration: 4, repeat: Infinity, delay: 2 }}
+                className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-terracotta/20 to-transparent pointer-events-none" 
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/80" />
+
+              <div className="absolute inset-0 bg-black/40" />
             </div>
 
-            {/* Glass Container for Content */}
-            <div className="relative z-10 w-full px-6 py-10 backdrop-blur-sm">
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="space-y-6"
-              >
-                {/* Divine Symbol */}
-                <div className="flex justify-center">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-terracotta blur-xl opacity-20 animate-pulse" />
-                    <div className="relative h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl flex text-terracotta shadow-2xl">
-                      <Mountain className="h-6 w-6 stroke-[1.5]" />
-                    </div>
-                  </div>
-                </div>
+            {/* Centered Divine Motif */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="relative h-64 w-64 md:h-96 md:w-96 rounded-full border border-white/5 bg-white/[0.02] flex items-center justify-center animate-[spin_20s_linear_infinite]">
+                 {/* Visual energy rings */}
+                 <div className="absolute inset-4 rounded-full border border-terracotta/10" />
+                 <div className="absolute inset-8 rounded-full border border-[#4A7FA5]/10" />
+              </div>
+            </div>
 
-                <div className="space-y-2 text-center">
-                  <span className="text-terracotta/80 text-[8px] font-black uppercase tracking-[0.4em] block mb-1">A Spiritual Odyssey</span>
-                  <h2 className="font-playfair text-4xl md:text-5xl lg:text-6xl text-white tracking-tighter leading-none" style={{ textShadow: '0 6px 20px rgba(0,0,0,0.5)' }}>
+            {/* Glass Content Plate */}
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-8 md:p-16">
+              <div className="max-w-3xl w-full space-y-8 text-center backdrop-blur-md bg-black/20 p-8 md:p-12 rounded-[2.5rem] border border-white/10 shadow-2xl">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8 }}
+                  className="space-y-4"
+                >
+                  <div className="flex justify-center gap-4 mb-2">
+                    <div className="h-px w-8 bg-white/20 self-center" />
+                    <span className="text-terracotta text-[10px] font-black uppercase tracking-[0.5em] drop-shadow-sm">Divine Union</span>
+                    <div className="h-px w-8 bg-white/20 self-center" />
+                  </div>
+
+                  <h2 className="font-playfair text-5xl md:text-7xl lg:text-8xl text-white font-black italic tracking-tighter drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                     Ardhnarishwar
                   </h2>
-                </div>
-                
-                <div className="max-w-2xl mx-auto">
-                  <p className="font-playfair italic text-base md:text-lg leading-relaxed text-white/90 text-center px-4" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)', fontWeight: 400 }}>
-                    "The Parvati Valley is inextricably linked to the cosmic relationship between Lord Shiva, the supreme ascetic and destroyer, and Goddess Parvati."
-                  </p>
-                </div>
-                
-                <div className="flex justify-center pt-2">
-                  <Button variant="ghost" className="h-auto py-2.5 px-6 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 group-hover/cosmic:border-terracotta/50 transition-all duration-500">
-                    <span className="text-terracotta text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3">
-                      Delve Deeper
-                      <ArrowRight className="h-3.5 w-3.5 group-hover/cosmic:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
-                </div>
-              </motion.div>
+
+                  <div className="flex items-center justify-center gap-2 text-white/40 uppercase tracking-[0.2em] text-[8px] font-bold">
+                    <span>Masculline</span>
+                    <div className="h-1 w-1 rounded-full bg-terracotta" />
+                    <span>Feminine</span>
+                  </div>
+                </motion.div>
+
+                <p className="font-playfair italic text-lg md:text-xl text-white/80 leading-relaxed max-w-2xl mx-auto">
+                  "Where the silent meditation of Shiva meets the vibrant dance of Parvati—discover the eternal balance in the shadows of the cedars."
+                </p>
+
+                <motion.div whileHover={{ scale: 1.05 }} className="inline-block">
+                  <div className="relative px-8 py-4 rounded-full bg-white text-forest font-black uppercase tracking-[0.25em] text-[10px] flex items-center gap-4 group/btn overflow-hidden transition-all shadow-[0_15px_40px_rgba(0,0,0,0.3)]">
+                    <span className="relative z-10">Experience the Cosmic</span>
+                    <ArrowRight className="relative z-10 h-4 w-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
+                    <div className="absolute inset-0 bg-terracotta scale-x-0 group-hover/btn:scale-x-100 origin-left transition-transform duration-500" />
+                    <span className="absolute inset-0 bg-terracotta opacity-0 group-hover/btn:opacity-100" />
+                    <span className="relative z-10 group-hover/btn:text-white transition-colors duration-300" />
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
         </Link>

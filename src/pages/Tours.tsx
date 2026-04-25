@@ -945,9 +945,7 @@ export default function Tours() {
                           dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
                         });
                         setSelectedTour(null);
-                        toast.success("Added to Cart", {
-                           description: `${selectedTour.title} has been added to your soul cart.`
-                        });
+                        navigate('/checkout');
                       }}
                       disabled={
                         selectedTour.isAvailable === false || 
@@ -990,6 +988,7 @@ export default function Tours() {
               dateRange: formatDateRange(selectedDate, activeSlotTour.duration, slot)
             });
             setActiveSlotTour(null);
+            navigate('/checkout');
           }}
           onCustomize={() => document.getElementById('customize-trip')?.scrollIntoView({ behavior: 'smooth' })}
           title={activeSlotTour.title}

@@ -675,9 +675,7 @@ export default function Meditation() {
                           dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
                         });
                         setSelectedPackage(null);
-                        toast.success("Added to Cart", {
-                           description: `${selectedPackage.title} has been added to your soul cart.`
-                        });
+                        navigate('/checkout');
                       }}
                       disabled={
                         selectedPackage.isAvailable === false || 
@@ -737,6 +735,7 @@ export default function Meditation() {
               dateRange: formatDateRange(selectedDate, activeSlotPackage.duration, slot)
             });
             setActiveSlotPackage(null);
+            navigate('/checkout');
           }}
           onCustomize={() => navigate('/contact')}
           title={activeSlotPackage.title}

@@ -152,16 +152,13 @@ export default function Navbar() {
             <CartCountBadge />
           </Link>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger
-              nativeButton={true}
-              render={
-                <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-9 w-9 sm:h-10 sm:w-10 p-0")}>
-                  <motion.div whileTap={{ scale: 0.9 }} className="flex items-center justify-center">
-                    <Menu className="h-7 w-7 sm:h-8 sm:w-8" />
-                  </motion.div>
-                </button>
-              }
-            />
+            <SheetTrigger asChild>
+              <button className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "text-white hover:bg-white/10 h-9 w-9 sm:h-10 sm:w-10 p-0")}>
+                <motion.div whileTap={{ scale: 0.9 }} className="flex items-center justify-center">
+                  <Menu className="h-7 w-7 sm:h-8 sm:w-8" />
+                </motion.div>
+              </button>
+            </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-forest border-white/10 text-cream p-0">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="p-6 pt-20 h-full flex flex-col">
