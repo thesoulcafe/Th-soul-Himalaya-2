@@ -468,7 +468,10 @@ export default function Tours() {
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3 }}
                   >
-                  <Card className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0">
+                  <Card 
+                    onClick={() => setSelectedTour(tour)}
+                    className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0 cursor-pointer"
+                  >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <ImageSlider 
                         images={((tour.title || '').toLowerCase().includes('valley of shadows') 
@@ -477,7 +480,10 @@ export default function Tours() {
                         alt={tour.title}
                         className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
                       />
-                      <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                      <div 
+                        className="absolute top-4 left-4 flex flex-col gap-2 z-10"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <Badge className="bg-white/90 backdrop-blur-md text-forest border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
                           {tour.focus || 'Best Seller'}
                         </Badge>
@@ -496,6 +502,7 @@ export default function Tours() {
                             to={tour.id ? `/admin?tab=content&type=${tour.originalType || 'tour'}&edit=${tour.id}` : `/admin?tab=content&type=${tour.originalType || 'tour'}`}
                             className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
                             title={tour.id ? `Edit ${tour.originalType || 'Tour'}` : "Sync defaults to edit"}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                           </Link>
@@ -552,7 +559,10 @@ export default function Tours() {
                         {tour.slots && tour.slots.length > 0 && (
                           <div className="mb-4">
                             <button 
-                              onClick={() => setActiveSlotTour(tour)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveSlotTour(tour);
+                              }}
                               className="w-full bg-forest/[0.03] border border-forest/5 rounded-xl p-3 text-[10px] text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
                             >
                               <div className="flex items-center gap-2">
@@ -575,12 +585,15 @@ export default function Tours() {
                         <Button 
                           variant="ghost" 
                           className="text-forest hover:text-terracotta p-0 font-bold text-xs"
-                          onClick={() => setSelectedTour(tour)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTour(tour);
+                          }}
                         >
                           Details
                         </Button>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
                           {(() => {
                             const slotIndex = selectedSlots[tour.id];
                             const baseId = tour.originalType && tour.originalType !== 'tour' 
@@ -654,7 +667,10 @@ export default function Tours() {
 
                                   {quantity === 0 ? (
                                     <Button 
-                                      onClick={handleBookAction}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleBookAction();
+                                      }}
                                       disabled={tour.isAvailable === false}
                                       className={cn(
                                         "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
@@ -666,7 +682,7 @@ export default function Tours() {
                                       {tour.isAvailable === false ? 'Unavailable' : 'Book Now'}
                                     </Button>
                                   ) : (
-                                    <Link to="/checkout" className="flex-grow">
+                                    <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
                                       <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2">
                                         <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
                                       </Button>
@@ -729,12 +745,14 @@ export default function Tours() {
 
             {/* Immersive Visuals - Now part of the scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img 
-                src={(selectedTour.title || '').toLowerCase().includes('valley of shadows') 
-                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
-                  : selectedTour.image} 
-                alt={selectedTour.title} 
-                className="w-full h-full object-cover scale-100" 
+              <ImageSlider 
+                images={((selectedTour.title || '').toLowerCase().includes('valley of shadows') 
+                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  : [selectedTour.image, ...(selectedTour.images || [])]).filter(Boolean)} 
+                alt={selectedTour.title}
+                className="h-full w-full"
+                autoSwipe={true}
+                interval={4000}
               />
               
               {/* Decorative Overlays */}

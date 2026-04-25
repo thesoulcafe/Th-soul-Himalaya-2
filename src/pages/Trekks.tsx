@@ -199,7 +199,10 @@ export default function Trekks() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl">
+                <Card 
+                  onClick={() => setSelectedTrekk(trekk)}
+                  className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                >
                   {/* Left Side: Image */}
                   <div className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden">
                     <ImageSlider 
@@ -209,7 +212,10 @@ export default function Trekks() {
                       alt={trekk.title}
                       className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
                     />
-                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                    <div 
+                      className="absolute top-4 left-4 flex flex-col gap-2 z-10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Badge className={`${trekk.color} border-none px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-widest`}>
                         {trekk.difficulty}
                       </Badge>
@@ -228,6 +234,7 @@ export default function Trekks() {
                         to={trekk.id ? `/admin?tab=content&type=trekk&edit=${trekk.id}` : `/admin?tab=content&type=trekk`}
                         className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
                         title={trekk.id ? "Edit Trekk" : "Sync defaults to edit"}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                       </Link>
@@ -289,7 +296,7 @@ export default function Trekks() {
 
                       {/* Slot Selection */}
                       {trekk.slots && trekk.slots.length > 0 && (
-                        <div className="mb-8">
+                        <div className="mb-8" onClick={(e) => e.stopPropagation()}>
                           <button 
                             onClick={() => setActiveSlotTrekk(trekk)}
                             className="w-full bg-forest/[0.03] border border-forest/5 rounded-2xl p-4 text-xs text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
@@ -314,12 +321,15 @@ export default function Trekks() {
                       <Button 
                         variant="ghost" 
                         className="text-forest hover:text-terracotta p-0 font-bold text-sm uppercase tracking-widest"
-                        onClick={() => setSelectedTrekk(trekk)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTrekk(trekk);
+                        }}
                       >
                         Details
                       </Button>
 
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
                         {(() => {
                           const slotIndex = selectedSlots[trekk.id];
                           const baseId = `trekk-${trekk.title.toLowerCase().replace(/\s+/g, '-')}`;
@@ -389,7 +399,10 @@ export default function Trekks() {
 
                                 {quantity === 0 ? (
                                   <Button 
-                                    onClick={handleBookAction}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleBookAction();
+                                    }}
                                     disabled={trekk.isAvailable === false}
                                     className={cn(
                                       "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
@@ -401,7 +414,7 @@ export default function Trekks() {
                                     {trekk.isAvailable === false ? 'Season Ended' : 'Join Trekk'}
                                   </Button>
                                 ) : (
-                                  <Link to="/checkout" className="flex-grow">
+                                  <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
                                     <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-forest hover:bg-forest/90 text-white shadow-lg shadow-forest/20 flex items-center justify-center gap-2">
                                       <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
                                     </Button>
@@ -484,12 +497,14 @@ export default function Trekks() {
 
             {/* Immersive Visuals - Now part of the scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img 
-                src={(selectedTrekk.title || '').toLowerCase().includes('valley of shadows') 
-                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
-                  : selectedTrekk.image} 
-                alt={selectedTrekk.title} 
-                className="w-full h-full object-cover scale-100" 
+              <ImageSlider 
+                images={((selectedTrekk.title || '').toLowerCase().includes('valley of shadows') 
+                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  : [selectedTrekk.image, ...(selectedTrekk.images || [])]).filter(Boolean)} 
+                alt={selectedTrekk.title}
+                className="h-full w-full"
+                autoSwipe={true}
+                interval={4000}
               />
               
               {/* Decorative Overlays */}

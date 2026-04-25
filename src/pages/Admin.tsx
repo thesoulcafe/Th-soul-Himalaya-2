@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send
+  Share2, Send, Instagram
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -27,12 +27,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { auth, db, storage } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { 
   collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, 
   query, where, serverTimestamp, orderBy, limit, getDoc
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { cn } from '@/lib/utils';
 
 enum OperationType {
@@ -87,7 +86,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager';
-type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'page_parvati' | 'all';
+type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'page_parvati' | 'instagram' | 'all';
 
 interface ContentItem {
   id: string;
@@ -254,90 +253,53 @@ export default function Admin() {
     setUploadProgress(10); // Start with some progress
     
     try {
-      if (!storage) {
-        throw new Error("Firebase Storage is not initialized. Please check your config.");
+      console.log("Uploading to server /api/upload...");
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `Upload failed with status ${response.status}` }));
+        throw new Error(errorData.error || `Upload failed with status ${response.status}`);
       }
 
-      // Format filename to be safe for URLs
-      const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-      const storagePath = `content/${Date.now()}_${safeName}`;
-      console.log(`Uploading to path: ${storagePath}`);
-
-      const storageRef = ref(storage, storagePath);
+      const result = await response.json();
+      const downloadURL = result.url;
       
-      // We'll use a simpler upload task first for better compatibility
-      const uploadTask = uploadBytesResumable(storageRef, file);
-
-      // Listen for progress
-      const unsubscribe = uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(Math.max(10, Math.round(progress)));
-          console.log(`Upload Progress: ${Math.round(progress)}%`);
-        }, 
-        (error) => {
-          console.error("Firebase Storage Progress Error:", error);
-          setNotification({ 
-            message: `Upload Failed: ${error.message}`, 
-            type: 'error' 
-          });
-          setIsUploading(false);
-          setUploadProgress(0);
-          unsubscribe();
-        }, 
-        async () => {
-          // Success!
-          try {
-            console.log("Upload task completed successfully. Fetching download URL...");
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            console.log("Download URL retrieved:", downloadURL);
-            
-            setUploadProgress(100);
-            
-            setFormData(prev => {
-              const updated = { ...prev };
-              if (fieldName === 'image') {
-                updated.image = downloadURL;
-              } else if (fieldName === 'images' && typeof index === 'number') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                currentImages[index] = downloadURL;
-                updated.images = currentImages;
-              } else if (fieldName === 'new_image') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                updated.images = [...currentImages, downloadURL];
-              }
-              return updated;
-            });
-
-            setNotification({ message: 'Cloud storage link synced successfully!', type: 'success' });
-            setIsUploading(false);
-            setTimeout(() => setUploadProgress(0), 1000);
-            unsubscribe();
-          } catch (urlErr: any) {
-            console.error("Critical error fetching download URL:", urlErr);
-            setNotification({ message: "Store succeeded but URL retrieval failed.", type: 'error' });
-            setIsUploading(false);
-            setUploadProgress(0);
-          }
+      console.log("File uploaded successfully:", downloadURL);
+      setUploadProgress(100);
+      
+      setFormData(prev => {
+        const updated = { ...prev };
+        if (fieldName === 'image') {
+          updated.image = downloadURL;
+        } else if (fieldName === 'tempLink') {
+          updated.tempLink = downloadURL;
+        } else if (fieldName === 'images' && typeof index === 'number') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          currentImages[index] = downloadURL;
+          updated.images = currentImages;
+        } else if (fieldName === 'new_image') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          updated.images = [...currentImages, downloadURL];
         }
-      );
+        return updated;
+      });
 
+      setNotification({ message: 'Media synced successfully!', type: 'success' });
+      setIsUploading(false);
+      setTimeout(() => setUploadProgress(0), 1000);
     } catch (error: any) {
-      console.error("CRITICAL UPLOAD FAILURE:", error);
+      console.error("UPLOAD FAILURE:", error);
       
-      // Specifically handle the "Unexpected token '<'" signature of HTML-in-JSON
-      if (error?.message?.includes?.("Unexpected token '<'")) {
-        console.error("DETECTION: Server returned HTML. Check AWS Amplify or Nginx redirection rules.");
-        setNotification({ 
-          message: "Server Configuration Error: The system returned an invalid response. Please try a smaller file or a different browser.", 
-          type: 'error' 
-        });
-      } else {
-        setNotification({ 
-          message: error.message || "Failed to connect to Cloud Storage.", 
-          type: 'error' 
-        });
-      }
+      setNotification({ 
+        message: error.message || "Failed to upload file to server.", 
+        type: 'error' 
+      });
       
       setIsUploading(false);
       setUploadProgress(0);
@@ -747,6 +709,12 @@ export default function Admin() {
             { type: 'adventure', data: DEFAULT_ADVENTURE },
             { type: 'wfh', data: DEFAULT_WFH },
             { type: 'service', data: DEFAULT_SERVICES },
+            { type: 'instagram', data: [
+              { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80', title: 'Mountain Expedition' },
+              { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80', title: 'Valley Life' },
+              { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80', title: 'Soul Himalayan Peaks' },
+              { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80', title: 'Starry Nights' }
+            ]},
             { type: 'config', data: [{
               title: 'Customize your trip',
               description: "Tell us your preferences and we'll craft the perfect Himalayan experience for you.",
@@ -1136,6 +1104,79 @@ export default function Admin() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-10"
               >
+                {/* Media Center / Image Uploader Overlay - New Section */}
+                <Card className="border border-forest/10 shadow-xl rounded-[2.5rem] bg-white overflow-hidden mb-12">
+                  <CardHeader className="p-10 border-b border-forest/5 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-2xl font-heading font-bold text-forest">Media Center</CardTitle>
+                      <CardDescription className="text-forest/40 text-sm font-medium">Upload images to Cloud & get direct links for your content.</CardDescription>
+                    </div>
+                    <Upload className="h-8 w-8 text-terracotta/20" />
+                  </CardHeader>
+                  <CardContent className="p-10">
+                    <div className="flex flex-col md:flex-row gap-8 items-center bg-forest/[0.02] p-8 rounded-[2rem] border border-forest/5 border-dashed">
+                      <div className="flex-grow space-y-4 w-full">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Sparkles className="h-5 w-5 text-terracotta" />
+                          <h4 className="font-bold text-forest uppercase tracking-widest text-xs">Direct Link Generator</h4>
+                        </div>
+                        <p className="text-xs text-forest/60">Upload any image here to generate a permanent soul-himalaya cloud link. You can use these links in the gallery or description fields below.</p>
+                        
+                        <div className="flex gap-3">
+                          <Input 
+                            value={formData.tempLink || ''} 
+                            readOnly
+                            placeholder="Your generated link will appear here..."
+                            className="h-14 rounded-2xl bg-white border-forest/10 focus:ring-2 focus:ring-terracotta/20 font-mono text-xs"
+                          />
+                          {formData.tempLink && (
+                            <Button 
+                              variant="outline"
+                              onClick={() => {
+                                navigator.clipboard.writeText(formData.tempLink);
+                                setNotification({ message: 'Link copied to clipboard!', type: 'success' });
+                              }}
+                              className="h-14 px-6 rounded-2xl border-forest/10 text-forest font-bold hover:bg-forest hover:text-white"
+                            >
+                              <Share2 className="h-4 w-4 mr-2" /> Copy
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
+                        <input
+                          id="media-center-upload"
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => {
+                            // Temporary handle for media center
+                            handleFileUpload(e, 'tempLink');
+                          }}
+                        />
+                        <Button 
+                          onClick={() => document.getElementById('media-center-upload')?.click()}
+                          disabled={isUploading}
+                          className="h-24 w-64 rounded-[2rem] bg-forest text-white hover:bg-forest/90 font-bold text-lg shadow-2xl shadow-forest/20 flex flex-col items-center justify-center gap-2 group transition-all"
+                        >
+                          {isUploading ? (
+                            <>
+                              <RefreshCw className="h-6 w-6 animate-spin mb-1" />
+                              <span className="text-xs uppercase tracking-widest text-white/60">Syncing {uploadProgress}%</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-6 w-6 group-hover:-translate-y-1 transition-transform" />
+                              <span>Upload to Cloud</span>
+                              <span className="text-[10px] uppercase tracking-widest text-white/40">JPEG, PNG, WEBP</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8">
               <div className="flex flex-wrap gap-2">
                 {[
@@ -1147,6 +1188,7 @@ export default function Admin() {
                   { id: 'meditation', label: 'Meditation', icon: Star, color: 'text-purple-500', bg: 'bg-purple-500/10' },
                   { id: 'adventure', label: 'Adventure', icon: Zap, color: 'text-orange-500', bg: 'bg-orange-500/10' },
                   { id: 'wfh', label: 'WFH', icon: Laptop, color: 'text-slate-500', bg: 'bg-slate-500/10' },
+                  { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', bg: 'bg-pink-500/10' },
                   { id: 'itinerary', label: 'Itineraries', icon: Clock, color: 'text-emerald-600', bg: 'bg-emerald-600/10' },
                   { id: 'config', label: 'Config', icon: Settings, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                   { id: 'page_parvati', label: 'Parvati Page', icon: Sparkles, color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10' },
@@ -1212,31 +1254,35 @@ export default function Admin() {
                     <div className="flex-grow overflow-y-auto p-10 custom-scrollbar">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Common Fields */}
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
-                            {activeContentTab === 'shop_item' ? 'Item Name' : 'Title'}
-                          </label>
-                          <Input 
-                            value={formData.title || formData.name || ''} 
-                            onChange={(e) => setFormData({
-                              ...formData, 
-                              [activeContentTab === 'shop_item' ? 'name' : 'title']: e.target.value
-                            })}
-                            className="h-12 rounded-xl bg-forest/[0.03] border-forest/5 focus:ring-2 focus:ring-terracotta/20 font-medium text-sm"
-                            placeholder="e.g. Mystical Parvati Expedition"
-                            required
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Price / Cost</label>
-                          <Input 
-                            value={formData.price || ''} 
-                            onChange={(e) => setFormData({...formData, price: e.target.value})}
-                            className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
-                            placeholder="e.g. ₹14,999"
-                            required={activeContentTab !== 'service' && activeContentTab !== 'page_parvati'}
-                          />
-                        </div>
+                        {activeContentTab !== 'instagram' && (
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
+                              {activeContentTab === 'shop_item' ? 'Item Name' : 'Title'}
+                            </label>
+                            <Input 
+                              value={formData.title || formData.name || ''} 
+                              onChange={(e) => setFormData({
+                                ...formData, 
+                                [activeContentTab === 'shop_item' ? 'name' : 'title']: e.target.value
+                              })}
+                              className="h-12 rounded-xl bg-forest/[0.03] border-forest/5 focus:ring-2 focus:ring-terracotta/20 font-medium text-sm"
+                              placeholder="e.g. Mystical Parvati Expedition"
+                              required
+                            />
+                          </div>
+                        )}
+                        {activeContentTab !== 'instagram' && activeContentTab !== 'page_parvati' && (
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Price / Cost</label>
+                            <Input 
+                              value={formData.price || ''} 
+                              onChange={(e) => setFormData({...formData, price: e.target.value})}
+                              className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                              placeholder="e.g. ₹14,999"
+                              required={activeContentTab !== 'service' && activeContentTab !== 'page_parvati'}
+                            />
+                          </div>
+                        )}
                         <div className="space-y-3">
                           <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Display Order (Lower = First)</label>
                           <Input 
@@ -1248,7 +1294,9 @@ export default function Admin() {
                           />
                         </div>
                         <div className="space-y-3 md:col-span-2">
-                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Cover Image (URL or Upload)</label>
+                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
+                            {activeContentTab === 'instagram' ? 'Post Image (Required)' : 'Cover Image (URL or Upload)'}
+                          </label>
                           <div className="flex gap-4 items-start">
                             {formData.image && (
                               <div className="relative group shrink-0">
@@ -1269,7 +1317,7 @@ export default function Admin() {
                                 value={formData.image || ''} 
                                 onChange={(e) => setFormData({...formData, image: e.target.value})}
                                 className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium flex-grow"
-                                placeholder="Paste image link here..."
+                                placeholder={activeContentTab === 'instagram' ? "Paste direct image link or upload below..." : "Paste image link here..."}
                                 required={activeContentTab !== 'service' && activeContentTab !== 'config'}
                               />
                               <input
@@ -1303,110 +1351,112 @@ export default function Admin() {
                             </div>
                           </div>
                         </div>
-                        <div className="space-y-3 md:col-span-2">
-                          <div className="flex items-center justify-between">
-                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Additional Gallery</label>
-                            <div className="flex gap-2">
-                              <Button 
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newImages = [...(formData.images || []), ''];
-                                  setFormData({ ...formData, images: newImages });
-                                }}
-                                className="h-8 rounded-full border-forest/10 text-forest hover:bg-forest/5 px-4"
-                              >
-                                <Plus className="h-3 w-3 mr-2" /> Add Link
-                              </Button>
-                              <input
-                                ref={galleryInputRef}
-                                type="file"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={(e) => handleFileUpload(e, 'new_image')}
-                              />
-                              <Button 
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => galleryInputRef.current?.click()}
-                                disabled={isUploading}
-                                className="h-8 rounded-full border border-forest/10 text-forest hover:bg-forest/5 px-4 flex items-center text-[11px] font-bold gap-2 relative overflow-hidden"
-                              >
-                                {isUploading ? (
-                                  <>
-                                    <div 
-                                      className="absolute inset-0 bg-forest/10" 
-                                      style={{ width: `${uploadProgress}%` }}
-                                    />
-                                    <span className="relative z-10">{uploadProgress}%</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Upload className="h-3 w-3" />
-                                    Upload
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="space-y-3">
-                            {(Array.isArray(formData.images) ? formData.images : []).map((img: string, index: number) => (
-                              <div key={index} className="flex gap-2 items-start">
-                                {img && (
-                                  <div className="h-14 w-14 rounded-2xl overflow-hidden border border-forest/10 shrink-0 shadow-sm">
-                                    <img src={img} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                                  </div>
-                                )}
-                                <div className="flex-grow flex gap-2">
-                                  <Input 
-                                    value={img} 
-                                    onChange={(e) => {
-                                      const currentImages = Array.isArray(formData.images) ? [...formData.images] : [];
-                                      currentImages[index] = e.target.value;
-                                      setFormData({ ...formData, images: currentImages });
-                                    }}
-                                    className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium flex-grow"
-                                    placeholder={`Gallery URL ${index + 1}`}
-                                  />
-                                  <label htmlFor={`gallery-item-${index}`} className="shrink-0 cursor-pointer">
-                                    <input
-                                      id={`gallery-item-${index}`}
-                                      type="file"
-                                      className="hidden"
-                                      accept="image/*"
-                                      onChange={(e) => handleFileUpload(e, 'images', index)}
-                                    />
-                                    <div className="h-14 w-14 rounded-2xl bg-forest/[0.02] flex items-center justify-center text-forest/30 hover:bg-forest/10 transition-colors relative overflow-hidden">
-                                      {isUploading ? (
-                                        <span className="text-[9px] font-mono font-bold">{uploadProgress}%</span>
-                                      ) : (
-                                        <Upload className="h-4 w-4" />
-                                      )}
-                                    </div>
-                                  </label>
-                                </div>
+                        {activeContentTab !== 'instagram' && (
+                          <div className="space-y-3 md:col-span-2">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Additional Gallery</label>
+                              <div className="flex gap-2">
                                 <Button 
                                   type="button"
-                                  variant="ghost"
-                                  size="icon"
+                                  variant="outline"
+                                  size="sm"
                                   onClick={() => {
-                                    const currentImages = Array.isArray(formData.images) ? [...formData.images] : [];
-                                    const newImages = currentImages.filter((_: any, i: number) => i !== index);
+                                    const newImages = [...(formData.images || []), ''];
                                     setFormData({ ...formData, images: newImages });
                                   }}
-                                  className="h-14 w-14 rounded-2xl text-forest/20 hover:text-destructive hover:bg-destructive/5"
+                                  className="h-8 rounded-full border-forest/10 text-forest hover:bg-forest/5 px-4"
                                 >
-                                  <Trash2 className="h-5 w-5" />
+                                  <Plus className="h-3 w-3 mr-2" /> Add Link
+                                </Button>
+                                <input
+                                  ref={galleryInputRef}
+                                  type="file"
+                                  className="hidden"
+                                  accept="image/*"
+                                  onChange={(e) => handleFileUpload(e, 'new_image')}
+                                />
+                                <Button 
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => galleryInputRef.current?.click()}
+                                  disabled={isUploading}
+                                  className="h-8 rounded-full border border-forest/10 text-forest hover:bg-forest/5 px-4 flex items-center text-[11px] font-bold gap-2 relative overflow-hidden"
+                                >
+                                  {isUploading ? (
+                                    <>
+                                      <div 
+                                        className="absolute inset-0 bg-forest/10" 
+                                        style={{ width: `${uploadProgress}%` }}
+                                      />
+                                      <span className="relative z-10">{uploadProgress}%</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="h-3 w-3" />
+                                      Upload
+                                    </>
+                                  )}
                                 </Button>
                               </div>
-                            ))}
-                            {(!formData.images || !Array.isArray(formData.images) || formData.images.length === 0) && (
-                              <p className="text-[10px] text-forest/30 font-medium italic ml-1">No additional images added.</p>
-                            )}
+                            </div>
+                            <div className="space-y-3">
+                              {(Array.isArray(formData.images) ? formData.images : []).map((img: string, index: number) => (
+                                <div key={index} className="flex gap-2 items-start">
+                                  {img && (
+                                    <div className="h-14 w-14 rounded-2xl overflow-hidden border border-forest/10 shrink-0 shadow-sm">
+                                      <img src={img} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    </div>
+                                  )}
+                                  <div className="flex-grow flex gap-2">
+                                    <Input 
+                                      value={img} 
+                                      onChange={(e) => {
+                                        const currentImages = Array.isArray(formData.images) ? [...formData.images] : [];
+                                        currentImages[index] = e.target.value;
+                                        setFormData({ ...formData, images: currentImages });
+                                      }}
+                                      className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium flex-grow"
+                                      placeholder={`Gallery URL ${index + 1}`}
+                                    />
+                                    <label htmlFor={`gallery-item-${index}`} className="shrink-0 cursor-pointer">
+                                      <input
+                                        id={`gallery-item-${index}`}
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileUpload(e, 'images', index)}
+                                      />
+                                      <div className="h-14 w-14 rounded-2xl bg-forest/[0.02] flex items-center justify-center text-forest/30 hover:bg-forest/10 transition-colors relative overflow-hidden">
+                                        {isUploading ? (
+                                          <span className="text-[9px] font-mono font-bold">{uploadProgress}%</span>
+                                        ) : (
+                                          <Upload className="h-4 w-4" />
+                                        )}
+                                      </div>
+                                    </label>
+                                  </div>
+                                  <Button 
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      const currentImages = Array.isArray(formData.images) ? [...formData.images] : [];
+                                      const newImages = currentImages.filter((_: any, i: number) => i !== index);
+                                      setFormData({ ...formData, images: newImages });
+                                    }}
+                                    className="h-14 w-14 rounded-2xl text-forest/20 hover:text-destructive hover:bg-destructive/5"
+                                  >
+                                    <Trash2 className="h-5 w-5" />
+                                  </Button>
+                                </div>
+                              ))}
+                              {(!formData.images || !Array.isArray(formData.images) || formData.images.length === 0) && (
+                                <p className="text-[10px] text-forest/30 font-medium italic ml-1">No additional images added.</p>
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* Type Specific Fields */}
                         {activeContentTab === 'page_parvati' && (
@@ -1507,6 +1557,33 @@ export default function Admin() {
                           </div>
                         )}
 
+                        {activeContentTab === 'instagram' && (
+                          <div className="md:col-span-2 space-y-6">
+                            <h4 className="font-bold text-forest border-b border-forest/10 pb-2">Instagram Post Details</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Instagram Link (Post URL)</label>
+                                <Input 
+                                  value={formData.url || ''} 
+                                  onChange={(e) => setFormData({...formData, url: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="https://www.instagram.com/p/..."
+                                />
+                              </div>
+                              <div className="space-y-3">
+                                <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Visual Caption (Internal)</label>
+                                <Input 
+                                  value={formData.title || ''} 
+                                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                  className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                  placeholder="e.g. Sunset at Tosh"
+                                />
+                              </div>
+                            </div>
+                            <p className="text-xs text-forest/40 italic">Note: Please provide a valid Image URL or Upload an image for this post. Direct Instagram image embeds are often blocked, so a local copy is best.</p>
+                          </div>
+                        )}
+                        
                         {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'service' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure' || activeContentTab === 'wfh') && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Duration</label>

@@ -229,7 +229,10 @@ export default function Yoga() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="overflow-hidden border-none shadow-xl rounded-[2.5rem] bg-white h-full flex flex-col group">
+                <Card 
+                  onClick={() => setSelectedPackage(pkg)}
+                  className="overflow-hidden border-none shadow-xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer"
+                >
                   <div className="relative h-64 overflow-hidden">
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
@@ -251,6 +254,7 @@ export default function Yoga() {
                         to={pkg.id ? `/admin?tab=content&type=yoga&edit=${pkg.id}` : `/admin?tab=content&type=yoga`}
                         className="absolute top-6 right-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit"
                         title={pkg.id ? "Edit Package" : "Sync defaults to edit"}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                       </Link>
@@ -270,7 +274,7 @@ export default function Yoga() {
                     >
                       <Share2 className="h-4 w-4 text-forest group-hover/share:text-terracotta transition-colors" />
                     </button>
-                    <div className="absolute bottom-6 left-6">
+                    <div className="absolute bottom-6 left-6" onClick={(e) => e.stopPropagation()}>
                       <span className="bg-white/90 text-forest px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                         {pkg.focus}
                       </span>
@@ -284,7 +288,7 @@ export default function Yoga() {
                           4.9 (150 reviews)
                         </div>
                         <div className="text-terracotta font-bold text-2xl">{pkg.price}</div>
-                        <h3 className="text-2xl font-heading font-bold text-forest leading-tight">{pkg.title}</h3>
+                        <h3 className="text-2xl font-heading font-bold text-forest leading-tight group-hover:text-terracotta transition-colors">{pkg.title}</h3>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm font-bold text-forest/40 mb-6 uppercase tracking-wider">
@@ -304,7 +308,7 @@ export default function Yoga() {
 
                     {/* Slot Selection */}
                     {pkg.slots && pkg.slots.length > 0 && (
-                      <div className="mb-6 p-4 rounded-2xl bg-forest/[0.03] border border-forest/5">
+                      <div className="mb-6 p-4 rounded-2xl bg-forest/[0.03] border border-forest/5" onClick={(e) => e.stopPropagation()}>
                         <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2 block">Available Slots</label>
                         <button 
                           onClick={() => setActiveSlotPackage(pkg)}
@@ -329,12 +333,15 @@ export default function Yoga() {
                       <Button 
                         variant="link" 
                         className="text-forest hover:text-terracotta p-0 font-bold"
-                        onClick={() => setSelectedPackage(pkg)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPackage(pkg);
+                        }}
                       >
                         View Details
                       </Button>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
                       {(() => {
                         const slotIndex = selectedSlots[pkg.id];
                         const baseId = `yoga-${pkg.title.toLowerCase().replace(/\s+/g, '-')}`;
@@ -404,7 +411,10 @@ export default function Yoga() {
 
                               {quantity === 0 ? (
                                 <Button 
-                                  onClick={handleBookAction}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBookAction();
+                                  }}
                                   disabled={pkg.isAvailable === false}
                                   className={cn(
                                     "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
@@ -416,7 +426,7 @@ export default function Yoga() {
                                   {pkg.isAvailable === false ? 'Unavailable' : 'Book Now'}
                                 </Button>
                               ) : (
-                                <Link to="/checkout" className="flex-grow">
+                                <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
                                   <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2">
                                     <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
                                   </Button>
@@ -473,12 +483,14 @@ export default function Yoga() {
 
             {/* Immersive Img - Now part of scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img 
-                src={(selectedPackage.title || "").toLowerCase().includes("valley of shadows") 
-                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
-                  : selectedPackage.image} 
-                alt={selectedPackage.title} 
-                className="w-full h-full object-cover scale-100" 
+              <ImageSlider 
+                images={((selectedPackage.title || "").toLowerCase().includes("valley of shadows") 
+                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
+                alt={selectedPackage.title}
+                className="h-full w-full"
+                autoSwipe={true}
+                interval={4000}
               />
               
               {/* Decorative Overlays */}

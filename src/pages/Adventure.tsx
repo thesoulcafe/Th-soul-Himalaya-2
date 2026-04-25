@@ -177,7 +177,10 @@ export default function Adventure() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <Card className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group">
+                <Card 
+                  onClick={() => setActiveSlotActivity(activity)}
+                  className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer"
+                >
                     <div className="relative h-80 overflow-hidden">
                       <ImageSlider 
                         images={((activity.title || '').toLowerCase().includes('valley of shadows') 
@@ -186,7 +189,10 @@ export default function Adventure() {
                         alt={activity.title}
                         className="h-full w-full"
                       />
-                      <div className="absolute top-6 left-6 bg-white/90 p-3 rounded-2xl shadow-lg flex items-center gap-3 z-10">
+                      <div 
+                        className="absolute top-6 left-6 bg-white/90 p-3 rounded-2xl shadow-lg flex items-center gap-3 z-10"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {React.createElement(getIcon(activity.title), { className: "h-6 w-6 text-terracotta" })}
                         {activity.isAvailable === false && (
                           <Badge className="bg-rose-500 text-white border-none px-3 py-1 text-[10px] font-bold rounded-full">
@@ -206,6 +212,7 @@ export default function Adventure() {
                           to={activity.id ? `/admin?tab=content&type=adventure&edit=${activity.id}` : `/admin?tab=content&type=adventure`}
                           className="absolute top-6 right-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
                           title={activity.id ? "Edit Activity" : "Sync defaults to edit"}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                         </Link>
@@ -234,7 +241,7 @@ export default function Adventure() {
                           4.7 (85 reviews)
                         </div>
                         <div className="text-terracotta font-bold text-2xl">{activity.price}</div>
-                        <h3 className="text-2xl font-heading font-bold text-forest leading-tight">{activity.title}</h3>
+                        <h3 className="text-2xl font-heading font-bold text-forest leading-tight group-hover:text-terracotta transition-colors">{activity.title}</h3>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm font-bold text-forest/40 mb-6 uppercase tracking-wider">
@@ -253,7 +260,7 @@ export default function Adventure() {
                     </div>
 
                     {activity.slots && activity.slots.length > 0 && (
-                      <div className="mb-8 space-y-3">
+                      <div className="mb-8 space-y-3" onClick={(e) => e.stopPropagation()}>
                         <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Select Available Slot</label>
                         <button 
                           onClick={() => setActiveSlotActivity(activity)}
@@ -290,12 +297,15 @@ export default function Adventure() {
                         <Button 
                           variant="link" 
                           className="text-forest/60 hover:text-terracotta p-0 font-bold h-auto w-fit text-xs"
-                          onClick={() => setActiveSlotActivity(activity)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveSlotActivity(activity);
+                          }}
                         >
                           View Details
                         </Button>
                       </div>
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
                         {(() => {
                           const slotIndex = selectedSlots[activity.id];
                           const baseId = `adventure-${activity.title.toLowerCase().replace(/\s+/g, '-')}`;
@@ -365,7 +375,10 @@ export default function Adventure() {
 
                                 {quantity === 0 ? (
                                   <Button 
-                                    onClick={handleBookAction}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleBookAction();
+                                    }}
                                     disabled={activity.isAvailable === false}
                                     className={cn(
                                       "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
@@ -377,7 +390,7 @@ export default function Adventure() {
                                     {activity.isAvailable === false ? 'Unavailable' : 'Add to Cart'}
                                   </Button>
                                 ) : (
-                                  <Link to="/checkout" className="flex-grow">
+                                  <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
                                     <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-forest hover:bg-forest/90 text-white shadow-lg shadow-forest/20 flex items-center justify-center gap-2">
                                       <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
                                     </Button>
@@ -476,12 +489,14 @@ export default function Adventure() {
 
             {/* Immersive Img - Now part of scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img 
-                src={(activeSlotActivity.title || '').toLowerCase().includes('valley of shadows') 
-                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
-                  : activeSlotActivity.image} 
-                alt={activeSlotActivity.title} 
-                className="w-full h-full object-cover scale-100" 
+              <ImageSlider 
+                images={((activeSlotActivity.title || '').toLowerCase().includes('valley of shadows') 
+                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  : [activeSlotActivity.image, ...(activeSlotActivity.images || [])]).filter(Boolean)} 
+                alt={activeSlotActivity.title}
+                className="h-full w-full"
+                autoSwipe={true}
+                interval={4000}
               />
               
               {/* Decorative Overlays */}

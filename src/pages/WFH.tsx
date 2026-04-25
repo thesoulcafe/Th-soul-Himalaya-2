@@ -184,9 +184,12 @@ export default function WFH() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className={`relative h-full border-none shadow-xl rounded-[2.5rem] overflow-hidden ${pkg.popular ? 'bg-forest text-white ring-4 ring-terracotta/20' : 'bg-white text-forest'}`}>
+                <Card 
+                  onClick={() => setSelectedPackage(pkg)}
+                  className={`relative h-full border-none shadow-xl rounded-[2.5rem] overflow-hidden cursor-pointer group ${pkg.popular ? 'bg-forest text-white ring-4 ring-terracotta/20' : 'bg-white text-forest'}`}
+                >
                   {pkg.popular && (
-                    <div className="absolute top-6 right-6">
+                    <div className="absolute top-6 right-6 z-10">
                       <Badge className="bg-terracotta text-white border-none px-4 py-1">Most Popular</Badge>
                     </div>
                   )}
@@ -202,6 +205,7 @@ export default function WFH() {
                       to={pkg.id ? `/admin?tab=content&type=wfh&edit=${pkg.id}` : `/admin?tab=content&type=wfh`}
                       className="absolute top-6 left-6 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-colors group/edit z-10"
                       title={pkg.id ? "Edit Package" : "Sync defaults to edit"}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <Edit2 className="h-4 w-4 text-forest group-hover/edit:text-terracotta transition-colors" />
                     </Link>
@@ -238,7 +242,7 @@ export default function WFH() {
                           4.9 (45 reviews)
                         </div>
                         <div className="text-terracotta font-bold text-2xl">{pkg.price}</div>
-                        <h3 className="text-2xl font-heading font-bold leading-tight">{pkg.title}</h3>
+                        <h3 className="text-2xl font-heading font-bold leading-tight group-hover:text-terracotta transition-colors">{pkg.title}</h3>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm font-bold opacity-40 mb-6 uppercase tracking-wider">
@@ -258,7 +262,10 @@ export default function WFH() {
 
                     {/* Slot Selection */}
                     {pkg.slots && pkg.slots.length > 0 && (
-                      <div className={`mb-6 p-4 rounded-2xl border ${pkg.popular ? 'bg-white/5 border-white/10' : 'bg-forest/[0.03] border-forest/5'}`}>
+                      <div 
+                        className={`mb-6 p-4 rounded-2xl border ${pkg.popular ? 'bg-white/5 border-white/10' : 'bg-forest/[0.03] border-forest/5'}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <label className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${pkg.popular ? 'text-white/40' : 'text-forest/40'}`}>Available Slots</label>
                         <button 
                           onClick={() => setActiveSlotPackage(pkg)}
@@ -286,12 +293,17 @@ export default function WFH() {
                       <Button 
                         variant="link" 
                         className={`${pkg.popular ? 'text-white/80 hover:text-white' : 'text-forest/60 hover:text-terracotta'} p-0 font-bold`}
-                        onClick={() => setSelectedPackage(pkg)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPackage(pkg);
+                        }}
                       >
                         View Details
                       </Button>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                    ...
+
                       {(() => {
                         const slotIndex = selectedSlots[pkg.id];
                         const baseId = `wfh-${pkg.title.toLowerCase().replace(/\s+/g, '-')}`;
@@ -399,12 +411,14 @@ export default function WFH() {
 
             {/* Left Side: Immersive Img */}
             <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
-              <img 
-                src={(selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
-                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
-                  : selectedPackage.image} 
-                alt={selectedPackage.title} 
-                className="w-full h-full object-cover scale-105 transition-transform duration-700 hover:scale-110" 
+              <ImageSlider 
+                images={((selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
+                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
+                alt={selectedPackage.title}
+                className="h-full w-full"
+                autoSwipe={true}
+                interval={4000}
               />
               
               {/* Decorative Overlays */}

@@ -185,16 +185,32 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [seo, setSeo] = useState<any>(null);
-  const [posts, setPosts] = useState([
-    { url: 'https://www.instagram.com/p/DBititYyy66/', img: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
-    { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', img: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
-    { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
-    { url: 'https://www.instagram.com/thesoulhimalaya', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
-  ]);
+  const [posts, setPosts] = useState<any[]>([]);
   const { user } = useAuth();
   const [services, setServices] = useState<any[]>([]);
   const [hasLoadedServices, setHasLoadedServices] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'content'), where('type', '==', 'instagram'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        setPosts(snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data().data
+        })));
+      } else {
+        setPosts([
+          { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80' },
+          { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80' },
+          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' },
+          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80' }
+        ]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
@@ -581,7 +597,7 @@ export default function Home() {
               >
                 <a href={post.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
                   <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/0 transition-colors duration-500 z-10" />
-                  <img src={post.img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
+                  <img src={post.image || (post as any).img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 z-20">
                     <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30">
                       <Instagram className="text-white h-6 w-6" />

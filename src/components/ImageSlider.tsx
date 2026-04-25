@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,20 +16,33 @@ export default function ImageSlider({
   alt, 
   className, 
   autoSwipe = true, 
-  interval = 2500 
+  interval = 3000 
 }: ImageSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { margin: "0px 0px -50px 0px" });
 
   useEffect(() => {
-    if (!autoSwipe || images.length <= 1 || isPaused) return;
+    if (!autoSwipe || images.length <= 1 || isPaused || !isInView) return;
 
-    const timer = setInterval(() => {
+    // Desynchronize by adding a random delay before the first transition
+    const desyncDelay = Math.random() * interval;
+    
+    let timer: NodeJS.Timeout;
+    
+    const timeout = setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, interval);
+      timer = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+      }, interval);
+    }, desyncDelay);
 
-    return () => clearInterval(timer);
-  }, [autoSwipe, images.length, interval, isPaused]);
+    return () => {
+      clearTimeout(timeout);
+      if (timer) clearInterval(timer);
+    };
+  }, [autoSwipe, images.length, interval, isPaused, isInView]);
 
   if (!images || images.length === 0) {
     return (
@@ -62,6 +75,7 @@ export default function ImageSlider({
 
   return (
     <div 
+      ref={containerRef}
       className={cn("relative group overflow-hidden touch-none", className)}
       onMouseDown={() => setIsPaused(true)}
       onMouseUp={() => setIsPaused(false)}
@@ -77,7 +91,7 @@ export default function ImageSlider({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
           style={{ position: 'absolute' }}
@@ -88,24 +102,24 @@ export default function ImageSlider({
 
       <button
         onClick={prev}
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0 z-10"
       >
         <ChevronLeft className="h-4 w-4 text-forest" />
       </button>
 
       <button
         onClick={next}
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 z-10"
       >
         <ChevronRight className="h-4 w-4 text-forest" />
       </button>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
         {images.map((_, i) => (
           <div
             key={i}
             className={cn(
-              "h-1.5 rounded-full transition-all duration-300",
+              "h-1.5 rounded-full transition-all duration-500",
               i === currentIndex ? "w-4 bg-white" : "w-1.5 bg-white/50"
             )}
           />
