@@ -701,6 +701,7 @@ export default function Trekks() {
                             <input
                               type="date"
                               min={new Date().toISOString().split('T')[0]}
+                              value={selectedDate}
                               onChange={(e) => setSelectedDate(e.target.value)}
                               className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                             />

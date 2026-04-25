@@ -557,7 +557,7 @@ export default function WFH() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                    {selectedPackage.slots && selectedPackage.slots.length > 0 && (
+                    {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
                       <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedPackage.id] || ''}
@@ -572,6 +572,19 @@ export default function WFH() {
                           ))}
                         </select>
                         <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                      </div>
+                    ) : (
+                      <div className="relative group w-full sm:w-auto">
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                          <Calendar className="h-4 w-4" />
+                        </div>
+                        <input
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                        />
                       </div>
                     )}
 

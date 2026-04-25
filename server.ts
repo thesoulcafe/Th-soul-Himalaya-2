@@ -229,20 +229,19 @@ async function startServer() {
       appType: "spa",
     });
     
-    // Custom middleware to inject meta tags in development
-    app.use(async (req, res, next) => {
-      // Check if it's a browser/crawler request for a page
-      const isHtml = req.headers.accept?.includes('text/html') || 
-                     !req.url.includes('.') || 
-                     req.headers['user-agent']?.includes('WhatsApp') ||
-                     req.headers['user-agent']?.includes('facebookexternalhit');
+    app.use(vite.middlewares);
 
+    // Dynamic Meta Tag Fallback for crawlers and link previews
+    app.use('*', async (req, res, next) => {
+      const url = req.originalUrl;
+      const isHtml = req.headers.accept?.includes('text/html') || !url.includes('.');
+      
       if (req.method !== 'GET' || !isHtml) {
         return next();
       }
 
+      console.log(`[Dev] Serving transformed HTML for: ${url}`);
       try {
-        const url = req.originalUrl;
         const html = await fs.promises.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
         const transformedHtml = await vite.transformIndexHtml(url, html);
         
@@ -251,11 +250,11 @@ async function startServer() {
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);
+        console.error("[Dev] HTML Transformation error:", e);
         next(e);
       }
     });
 
-    app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath, { index: false }));
@@ -266,7 +265,7 @@ async function startServer() {
         const finalHtml = await injectMetaTags(req, html);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
-        console.error("Failed to serve index.html:", e);
+        console.error("[Prod] Failed to serve index.html:", e);
         res.status(500).send("Internal Server Error");
       }
     });

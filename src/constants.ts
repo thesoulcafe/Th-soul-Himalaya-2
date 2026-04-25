@@ -8,7 +8,7 @@ export const DEFAULT_TOURS = [
     rating: 4.9,
     reviews: 156,
     category: 'Romantic',
-    image: 'https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     highlights: ['Riverside Camps in Soma Ropa', 'Chalal Nature Walk', 'Private Parvati Bank Dinner'],
     description: 'A curated escape for couples seeking intimacy by the turquoise waters of the Parvati River.',
     theExperience: 'Day 1: Arrival in Kasol, check-in to Riverside Camp at Soma Ropa. Afternoon walk to Chalal village. Candlelight dinner by the river.\nDay 2: Exploration of Manikaran hot springs and local Kasol market. Evening private bonfire session.\nDay 3: Breakfast by the river and departure with mountain memories.'
@@ -21,7 +21,7 @@ export const DEFAULT_TOURS = [
     rating: 4.8,
     reviews: 92,
     category: 'Romantic',
-    image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     highlights: ['Traditional Wooden Architecture', 'Pin Parvati Pass Views', 'Kutla Meadow Trek'],
     description: 'Venture to the very edge of the valley where the road ends and the romance begins.',
     theExperience: 'Day 1: Drive to Barshaini and hike to Tosh. Evening sunset at the last cafe.\nDay 2: Trek to the hidden meadows of Kutla. Private picnic with Tosh Glacier views.\nDay 3: Interaction with local culture in Tosh. Free time for reflection and departure.'
@@ -34,7 +34,7 @@ export const DEFAULT_TOURS = [
     rating: 4.9,
     reviews: 64,
     category: 'Romantic',
-    image: 'https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     highlights: ['Mastiff Grand Stay', 'Riverside Luxury Camps', 'Private SUV Transit'],
     description: 'The best of both worlds: the vibrant energy of Manali and the soulful calm of Parvati.',
     theExperience: 'Day 1: Arrival in Manali, stay at a boutique forest villa. Evening walk at Mall Road.\nDay 2: Day trip to Solang Valley and Rohtang Pass.\nDay 3: Transfer to Kasol in a private luxury car. Evening Riverside glamping.\nDay 4: Visit to Manikaran and local exploration.\nDay 5: Leisure breakfast and transfer to Bhuntar.'
@@ -47,7 +47,7 @@ export const DEFAULT_TOURS = [
     rating: 4.9,
     reviews: 45,
     category: 'Romantic',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     highlights: ['Apple Orchard Stay', 'Guided Forest Walks', 'Starlit Cafe Dinners'],
     description: 'Lose yourselves in the mystical "Fairy Forest" of Pulga, where time stands still.',
     theExperience: 'Day 1: Arrival and hike from Barshaini to Pulga. Settle into a traditional wood cabin.\nDay 2: Morning meditation in the Fairy Forest. Evening village exploration.\nDay 3: Photography session in the ancient deodar groves. Candlelight dinner at a hilltop cafe.\nDay 4: Farewells and descent to Barshaini.'
@@ -60,7 +60,7 @@ export const DEFAULT_TOURS = [
     rating: 4.8,
     reviews: 29,
     category: 'Romantic',
-    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     highlights: ['Tirthan Valley Transit', 'Waterfall Picnics', 'Remote Cabin Stays'],
     description: 'Explore the untouched beauty of Tirthan Valley alongside the Parvati corridor.',
     theExperience: 'Day 1: Arrival in Jibhi. Stay at a riverside treehouse.\nDay 2: Hike to Seolsar Lake through Jalori Pass.\nDay 3: Jibhi waterfall and local culture exploration.\nDay 4: Scenic drive to Kasol. Evening by the Parvati river.\nDay 5: Manikaran visit and forest walks.\nDay 6: Final mountain brunch and departure.'

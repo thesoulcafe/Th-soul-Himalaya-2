@@ -10,7 +10,21 @@ function Sheet({ ...props }: SheetPrimitive.Root.Props) {
 }
 
 function SheetTrigger({ nativeButton, ...props }: SheetPrimitive.Trigger.Props & { nativeButton?: boolean }) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...(nativeButton !== undefined ? { nativeButton } : {})} {...props} />
+  const { asChild, aschild, children, render, ...rest } = props as any
+  const isAsChild = !!(asChild || aschild)
+  const resolvedNativeButton = isAsChild ? false : nativeButton
+  const resolvedRender = isAsChild ? children : render
+
+  return (
+    <SheetPrimitive.Trigger
+      data-slot="sheet-trigger"
+      {...(resolvedNativeButton !== undefined ? { nativeButton: resolvedNativeButton } : {})}
+      {...rest}
+      render={resolvedRender}
+    >
+      {!resolvedRender && children}
+    </SheetPrimitive.Trigger>
+  )
 }
 
 function SheetClose({ ...props }: SheetPrimitive.Close.Props) {

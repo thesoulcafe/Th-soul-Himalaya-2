@@ -654,6 +654,7 @@ export default function Meditation() {
                         <input
                           type="date"
                           min={new Date().toISOString().split('T')[0]}
+                          value={selectedDate}
                           onChange={(e) => {
                             setSelectedDate(e.target.value);
                           }}

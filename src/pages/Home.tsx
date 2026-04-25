@@ -415,7 +415,7 @@ export default function Home() {
               <Link to="/tours?category=Romantic" className="absolute inset-0 z-30" />
               <div className="absolute inset-0 z-10 bg-gradient-to-t from-terracotta via-terracotta/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
               <img 
-                src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80" 
+                src="https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=1696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                 alt="Romantic Escape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 referrerPolicy="no-referrer"

@@ -27,9 +27,9 @@ const PARVATI_DATA = {
     parallaxIntensity: 0.5
   },
   narrative: {
-    title: "The Eternal Dance of Ardhanarishvara",
-    content: "In the silken mists that rise from the Parvati river, one does not merely find a waterway, but the physical manifestation of Shakti herself. The river takes its name from the consort of Lord Shiva, who is said to have meditated for three thousand years in these high glens. It is here that the concept of Ardhanarishvara—the divine union of masculine and feminine principles—becomes visceral. The hot springs of Manikaran, bubbling with primordial energy, are whispered to be the result of a divine Mani (jewel) lost by the Goddess and returned with the hiss of the underworld's heat. To walk the valley is to walk between the shadows of cedar forests and the blinding light of the Great Himalayan summits.",
-    imageDescription: "An evocative illustration of Lord Shiva and Parvati as Ardhanarishvara, one half ethereal blue (Shiva), the other vibrant orange-pink (Parvati), merging into each other against a background of snow-capped Himalayan peaks and mossy pines."
+    title: "The Eternal Dance of Shiva Shakti",
+    content: "In the silken mists that rise from the Parvati river, one does not merely find a waterway, but the physical manifestation of Shakti herself. The river takes its name from the consort of Lord Shiva, who is said to have meditated for three thousand years in these high glens. It is here that the concept of Shiva Shakti—the divine union of masculine and feminine principles—becomes visceral. The hot springs of Manikaran, bubbling with primordial energy, are whispered to be the result of a divine Mani (jewel) lost by the Goddess and returned with the hiss of the underworld's heat. To walk the valley is to walk between the shadows of cedar forests and the blinding light of the Great Himalayan summits.",
+    imageDescription: "An evocative illustration of Lord Shiva and Parvati as Shiva Shakti, one half ethereal blue (Shiva), the other vibrant orange-pink (Parvati), merging into each other against a background of snow-capped Himalayan peaks and mossy pines."
   },
   villages: [
     {
@@ -108,19 +108,33 @@ const ParvatiValley = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 selection:bg-terracotta/20 font-sans overflow-x-hidden pt-24">
-      {/* 1. Cosmic Ardhnarishwar Card - Enhanced Visuals */}
+      {/* 1. Cosmic Shiva Shakti Card - Enhanced Visuals */}
       <section className="px-6 max-w-5xl mx-auto mb-20 relative">
         <Link to="/cosmic-manifestation" className="block relative group/cosmic cursor-pointer">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-[3rem] min-h-[450px] flex items-center justify-center overflow-hidden bg-[#0c0603] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
+            className="relative rounded-[2.5rem] md:rounded-[3rem] min-h-[350px] sm:min-h-[450px] flex items-center justify-center overflow-hidden bg-[#0c0603] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
           >
             {/* Split Background Effect (Shiva/Shakti) */}
             <div className="absolute inset-0 flex">
-              <div className="w-1/2 h-full bg-[#0a1a2f]" /> {/* Shiva Side */}
-              <div className="w-1/2 h-full bg-[#2d0a1a]" /> {/* Shakti Side */}
+              <div className="w-1/2 h-full relative overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1623492701902-47dc207df5dc?auto=format&fit=crop&w=1200" 
+                  alt="Shiva side" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
+                />
+                <div className="absolute inset-0 bg-[#0a1a2f]/80" />
+              </div>
+              <div className="w-1/2 h-full relative overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1544735032-6a71fd64446b?auto=format&fit=crop&w=1200" 
+                  alt="Shakti side" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
+                />
+                <div className="absolute inset-0 bg-[#2d0a1a]/80" />
+              </div>
             </div>
 
             {/* Immersive Background Images with Mix Blend */}
@@ -175,8 +189,8 @@ const ParvatiValley = () => {
                     <div className="h-px w-8 bg-white/20 self-center" />
                   </div>
 
-                  <h2 className="font-playfair text-5xl md:text-7xl lg:text-8xl text-white font-black italic tracking-tighter drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                    Ardhnarishwar
+                  <h2 className="font-playfair text-4xl xs:text-5xl md:text-7xl lg:text-8xl text-white font-black italic tracking-tighter drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] uppercase text-wrap">
+                    Shiva Shakti
                   </h2>
 
                   <div className="flex items-center justify-center gap-2 text-white/40 uppercase tracking-[0.2em] text-[8px] font-bold">
