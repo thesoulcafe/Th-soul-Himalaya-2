@@ -298,6 +298,24 @@ async function injectMetaTags(req: express.Request, html: string) {
 
     let pkg: any = null;
 
+    // 0. Handle Path-based defaults (if no ID)
+    if (!id) {
+      if (urlStr.includes('/parvati-valley')) {
+        title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
+        description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
+        image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
+      } else if (urlStr.includes('/tours')) {
+        title = "Curated Tours | The Soul Himalaya";
+        description = "Discover our handpicked mountain journeys across the Kullu and Parvati valleys.";
+      } else if (urlStr.includes('/trekks')) {
+        title = "Mountain Trekks | High Altitude Adventures";
+        description = "From easy waterfalls to challenging glaciers, find your path in the Himalayas.";
+      } else if (urlStr.includes('/meditation')) {
+        title = "Meditation Retreats | Find Inner Peace";
+        description = "Experience deep silence and mindfulness in the remote high-altitude wilderness.";
+      }
+    }
+
     // 1. Try Firestore First (Most up to date)
     if (id) {
       try {
@@ -352,7 +370,12 @@ async function injectMetaTags(req: express.Request, html: string) {
         description = description.substring(0, 197) + "...";
       }
 
-      image = pkg.image || image;
+      // Special Case: The Valley of Shadows & Light should ALWAYS use the specific image
+      if (pkgTitle.toLowerCase().includes('valley of shadows')) {
+        image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
+      } else {
+        image = pkg.image || image;
+      }
       
       // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
       if (image.includes('unsplash.com')) {
@@ -367,6 +390,7 @@ async function injectMetaTags(req: express.Request, html: string) {
     }
 
     const metaTags = `
+    <!-- Dynamic SEO -->
     <title>${title}</title>
     <meta name="description" content="${description}">
     <link rel="canonical" href="${absoluteUrl}">
@@ -389,8 +413,12 @@ async function injectMetaTags(req: express.Request, html: string) {
     <meta name="twitter:image" content="${image}">
     `;
 
-    // Inject before </head> to override defaults if any
-    return html.replace('</head>', `${metaTags}\n</head>`);
+    // Remove existing title and description tags to prevent duplicates
+    let cleanedHtml = html.replace(/<title>.*?<\/title>/i, '');
+    cleanedHtml = cleanedHtml.replace(/<meta name="description".*?>/i, '');
+
+    // Inject before </head>
+    return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
   } catch (error) {
     console.error("Meta injection failed:", error);
     return html;

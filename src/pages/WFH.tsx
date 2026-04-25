@@ -223,7 +223,9 @@ export default function WFH() {
                   </button>
                   <div className="relative h-48 overflow-hidden">
                     <ImageSlider 
-                      images={[pkg.image, ...(pkg.images || [])].filter(Boolean)} 
+                      images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
+                        ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                        : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"
                     />
@@ -397,7 +399,13 @@ export default function WFH() {
 
             {/* Left Side: Immersive Img */}
             <div className="relative w-full lg:w-[45%] h-72 lg:h-auto shrink-0 overflow-hidden bg-forest">
-              <img src={selectedPackage.image} alt={selectedPackage.title} className="w-full h-full object-cover scale-105 transition-transform duration-700 hover:scale-110" />
+              <img 
+                src={(selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
+                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
+                  : selectedPackage.image} 
+                alt={selectedPackage.title} 
+                className="w-full h-full object-cover scale-105 transition-transform duration-700 hover:scale-110" 
+              />
               
               {/* Decorative Overlays */}
               <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/20 to-transparent" />
@@ -452,7 +460,7 @@ export default function WFH() {
                 </button>
               </div>
 
-              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14">
+              <div className="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-14" data-lenis-prevent>
                 <div className="max-w-3xl mx-auto space-y-16">
                   
                   {/* Stats Grid */}

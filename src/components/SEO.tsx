@@ -10,7 +10,9 @@ interface SEOProps {
 export const SEO = ({ title, description, keywords, canonicalUrl, image }: SEOProps & { image?: string }) => {
   const finalTitle = `${title} | Soul Himalaya`;
   const defaultImage = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
-  const finalImage = image || defaultImage;
+  const finalImage = (title || "").toLowerCase().includes("valley of shadows")
+    ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"
+    : (image || defaultImage);
 
   return (
     <Helmet>

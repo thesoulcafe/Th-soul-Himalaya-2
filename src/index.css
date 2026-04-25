@@ -165,4 +165,9 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(45, 74, 62, 0.2);
   }
+  
+  [data-lenis-prevent] {
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
 }

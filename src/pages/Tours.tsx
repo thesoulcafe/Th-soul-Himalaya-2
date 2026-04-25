@@ -471,7 +471,9 @@ export default function Tours() {
                   <Card className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <ImageSlider 
-                        images={[tour.image, ...(tour.images || [])].filter(Boolean)} 
+                        images={((tour.title || '').toLowerCase().includes('valley of shadows') 
+                          ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                          : [tour.image, ...(tour.images || [])]).filter(Boolean)} 
                         alt={tour.title}
                         className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
                       />
@@ -720,13 +722,20 @@ export default function Tours() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 40 }}
               className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
+              data-lenis-prevent
             >
             {/* Background Texture Overlay */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
 
             {/* Immersive Visuals - Now part of the scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img src={selectedTour.image} alt={selectedTour.title} className="w-full h-full object-cover scale-100" />
+              <img 
+                src={(selectedTour.title || '').toLowerCase().includes('valley of shadows') 
+                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
+                  : selectedTour.image} 
+                alt={selectedTour.title} 
+                className="w-full h-full object-cover scale-100" 
+              />
               
               {/* Decorative Overlays */}
               <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
@@ -917,7 +926,7 @@ export default function Tours() {
                         <input
                           type="date"
                           min={new Date().toISOString().split('T')[0]}
-                          onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                          onChange={(e) => setSelectedDate(e.target.value)}
                           className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] pl-14 pr-8 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         />
                       </div>

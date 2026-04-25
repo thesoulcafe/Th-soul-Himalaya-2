@@ -180,7 +180,9 @@ export default function Adventure() {
                 <Card className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group">
                     <div className="relative h-80 overflow-hidden">
                       <ImageSlider 
-                        images={[activity.image, ...(activity.images || [])].filter(Boolean)} 
+                        images={((activity.title || '').toLowerCase().includes('valley of shadows') 
+                          ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                          : [activity.image, ...(activity.images || [])]).filter(Boolean)} 
                         alt={activity.title}
                         className="h-full w-full"
                       />
@@ -467,13 +469,20 @@ export default function Adventure() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 40 }}
               className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
+              data-lenis-prevent
             >
             {/* Background Texture Overlay */}
             <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
 
             {/* Immersive Img - Now part of scroll flow */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <img src={activeSlotActivity.image} alt={activeSlotActivity.title} className="w-full h-full object-cover scale-100" />
+              <img 
+                src={(activeSlotActivity.title || '').toLowerCase().includes('valley of shadows') 
+                  ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" 
+                  : activeSlotActivity.image} 
+                alt={activeSlotActivity.title} 
+                className="w-full h-full object-cover scale-100" 
+              />
               
               {/* Decorative Overlays */}
               <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
