@@ -60,7 +60,7 @@ export default function SlotSelectionPopup({
           </motion.div>
         </div>
 
-        <div className="p-8 space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+        <div className="p-4 sm:p-8 space-y-4 max-h-[50vh] min-h-[200px] overflow-y-auto custom-scrollbar">
           {slots.map((slot, i) => {
             const isSelected = selectedSlotIndex === i.toString();
             const startDate = new Date(slot.startDate);

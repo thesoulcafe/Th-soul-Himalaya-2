@@ -300,12 +300,12 @@ export default function Home() {
               Parvati Valley & Beyond
             </motion.p>
             
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
               <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
               <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
             </h1>
 
-            <p className="text-sm md:text-base text-cream/80 mb-8 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px]">
+            <p className="text-xs xs:text-sm md:text-base text-cream/80 mb-8 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px] px-4">
               A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
             </p>
 
@@ -368,7 +368,7 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {/* Corporate Package */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}

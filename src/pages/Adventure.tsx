@@ -494,7 +494,7 @@ export default function Adventure() {
                   transition={{ delay: 0.2 }}
                 >
                   <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Wild Spirit</span>
-                  <h2 className="text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
+                  <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
                     {activeSlotActivity.title.split(' ').map((word: string, i: number) => (
                       <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
                     ))}
@@ -624,17 +624,17 @@ export default function Adventure() {
                     </section>
                   )}
                   {/* Booking Footer - Creative Style */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 md:-mx-16 p-6 md:p-10">
-                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
-                      <div className="text-center lg:text-left">
-                        <div className="font-fluid text-xl text-terracotta -mb-1">Adrenaline Pack</div>
-                        <div className="text-4xl font-playfair font-black italic text-forest leading-none">
+                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
+                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+                      <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
+                        <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Adrenaline Pack</div>
+                        <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
                           {activeSlotActivity.price}
                           <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
                         {activeSlotActivity.slots && activeSlotActivity.slots.length > 0 ? (
                           <div className="relative group w-full sm:w-auto">
                             <select 
@@ -687,7 +687,7 @@ export default function Adventure() {
                           disabled={
                             activeSlotActivity.isAvailable === false || 
                             (activeSlotActivity.slots && activeSlotActivity.slots.length > 0 
-                              ? selectedSlots[activeSlotActivity.id] === undefined 
+                              ? !selectedSlots[activeSlotActivity.id] 
                               : !selectedDate)
                           }
                           className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"

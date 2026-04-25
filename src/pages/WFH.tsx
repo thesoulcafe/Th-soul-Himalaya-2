@@ -417,7 +417,7 @@ export default function WFH() {
                   transition={{ delay: 0.2 }}
                 >
                   <span className="font-fluid text-3xl md:text-4xl text-terracotta drop-shadow-md mb-2 block">Nomad Haven</span>
-                  <h2 className="text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
+                  <h2 className="text-3xl xs:text-4xl md:text-6xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase">
                     {selectedPackage.title.split(' ').map((word: string, i: number) => (
                       <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
                     ))}
@@ -546,17 +546,17 @@ export default function WFH() {
               </div>
 
               {/* Booking Footer - Creative Style */}
-              <div className="p-6 md:p-10 border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)]">
-                <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-10">
-                  <div className="text-center lg:text-left">
-                    <div className="font-fluid text-xl text-terracotta -mb-1">Productivity Gift</div>
-                    <div className="text-4xl font-playfair font-black italic text-forest leading-none">
+              <div className="p-6 sm:p-8 md:p-10 border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)]">
+                <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+                  <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
+                    <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Productivity Gift</div>
+                    <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
                       {selectedPackage.price}
                       <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Package</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
                     {selectedPackage.slots && selectedPackage.slots.length > 0 && (
                       <div className="relative group w-full sm:w-auto">
                         <select 
@@ -597,7 +597,7 @@ export default function WFH() {
                       disabled={
                         selectedPackage.isAvailable === false || 
                         (selectedPackage.slots && selectedPackage.slots.length > 0 
-                          ? selectedSlots[selectedPackage.id] === undefined 
+                          ? !selectedSlots[selectedPackage.id] 
                           : !selectedDate)
                       }
                       className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
