@@ -31,15 +31,14 @@ import { Toaster } from 'sonner';
 
 export default function App() {
   return (
-    <HelmetProvider>
-      <ErrorBoundary>
-        <AuthProvider>
-          <CartProvider>
-            <SmoothScroll />
-            <Toaster position="top-center" richColors />
-            <Router>
-              <ScrollToTop />
-              <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <SmoothScroll />
+          <Toaster position="top-center" richColors />
+          <Router>
+            <ScrollToTop />
+            <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
                   <Route path="tours" element={<Tours />} />
@@ -68,6 +67,5 @@ export default function App() {
           </CartProvider>
         </AuthProvider>
       </ErrorBoundary>
-    </HelmetProvider>
   );
 }

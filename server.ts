@@ -282,147 +282,159 @@ async function startServer() {
 // -----------------------------------------------------------------------------
 
 async function injectMetaTags(req: express.Request, html: string) {
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error("Timeout")), 1500)
+  );
+
   try {
-    const urlStr = req.originalUrl;
-    const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
-    const id = url.searchParams.get('id');
-    
-    // Get protocol and host dynamically
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers.host || 'thesoulhimalaya.com';
-    const absoluteUrl = `${protocol}://${host}${urlStr}`;
+    const metaPromise = (async () => {
+      const urlStr = req.originalUrl;
+      const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
+      const id = url.searchParams.get('id');
+      
+      // Get protocol and host dynamically
+      const protocol = req.headers['x-forwarded-proto'] || 'https';
+      const host = req.headers.host || 'thesoulhimalaya.com';
+      const absoluteUrl = `${protocol}://${host}${urlStr}`;
 
-    let title = "Soul Himalaya - Soulful Travel in Kullu & Parvati Valley";
-    let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
-    let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
+      let title = "Soul Himalaya - Soulful Travel in Kullu & Parvati Valley";
+      let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
+      let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
-    let pkg: any = null;
+      let pkg: any = null;
 
-    // 0. Handle Path-based defaults (if no ID)
-    if (!id) {
-      if (urlStr.includes('/parvati-valley')) {
-        title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
-        description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
-        image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
-      } else if (urlStr.includes('/tours')) {
-        title = "Curated Tours | The Soul Himalaya";
-        description = "Discover our handpicked mountain journeys across the Kullu and Parvati valleys.";
-      } else if (urlStr.includes('/trekks')) {
-        title = "Mountain Trekks | High Altitude Adventures";
-        description = "From easy waterfalls to challenging glaciers, find your path in the Himalayas.";
-      } else if (urlStr.includes('/meditation')) {
-        title = "Meditation Retreats | Find Inner Peace";
-        description = "Experience deep silence and mindfulness in the remote high-altitude wilderness.";
-      }
-    }
-
-    // 1. Try Firestore First (Most up to date)
-    if (id) {
-      try {
-        const docRef = doc(db, "content", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const docData = docSnap.data();
-          pkg = { id, ...docData.data };
-          console.log(`[Meta] Found package in Firestore: ${id}`);
+      // 0. Handle Path-based defaults (if no ID)
+      if (!id) {
+        if (urlStr.includes('/parvati-valley')) {
+          title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
+          description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
+          image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
+        } else if (urlStr.includes('/tours')) {
+          title = "Curated Tours | The Soul Himalaya";
+          description = "Discover our handpicked mountain journeys across the Kullu and Parvati valleys.";
+        } else if (urlStr.includes('/trekks')) {
+          title = "Mountain Trekks | High Altitude Adventures";
+          description = "From easy waterfalls to challenging glaciers, find your path in the Himalayas.";
+        } else if (urlStr.includes('/meditation')) {
+          title = "Meditation Retreats | Find Inner Peace";
+          description = "Experience deep silence and mindfulness in the remote high-altitude wilderness.";
         }
-      } catch (e) {
-        console.error("[Meta] Firestore lookup failed:", e);
       }
-    }
 
-    // 2. Try Constants Fallback (If not in Firestore)
-    if (!pkg && id) {
-      try {
-        const constants = await import('./src/constants.ts');
-        const allPackages = [
-          ...(constants.DEFAULT_TOURS || []),
-          ...(constants.DEFAULT_TREKKS || []),
-          ...(constants.DEFAULT_YOGA || []),
-          ...(constants.DEFAULT_MEDITATION || []),
-          ...(constants.DEFAULT_ADVENTURE || []),
-          ...(constants.DEFAULT_WFH || [])
-        ];
-        pkg = allPackages.find(p => p.id === id);
-        if (pkg) console.log(`[Meta] Found package in Constants: ${id}`);
-      } catch (e) {
-        // This might fail in production if .ts files aren't pre-compiled
-        console.warn("[Meta] Could not import constants.ts, skipping local fallback.");
+      // 1. Try Firestore First (Most up to date)
+      if (id) {
+        try {
+          const docRef = doc(db, "content", id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const docData = docSnap.data();
+            pkg = { id, ...docData.data };
+            console.log(`[Meta] Found package in Firestore: ${id}`);
+          }
+        } catch (e) {
+          console.error("[Meta] Firestore lookup failed:", e);
+        }
       }
-    }
 
-    if (pkg) {
-      const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
-      title = `${pkgTitle} | Soul Himalaya`;
+      // 2. Try Constants Fallback (If not in Firestore)
+      if (!pkg && id) {
+        try {
+          const constants = await import('./src/constants.ts');
+          const allPackages = [
+            ...(constants.DEFAULT_TOURS || []),
+            ...(constants.DEFAULT_TREKKS || []),
+            ...(constants.DEFAULT_YOGA || []),
+            ...(constants.DEFAULT_MEDITATION || []),
+            ...(constants.DEFAULT_ADVENTURE || []),
+            ...(constants.DEFAULT_WFH || [])
+          ];
+          pkg = allPackages.find(p => p.id === id);
+          if (pkg) console.log(`[Meta] Found package in Constants: ${id}`);
+        } catch (e) {
+          // This might fail in production if .ts files aren't pre-compiled
+          console.warn("[Meta] Could not import constants.ts, skipping local fallback.");
+        }
+      }
+
+      if (pkg) {
+        const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
+        title = `${pkgTitle} | Soul Himalaya`;
+        
+        let highlightsStr = "";
+        if (pkg.highlights && Array.isArray(pkg.highlights)) {
+          highlightsStr = " Highlights: " + pkg.highlights.join(", ") + ".";
+        } else if (pkg.features && Array.isArray(pkg.features)) {
+          highlightsStr = " Features: " + pkg.features.join(", ") + ".";
+        }
+
+        description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
+                      ` Duration: ${pkg.duration || 'Flexible'}.` + 
+                      highlightsStr;
+        
+        if (description.length > 200) {
+          description = description.substring(0, 197) + "...";
+        }
+
+        // Special Case: The Valley of Shadows & Light should ALWAYS use the specific image
+        if (pkgTitle.toLowerCase().includes('valley of shadows')) {
+          image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
+        } else {
+          image = pkg.image || image;
+        }
+        
+        // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
+        if (image.includes('unsplash.com')) {
+          image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
+          if (!image.includes('&h=')) image += '&h=630';
+          if (!image.includes('&fit=crop')) image += '&fit=crop';
+        }
+      }
+
+      if (image.startsWith('/')) {
+        image = `${protocol}://${host}${image}`;
+      }
+
+      const metaTags = `
+      <!-- Dynamic SEO -->
+      <title>${title}</title>
+      <meta name="description" content="${description}">
+      <link rel="canonical" href="${absoluteUrl}">
       
-      let highlightsStr = "";
-      if (pkg.highlights && Array.isArray(pkg.highlights)) {
-        highlightsStr = " Highlights: " + pkg.highlights.join(", ") + ".";
-      } else if (pkg.features && Array.isArray(pkg.features)) {
-        highlightsStr = " Features: " + pkg.features.join(", ") + ".";
-      }
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="${absoluteUrl}">
+      <meta property="og:title" content="${title}">
+      <meta property="og:description" content="${description}">
+      <meta property="og:image" content="${image}">
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630">
+      <meta property="og:site_name" content="The Soul Himalaya">
 
-      description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
-                    ` Duration: ${pkg.duration || 'Flexible'}.` + 
-                    highlightsStr;
-      
-      if (description.length > 200) {
-        description = description.substring(0, 197) + "...";
-      }
+      <!-- Twitter -->
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:url" content="${absoluteUrl}">
+      <meta name="twitter:title" content="${title}">
+      <meta name="twitter:description" content="${description}">
+      <meta name="twitter:image" content="${image}">
+      `;
 
-      // Special Case: The Valley of Shadows & Light should ALWAYS use the specific image
-      if (pkgTitle.toLowerCase().includes('valley of shadows')) {
-        image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
-      } else {
-        image = pkg.image || image;
-      }
-      
-      // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
-      if (image.includes('unsplash.com')) {
-        image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
-        if (!image.includes('&h=')) image += '&h=630';
-        if (!image.includes('&fit=crop')) image += '&fit=crop';
-      }
-    }
+      // Remove existing title and description tags to prevent duplicates
+      let cleanedHtml = html.replace(/<title>.*?<\/title>/i, '');
+      cleanedHtml = cleanedHtml.replace(/<meta name="description".*?>/i, '');
 
-    if (image.startsWith('/')) {
-      image = `${protocol}://${host}${image}`;
-    }
+      // Inject before </head>
+      return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
+    })();
 
-    const metaTags = `
-    <!-- Dynamic SEO -->
-    <title>${title}</title>
-    <meta name="description" content="${description}">
-    <link rel="canonical" href="${absoluteUrl}">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="${absoluteUrl}">
-    <meta property="og:title" content="${title}">
-    <meta property="og:description" content="${description}">
-    <meta property="og:image" content="${image}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="The Soul Himalaya">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="${absoluteUrl}">
-    <meta name="twitter:title" content="${title}">
-    <meta name="twitter:description" content="${description}">
-    <meta name="twitter:image" content="${image}">
-    `;
-
-    // Remove existing title and description tags to prevent duplicates
-    let cleanedHtml = html.replace(/<title>.*?<\/title>/i, '');
-    cleanedHtml = cleanedHtml.replace(/<meta name="description".*?>/i, '');
-
-    // Inject before </head>
-    return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
+    return await Promise.race([metaPromise, timeoutPromise]) as string;
   } catch (error) {
-    console.error("Meta injection failed:", error);
+    console.error("Meta injection failed or timed out:", error);
     return html;
   }
 }
 
-startServer();
+startServer().catch(err => {
+  console.error("CRITICAL: Failed to start server:", err);
+  process.exit(1);
+});
+

@@ -27,7 +27,7 @@ export default function Trekks() {
   const [trekkList, setTrekkList] = useState<any[]>([]);
   const [seo, setSeo] = useState<any>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('2026-06-10');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedTrekk, setSelectedTrekk] = useState<any>(null);
   const [activeSlotTrekk, setActiveSlotTrekk] = useState<any>(null);
@@ -666,23 +666,23 @@ export default function Trekks() {
                     </section>
                   )}
                   {/* Booking Footer - Creative Style */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)] -mx-8 md:-mx-14 p-6 md:p-12">
-                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10">
-                      <div className="text-center md:text-left">
-                        <div className="font-fluid text-2xl text-terracotta -mb-2">Energy Exchange</div>
-                        <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 md:-mx-14 p-6 md:p-10">
+                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
+                      <div className="text-center lg:text-left">
+                        <div className="font-fluid text-xl text-terracotta -mb-1">Energy Exchange</div>
+                        <div className="text-4xl font-playfair font-black italic text-forest leading-none">
                           {selectedTrekk.price}
-                          <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Wanderer</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Wanderer</span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                         {selectedTrekk.slots && selectedTrekk.slots.length > 0 ? (
                           <div className="relative group w-full sm:w-auto">
                             <select 
                               value={selectedSlots[selectedTrekk.id] || ''}
                               onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTrekk.id]: e.target.value })}
-                              className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                             >
                               <option value="">Pick Date Slot</option>
                               {selectedTrekk.slots.map((slot: any, i: number) => (
@@ -702,7 +702,7 @@ export default function Trekks() {
                               type="date"
                               min={new Date().toISOString().split('T')[0]}
                               onChange={(e) => setSelectedDate(e.target.value)}
-                              className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] pl-14 pr-8 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                             />
                           </div>
                         )}
@@ -724,22 +724,27 @@ export default function Trekks() {
                                description: `${selectedTrekk.title} has been added to your soul cart.`
                             });
                           }}
-                          disabled={selectedTrekk.slots && selectedTrekk.slots.length > 0 && selectedSlots[selectedTrekk.id] === undefined}
-                          className="w-full sm:min-w-[240px] h-16 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-terracotta/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                          disabled={
+                            selectedTrekk.isAvailable === false || 
+                            (selectedTrekk.slots && selectedTrekk.slots.length > 0 
+                              ? selectedSlots[selectedTrekk.id] === undefined 
+                              : !selectedDate)
+                          }
+                          className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
                         >
                           <Sparkles className="h-4 w-4" />
                           Book Now
                         </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
       {/* Customize Section */}
       <section className="py-24 bg-cream/30">
         <div className="container mx-auto px-4">

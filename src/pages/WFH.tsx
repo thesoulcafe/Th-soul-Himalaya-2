@@ -21,7 +21,7 @@ export default function WFH() {
   const navigate = useNavigate();
   const [packages, setPackages] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('2026-06-10');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [activeSlotPackage, setActiveSlotPackage] = useState<any>(null);
@@ -545,24 +545,24 @@ export default function WFH() {
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="p-8 md:p-12 border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
-                  <div className="text-center md:text-left">
-                    <div className="font-fluid text-2xl text-terracotta -mb-2">Productivity Gift</div>
-                    <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+              {/* Booking Footer - Creative Style */}
+              <div className="p-6 md:p-10 border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)]">
+                <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-10">
+                  <div className="text-center lg:text-left">
+                    <div className="font-fluid text-xl text-terracotta -mb-1">Productivity Gift</div>
+                    <div className="text-4xl font-playfair font-black italic text-forest leading-none">
                       {selectedPackage.price}
-                      <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Package</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Package</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                     {selectedPackage.slots && selectedPackage.slots.length > 0 && (
                       <div className="relative group w-full sm:w-auto">
                         <select 
                           value={selectedSlots[selectedPackage.id] || ''}
                           onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
-                          className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                         >
                           <option value="">Select Season</option>
                           {selectedPackage.slots.map((slot: any, i: number) => (
@@ -590,9 +590,17 @@ export default function WFH() {
                           dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
                         });
                         setSelectedPackage(null);
+                        toast.success("Added to Cart", {
+                           description: `${selectedPackage.title} has been added to your soul cart.`
+                        });
                       }}
-                      disabled={selectedPackage.isAvailable === false || (selectedPackage.slots && selectedPackage.slots.length > 0 && selectedSlots[selectedPackage.id] === undefined)}
-                      className="w-full sm:min-w-[240px] h-16 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-forest/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4 group"
+                      disabled={
+                        selectedPackage.isAvailable === false || 
+                        (selectedPackage.slots && selectedPackage.slots.length > 0 
+                          ? selectedSlots[selectedPackage.id] === undefined 
+                          : !selectedDate)
+                      }
+                      className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-[#1a2f26] text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 group"
                     >
                       <Coffee className="h-4 w-4 transition-transform group-hover:rotate-12" />
                       Reserve Space

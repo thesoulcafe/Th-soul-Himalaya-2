@@ -40,7 +40,7 @@ export default function Adventure() {
       document.body.style.overflow = 'unset';
     };
   }, [activeSlotActivity]);
-  const selectedDate = new Date().toISOString();
+  const [selectedDate, setSelectedDate] = useState('');
 
   const handleShare = async (activity: any) => {
     const shareData = {
@@ -623,24 +623,24 @@ export default function Adventure() {
                       </div>
                     </section>
                   )}
-                  {/* Booking Footer inside scroll */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-20px_50px_rgba(0,0,0,0.02)] -mx-8 md:-mx-16 p-8 md:p-14">
-                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10">
-                      <div className="text-center md:text-left">
-                        <div className="font-fluid text-2xl text-terracotta -mb-2">Adrenaline Pack</div>
-                        <div className="text-5xl font-playfair font-black italic text-forest leading-none">
+                  {/* Booking Footer - Creative Style */}
+                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 md:-mx-16 p-6 md:p-10">
+                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
+                      <div className="text-center lg:text-left">
+                        <div className="font-fluid text-xl text-terracotta -mb-1">Adrenaline Pack</div>
+                        <div className="text-4xl font-playfair font-black italic text-forest leading-none">
                           {activeSlotActivity.price}
-                          <span className="text-xs font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                         {activeSlotActivity.slots && activeSlotActivity.slots.length > 0 ? (
                           <div className="relative group w-full sm:w-auto">
                             <select 
                               value={selectedSlots[activeSlotActivity.id] || ''}
                               onChange={(e) => setSelectedSlots({ ...selectedSlots, [activeSlotActivity.id]: e.target.value })}
-                              className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] px-8 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                             >
                               <option value="">Pick Date Slot</option>
                               {activeSlotActivity.slots.map((slot: any, i: number) => (
@@ -659,45 +659,38 @@ export default function Adventure() {
                             <input
                               type="date"
                               min={new Date().toISOString().split('T')[0]}
-                              onChange={(e) => {}}
-                              className="w-full sm:min-w-[220px] h-16 rounded-full border-forest/10 bg-forest/[0.03] pl-14 pr-8 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-xs uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                              value={selectedDate}
+                              onChange={(e) => setSelectedDate(e.target.value)}
+                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
                             />
                           </div>
                         )}
 
                         <Button 
-                          onClick={(e) => {
-                            const dateInput = (e.currentTarget.parentElement?.querySelector('input[type="date"]') as HTMLInputElement);
-                            const customDate = dateInput?.value ? new Date(dateInput.value) : new Date();
-                            
+                          onClick={() => {
                             const slotIndex = selectedSlots[activeSlotActivity.id];
                             const slot = slotIndex !== undefined ? activeSlotActivity.slots?.[parseInt(slotIndex)] : undefined;
-                            const baseId = `adventure-${activeSlotActivity.title.toLowerCase().replace(/\s+/g, '-')}`;
-                            const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
                             
-                            function formatDateRangeLocal(date: Date, duration: string, slot?: any) {
-                              if (slot) return `${new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-                              const days = parseInt(duration) || 1;
-                              const endDate = new Date(date);
-                              endDate.setDate(date.getDate() + days);
-                              return `${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - ${endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-                            }
-
                             globalAddToCart({
-                              id: currentItemId,
+                              id: `adventure-${activeSlotActivity.id}`,
                               name: activeSlotActivity.title,
                               price: activeSlotActivity.price,
                               type: 'Adventure Activity',
                               image: activeSlotActivity.image,
-                              dateRange: formatDateRangeLocal(customDate, activeSlotActivity.duration, slot)
+                              dateRange: formatDateRange(selectedDate, activeSlotActivity.duration, slot)
                             });
                             setActiveSlotActivity(null);
                             toast.success("Added to Cart", {
-                              description: `${activeSlotActivity.title} has been added to your soul cart.`
+                               description: `${activeSlotActivity.title} has been added to your soul cart.`
                             });
                           }}
-                          disabled={activeSlotActivity.isAvailable === false || (activeSlotActivity.slots && activeSlotActivity.slots.length > 0 && selectedSlots[activeSlotActivity.id] === undefined)}
-                          className="w-full sm:min-w-[240px] h-16 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-terracotta/20 transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-4"
+                          disabled={
+                            activeSlotActivity.isAvailable === false || 
+                            (activeSlotActivity.slots && activeSlotActivity.slots.length > 0 
+                              ? selectedSlots[activeSlotActivity.id] === undefined 
+                              : !selectedDate)
+                          }
+                          className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
                         >
                           <Sparkles className="h-4 w-4" />
                           Book Now
