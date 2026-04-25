@@ -453,67 +453,30 @@ export default function Home() {
               <p className="text-forest/60 text-lg leading-relaxed max-w-xl font-medium">
                 Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
               </p>
-              
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
-                <Button asChild variant="outline" className="rounded-full border-forest/20 text-forest hover:bg-forest hover:text-white">
-                  <Link to="/parvati-valley">Explore Detailed Guide</Link>
-                </Button>
-                <Button asChild className="rounded-full bg-terracotta text-white hover:bg-terracotta/90 group/btn">
-                  <Link to="/tours?category=Adventure" className="flex items-center gap-2">
-                    View Expeditions <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6 relative z-10 w-full lg:w-auto">
-              {/* Card 1: Shadows */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: -1 }}
-                className="w-full sm:w-[220px] h-[340px] relative rounded-[2.5rem] overflow-hidden border border-white/20 shadow-2xl group/card"
-              >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover/card:scale-110"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200&auto=format&fit=crop)' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
-                <div className="absolute inset-x-0 bottom-0 p-8">
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-terracotta mb-1 block">The Shadows</span>
-                  <h4 className="text-xl font-heading font-bold text-white tracking-tight">Ancient Forests</h4>
-                </div>
-              </motion.div>
-
-              {/* Card 2: Light */}
-              <motion.div 
-                whileHover={{ y: -15, rotate: 1 }}
-                className="w-full sm:w-[240px] h-[380px] relative rounded-[2.5rem] overflow-hidden border border-white/20 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] group/card z-10 mt-0 sm:-mt-8"
-              >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover/card:scale-110"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1200&auto=format&fit=crop)' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
-                <div className="absolute inset-x-0 bottom-0 p-8">
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-gold mb-1 block">The Light</span>
-                  <h4 className="text-2xl font-heading font-bold text-white tracking-tight">Sacred Peaks</h4>
-                </div>
-              </motion.div>
-
-              {/* Card 3: The River (Matching user's image vibe) */}
-              <motion.div 
-                whileHover={{ y: -10, rotate: -1 }}
-                className="w-full sm:w-[220px] h-[340px] relative rounded-[2.5rem] overflow-hidden border border-white/20 shadow-2xl group/card"
-              >
-                <div 
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover/card:scale-110"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1506466010722-395aa2bef877?q=80&w=1200&auto=format&fit=crop)' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
-                <div className="absolute inset-x-0 bottom-0 p-8">
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-400 mb-1 block">The Flow</span>
-                  <h4 className="text-xl font-heading font-bold text-white tracking-tight">Shakti's River</h4>
-                </div>
-              </motion.div>
+            <div className="flex justify-center relative z-10">
+              <Link to="/parvati-valley" className="block cursor-pointer">
+                <motion.div 
+                  whileHover={{ scale: 1.05, rotate: -2 }}
+                  className="w-[280px] h-[360px] md:w-[350px] md:h-[450px] relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] group/pv"
+                >
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
+                    style={{ backgroundImage: 'url(https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg)' }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">
+                    <div>
+                      <h4 className="text-xl md:text-3xl font-heading font-bold text-white tracking-tighter">Parvati Deep Dive</h4>
+                      <p className="text-white/60 text-[9px] md:text-[10px] font-black mt-1 uppercase tracking-[0.2em]">A Spiritual Odyssey</p>
+                    </div>
+                    <div className="w-full h-10 md:h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-md shadow-xl shadow-terracotta/20 flex items-center justify-center transition-all">
+                        Explore the Valley
+                    </div>
+                  </div>
+                </motion.div>
+              </Link>
             </div>
           </div>
         </div>

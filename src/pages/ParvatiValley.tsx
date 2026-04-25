@@ -21,9 +21,9 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 // Content JSON Structure
 const PARVATI_DATA = {
   hero: {
-    headline: "The Valley of Shadows & Light",
+    headline: "The Valley of Shadows and Light",
     subheadline: "A Spiritual Odyssey through the heart of the Kullu Himalayas",
-    backgroundImage: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2670&auto=format&fit=crop", // Mantalai Lake representation
+    backgroundImage: "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg", // Mantra Lake representation
     parallaxIntensity: 0.5
   },
   narrative: {
@@ -37,28 +37,28 @@ const PARVATI_DATA = {
       history: "Known as the oldest democracy in the world, the Malanese believe themselves to be direct descendants of Alexander the Great's soldiers. Their social structure is governed strictly by the edicts of Jamlu Devta.",
       vibe: "#AncientDemocracy",
       icon: <Shield className="h-5 w-5" />,
-      image: "https://images.unsplash.com/photo-1595928898133-9354334e47f4?q=80&w=1200&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1595928898133-9354334e47f4?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       name: "Tosh",
       history: "A village that clings to the edges of the mountainside at 2,400m. It serves as the ultimate gateway to the Pin Parvati Pass, standing as a sentinel between the forest and the tundra.",
       vibe: "#HippieHideaway",
       icon: <Wind className="h-5 w-5" />,
-      image: "https://images.unsplash.com/photo-1506466010722-395aa2bef877?q=80&w=1200&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000&auto=format&fit=crop"
     },
     {
       name: "Pulga",
       history: "Famed for its 'Fairy Forest', Pulga is a masterclass in traditional wooden housing. The architecture here tells stories of centuries spent in isolation, perfecting the art of timber framing.",
       vibe: "#TheWoodenHive",
       icon: <Mountain className="h-5 w-5" />,
-      image: "https://images.unsplash.com/photo-1643527311836-1b882311dbdb?q=80&w=1200&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1643527311836-1b882311dbdb?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     },
     {
       name: "Kheerganga",
       history: "The site where Kartikeya, the god of war and son of Shiva, is said to have meditated. The milky-white waters of the hot springs remain a site of ritual purification for spiritual seekers.",
       vibe: "#SpiritualPeak",
       icon: <Droplets className="h-5 w-5" />,
-      image: "https://images.unsplash.com/photo-1528319725582-ddc096101511?q=80&w=1200&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1623492701902-47dc207df5dc?q=80&w=2000&auto=format&fit=crop"
     }
   ],
   materialCulture: {
@@ -123,7 +123,7 @@ const ParvatiValley = () => {
               <div 
                 className="absolute inset-0 opacity-40 mix-blend-screen transition-transform duration-[4s] group-hover/cosmic:scale-110"
                 style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=2670&auto=format&fit=crop')`,
+                  backgroundImage: `url('https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
