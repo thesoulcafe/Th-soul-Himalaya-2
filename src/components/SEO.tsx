@@ -1,4 +1,7 @@
 import { Helmet } from 'react-helmet-async';
+import { useEffect, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface SEOProps {
   title: string;
@@ -8,6 +11,17 @@ interface SEOProps {
 }
 
 export const SEO = ({ title, description, keywords, canonicalUrl, image }: SEOProps & { image?: string }) => {
+  const [siteSettings, setSiteSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'site_settings', 'global'), (doc) => {
+      if (doc.exists()) {
+        setSiteSettings(doc.data());
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const finalTitle = `${title} | Soul Himalaya`;
   const defaultImage = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
   const finalImage = (title || "").toLowerCase().includes("valley of shadows")
@@ -20,6 +34,10 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image }: SEOPr
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      
+      {siteSettings?.googleSiteVerification && (
+        <meta name="google-site-verification" content={siteSettings.googleSiteVerification} />
+      )}
       
       {/* Open Graph */}
       <meta property="og:title" content={finalTitle} />

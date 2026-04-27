@@ -12,8 +12,8 @@ import { useCart } from '@/lib/CartContext';
 import { Badge } from '@/components/ui/badge';
 
 const navLinks = [
-  { name: 'TOUR PACKAGES', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
-  { name: 'MOUNTAIN TREKKS', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
+  { name: 'TOUR PACKAGES', href: '/tours' },
+  { name: 'MOUNTAIN TREKKS', href: '/trekks' },
   { name: 'GUIDE', href: '/guide' },
   { name: 'YOGA', href: '/yoga' },
   { name: 'MEDITATION', href: '/meditation' },

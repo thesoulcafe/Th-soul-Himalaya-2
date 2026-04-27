@@ -161,6 +161,14 @@
     "/messages/{messageId}": {
       "schema": "Message",
       "description": "Direct messages from users to admin."
+    },
+    "/seo_settings/{settingId}": {
+      "schema": "object",
+      "description": "Page-specific SEO configurations."
+    },
+    "/site_settings/global": {
+      "schema": "object",
+      "description": "Global website settings like verification tokens."
     }
   }
 }

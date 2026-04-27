@@ -86,8 +86,8 @@ export default function Footer() {
             <h4 className="text-lg font-bold">Services</h4>
             <ul className="space-y-3 text-sm text-cream/70">
               {[
-                { name: 'Tour Packages', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/tours' },
-                { name: 'Mountain Trekks', href: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/trekks' },
+                { name: 'Tour Packages', href: '/tours' },
+                { name: 'Mountain Trekks', href: '/trekks' },
                 { name: 'Yoga & Wellness', href: '/yoga' },
                 { name: 'Digital Workation', href: '/wfh' },
                 { name: 'Macramé Shop', href: '/shop' },

@@ -156,6 +156,7 @@ export default function Admin() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [seoSettings, setSeoSettings] = useState<any[]>([]);
+  const [siteSettings, setSiteSettings] = useState<any>({ googleSiteVerification: '' });
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   
   const [isEditing, setIsEditing] = useState<string | null>(null);
@@ -419,12 +420,19 @@ export default function Admin() {
       setSeoSettings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
+    const unsubscribeSite = onSnapshot(doc(db, 'site_settings', 'global'), (doc) => {
+      if (doc.exists()) {
+        setSiteSettings(doc.data());
+      }
+    });
+
     return () => {
       unsubscribeContent();
       unsubscribeBookings();
       unsubscribeUsers();
       unsubscribeMessages();
       unsubscribeSeo();
+      unsubscribeSite();
     };
   }, [profile, isAuthorized]);
 
@@ -2716,79 +2724,115 @@ export default function Admin() {
               </p>
             </div>
             
-            <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
-              <form 
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  try {
-                    await addDoc(collection(db, 'seo_settings'), {
-                      ...seoFormData,
-                      updatedAt: serverTimestamp()
-                    });
-                    setNotification({ message: 'SEO data saved successfully', type: 'success' });
-                    setSeoFormData({ path: '', keyword: '', title: '', description: '' });
-                  } catch (error) {
-                    handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
-                  }
-                }}
-                className="space-y-4"
-              >
-                <Input placeholder="Page Path or Slug (e.g., /tours)" value={seoFormData.path} onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} className="h-12 rounded-lg" required />
-                <Input placeholder="Target Keyword" value={seoFormData.keyword} onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} className="h-12 rounded-lg" />
-                <Input placeholder="SEO Title" value={seoFormData.title} onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} className="h-12 rounded-lg" required />
-                <Textarea placeholder="Meta Description" value={seoFormData.description} onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} className="rounded-lg" required />
-                <Button type="submit" className="bg-terracotta hover:bg-terracotta/90 text-white font-bold h-10 w-full">Save SEO Data</Button>
-              </form>
-            </Card>
-
-            <div className="mt-12 space-y-4">
-              <h3 className="text-lg font-bold text-forest">Existing Settings</h3>
-              <div className="grid gap-4">
-                {seoSettings.map((item) => (
-                  <Card key={item.id} className="border border-forest/5 shadow-sm rounded-xl p-6 bg-white">
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="bg-forest/5 text-forest border-none font-mono text-[10px]">
-                            {item.path}
-                          </Badge>
-                          {item.keyword && (
-                            <Badge variant="outline" className="bg-terracotta/5 text-terracotta border-none font-mono text-[10px]">
-                              {item.keyword}
-                            </Badge>
-                          )}
-                        </div>
-                        <h4 className="font-bold text-forest">{item.title}</h4>
-                        <p className="text-sm text-forest/60 line-clamp-2">{item.description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-forest/40 hover:text-terracotta"
-                          onClick={async () => {
-                            if (window.confirm('Delete this SEO setting?')) {
-                              try {
-                                await deleteDoc(doc(db, 'seo_settings', item.id));
-                                setNotification({ message: 'SEO setting deleted', type: 'success' });
-                              } catch (error) {
-                                handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
-                              }
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-8">
+                <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-forest mb-4">Global Site Verification</h3>
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await setDoc(doc(db, 'site_settings', 'global'), {
+                          googleSiteVerification: siteSettings.googleSiteVerification,
+                          updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        setNotification({ message: 'Global settings updated', type: 'success' });
+                      } catch (error) {
+                        handleFirestoreError(error, OperationType.WRITE, 'site_settings/global');
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <label className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Google Site Verification Token</label>
+                      <Input 
+                        placeholder="e.g. google-site-verification=abc123xyz" 
+                        value={siteSettings.googleSiteVerification || ''} 
+                        onChange={e => setSiteSettings({...siteSettings, googleSiteVerification: e.target.value})} 
+                        className="h-12 rounded-lg" 
+                      />
+                      <p className="text-[10px] text-forest/30 italic">Paste the content of your meta tag or the full verification token here.</p>
                     </div>
-                  </Card>
-                ))}
-                {seoSettings.length === 0 && (
-                  <div className="text-center py-12 bg-white rounded-xl border border-dashed border-forest/20">
-                    <Search className="h-8 w-8 text-forest/20 mx-auto mb-3" />
-                    <p className="text-forest/40 font-bold uppercase tracking-widest text-[10px]">No SEO data found</p>
-                  </div>
-                )}
+                    <Button type="submit" className="bg-forest hover:bg-forest/90 text-white font-bold h-10 w-full">Update Global Settings</Button>
+                  </form>
+                </Card>
+
+                <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
+                  <h3 className="text-lg font-bold text-forest mb-4">Add Page Specific SEO</h3>
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await addDoc(collection(db, 'seo_settings'), {
+                          ...seoFormData,
+                          updatedAt: serverTimestamp()
+                        });
+                        setNotification({ message: 'SEO data saved successfully', type: 'success' });
+                        setSeoFormData({ path: '', keyword: '', title: '', description: '' });
+                      } catch (error) {
+                        handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <Input placeholder="Page Path or Slug (e.g., /tours)" value={seoFormData.path} onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} className="h-12 rounded-lg" required />
+                    <Input placeholder="Target Keyword" value={seoFormData.keyword} onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} className="h-12 rounded-lg" />
+                    <Input placeholder="SEO Title" value={seoFormData.title} onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} className="h-12 rounded-lg" required />
+                    <Textarea placeholder="Meta Description" value={seoFormData.description} onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} className="rounded-lg" required />
+                    <Button type="submit" className="bg-terracotta hover:bg-terracotta/90 text-white font-bold h-10 w-full">Save SEO Data</Button>
+                  </form>
+                </Card>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-forest">Existing Page Settings</h3>
+                <div className="grid gap-4">
+                  {seoSettings.map((item) => (
+                    <Card key={item.id} className="border border-forest/5 shadow-sm rounded-xl p-6 bg-white">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="bg-forest/5 text-forest border-none font-mono text-[10px]">
+                              {item.path}
+                            </Badge>
+                            {item.keyword && (
+                              <Badge variant="outline" className="bg-terracotta/5 text-terracotta border-none font-mono text-[10px]">
+                                {item.keyword}
+                              </Badge>
+                            )}
+                          </div>
+                          <h4 className="font-bold text-forest">{item.title}</h4>
+                          <p className="text-sm text-forest/60 line-clamp-2">{item.description}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-forest/40 hover:text-terracotta"
+                            onClick={async () => {
+                              if (window.confirm('Delete this SEO setting?')) {
+                                try {
+                                  await deleteDoc(doc(db, 'seo_settings', item.id));
+                                  setNotification({ message: 'SEO setting deleted', type: 'success' });
+                                } catch (error) {
+                                  handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
+                                }
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                  {seoSettings.length === 0 && (
+                    <div className="text-center py-12 bg-white rounded-xl border border-dashed border-forest/20">
+                      <Search className="h-8 w-8 text-forest/20 mx-auto mb-3" />
+                      <p className="text-forest/40 font-bold uppercase tracking-widest text-[10px]">No SEO data found</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
