@@ -23,10 +23,23 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image }: SEOPr
   }, []);
 
   const finalTitle = `${title} | Soul Himalaya`;
-  const defaultImage = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
-  const finalImage = (title || "").toLowerCase().includes("valley of shadows")
+  const defaultImage = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=60";
+  
+  let finalImage = (title || "").toLowerCase().includes("valley of shadows")
     ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"
     : (image || defaultImage);
+
+  // Ensure absolute URL for images
+  if (finalImage.startsWith('/')) {
+    finalImage = `${window.location.origin}${finalImage}`;
+  }
+  
+  // Optimize unsplash images for WhatsApp/FB (1200x630, q=60 for size)
+  if (finalImage.includes('unsplash.com')) {
+    finalImage = finalImage.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=60');
+    if (!finalImage.includes('&h=')) finalImage += '&h=630';
+    if (!finalImage.includes('&q=')) finalImage += '&q=60';
+  }
 
   return (
     <Helmet>

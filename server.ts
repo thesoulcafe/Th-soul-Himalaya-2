@@ -400,8 +400,12 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
-      if (image.startsWith('/')) {
-        image = `${protocol}://${host}${image}`;
+      if (!image.startsWith('http')) {
+        if (image.startsWith('/')) {
+          image = `${protocol}://${host}${image}`;
+        } else {
+          image = `${protocol}://${host}/${image}`;
+        }
       }
 
       const metaTags = `
@@ -418,7 +422,9 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta property="og:image" content="${image}">
       <meta property="og:image:width" content="1200">
       <meta property="og:image:height" content="630">
+      <meta property="og:image:type" content="image/jpeg">
       <meta property="og:site_name" content="The Soul Himalaya">
+      <meta property="og:locale" content="en_IN">
 
       <!-- Twitter -->
       <meta name="twitter:card" content="summary_large_image">
@@ -428,9 +434,13 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta name="twitter:image" content="${image}">
       `;
 
-      // Remove existing title and description tags to prevent duplicates
-      let cleanedHtml = html.replace(/<title>.*?<\/title>/i, '');
-      cleanedHtml = cleanedHtml.replace(/<meta name="description".*?>/i, '');
+      // Remove existing SEO tags to prevent duplicates which confuse crawlers
+      let cleanedHtml = html
+        .replace(/<title>.*?<\/title>/i, '')
+        .replace(/<meta name="description".*?>/i, '')
+        .replace(/<meta property="og:.*?".*?>/gi, '')
+        .replace(/<meta name="twitter:.*?".*?>/gi, '')
+        .replace(/<link rel="canonical".*?>/i, '');
 
       // Inject before </head>
       return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);

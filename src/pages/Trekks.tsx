@@ -51,7 +51,7 @@ export default function Trekks() {
     const shareData = {
       title: `The Soul Himalaya - ${trekk.title}`,
       text: trekk.description || `Discover this wild path: ${trekk.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${trekk.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${trekk.id}&v=${Date.now()}`
     };
 
     try {
@@ -152,6 +152,7 @@ export default function Trekks() {
     if (id && trekkList.length > 0) {
       const trekk = trekkList.find(t => t.id === id);
       if (trekk) {
+        setSelectedTrekk(trekk);
         setSeo({
           title: trekk.title,
           description: trekk.description,

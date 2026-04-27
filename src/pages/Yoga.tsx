@@ -51,7 +51,7 @@ export default function Yoga() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Heal your soul with this retreat: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}&v=${Date.now()}`
     };
 
     try {
@@ -150,6 +150,7 @@ export default function Yoga() {
     if (id && packageList.length > 0) {
       const pkg = packageList.find(p => p.id === id);
       if (pkg) {
+        setSelectedPackage(pkg);
         setSeo({
           title: pkg.title,
           description: pkg.description,
@@ -755,6 +756,7 @@ export default function Yoga() {
                dateRange: formatDateRange(selectedDate, activeSlotPackage.duration, slot)
              });
             setActiveSlotPackage(null);
+            navigate('/checkout');
           }}
           onCustomize={() => navigate('/contact')}
           title={activeSlotPackage.title}

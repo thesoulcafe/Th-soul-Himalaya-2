@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
+import { SEO } from '@/components/SEO';
+import { useSearchParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { DEFAULT_WFH } from '@/constants';
@@ -28,11 +30,23 @@ export default function WFH() {
   const [config, setConfig] = useState<any>(null);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity } = useCart();
 
+  const [packageList, setPackageList] = useState<any[]>([]); // Using packages state but adding search params
+  const [searchParams] = useSearchParams();
+  const [seo, setSeo] = useState<any>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/wfh'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
+
   const handleShare = async (pkg: any) => {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Elevate your productivity with this: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}&v=${Date.now()}`
     };
 
     try {
@@ -126,8 +140,30 @@ export default function WFH() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  useEffect(() => {
+    const id = searchParams.get('id');
+    if (id && packages.length > 0) {
+      const pkg = packages.find(p => p.id === id);
+      if (pkg) {
+        setSeo({
+          title: pkg.title || pkg.name,
+          description: pkg.description,
+          image: pkg.image || pkg.images?.[0],
+          path: `/wfh?id=${id}`
+        });
+        // Auto open if it matches
+        setActiveSlotPackage(pkg);
+      }
+    }
+  }, [searchParams, packages]);
+
   return (
     <div className="pt-24">
+      {seo && <SEO 
+        title={seo.title || "Work from Himalaya"} 
+        description={seo.description || "Mountain offices for the soulful worker."} 
+        image={seo.image}
+      />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Work From Himalaya</h1>
@@ -660,7 +696,22 @@ export default function WFH() {
           onClose={() => setActiveSlotPackage(null)}
           slots={activeSlotPackage.slots}
           selectedSlotIndex={selectedSlots[activeSlotPackage.id]}
-          onSelectSlot={(index) => setSelectedSlots({ ...selectedSlots, [activeSlotPackage.id]: index })}
+          onSelectSlot={(index) => {
+            setSelectedSlots({ ...selectedSlots, [activeSlotPackage.id]: index });
+            // Auto add after selection
+            const slot = activeSlotPackage.slots[parseInt(index)];
+            const baseId = `wfh-${activeSlotPackage.title.toLowerCase().replace(/\s+/g, '-')}`;
+            globalAddToCart({
+              id: `${baseId}-slot-${index}`,
+              name: activeSlotPackage.title,
+              price: activeSlotPackage.price,
+              type: 'WFH Stay',
+              image: activeSlotPackage.image,
+              dateRange: formatDateRange(selectedDate, activeSlotPackage.duration, slot)
+            });
+            setActiveSlotPackage(null);
+            navigate('/checkout');
+          }}
           onCustomize={() => navigate('/contact')}
           title={activeSlotPackage.title}
         />

@@ -30,7 +30,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { auth, db, storage } from '@/lib/firebase';
 import { 
   collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, 
-  query, where, serverTimestamp, orderBy, limit, getDoc
+  query, where, serverTimestamp, orderBy, limit, getDoc, setDoc
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { cn } from '@/lib/utils';

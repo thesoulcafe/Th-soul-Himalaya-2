@@ -51,7 +51,7 @@ export default function Meditation() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Find your inner peace with this retreat: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}&v=${Date.now()}`
     };
 
     try {
@@ -150,6 +150,7 @@ export default function Meditation() {
     if (id && packageList.length > 0) {
       const pkg = packageList.find(p => p.id === id);
       if (pkg) {
+        setSelectedPackage(pkg);
         setSeo({
           title: pkg.title,
           description: pkg.description,

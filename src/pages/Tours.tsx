@@ -94,7 +94,7 @@ export default function Tours() {
     const shareData = {
       title: `The Soul Himalaya - ${tour.title}`,
       text: tour.description || `Check out this amazing journey: ${tour.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${tour.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${tour.id}&v=${Date.now()}`
     };
 
     try {
@@ -256,6 +256,7 @@ export default function Tours() {
     if (id && tours.length > 0) {
       const tour = tours.find(t => t.id === id);
       if (tour) {
+        setSelectedTour(tour);
         setSeo({
           title: tour.title || tour.name,
           description: tour.description,

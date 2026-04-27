@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import SlotSelectionPopup from '@/components/SlotSelectionPopup';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
+import { SEO } from '@/components/SEO';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { DEFAULT_ADVENTURE } from '@/constants';
@@ -41,12 +42,21 @@ export default function Adventure() {
     };
   }, [activeSlotActivity]);
   const [selectedDate, setSelectedDate] = useState('');
+  const [seo, setSeo] = useState<any>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/adventure'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleShare = async (activity: any) => {
     const shareData = {
       title: `The Soul Himalaya - ${activity.title}`,
       text: activity.description || `Feel the adrenaline with this: ${activity.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${activity.id}`
+      url: `${window.location.origin}${window.location.pathname}?id=${activity.id}&v=${Date.now()}`
     };
 
     try {
@@ -146,8 +156,31 @@ export default function Adventure() {
     }
   };
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get('id');
+    if (id && activities.length > 0) {
+      const activity = activities.find(a => a.id === id);
+      if (activity) {
+        setSeo({
+          title: activity.title || activity.name,
+          description: activity.description,
+          image: activity.image || activity.images?.[0],
+          path: `/adventure?id=${id}`
+        });
+        // Auto open if it matches
+        setActiveSlotActivity(activity);
+      }
+    }
+  }, [activities]);
+
   return (
     <div className="pt-24">
+      {seo && <SEO 
+        title={seo.title || "Adventure Sports"} 
+        description={seo.description || "Feel the adrenaline in the Himalayas."} 
+        image={seo.image}
+      />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Adventure Sports</h1>
