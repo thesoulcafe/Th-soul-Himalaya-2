@@ -276,7 +276,7 @@ export default function Tours() {
       />}
       
       {/* Search & Filter Header (Sticky) */}
-      <div className="top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
+      <div className="sticky top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
             {/* Page Identity - Elegant & Compact */}
@@ -441,8 +441,8 @@ export default function Tours() {
 
       {/* Tour List */}
       <section className="py-20 px-6 bg-cream">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-3 gap-12">
+          <div className="xl:col-span-2">
             {!hasLoaded ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[1, 2, 3, 4].map((i) => (
@@ -469,10 +469,12 @@ export default function Tours() {
                     transition={{ duration: 0.3 }}
                   >
                   <Card 
-                    onClick={() => setSelectedTour(tour)}
-                    className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0 cursor-pointer"
+                    className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0 relative"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div 
+                      className="relative aspect-[4/3] overflow-hidden cursor-pointer"
+                      onClick={() => setSelectedTour(tour)}
+                    >
                       <ImageSlider 
                         images={((tour.title || '').toLowerCase().includes('valley of shadows') 
                           ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
@@ -530,7 +532,7 @@ export default function Tours() {
                     </div>
 
                     <div className="p-6 flex flex-col flex-grow bg-white relative">
-                      <div className="flex-grow">
+                      <div className="flex-grow cursor-pointer" onClick={() => setSelectedTour(tour)}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center text-yellow-500 text-[10px] font-bold bg-yellow-500/5 px-2 py-1 rounded-full">
                             <Star className="h-3 w-3 fill-current mr-1" />
@@ -709,7 +711,7 @@ export default function Tours() {
         </div>
 
           {/* Booking Sidebar */}
-          <div className="lg:col-span-1" id="customize-trip">
+          <div className="xl:col-span-1" id="customize-trip">
             <div className="">
               <CustomizeTripCard 
                 places={config?.places}

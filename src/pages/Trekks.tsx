@@ -200,11 +200,13 @@ export default function Trekks() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card 
-                  onClick={() => setSelectedTrekk(trekk)}
-                  className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl cursor-pointer"
+                  className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl relative"
                 >
                   {/* Left Side: Image */}
-                  <div className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden">
+                  <div 
+                    className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedTrekk(trekk)}
+                  >
                     <ImageSlider 
                       images={((trekk.title || '').toLowerCase().includes('valley of shadows') 
                         ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
@@ -263,7 +265,7 @@ export default function Trekks() {
 
                   {/* Right Side: Details */}
                   <CardContent className="p-8 md:p-12 w-full md:w-1/2 flex flex-col">
-                    <div className="flex-grow">
+                    <div className="flex-grow cursor-pointer" onClick={() => setSelectedTrekk(trekk)}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center text-yellow-500 text-[10px] font-bold bg-yellow-500/5 px-2 py-1 rounded-full">
                           <Star className="h-3 w-3 fill-current mr-1" />

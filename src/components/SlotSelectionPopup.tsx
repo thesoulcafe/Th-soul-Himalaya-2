@@ -39,7 +39,7 @@ export default function SlotSelectionPopup({
 }: SlotSelectionPopupProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] bg-[#FAF9F6] rounded-[3rem] border-none shadow-[0_0_80px_rgba(45,62,53,0.2)] p-0 overflow-hidden relative">
+      <DialogContent className="sm:max-w-[480px] bg-[#FAF9F6] rounded-[3rem] border-none shadow-[0_0_80px_rgba(45,62,53,0.2)] p-0 overflow-y-auto max-h-[90vh] custom-scrollbar relative">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
 
         <div className="bg-forest p-10 text-white relative overflow-hidden">
@@ -60,7 +60,7 @@ export default function SlotSelectionPopup({
           </motion.div>
         </div>
 
-        <div className="p-4 sm:px-8 sm:py-6 space-y-4 max-h-[50vh] overflow-y-auto custom-scrollbar overscroll-contain">
+        <div className="p-4 sm:px-8 sm:py-6 space-y-4 max-h-[40vh] md:max-h-[50vh] overflow-y-auto custom-scrollbar overscroll-contain">
           {slots.map((slot, i) => {
             const isSelected = selectedSlotIndex === i.toString();
             const startDate = new Date(slot.startDate);

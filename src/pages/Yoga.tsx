@@ -230,10 +230,12 @@ export default function Yoga() {
                 transition={{ delay: i * 0.1 }}
               >
                 <Card 
-                  onClick={() => setSelectedPackage(pkg)}
-                  className="overflow-hidden border-none shadow-xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer"
+                  className="overflow-hidden border-none shadow-xl rounded-[2.5rem] bg-white h-full flex flex-col group relative"
                 >
-                  <div className="relative h-64 overflow-hidden">
+                  <div 
+                    className="relative h-64 overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedPackage(pkg)}
+                  >
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
                         ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
@@ -281,7 +283,7 @@ export default function Yoga() {
                     </div>
                   </div>
                   <CardContent className="p-8 flex-grow flex flex-col">
-                    <div>
+                    <div className="cursor-pointer" onClick={() => setSelectedPackage(pkg)}>
                       <div className="space-y-1 mb-4">
                         <div className="flex items-center text-yellow-500 text-xs font-bold">
                           <Star className="h-3 w-3 fill-current mr-1" />
