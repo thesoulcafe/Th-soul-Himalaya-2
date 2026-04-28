@@ -242,11 +242,25 @@ export default function Tours() {
     if (id && tours.length > 0) {
       const tour = tours.find(t => t.id === id);
       if (tour) {
+        setSelectedTour(tour); // Auto-open modal
+        
+        // Detailed description for OG tags including day-by-day
+        let detailedDesc = tour.description || "";
+        if (tour.theExperience) {
+          const itineraryBrief = tour.theExperience.split('\n')
+            .filter((l: string) => l.toLowerCase().startsWith('day') || l.toLowerCase().startsWith('step'))
+            .slice(0, 5)
+            .join(' | ');
+          if (itineraryBrief) {
+            detailedDesc = `${detailedDesc}\n\nExperience: ${itineraryBrief}`;
+          }
+        }
+
         setSeo({
           title: tour.title || tour.name,
-          description: tour.description,
+          description: detailedDesc,
           image: tour.image || tour.images?.[0],
-          path: `/tours?id=${id}`
+          path: `${window.location.origin}/tours?id=${id}`
         });
       }
     }
@@ -869,6 +883,7 @@ export default function Tours() {
                                       }
 
                                       globalAddToCart(cartItem);
+                                      navigate('/cart');
                                     }}
                                     disabled={
                                       selectedTour.isAvailable === false || 

@@ -153,11 +153,21 @@ export default function Meditation() {
     if (id && packageList.length > 0) {
       const pkg = packageList.find(p => p.id === id);
       if (pkg) {
+        setSelectedPackage(pkg);
+        const itinerarySummary = pkg.theExperience 
+          ? pkg.theExperience.split('\n')
+              .filter((line: string) => line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step'))
+              .slice(0, 3)
+              .join(' | ')
+          : '';
+        const fullDescription = itinerarySummary 
+          ? `${pkg.description} Plan: ${itinerarySummary}...`
+          : pkg.description;
         setSeo({
           title: pkg.title,
-          description: pkg.description,
+          description: fullDescription,
           image: pkg.image,
-          path: `/meditation?id=${id}`
+          path: `${window.location.origin}/meditation?id=${id}`
         });
       }
     }
@@ -650,6 +660,7 @@ export default function Meditation() {
                                     }
 
                                     globalAddToCart(cartItem);
+                                    navigate('/cart');
                                   }}
                                   disabled={
                                     selectedPackage.isAvailable === false || 

@@ -34,44 +34,46 @@ import { Toaster } from 'sonner';
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <CartProvider>
-          <SmoothScroll />
-          <Toaster position="top-center" richColors />
-          <Router>
-            <ScrollToTop />
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="tours" element={<Tours />} />
-                  <Route path="trekks" element={<Trekks />} />
-                  <Route path="wfh" element={<WFH />} />
-                  <Route path="yoga" element={<Yoga />} />
-                  <Route path="meditation" element={<Meditation />} />
-                  <Route path="adventure" element={<Adventure />} />
-                  <Route path=":category/:id" element={<ServiceDetail />} />
-                  <Route path=":category/:id/book" element={<BookingPage />} />
-                  <Route path="shop" element={<Shop />} />
-                  <Route path="cart" element={<Cart />} />
-                  <Route path="blueberry" element={<Blueberry />} />
-                  <Route path="about" element={<About />} />
-                  <Route path="guide" element={<Guide />} />
-                  <Route path="gallery" element={<Gallery />} />
-                  <Route path="contact" element={<Contact />} />
-                  <Route path="services" element={<Services />} />
-                  <Route path="tailor-made" element={<TailorMade />} />
-                  <Route path="admin" element={<Admin />} />
-                  <Route path="checkout" element={<Checkout />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="dashboard/booking/:id" element={<BookingDetails />} />
-                  <Route path="parvati-valley" element={<ParvatiValley />} />
-                  <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
-                </Route>
-              </Routes>
-            </Router>
-          </CartProvider>
-        </AuthProvider>
-      </ErrorBoundary>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <CartProvider>
+            <SmoothScroll />
+            <Toaster position="top-center" richColors />
+            <Router>
+              <ScrollToTop />
+              <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="tours" element={<Tours />} />
+                    <Route path="trekks" element={<Trekks />} />
+                    <Route path="wfh" element={<WFH />} />
+                    <Route path="yoga" element={<Yoga />} />
+                    <Route path="meditation" element={<Meditation />} />
+                    <Route path="adventure" element={<Adventure />} />
+                    <Route path=":category/:id" element={<ServiceDetail />} />
+                    <Route path=":category/:id/book" element={<BookingPage />} />
+                    <Route path="shop" element={<Shop />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="blueberry" element={<Blueberry />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="guide" element={<Guide />} />
+                    <Route path="gallery" element={<Gallery />} />
+                    <Route path="contact" element={<Contact />} />
+                    <Route path="services" element={<Services />} />
+                    <Route path="tailor-made" element={<TailorMade />} />
+                    <Route path="admin" element={<Admin />} />
+                    <Route path="checkout" element={<Checkout />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="dashboard/booking/:id" element={<BookingDetails />} />
+                    <Route path="parvati-valley" element={<ParvatiValley />} />
+                    <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
+                  </Route>
+                </Routes>
+              </Router>
+            </CartProvider>
+          </AuthProvider>
+        </ErrorBoundary>
+    </HelmetProvider>
   );
 }

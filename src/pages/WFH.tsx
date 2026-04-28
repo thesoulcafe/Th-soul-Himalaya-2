@@ -152,11 +152,21 @@ export default function WFH() {
     if (id && packages.length > 0) {
       const pkg = packages.find(p => p.id === id);
       if (pkg) {
+        setSelectedPackage(pkg);
+        const itinerarySummary = pkg.theExperience 
+          ? pkg.theExperience.split('\n')
+              .filter((line: string) => line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step'))
+              .slice(0, 3)
+              .join(' | ')
+          : '';
+        const fullDescription = itinerarySummary 
+          ? `${pkg.description} Plan: ${itinerarySummary}...`
+          : pkg.description;
         setSeo({
           title: pkg.title || pkg.name,
-          description: pkg.description,
+          description: fullDescription,
           image: pkg.image || pkg.images?.[0],
-          path: `/wfh?id=${id}`
+          path: `${window.location.origin}/wfh?id=${id}`
         });
       }
     }
@@ -656,6 +666,7 @@ export default function WFH() {
                                     }
 
                                     globalAddToCart(cartItem);
+                                    navigate('/cart');
                                   }}
                                   disabled={
                                     selectedPackage.isAvailable === false || 

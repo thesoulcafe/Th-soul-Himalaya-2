@@ -147,11 +147,25 @@ export default function Trekks() {
     if (id && trekkList.length > 0) {
       const trekk = trekkList.find(t => t.id === id);
       if (trekk) {
+        setSelectedTrekk(trekk); // Auto-open modal
+
+        // Detailed description for OG tags including day-by-day
+        let detailedDesc = trekk.description || "";
+        if (trekk.theExperience) {
+          const itineraryBrief = trekk.theExperience.split('\n')
+            .filter((l: string) => l.toLowerCase().startsWith('day') || l.toLowerCase().startsWith('step'))
+            .slice(0, 5)
+            .join(' | ');
+          if (itineraryBrief) {
+            detailedDesc = `${detailedDesc}\n\nExperience: ${itineraryBrief}`;
+          }
+        }
+
         setSeo({
           title: trekk.title,
-          description: trekk.description,
+          description: detailedDesc,
           image: trekk.image,
-          path: `/trekks?id=${id}`
+          path: `${window.location.origin}/trekks?id=${id}`
         });
       }
     }
@@ -665,6 +679,7 @@ export default function Trekks() {
                                   }
 
                                   globalAddToCart(cartItem);
+                                  navigate('/cart');
                                 }}
                                 disabled={
                                   selectedTrekk.isAvailable === false || 

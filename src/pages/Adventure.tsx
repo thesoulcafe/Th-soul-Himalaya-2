@@ -159,11 +159,21 @@ export default function Adventure() {
     if (id && activities.length > 0) {
       const activity = activities.find(a => a.id === id);
       if (activity) {
+        setSelectedActivity(activity);
+        const itinerarySummary = activity.theExperience 
+          ? activity.theExperience.split('\n')
+              .filter((line: string) => line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step'))
+              .slice(0, 3)
+              .join(' | ')
+          : '';
+        const fullDescription = itinerarySummary 
+          ? `${activity.description} Plan: ${itinerarySummary}...`
+          : activity.description;
         setSeo({
           title: activity.title || activity.name,
-          description: activity.description,
+          description: fullDescription,
           image: activity.image || activity.images?.[0],
-          path: `/adventure?id=${id}`
+          path: `${window.location.origin}/adventure?id=${id}`
         });
       }
     }
@@ -672,6 +682,7 @@ export default function Adventure() {
                                     }
 
                                     globalAddToCart(cartItem);
+                                    navigate('/cart');
                                   }}
                                   disabled={
                                     selectedActivity.isAvailable === false || 
