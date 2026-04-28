@@ -35,11 +35,10 @@ export default function Trekks() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock and reset when modal/tour detail is open
+  // Scroll lock when modal is open
   useEffect(() => {
     if (selectedTrekk || activeSlotTrekk) {
       document.body.style.overflow = 'hidden';
-      window.scrollTo(0, 0); // Reset to top when opening details
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -161,10 +160,6 @@ export default function Trekks() {
           path: `/trekks?id=${id}`
         });
       }
-    } else if (!id) {
-      setSelectedTrekk(null);
-      setActiveSlotTrekk(null);
-      document.body.style.overflow = 'unset';
     }
   }, [searchParams, trekkList]);
 
