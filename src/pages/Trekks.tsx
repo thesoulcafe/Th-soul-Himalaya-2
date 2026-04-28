@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Mountain, Compass, Map, Info, AlertTriangle, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, Sparkles, ShoppingCart, ArrowRight, Share2, X, Users } from 'lucide-react';
+import { Plus, Minus, Mountain, Compass, Map, Info, AlertTriangle, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, Sparkles, ShoppingCart, ArrowRight, Share2, X, Users, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
@@ -17,7 +17,7 @@ import { SEO } from '@/components/SEO';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DEFAULT_TREKKS } from '@/constants';
 
 export default function Trekks() {
@@ -35,7 +35,7 @@ export default function Trekks() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal/tour detail is open
   useEffect(() => {
     if (selectedTrekk || activeSlotTrekk) {
       document.body.style.overflow = 'hidden';
@@ -102,31 +102,39 @@ export default function Trekks() {
   };
 
   useEffect(() => {
-    const q = query(collection(db, 'content'), where('type', '==', 'trekk'));
+    const q = query(collection(db, 'content'), where('type', 'in', ['trekk', 'trek']));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const dbTrekks = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data().data
-        })).sort((a, b) => {
-          const aAvail = a.isAvailable !== false;
-          const bAvail = b.isAvailable !== false;
-          if (aAvail && !bAvail) return -1;
-          if (!aAvail && bAvail) return 1;
+      const dbTrekks = snapshot.empty ? [] : snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data().data,
+        originalType: doc.data().type
+      }));
 
-          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-          return aOrder - bOrder;
+      // Merge defaults with DB items
+      let combined = [...dbTrekks];
+      DEFAULT_TREKKS.forEach(def => {
+        const exists = dbTrekks.some(dbItem => {
+          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
+          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
+          return dbItem.id === def.id || dbTitle === defTitle;
         });
-        setTrekkList(dbTrekks);
-      } else {
-        // Fallback to defaults
-        setTrekkList([...DEFAULT_TREKKS].sort((a, b) => {
-          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
-          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
-          return aOrder - bOrder;
-        }));
-      }
+        if (!exists) {
+          combined.push({ ...def, originalType: 'trekk' });
+        }
+      });
+
+      const sortedTrekks = combined.sort((a, b) => {
+        const aAvail = a.isAvailable !== false;
+        const bAvail = b.isAvailable !== false;
+        if (aAvail && !bAvail) return -1;
+        if (!aAvail && bAvail) return 1;
+
+        const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+        const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+        return aOrder - bOrder;
+      });
+
+      setTrekkList(sortedTrekks);
       setHasLoaded(true);
     });
 
@@ -152,7 +160,6 @@ export default function Trekks() {
     if (id && trekkList.length > 0) {
       const trekk = trekkList.find(t => t.id === id);
       if (trekk) {
-        setSelectedTrekk(trekk);
         setSeo({
           title: trekk.title,
           description: trekk.description,
@@ -162,6 +169,13 @@ export default function Trekks() {
       }
     }
   }, [searchParams, trekkList]);
+
+  const filteredTrekks = useMemo(() => {
+    return trekkList.filter(trekk => {
+      if (profile?.role !== 'admin' && trekk.isAvailable === false) return false;
+      return true;
+    });
+  }, [trekkList, profile?.role]);
 
   return (
     <div className="pt-24">
@@ -192,7 +206,7 @@ export default function Trekks() {
                 </div>
               ))
             ) : (
-              trekkList.map((trekk, index) => (
+              filteredTrekks.map((trekk, index) => (
                 <motion.div
                   key={trekk.id || trekk.title}
                 initial={{ opacity: 0, y: 30 }}
@@ -297,22 +311,16 @@ export default function Trekks() {
                         </div>
                       </div>
 
-                      {/* Slot Selection */}
+                      {/* Slot Selection - Now links to booking page */}
                       {trekk.slots && trekk.slots.length > 0 && (
                         <div className="mb-8" onClick={(e) => e.stopPropagation()}>
                           <button 
-                            onClick={() => setActiveSlotTrekk(trekk)}
+                            onClick={() => navigate(`/trekks/${trekk.id}/book`)}
                             className="w-full bg-forest/[0.03] border border-forest/5 rounded-2xl p-4 text-xs text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
                           >
                             <div className="flex items-center gap-3">
                               <Calendar className="h-4 w-4 text-terracotta" />
-                              {selectedSlots[trekk.id] !== undefined ? (
-                                <span>
-                                  Departure: {new Date(trekk.slots[parseInt(selectedSlots[trekk.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}
-                                </span>
-                              ) : (
-                                <span className="text-forest/30">Select Date</span>
-                              )}
+                              <span className="text-forest/30 text-xs">Select Date</span>
                             </div>
                             <ChevronDown className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-colors" />
                           </button>
@@ -340,6 +348,11 @@ export default function Trekks() {
                           const quantity = getItemQuantity(currentItemId);
                           
                           const handleBookAction = () => {
+                            if (trekk.slots && trekk.slots.length > 0) {
+                              navigate(`/trekks/${trekk.id}/book`);
+                              return;
+                            }
+
                             if (!user) {
                               setPendingCartItem({
                                 id: currentItemId,
@@ -347,25 +360,19 @@ export default function Trekks() {
                                 price: trekk.price,
                                 type: 'Trekk',
                                 image: trekk.image,
-                                dateRange: formatDateRange(selectedDate, trekk.duration, slotIndex !== undefined ? trekk.slots?.[parseInt(slotIndex)] : undefined)
+                                dateRange: formatDateRange(selectedDate, trekk.duration)
                               });
                               setShowAuthModal(true);
                               return;
                             }
 
-                            if (trekk.slots && trekk.slots.length > 0 && slotIndex === undefined) {
-                              setActiveSlotTrekk(trekk);
-                              return;
-                            }
-
-                            const slot = slotIndex !== undefined ? trekk.slots?.[parseInt(slotIndex)] : undefined;
                             globalAddToCart({
                               id: currentItemId,
                               name: trekk.title,
                               price: trekk.price,
                               type: 'Trekk',
                               image: trekk.image,
-                              dateRange: formatDateRange(selectedDate, trekk.duration, slot)
+                              dateRange: formatDateRange(selectedDate, trekk.duration)
                             });
                           };
 
@@ -479,6 +486,27 @@ export default function Trekks() {
         </div>
       </section>
 
+      {/* Customize Section */}
+      <section className="py-24 bg-cream/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <CustomizeTripCard 
+              places={config?.places}
+              treks={config?.trekks}
+              yoga={config?.yoga}
+              meditation={config?.meditation}
+              title={config?.title}
+              description={config?.description}
+            />
+          </div>
+        </div>
+      </section>
+
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+
       {/* Trekk Detail Modal */}
       <AnimatePresence>
         {selectedTrekk && (
@@ -496,9 +524,9 @@ export default function Trekks() {
               data-lenis-prevent
             >
             {/* Background Texture Overlay */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
 
-            {/* Immersive Visuals - Now part of the scroll flow */}
+            {/* Immersive Img */}
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
               <ImageSlider 
                 images={((selectedTrekk.title || '').toLowerCase().includes('valley of shadows') 
@@ -519,25 +547,25 @@ export default function Trekks() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">The Sacred</span>
+                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Wild Spirit</span>
                   <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
                     {selectedTrekk.title.split(' ').map((word: string, i: number) => (
-                      <span key={i} className={i === 1 ? 'text-white/40' : ''}>{word} </span>
+                      <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
                     ))}
                   </h2>
                 </motion.div>
                 
                 <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
                   <div className="flex items-center gap-2">
-                    <Map className="h-4 w-4 text-terracotta" />
-                    <span>Wild Frontier</span>
+                    <Shield className="h-4 w-4 text-terracotta" />
+                    <span>Safety First</span>
                   </div>
                   <div className="w-1 h-1 rounded-full bg-terracotta" />
-                  <span>Hidden Valleys</span>
+                  <span>Certified Path</span>
                 </div>
               </div>
 
-              {/* Close & Share - Now absolute within the scroll flow */}
+              {/* Close & Share */}
               <div className="absolute top-6 right-6 flex gap-3 z-50">
                 <button 
                   onClick={() => handleShare(selectedTrekk)}
@@ -549,22 +577,23 @@ export default function Trekks() {
                   onClick={() => setSelectedTrekk(null)} 
                   className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
                 >
-                  <X className="h-5 w-5" />
+                  <Plus className="h-5 w-5 rotate-45" />
                 </button>
               </div>
             </div>
 
-            {/* Soulful Details - Scroll continues here */}
+            {/* Details */}
             <div className="flex-grow bg-[#FAF9F6] relative">
               <div className="p-8 md:p-16">
                 <div className="max-w-3xl mx-auto space-y-16">
                   
-                  {/* Stats Grid - Fluid Style */}
-                  <div className="grid grid-cols-3 gap-4">
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                      { icon: Clock, label: 'Duration', value: selectedTrekk.duration, sub: 'Days & Nights' },
-                      { icon: Mountain, label: 'Altitude', value: selectedTrekk.altitude, sub: 'Above Sea Level' },
-                      { icon: Zap, label: 'Challenge', value: selectedTrekk.difficulty, sub: 'Expedition Tier' }
+                      { icon: Clock, label: 'Residency', value: selectedTrekk.duration, sub: 'Mindful Pace' },
+                      { icon: Mountain, label: 'Altitude', value: selectedTrekk.altitude, sub: 'Elevation' },
+                      { icon: Zap, label: 'Difficulty', value: selectedTrekk.difficulty, sub: 'Effort Level' },
+                      { icon: Users, label: 'Group Size', value: '4-8 People', sub: 'Shared Spirit' }
                     ].map((stat, i) => (
                       <motion.div 
                         key={i}
@@ -583,15 +612,31 @@ export default function Trekks() {
                     ))}
                   </div>
 
-                  {/* Soulful Description */}
+                  {/* Highlights Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {(selectedTrekk.highlights || []).map((h: string, i: number) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-4 shrink-0" />
+                        {h}
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Description */}
                   <section>
                     <div className="flex items-center gap-4 mb-6">
                       <div className="h-px flex-grow bg-forest/5" />
-                      <span className="font-fluid text-2xl text-terracotta">The Expedition Experience</span>
+                      <span className="font-fluid text-2xl text-terracotta">Soul Path</span>
                       <div className="h-px flex-grow bg-forest/5" />
                     </div>
                     <p className="text-forest/70 text-base leading-[1.8] font-medium italic mb-8">
-                      "{selectedTrekk.description}"
+                       "{selectedTrekk.description || "Prepare yourself for an unforgettable journey into the heart of the Himalayas. Led by experts who ensure your safety while providing a soulful connection to the mountains."}"
                     </p>
 
                     {/* Day-by-Day Experience Header */}
@@ -600,97 +645,48 @@ export default function Trekks() {
                         <div className="bg-terracotta/20 p-3 rounded-full">
                           <Compass className="h-6 w-6 text-terracotta" />
                         </div>
-                        <h4 className="text-xl font-bold text-forest uppercase tracking-tight">Day-by-Day Journey</h4>
+                        <h4 className="text-xl font-bold text-forest uppercase tracking-tight">The Journey Itinerary</h4>
                       </div>
-                      <p className="text-xs text-forest/50 font-medium">Follow the trail through the heart of the mountains. A daily flow of discovery and resilience.</p>
+                      <p className="text-xs text-forest/50 font-medium">A mindful progression through sacred landscapes.</p>
                     </div>
                   </section>
 
-                  {/* Experience Split */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <h4 className="text-xs font-black text-forest uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-terracotta" /> Core Experience
-                      </h4>
-                      <div className="space-y-4">
-                        {[
-                          'Ancient Forest Trails',
-                          'Glacial Stream Crossing',
-                          'Traditional Village Stays',
-                          'Starlit Alpine Camps'
-                        ].map((item, i) => (
-                          <div key={i} className="flex items-center gap-4 text-sm font-bold text-forest/60 group">
-                            <div className="w-1.5 h-1.5 rounded-full bg-terracotta group-hover:scale-150 transition-transform" />
-                            {item}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-white/50 border border-forest/5 p-8 rounded-[2.5rem]">
-                      <h4 className="text-xs font-black text-forest uppercase tracking-[0.2em] mb-4">Inclusions</h4>
-                      <div className="grid grid-cols-1 gap-4">
-                        {[
-                          { icon: Users, label: 'Boutique Group Size' },
-                          { icon: Star, label: 'Premium Gear' },
-                          { icon: Mountain, label: 'Safety Backed' }
-                        ].map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 text-xs font-bold text-forest/40">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                            {item.label}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Detailed Itinerary */}
-                  {(selectedTrekk.itinerary || selectedTrekk.theExperience) && (
-                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5">
+                  {/* Experience */}
+                  {selectedTrekk.theExperience && (
+                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
+                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
+                      
                       <div className="flex items-center justify-between mb-10">
-                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Day-to-Day Flow</h4>
-                        <Compass className="h-8 w-8 text-terracotta animate-pulse" />
+                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Experience</h4>
+                        <Sparkles className="h-8 w-8 text-terracotta animate-pulse" />
                       </div>
                       
                       <div className="space-y-8 relative">
                         <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
                         
-                        {Array.isArray(selectedTrekk.itinerary) ? (
-                          selectedTrekk.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="relative pl-12 group">
-                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta border-4 border-[#FAF9F6] ring-1 ring-terracotta/20 z-10 group-hover:scale-150 transition-transform" />
-                              <div className="text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
-                              <h5 className="text-lg font-bold text-forest mb-2">Mountain Awakening</h5>
-                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
-                                {item.description}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          selectedTrekk.theExperience.split('\n').map((line: string, i: number) => {
-                            if (!line.trim()) return null;
-                            const isDay = line.toLowerCase().startsWith('day');
-                            return (
-                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
-                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
-                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
-                                  {line.trim()}
-                                </div>
+                        {selectedTrekk.theExperience.split('\n').map((line: string, i: number) => {
+                          if (!line.trim()) return null;
+                          const isDay = line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step');
+                          return (
+                            <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
+                              {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
+                              <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
+                                {line.trim()}
                               </div>
-                            );
-                          })
-                        )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </section>
                   )}
-                  {/* Booking Footer - Creative Style */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-14 p-6 sm:p-8 md:p-10">
+                  {/* Booking Footer */}
+                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
                     <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
                       <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
                         <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Energy Exchange</div>
                         <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
                           {selectedTrekk.price}
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Wanderer</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                         </div>
                       </div>
 
@@ -728,10 +724,15 @@ export default function Trekks() {
 
                         <Button 
                           onClick={() => {
+                            if (!user) {
+                              setShowAuthModal(true);
+                              return;
+                            }
                             const slotIndex = selectedSlots[selectedTrekk.id];
                             const slot = slotIndex !== undefined ? selectedTrekk.slots?.[parseInt(slotIndex)] : undefined;
+                            
                             globalAddToCart({
-                              id: `trekk-${selectedTrekk.id}`,
+                              id: `trekk-${selectedTrekk.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
                               name: selectedTrekk.title,
                               price: selectedTrekk.price,
                               type: 'Trekk',
@@ -750,7 +751,7 @@ export default function Trekks() {
                           className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
                         >
                           <Sparkles className="h-4 w-4" />
-                          Book Now
+                          Reserve Spot
                         </Button>
                       </div>
                     </div>
@@ -762,54 +763,6 @@ export default function Trekks() {
         </motion.div>
       )}
     </AnimatePresence>
-      {/* Customize Section */}
-      <section className="py-24 bg-cream/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <CustomizeTripCard 
-              places={config?.places}
-              treks={config?.trekks}
-              yoga={config?.yoga}
-              meditation={config?.meditation}
-              title={config?.title}
-              description={config?.description}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Slot Selection Popup */}
-      {activeSlotTrekk && (
-        <SlotSelectionPopup 
-          isOpen={!!activeSlotTrekk}
-          onClose={() => setActiveSlotTrekk(null)}
-          slots={activeSlotTrekk.slots}
-          selectedSlotIndex={selectedSlots[activeSlotTrekk.id]}
-          onSelectSlot={(index) => {
-            setSelectedSlots({ ...selectedSlots, [activeSlotTrekk.id]: index });
-            // Auto add after selection
-            const slot = activeSlotTrekk.slots[index];
-            const baseId = `trekk-${activeSlotTrekk.title.toLowerCase().replace(/\s+/g, '-')}`;
-            globalAddToCart({
-              id: `${baseId}-slot-${index}`,
-              name: activeSlotTrekk.title,
-              price: activeSlotTrekk.price,
-              type: 'Trekk',
-              image: activeSlotTrekk.image,
-              dateRange: formatDateRange(selectedDate, activeSlotTrekk.duration, slot)
-            });
-            setActiveSlotTrekk(null);
-            navigate('/checkout');
-          }}
-          onCustomize={() => navigate('/contact')}
-          title={activeSlotTrekk.title}
-        />
-      )}
-
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
-    </div>
-  );
+  </div>
+);
 }

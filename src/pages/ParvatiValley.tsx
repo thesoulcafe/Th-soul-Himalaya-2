@@ -10,7 +10,8 @@ import {
   ArrowRight,
   Droplets,
   ExternalLink,
-  Info
+  Info,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -219,7 +220,48 @@ const ParvatiValley = () => {
         </Link>
       </section>
 
-      {/* 2. Interactive Village Grid (The Hamlets of the Gods) */}
+      {/* New: Divine Duality Card (Shiva Meditation & Sikh Reverence) */}
+      <section className="px-6 max-w-5xl mx-auto mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="group relative rounded-[2.5rem] bg-forest/5 border border-forest/10 p-10 overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-8">
+              <Sparkles className="h-8 w-8 text-forest/10 group-hover:text-terracotta/20 transition-colors" />
+            </div>
+            <div className="relative z-10 space-y-4">
+              <span className="text-terracotta text-[10px] font-black uppercase tracking-widest">Ancient Penance</span>
+              <h3 className="text-3xl font-playfair italic font-bold text-forest">The 3,000 Year Meditation</h3>
+              <p className="text-sm text-forest/60 leading-relaxed font-medium">
+                It is whispered that Lord Shiva himself chose this high alpine sanctuary for his intense dhyana (meditation), which lasted three millennia. This profound spiritual energy is what gives the Parvati Valley its legendary aura and makes it a site where the veil between the physical and divine worlds is remarkably thin.
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="group relative rounded-[2.5rem] bg-white border border-forest/5 shadow-xl shadow-forest/5 p-10 overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-8">
+              <History className="h-8 w-8 text-forest/10 group-hover:text-blue-400/20 transition-colors" />
+            </div>
+            <div className="relative z-10 space-y-4">
+              <span className="text-blue-500/60 text-[10px] font-black uppercase tracking-widest">Sikh Heritage</span>
+              <h3 className="text-3xl font-playfair italic font-bold text-forest">The Miracle of Manikaran</h3>
+              <p className="text-[13px] text-forest/70 leading-relaxed font-medium">
+                Sikh community holds Manikaran in equal reverence, associating it with a 16th-century visit by Guru Nanak Dev Ji and his disciple Bhai Mardana. When Mardana found himself without fire to cook chapatis, Guru Nanak directed him to lift a stone, revealing a hot spring. Today, the Manikaran Sahib Gurudwara continues this legacy by cooking the daily langar directly in the boiling spring water—a living testament to the equality and selfless service central to Sikhism.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 3. Interactive Village Grid (The Hamlets of the Gods) */}
       <section className="py-24 bg-forest border-y border-white/5 relative overflow-hidden">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[120px]" />

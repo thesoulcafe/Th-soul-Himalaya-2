@@ -9,6 +9,7 @@ import {
   MapPin, 
   Clock, 
   Star, 
+  Stars,
   Compass,
   CheckCircle2, 
   Home as HomeIcon, 
@@ -70,10 +71,11 @@ export default function Tours() {
 
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal/tour detail is open
   useEffect(() => {
     if (selectedTour || activeSlotTour) {
       document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); // Reset to top when opening details
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -158,37 +160,42 @@ export default function Tours() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       let combinedItems: any[] = [];
       
-      if (!snapshot.empty) {
-        combinedItems = snapshot.docs.map(doc => {
-          const type = doc.data().type;
-          const data = doc.data().data;
-          return {
-            id: doc.id,
-            ...data,
-            originalType: type,
-            category: (type === 'yoga' || type === 'meditation') ? 'Wellness' : (data.category || 'All'),
-            highlights: data.highlights || data.features || []
-          };
-        }).filter(item => {
-          const title = (item.title || item.name || '').toLowerCase();
-          return !title.includes('photography & cafe narrative');
+      // Merge DB items with defaults, preferring DB items if IDs match
+      const dbItems = snapshot.empty ? [] : snapshot.docs.map(doc => {
+        const type = doc.data().type;
+        const data = doc.data().data;
+        return {
+          id: doc.id,
+          ...data,
+          originalType: type,
+          category: (type === 'yoga' || type === 'meditation') ? 'Wellness' : (data.category || 'All'),
+          highlights: data.highlights || data.features || []
+        };
+      }).filter(item => {
+        const title = (item.title || item.name || '').toLowerCase();
+        return !title.includes('photography & cafe narrative');
+      });
+
+      // Start with DB items
+      combinedItems = [...dbItems];
+      
+      // Add defaults if they don't exist in DB (by title matching or ID matching)
+      const allDefaults = [
+        ...DEFAULT_TOURS.map(t => ({ ...t, originalType: 'tour' })),
+        ...DEFAULT_YOGA.map(y => ({ ...y, originalType: 'yoga', category: 'Wellness', highlights: y.features || [] })),
+        ...DEFAULT_MEDITATION.map(m => ({ ...m, originalType: 'meditation', category: 'Wellness', highlights: m.features || [] }))
+      ];
+
+      allDefaults.forEach(def => {
+        const exists = dbItems.some(dbItem => {
+          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
+          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
+          return dbItem.id === def.id || dbTitle === defTitle;
         });
-      }
-
-      // If DB items are missing some types or totally empty, fill with defaults
-      const hasTours = combinedItems.some(i => i.originalType === 'tour');
-      const hasYoga = combinedItems.some(i => i.originalType === 'yoga');
-      const hasMeditation = combinedItems.some(i => i.originalType === 'meditation');
-
-      if (!hasTours) {
-        combinedItems = [...combinedItems, ...DEFAULT_TOURS.map(t => ({ ...t, originalType: 'tour' }))];
-      }
-      if (!hasYoga) {
-        combinedItems = [...combinedItems, ...DEFAULT_YOGA.map(y => ({ ...y, originalType: 'yoga', category: 'Wellness', highlights: y.features || [] }))];
-      }
-      if (!hasMeditation) {
-        combinedItems = [...combinedItems, ...DEFAULT_MEDITATION.map(m => ({ ...m, originalType: 'meditation', category: 'Wellness', highlights: m.features || [] }))];
-      }
+        if (!exists) {
+          combinedItems.push(def);
+        }
+      });
 
       const sortedItems = combinedItems.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
@@ -234,6 +241,9 @@ export default function Tours() {
 
   const filteredTours = useMemo(() => {
     return tours.filter(tour => {
+      // Hide unavailable tours for non-admins
+      if (profile?.role !== 'admin' && tour.isAvailable === false) return false;
+
       const title = String(tour.title || tour.name || '').toLowerCase();
       const description = String(tour.description || '').toLowerCase();
       const query = searchQuery.toLowerCase();
@@ -249,14 +259,13 @@ export default function Tours() {
       
       return matchesCategory && matchesSearch && matchesPrice && matchesDuration;
     });
-  }, [tours, activeCategory, searchQuery, maxPrice, maxDuration]);
+  }, [tours, activeCategory, searchQuery, maxPrice, maxDuration, profile?.role]);
 
   useEffect(() => {
     const id = searchParams.get('id');
     if (id && tours.length > 0) {
       const tour = tours.find(t => t.id === id);
       if (tour) {
-        setSelectedTour(tour);
         setSeo({
           title: tour.title || tour.name,
           description: tour.description,
@@ -558,25 +567,19 @@ export default function Tours() {
                           ))}
                         </div>
 
-                        {/* Slot Selection (Conditional) */}
+                        {/* Slot Selection (Conditional) - Now links to booking page */}
                         {tour.slots && tour.slots.length > 0 && (
                           <div className="mb-4">
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setActiveSlotTour(tour);
+                                navigate(`/tours/${tour.id}/book`);
                               }}
                               className="w-full bg-forest/[0.03] border border-forest/5 rounded-xl p-3 text-[10px] text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
                             >
                               <div className="flex items-center gap-2">
                                 <Calendar className="h-3.5 w-3.5 text-terracotta" />
-                                  {selectedSlots[tour.id] !== undefined && tour.slots && tour.slots[parseInt(selectedSlots[tour.id])] ? (
-                                    <span>
-                                      {new Date(tour.slots[parseInt(selectedSlots[tour.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                                    </span>
-                                  ) : (
-                                  <span className="text-forest/30">Pick Date</span>
-                                )}
+                                <span className="text-forest/30 text-xs">Pick Date</span>
                               </div>
                               <ChevronDown className="h-3 w-3 text-forest/20 group-hover:text-terracotta transition-colors" />
                             </button>
@@ -606,6 +609,12 @@ export default function Tours() {
                             const quantity = getItemQuantity(currentItemId);
                             
                             const handleBookAction = () => {
+                              if (tour.slots && tour.slots.length > 0) {
+                                // Redirect to booking page if slots exist
+                                navigate(`/tours/${tour.id}/book`);
+                                return;
+                              }
+
                               if (!user) {
                                 // Store pending item and open auth modal
                                 setPendingCartItem({
@@ -614,27 +623,20 @@ export default function Tours() {
                                   price: tour.price,
                                   type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
                                   image: tour.image,
-                                  dateRange: formatDateRange(selectedDate, tour.duration, slotIndex !== undefined ? tour.slots?.[parseInt(slotIndex)] : undefined)
+                                  dateRange: formatDateRange(selectedDate, tour.duration)
                                 });
                                 setShowAuthModal(true);
                                 return;
                               }
 
-                              if (tour.slots && tour.slots.length > 0 && slotIndex === undefined) {
-                                // If slots exist but none selected, show the popup
-                                setActiveSlotTour(tour);
-                                return;
-                              }
-
-                              const slot = slotIndex !== undefined ? tour.slots?.[parseInt(slotIndex)] : undefined;
                               globalAddToCart({
                                 id: currentItemId,
-                                name: tour.title,
-                                price: tour.price,
-                                type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
-                                image: tour.image,
-                                dateRange: formatDateRange(selectedDate, tour.duration, slot)
-                              });
+                                  name: tour.title,
+                                  price: tour.price,
+                                  type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
+                                  image: tour.image,
+                                  dateRange: formatDateRange(selectedDate, tour.duration)
+                                });
                             };
 
                             return (
@@ -727,6 +729,8 @@ export default function Tours() {
         </div>
       </section>
 
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
       {/* Tour Detail Modal */}
       <AnimatePresence>
         {selectedTour && (
@@ -743,160 +747,149 @@ export default function Tours() {
               className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
               data-lenis-prevent
             >
-            {/* Background Texture Overlay */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")' }} />
+              {/* Background Texture Overlay */}
+              <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
 
-            {/* Immersive Visuals - Now part of the scroll flow */}
-            <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <ImageSlider 
-                images={((selectedTour.title || '').toLowerCase().includes('valley of shadows') 
-                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
-                  : [selectedTour.image, ...(selectedTour.images || [])]).filter(Boolean)} 
-                alt={selectedTour.title}
-                className="h-full w-full"
-                autoSwipe={true}
-                interval={4000}
-              />
-              
-              {/* Decorative Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
-              
-              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">The Curated</span>
-                  <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
-                    {selectedTour.title.split(' ').map((word: string, i: number) => (
-                      <span key={i} className={i === 1 ? 'text-white/40' : ''}>{word} </span>
-                    ))}
-                  </h2>
-                </motion.div>
+              {/* Immersive Img */}
+              <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
+                <ImageSlider 
+                  images={((selectedTour.title || '').toLowerCase().includes('valley of shadows') 
+                    ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                    : [selectedTour.image, ...(selectedTour.images || [])]).filter(Boolean)} 
+                  alt={selectedTour.title}
+                  className="h-full w-full"
+                  autoSwipe={true}
+                  interval={4000}
+                />
                 
-                <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-terracotta" />
-                    <span>Sacred Paths</span>
+                {/* Decorative Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
+                
+                <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Soul Journey</span>
+                    <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
+                      {selectedTour.title.split(' ').map((word: string, i: number) => (
+                        <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
+                      ))}
+                    </h2>
+                  </motion.div>
+                  
+                  <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-terracotta fill-current" />
+                      <span>{selectedTour.rating} / 5.0</span>
+                    </div>
+                    <div className="w-1 h-1 rounded-full bg-terracotta" />
+                    <span>{selectedTour.category || 'Curated'}</span>
                   </div>
-                  <div className="w-1 h-1 rounded-full bg-terracotta" />
-                  <span>Cultural Wonders</span>
+                </div>
+
+                {/* Close & Share */}
+                <div className="absolute top-6 right-6 flex gap-3 z-50">
+                  <button 
+                    onClick={() => handleShare(selectedTour)}
+                    className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-terracotta transition-all"
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </button>
+                  <button 
+                    onClick={() => setSelectedTour(null)} 
+                    className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
+                  >
+                    <Plus className="h-5 w-5 rotate-45" />
+                  </button>
                 </div>
               </div>
 
-              {/* Close & Share - Now absolute within the scroll flow */}
-              <div className="absolute top-6 right-6 flex gap-3 z-50">
-                <button 
-                  onClick={() => handleShare(selectedTour)}
-                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-terracotta transition-all"
-                >
-                  <Share2 className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={() => setSelectedTour(null)} 
-                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Soulful Details - Scroll continues here */}
-            <div className="flex-grow bg-[#FAF9F6] relative">
-              <div className="p-8 md:p-16">
-                <div className="max-w-3xl mx-auto space-y-16">
-                  
-                  {/* Stats Grid - Fluid Style */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { icon: Clock, label: 'Duration', value: selectedTour.duration, sub: 'Days & Nights' },
-                      { icon: Star, label: 'Rating', value: `${selectedTour.rating} Stars`, sub: `${selectedTour.reviews} Soulful Reviews` }
-                    ].map((stat, i) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 + (i * 0.1) }}
-                        className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all"
-                      >
-                        <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                          <stat.icon className="h-5 w-5 text-terracotta" />
-                        </div>
-                        <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
-                        <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
-                        <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {selectedTour.highlights.map((h: string, i: number) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
-                      >
-                        <CheckCircle2 className="h-4 w-4 text-terracotta mr-4 shrink-0" />
-                        {h}
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Soulful Description */}
-                  <section>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="h-px flex-grow bg-forest/5" />
-                      <span className="font-fluid text-2xl text-terracotta">The Experience</span>
-                      <div className="h-px flex-grow bg-forest/5" />
-                    </div>
-                    <p className="text-forest/70 text-base leading-[1.8] font-medium italic mb-8">
-                      "{selectedTour.description}"
-                    </p>
+              {/* Details */}
+              <div className="flex-grow bg-[#FAF9F6] relative">
+                <div className="p-8 md:p-16">
+                  <div className="max-w-3xl mx-auto space-y-16">
                     
-                    {/* Day-by-Day Experience Header */}
-                    <div className="bg-forest/5 rounded-2xl p-6 border border-forest/10 mb-8">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="bg-terracotta/20 p-3 rounded-full">
-                          <Compass className="h-6 w-6 text-terracotta" />
-                        </div>
-                        <h4 className="text-xl font-bold text-forest uppercase tracking-tight">Day-by-Day Journey</h4>
-                      </div>
-                      <p className="text-xs text-forest/50 font-medium">Follow the path designed for your spiritual evolution. Each day is a step closer to the divine.</p>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      {[
+                        { icon: Clock, label: 'Duration', value: selectedTour.duration, sub: 'Immersive Time' },
+                        { icon: Users, label: 'Group Size', value: '4-10 People', sub: 'Collective Energy' },
+                        { icon: Zap, label: 'Activity', value: 'Moderate', sub: 'Effort Required' },
+                        { icon: Stars, label: 'Focus', value: selectedTour.focus || 'Experience', sub: 'Core Value' }
+                      ].map((stat, i) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 + (i * 0.1) }}
+                          className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all font-sans"
+                        >
+                          <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            {stat.icon && <stat.icon className="h-5 w-5 text-terracotta" />}
+                          </div>
+                          <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
+                          <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
+                          <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
+                        </motion.div>
+                      ))}
                     </div>
-                  </section>
 
-                  {/* Detailed Itinerary */}
-                  {(selectedTour.itinerary || selectedTour.theExperience) && (
-                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
-                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
-                      
-                      <div className="flex items-center justify-between mb-10">
-                        <h4 className="font-playfair text-3xl font-black italic text-forest">Chronicle of Wonder</h4>
-                        <Sparkles className="h-8 w-8 text-terracotta animate-pulse" />
+                    {/* Highlights Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(selectedTour.highlights || []).map((h: string, i: number) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-4 shrink-0" />
+                          {h}
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Description */}
+                    <section>
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="h-px flex-grow bg-forest/5" />
+                        <span className="font-fluid text-2xl text-terracotta">Soul Narrative</span>
+                        <div className="h-px flex-grow bg-forest/5" />
                       </div>
-                      
-                      <div className="space-y-8 relative">
-                        <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                      <p className="text-forest/70 text-base leading-[1.8] font-medium italic mb-8">
+                         "{selectedTour.description || "A meticulously crafted journey through the sacred mists of the Himalayas. We don't just show you places; we help you feel their heartbeat."}"
+                      </p>
+
+                      {/* Itinerary Header */}
+                      <div className="bg-forest/5 rounded-2xl p-6 border border-forest/10 mb-8">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="bg-terracotta/20 p-3 rounded-full">
+                            <Compass className="h-6 w-6 text-terracotta" />
+                          </div>
+                          <h4 className="text-xl font-bold text-forest uppercase tracking-tight">The Itinerary</h4>
+                        </div>
+                        <p className="text-xs text-forest/50 font-medium">A mindful progression through sacred landscapes.</p>
+                      </div>
+                    </section>
+
+                    {/* Experience Detail */}
+                    {selectedTour.theExperience && (
+                      <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
+                        <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
+                        <div className="flex items-center justify-between mb-10">
+                          <h4 className="font-playfair text-3xl font-black italic text-forest uppercase">Experience Path</h4>
+                          <Sparkles className="h-8 w-8 text-terracotta animate-pulse" />
+                        </div>
                         
-                        {Array.isArray(selectedTour.itinerary) ? (
-                          selectedTour.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="relative pl-12 group">
-                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta border-4 border-[#FAF9F6] ring-1 ring-terracotta/20 z-10 group-hover:scale-150 transition-transform" />
-                              <div className="text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
-                              <h5 className="text-lg font-bold text-forest mb-2">Morning Discovery</h5>
-                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
-                                {item.description}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          selectedTour.theExperience.split('\n').map((line: string, i: number) => {
+                        <div className="space-y-8 relative">
+                          <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                          
+                          {selectedTour.theExperience.split('\n').map((line: string, i: number) => {
                             if (!line.trim()) return null;
-                            const isDay = line.toLowerCase().startsWith('day');
+                            const isDay = line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step');
                             return (
                               <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
                                 {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
@@ -905,122 +898,95 @@ export default function Tours() {
                                 </div>
                               </div>
                             );
-                          })
-                        )}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Booking Footer - Creative Style */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
-                <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
-                  <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
-                    <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Energy Exchange</div>
-                    <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
-                      {selectedTour.price}
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Traveler</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                    {selectedTour.slots && selectedTour.slots.length > 0 ? (
-                      <div className="relative group w-full sm:w-auto">
-                        <select 
-                          value={selectedSlots[selectedTour.id] || ''}
-                          onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTour.id]: e.target.value })}
-                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                        >
-                          <option value="">Pick Date Slot</option>
-                          {selectedTour.slots.map((slot: any, i: number) => (
-                            <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                      </div>
-                    ) : (
-                      <div className="relative group w-full sm:w-auto">
-                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                          <Calendar className="h-4 w-4" />
+                          })}
                         </div>
-                        <input
-                          type="date"
-                          min={new Date().toISOString().split('T')[0]}
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                        />
-                      </div>
+                      </section>
                     )}
 
-                    <Button 
-                      onClick={() => {
-                        const slotIndex = selectedSlots[selectedTour.id];
-                        const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
-                        globalAddToCart({
-                          id: `tour-${selectedTour.id}`,
-                          name: selectedTour.title,
-                          price: selectedTour.price,
-                          type: 'Tour',
-                          image: selectedTour.image,
-                          dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
-                        });
-                        setSelectedTour(null);
-                        navigate('/checkout');
-                      }}
-                      disabled={
-                        selectedTour.isAvailable === false || 
-                        (selectedTour.slots && selectedTour.slots.length > 0 
-                          ? !selectedSlots[selectedTour.id] 
-                          : !selectedDate)
-                      }
-                      className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Book Now
-                    </Button>
+                    {/* Booking Footer */}
+                    <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
+                      <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+                        <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
+                          <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Energy Exchange</div>
+                          <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
+                            {selectedTour.price}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                          {selectedTour.slots && selectedTour.slots.length > 0 ? (
+                            <div className="relative group w-full sm:w-auto">
+                              <select 
+                                value={selectedSlots[selectedTour.id] || ''}
+                                onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTour.id]: e.target.value })}
+                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                              >
+                                <option value="">Pick Date Slot</option>
+                                {selectedTour.slots.map((slot: any, i: number) => (
+                                  <option key={i} value={i}>
+                                    {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  </option>
+                                ))}
+                              </select>
+                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                            </div>
+                          ) : (
+                            <div className="relative group w-full sm:w-auto">
+                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                <Calendar className="h-4 w-4" />
+                              </div>
+                              <input
+                                type="date"
+                                min={new Date().toISOString().split('T')[0]}
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                              />
+                            </div>
+                          )}
+
+                          <Button 
+                            onClick={() => {
+                              if (!user) {
+                                setShowAuthModal(true);
+                                return;
+                              }
+                              const slotIndex = selectedSlots[selectedTour.id];
+                              const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
+                              
+                              globalAddToCart({
+                                id: `${selectedTour.originalType || 'tour'}-${selectedTour.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
+                                name: selectedTour.title || selectedTour.name,
+                                price: selectedTour.price,
+                                type: selectedTour.originalType === 'yoga' ? 'Yoga Retreat' : (selectedTour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
+                                image: selectedTour.image,
+                                dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
+                              });
+                              setSelectedTour(null);
+                              navigate('/checkout');
+                            }}
+                            disabled={
+                              selectedTour.isAvailable === false || 
+                              (selectedTour.slots && selectedTour.slots.length > 0 
+                                ? !selectedSlots[selectedTour.id] 
+                                : !selectedDate)
+                            }
+                            className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                            Reserve Spot
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
-      {/* Slot Selection Popup */}
-      {activeSlotTour && (
-        <SlotSelectionPopup 
-          isOpen={!!activeSlotTour}
-          onClose={() => setActiveSlotTour(null)}
-          slots={activeSlotTour.slots}
-          selectedSlotIndex={selectedSlots[activeSlotTour.id]}
-          onSelectSlot={(index) => {
-            setSelectedSlots({ ...selectedSlots, [activeSlotTour.id]: index });
-            // Auto add after selection
-            const slot = activeSlotTour.slots[index];
-            globalAddToCart({
-              id: `tour-${activeSlotTour.id}-slot-${index}`,
-              name: activeSlotTour.title,
-              price: activeSlotTour.price,
-              type: 'Tour',
-              image: activeSlotTour.image,
-              dateRange: formatDateRange(selectedDate, activeSlotTour.duration, slot)
-            });
-            setActiveSlotTour(null);
-            navigate('/checkout');
-          }}
-          onCustomize={() => document.getElementById('customize-trip')?.scrollIntoView({ behavior: 'smooth' })}
-          title={activeSlotTour.title}
-        />
-      )}
-
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

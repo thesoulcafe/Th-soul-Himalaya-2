@@ -21,6 +21,8 @@ import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import ParvatiValley from './pages/ParvatiValley';
 import CosmicManifestation from './pages/CosmicManifestation';
+import ServiceDetail from './pages/ServiceDetail';
+import BookingPage from './pages/BookingPage';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
@@ -47,6 +49,8 @@ export default function App() {
                   <Route path="yoga" element={<Yoga />} />
                   <Route path="meditation" element={<Meditation />} />
                   <Route path="adventure" element={<Adventure />} />
+                  <Route path=":category/:id" element={<ServiceDetail />} />
+                  <Route path=":category/:id/book" element={<BookingPage />} />
                   <Route path="shop" element={<Shop />} />
                   <Route path="cart" element={<Cart />} />
                   <Route path="blueberry" element={<Blueberry />} />

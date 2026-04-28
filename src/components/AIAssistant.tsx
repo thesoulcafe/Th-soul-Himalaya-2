@@ -43,25 +43,9 @@ export default function AIAssistant() {
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const { addToCart } = useCart();
 
-  // Initialize Gemini
-  const genAI = useMemo(() => {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      console.warn("GEMINI_API_KEY is missing. AI Guide will not be available.");
-      return null;
-    }
-    return new GoogleGenAI({ apiKey: key });
-  }, []);
-
+  // Remove client-side GenAI initialization since we use the /api/chat server endpoint
+  
   const append = async (message: { role: string; content: string }) => {
-    if (!genAI) {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: "My spiritual connection is currently limited (API key missing). Please check the environment configuration."
-      }]);
-      return;
-    }
     const userMessage = { id: Date.now().toString(), ...message };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -99,13 +83,36 @@ export default function AIAssistant() {
         
         const chunk = decoder.decode(value, { stream: true });
         
-        // Very basic parsing for development - ideally use @ai-sdk/ui or similar
-        // For this demo, we'll handle the text and simple tool markers if present
-        accumulatedText += chunk;
-        
-        setMessages(prev => prev.map(m => 
-          m.id === tempId ? { ...m, content: accumulatedText } : m
-        ));
+        // Handle the Vercel AI SDK stream format (text chunks start with 0:)
+        const lines = chunk.split('\n').filter(l => l.trim());
+        for (const line of lines) {
+          if (line.startsWith('0:')) {
+            const textChunk = line.substring(2).replace(/^"(.*)"$/, '$1').replace(/\\n/g, '\n').replace(/\\"/g, '"');
+            accumulatedText += textChunk;
+            
+            setMessages(prev => prev.map(m => 
+              m.id === tempId ? { ...m, content: accumulatedText } : m
+            ));
+          } else if (line.startsWith('9:')) {
+            // Tool call information
+            try {
+              const toolData = JSON.parse(line.substring(2));
+              setMessages(prev => prev.map(m => 
+                m.id === tempId ? { 
+                  ...m, 
+                  toolInvocations: [...(m.toolInvocations || []), {
+                    state: 'result',
+                    toolCallId: toolData.toolCallId,
+                    toolName: toolData.toolName,
+                    result: toolData.result
+                  }] 
+                } : m
+              ));
+            } catch (e) {
+              console.error("Failed to parse tool data:", e);
+            }
+          }
+        }
       }
 
       // Final cleanup and suggestion extraction (similar to before but adapted for API flow)

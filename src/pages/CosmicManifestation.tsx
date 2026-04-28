@@ -19,13 +19,12 @@ const COSMIC_SECTIONS = [
   },
   {
     id: "manikaran",
-    title: "God Shiva meditate 3000 Year in valley",
+    title: "Manikaran: The Sacred Convergence",
     subtitle: "The Boiling Waters of Legend",
     image: "https://i.postimg.cc/bJtyTF8k/IMG-8099.jpg",
     paragraphs: [
       "Manikaran, located on the right bank of the roaring Parvati River, is perhaps the most significant pilgrimage site in the region.",
-      "For Hindus, the origin of the hot springs is tied to the Mani (jewel) legend. It is said that while Shiva and Parvati were residing in the valley, the Goddess lost a precious stone in the river. When Shiva’s attendants failed to find it, he opened his third eye in a rage that threatened to destroy the universe. To appease him, the serpent god Sheshnag hissed, causing boiling water to gush from the earth, bringing with it thousands of jewels. This pacified the deity and created the healing springs that define the town today.",
-      "The Sikh community holds Manikaran in equal reverence, associating it with a 16th-century visit by Guru Nanak Dev Ji, the founder of Sikhism, and his disciple Bhai Mardana. When Mardana found himself without fire to cook the food provided by the local community, Guru Nanak directed him to lift a stone, revealing a hot spring. The miracle of the floating, baked chapatis (flatbreads) served to reinforce the Guru’s message of faith and the divine presence in nature. Today, the Manikaran Sahib Gurudwara continues this legacy by cooking the daily langar (community meal) directly in the boiling spring water, a practice that serves as a living testament to the equality and selfless service central to the Sikh faith."
+      "For Hindus, the origin of the hot springs is tied to the Mani (jewel) legend. It is said that while Shiva and Parvati were residing in the valley, the Goddess lost a precious stone in the river. When Shiva’s attendants failed to find it, he opened his third eye in a rage that threatened to destroy the universe. To appease him, the serpent god Sheshnag hissed, causing boiling water to gush from the earth, bringing with it thousands of jewels. This pacified the deity and created the healing springs that define the town today."
     ],
     theme: "from-orange-900/20 to-black",
     icon: <Sun className="h-8 w-8 text-orange-300" />

@@ -468,7 +468,7 @@ export default function Admin() {
       }
     });
 
-    const trekkBookings = itemsList.filter(i => i.type === 'trekk' || i.type === 'trek');
+    const trekkBookings = itemsList.filter(i => i.type === 'trekk' || i.type === 'trek' || i.type === 'Trekk');
     const trekkCounts: Record<string, number> = {};
     trekkBookings.forEach(i => {
       trekkCounts[i.name] = (trekkCounts[i.name] || 0) + (i.quantity || 1);
@@ -1309,6 +1309,27 @@ export default function Admin() {
                             />
                           </div>
                         )}
+
+                        {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'shop_item' || activeContentTab === 'service' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure' || activeContentTab === 'wfh') && (
+                          <div className="md:col-span-2 space-y-4 bg-forest/[0.02] p-6 rounded-[2rem] border border-forest/5 flex items-center justify-between">
+                            <div className="space-y-1">
+                              <label className="text-sm font-black text-forest uppercase tracking-widest">Available for Booking</label>
+                              <p className="text-[10px] text-forest/40 font-medium italic">Uncheck to hide this package from regular users</p>
+                            </div>
+                            <div 
+                              onClick={() => setFormData({ ...formData, isAvailable: formData.isAvailable === false ? true : false })}
+                              className={cn(
+                                "w-14 h-8 rounded-full p-1 cursor-pointer transition-all duration-300",
+                                formData.isAvailable === false ? "bg-forest/10" : "bg-terracotta"
+                              )}
+                            >
+                              <div className={cn(
+                                "w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300",
+                                formData.isAvailable === false ? "translate-x-0" : "translate-x-6"
+                              )} />
+                            </div>
+                          </div>
+                        )}
                         {activeContentTab !== 'instagram' && activeContentTab !== 'page_parvati' && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Price / Cost</label>
@@ -1622,7 +1643,7 @@ export default function Admin() {
                           </div>
                         )}
                         
-                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'service' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure' || activeContentTab === 'wfh') && (
+                        {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'service' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure' || activeContentTab === 'wfh') && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Duration</label>
                             <Input 
@@ -1716,18 +1737,18 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'wfh' || activeContentTab === 'trek') && (
+                        {(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'wfh' || activeContentTab === 'trekk') && (
                           <div className="md:col-span-2 space-y-4">
                             <div className="flex items-center justify-between">
                               <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
-                                {(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? 'Highlights' : 'Key Features'}
+                                {(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? 'Highlights' : 'Key Features'}
                               </label>
                               <Button 
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? 'highlights' : 'features';
+                                  const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? 'highlights' : 'features';
                                   const currentList = Array.isArray(formData[field]) ? formData[field] : [];
                                   setFormData({ ...formData, [field]: [...currentList, ''] });
                                 }}
@@ -1737,8 +1758,8 @@ export default function Admin() {
                               </Button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {(Array.isArray((activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? formData.highlights : formData.features) 
-                                ? ((activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? formData.highlights : formData.features) 
+                              {(Array.isArray((activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? formData.highlights : formData.features) 
+                                ? ((activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? formData.highlights : formData.features) 
                                 : []
                               ).map((item: string, index: number) => (
                                 <div key={index} className="flex gap-2 items-center group">
@@ -1746,7 +1767,7 @@ export default function Admin() {
                                     <Input 
                                       value={item} 
                                       onChange={(e) => {
-                                        const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? 'highlights' : 'features';
+                                        const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? 'highlights' : 'features';
                                         const newList = [...formData[field]];
                                         newList[index] = e.target.value;
                                         setFormData({ ...formData, [field]: newList });
@@ -1760,7 +1781,7 @@ export default function Admin() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => {
-                                      const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek') ? 'highlights' : 'features';
+                                      const field = (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk') ? 'highlights' : 'features';
                                       const newList = formData[field].filter((_: any, i: number) => i !== index);
                                       setFormData({ ...formData, [field]: newList });
                                     }}
@@ -1770,9 +1791,9 @@ export default function Admin() {
                                   </Button>
                                 </div>
                               ))}
-                              {(!(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek' ? formData.highlights : formData.features) || 
-                                 !Array.isArray(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek' ? formData.highlights : formData.features) || 
-                                 (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trek' ? formData.highlights : formData.features).length === 0) && (
+                              {(!(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk' ? formData.highlights : formData.features) || 
+                                 !Array.isArray(activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk' ? formData.highlights : formData.features) || 
+                                 (activeContentTab === 'tour' || activeContentTab === 'adventure' || activeContentTab === 'trekk' ? formData.highlights : formData.features).length === 0) && (
                                 <div className="md:col-span-2 text-center py-6 border-2 border-dashed border-forest/5 rounded-2xl">
                                   <p className="text-[10px] text-forest/30 font-medium italic">No items added yet. Click 'Add Item' to begin.</p>
                                 </div>
@@ -1794,7 +1815,7 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {activeContentTab === 'trek' && (
+                        {activeContentTab === 'trekk' && (
                           <>
                             <div className="space-y-3">
                               <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Difficulty Level</label>
@@ -1847,7 +1868,7 @@ export default function Admin() {
                         </div>
 
                         {/* Day-by-Day Experience Editor */}
-                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'trekk' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
+                        {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
                           <div className="md:col-span-2 space-y-4 border-t border-forest/5 pt-8 mt-4">
                             <div className="flex items-center justify-between">
                               <div>
@@ -1935,7 +1956,7 @@ export default function Admin() {
                         )}
 
                         {/* Slots Management */}
-                        {(activeContentTab === 'tour' || activeContentTab === 'trek' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'wfh' || activeContentTab === 'adventure') && (
+                        {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'wfh' || activeContentTab === 'adventure') && (
                           <div className="md:col-span-2 space-y-4">
                             <div className="flex items-center justify-between">
                               <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Available Slots (Dates)</label>
@@ -2660,7 +2681,7 @@ export default function Admin() {
                                       <div className={cn(
                                         "h-12 w-12 rounded-xl flex items-center justify-center shrink-0",
                                         (booking.items?.[0]?.type || booking.serviceType) === 'tour' ? "bg-sky-500/10 text-sky-600" :
-                                        (booking.items?.[0]?.type || booking.serviceType) === 'trek' ? "bg-emerald-500/10 text-emerald-600" :
+                                        (booking.items?.[0]?.type || booking.serviceType) === 'trekk' ? "bg-emerald-500/10 text-emerald-600" :
                                         "bg-indigo-500/10 text-indigo-600"
                                       )}>
                                         {(booking.items?.[0]?.type || booking.serviceType) === 'tour' ? <Map className="h-6 w-6" /> : <Compass className="h-6 w-6" />}

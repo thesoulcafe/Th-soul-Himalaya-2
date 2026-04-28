@@ -17,7 +17,7 @@ import { SEO } from '@/components/SEO';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DEFAULT_YOGA } from '@/constants';
 
 export default function Yoga() {
@@ -35,10 +35,11 @@ export default function Yoga() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal/tour detail is open
   useEffect(() => {
     if (selectedPackage || activeSlotPackage) {
       document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); // Reset to top when opening details
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -102,29 +103,37 @@ export default function Yoga() {
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'yoga'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const dbPackages = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data().data
-        })).sort((a, b) => {
-          const aAvail = a.isAvailable !== false;
-          const bAvail = b.isAvailable !== false;
-          if (aAvail && !bAvail) return -1;
-          if (!aAvail && bAvail) return 1;
+      const dbPackages = snapshot.empty ? [] : snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data().data,
+        originalType: 'yoga'
+      }));
 
-          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-          return aOrder - bOrder;
+      // Merge with defaults
+      let combined = [...dbPackages];
+      DEFAULT_YOGA.forEach(def => {
+        const exists = dbPackages.some(dbItem => {
+          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
+          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
+          return dbItem.id === def.id || dbTitle === defTitle;
         });
-        setPackageList(dbPackages);
-      } else {
-        // Fallback to defaults
-        setPackageList([...DEFAULT_YOGA].sort((a, b) => {
-          const aOrder = ((a as any).order !== undefined && (a as any).order !== null) ? Number((a as any).order) : 999;
-          const bOrder = ((b as any).order !== undefined && (b as any).order !== null) ? Number((b as any).order) : 999;
-          return aOrder - bOrder;
-        }));
-      }
+        if (!exists) {
+          combined.push({ ...def, originalType: 'yoga' });
+        }
+      });
+
+      const sortedPackages = combined.sort((a, b) => {
+        const aAvail = a.isAvailable !== false;
+        const bAvail = b.isAvailable !== false;
+        if (aAvail && !bAvail) return -1;
+        if (!aAvail && bAvail) return 1;
+
+        const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+        const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+        return aOrder - bOrder;
+      });
+
+      setPackageList(sortedPackages);
       setHasLoaded(true);
     });
 
@@ -150,7 +159,6 @@ export default function Yoga() {
     if (id && packageList.length > 0) {
       const pkg = packageList.find(p => p.id === id);
       if (pkg) {
-        setSelectedPackage(pkg);
         setSeo({
           title: pkg.title,
           description: pkg.description,
@@ -160,6 +168,13 @@ export default function Yoga() {
       }
     }
   }, [searchParams, packageList]);
+
+  const filteredPackages = useMemo(() => {
+    return packageList.filter(pkg => {
+      if (profile?.role !== 'admin' && pkg.isAvailable === false) return false;
+      return true;
+    });
+  }, [packageList, profile?.role]);
 
   return (
     <div className="pt-24">
@@ -222,7 +237,7 @@ export default function Yoga() {
                 </div>
               ))
             ) : (
-              packageList.map((pkg, i) => (
+              filteredPackages.map((pkg, i) => (
                 <motion.div
                   key={pkg.id || pkg.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -309,23 +324,17 @@ export default function Yoga() {
                       </div>
                     </div>
 
-                    {/* Slot Selection */}
+                    {/* Slot Selection - Now links to booking page */}
                     {pkg.slots && pkg.slots.length > 0 && (
                       <div className="mb-6 p-4 rounded-2xl bg-forest/[0.03] border border-forest/5" onClick={(e) => e.stopPropagation()}>
                         <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2 block">Available Slots</label>
                         <button 
-                          onClick={() => setActiveSlotPackage(pkg)}
+                          onClick={() => navigate(`/yoga/${pkg.id}/book`)}
                           className="w-full bg-white border border-forest/10 rounded-xl p-3 text-xs text-forest font-medium flex items-center justify-between hover:border-terracotta/30 transition-all group"
                         >
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3.5 w-3.5 text-terracotta" />
-                            {selectedSlots[pkg.id] !== undefined && pkg.slots && pkg.slots[parseInt(selectedSlots[pkg.id])] ? (
-                              <span>
-                                {new Date(pkg.slots[parseInt(selectedSlots[pkg.id])].startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(pkg.slots[parseInt(selectedSlots[pkg.id])].endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                              </span>
-                            ) : (
-                              <span className="text-forest/40">Select a slot</span>
-                            )}
+                            <span className="text-forest/40">Select a slot</span>
                           </div>
                           <ChevronDown className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-colors" />
                         </button>
@@ -352,6 +361,11 @@ export default function Yoga() {
                         const quantity = getItemQuantity(currentItemId);
                         
                         const handleBookAction = () => {
+                          if (pkg.slots && pkg.slots.length > 0) {
+                            navigate(`/yoga/${pkg.id}/book`);
+                            return;
+                          }
+
                           if (!user) {
                             setPendingCartItem({
                               id: currentItemId,
@@ -359,25 +373,19 @@ export default function Yoga() {
                               price: pkg.price,
                               type: 'Yoga Retreat',
                               image: pkg.image,
-                              dateRange: formatDateRange(selectedDate, pkg.duration, slotIndex !== undefined ? pkg.slots?.[parseInt(slotIndex)] : undefined)
+                              dateRange: formatDateRange(selectedDate, pkg.duration)
                             });
                             setShowAuthModal(true);
                             return;
                           }
 
-                          if (pkg.slots && pkg.slots.length > 0 && slotIndex === undefined) {
-                            setActiveSlotPackage(pkg);
-                            return;
-                          }
-
-                          const slot = slotIndex !== undefined ? pkg.slots?.[parseInt(slotIndex)] : undefined;
                           globalAddToCart({
                             id: currentItemId,
                             name: pkg.title,
                             price: pkg.price,
                             type: 'Yoga Retreat',
                             image: pkg.image,
-                            dateRange: formatDateRange(selectedDate, pkg.duration, slot)
+                            dateRange: formatDateRange(selectedDate, pkg.duration)
                           });
                         };
 
@@ -463,263 +471,7 @@ export default function Yoga() {
           </blockquote>
           <cite className="text-terracotta font-bold uppercase tracking-widest not-italic">— John Ruskin</cite>
         </div>
-      </section>
-
-      {/* Yoga Detail Modal */}
-      <AnimatePresence>
-        {selectedPackage && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-forest/90 backdrop-blur-2xl"
-          >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 40 }}
-              className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
-              data-lenis-prevent
-            >
-            {/* Background Texture Overlay */}
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
-
-            {/* Immersive Img - Now part of scroll flow */}
-            <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
-              <ImageSlider 
-                images={((selectedPackage.title || "").toLowerCase().includes("valley of shadows") 
-                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
-                  : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
-                alt={selectedPackage.title}
-                className="h-full w-full"
-                autoSwipe={true}
-                interval={4000}
-              />
-              
-              {/* Decorative Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
-              
-              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Sacred Space</span>
-                  <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
-                    {selectedPackage.title.split(' ').map((word: string, i: number) => (
-                      <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
-                    ))}
-                  </h2>
-                </motion.div>
-                
-                <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
-                  <div className="flex items-center gap-2">
-                    <Flower2 className="h-4 w-4 text-terracotta" />
-                    <span>Pure Presence</span>
-                  </div>
-                  <div className="w-1 h-1 rounded-full bg-terracotta" />
-                  <span>{selectedPackage.focus}</span>
-                </div>
-              </div>
-
-              {/* Close & Share */}
-              <div className="absolute top-6 right-6 flex gap-3 z-50">
-                <button 
-                  onClick={() => handleShare(selectedPackage)}
-                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-terracotta transition-all"
-                >
-                  <Share2 className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={() => setSelectedPackage(null)} 
-                  className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
-                >
-                  <Plus className="h-5 w-5 rotate-45" />
-                </button>
-              </div>
-            </div>
-
-            {/* Details - Scroll continues */}
-            <div className="flex-grow bg-[#FAF9F6] relative">
-              <div className="p-8 md:p-16">
-                <div className="max-w-3xl mx-auto space-y-16">
-                  
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { icon: Clock, label: 'Respite', value: selectedPackage.duration, sub: 'Days of Peace' },
-                      { icon: Wind, label: 'Energy', value: 'Restorative', sub: 'Yoga & Meditation' }
-                    ].map((stat, i) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 + (i * 0.1) }}
-                        className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all"
-                      >
-                        <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                          <stat.icon className="h-5 w-5 text-terracotta" />
-                        </div>
-                        <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
-                        <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
-                        <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {selectedPackage.features.map((f: string, i: number) => (
-                      <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
-                      >
-                        <Sparkles className="h-4 w-4 text-terracotta mr-4 shrink-0" />
-                        {f}
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* Description */}
-                  <section>
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="h-px flex-grow bg-forest/5" />
-                      <span className="font-fluid text-2xl text-terracotta">Internal Balance</span>
-                      <div className="h-px flex-grow bg-forest/5" />
-                    </div>
-                    <p className="text-forest/70 text-base leading-[1.8] font-medium italic">
-                       "{selectedPackage.description || "Heal your soul in the divine silence of the high peaks."}"
-                    </p>
-                  </section>
-
-                  {/* Itinerary */}
-                  {(selectedPackage.itinerary || selectedPackage.theExperience) && (
-                    <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
-                      <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
-                      
-                      <div className="flex items-center justify-between mb-10">
-                        <h4 className="font-playfair text-3xl font-black italic text-forest">The Day-by-Day Journey</h4>
-                        <Sun className="h-8 w-8 text-terracotta animate-spin-slow" />
-                      </div>
-                      
-                      <div className="space-y-8 relative">
-                        <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
-                        
-                        {Array.isArray(selectedPackage.itinerary) ? (
-                          selectedPackage.itinerary.map((item: any, i: number) => (
-                            <div key={i} className="relative pl-12 group">
-                              <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-emerald-500/20 border-4 border-[#FAF9F6] ring-1 ring-emerald-500/10 z-10" />
-                              <div className="text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.2em] mb-1">Day {item.day || i + 1}</div>
-                              <h5 className="text-lg font-bold text-forest mb-2">Divine Session</h5>
-                              <p className="text-xs text-forest/50 font-medium leading-relaxed">
-                                {item.description}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          selectedPackage.theExperience.split('\n').map((line: string, i: number) => {
-                            if (!line.trim()) return null;
-                            const isDay = line.toLowerCase().startsWith('day');
-                            return (
-                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
-                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
-                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
-                                  {line.trim()}
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </div>
-                    </section>
-                  )}
-
-                  {/* Booking Footer - Creative Style */}
-                  <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
-                <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
-                  <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
-                    <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Spiritual Investment</div>
-                    <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
-                      {selectedPackage.price}
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                    {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
-                      <div className="relative group w-full sm:w-auto">
-                        <select 
-                          value={selectedSlots[selectedPackage.id] || ''}
-                          onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
-                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                        >
-                          <option value="">Pick Date Slot</option>
-                          {selectedPackage.slots.map((slot: any, i: number) => (
-                            <option key={i} value={i}>
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                      </div>
-                    ) : (
-                      <div className="relative group w-full sm:w-auto">
-                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                          <Calendar className="h-4 w-4" />
-                        </div>
-                        <input
-                          type="date"
-                          min={new Date().toISOString().split('T')[0]}
-                          value={selectedDate}
-                          onChange={(e) => {
-                            setSelectedDate(e.target.value);
-                          }}
-                          className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                        />
-                      </div>
-                    )}
-
-                    <Button 
-                      onClick={() => {
-                        const slotIndex = selectedSlots[selectedPackage.id];
-                        const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
-                        globalAddToCart({
-                          id: `yoga-${selectedPackage.title.toLowerCase().replace(/\s+/g, '-')}`,
-                          name: selectedPackage.title,
-                          price: selectedPackage.price,
-                          type: 'Yoga Retreat',
-                          image: selectedPackage.image,
-                          dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
-                        });
-                        setSelectedPackage(null);
-                        navigate('/checkout');
-                      }}
-                      disabled={
-                        selectedPackage.isAvailable === false || 
-                        (selectedPackage.slots && selectedPackage.slots.length > 0 
-                          ? !selectedSlots[selectedPackage.id] 
-                          : !selectedDate)
-                      }
-                      className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Book Now
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
-      {/* Customize Section */}
+      </section>      {/* Customize Section */}
       <section className="py-24 bg-cream/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -735,38 +487,270 @@ export default function Yoga() {
         </div>
       </section>
 
-      {/* Slot Selection Popup */}
-      {activeSlotPackage && (
-        <SlotSelectionPopup 
-          isOpen={!!activeSlotPackage}
-          onClose={() => setActiveSlotPackage(null)}
-          slots={activeSlotPackage.slots}
-          selectedSlotIndex={selectedSlots[activeSlotPackage.id]}
-          onSelectSlot={(index) => {
-            setSelectedSlots({ ...selectedSlots, [activeSlotPackage.id]: index });
-             // Auto add after selection
-             const slot = activeSlotPackage.slots[index];
-             const baseId = `yoga-${activeSlotPackage.title.toLowerCase().replace(/\s+/g, '-')}`;
-             globalAddToCart({
-               id: `${baseId}-slot-${index}`,
-               name: activeSlotPackage.title,
-               price: activeSlotPackage.price,
-               type: 'Yoga Retreat',
-               image: activeSlotPackage.image,
-               dateRange: formatDateRange(selectedDate, activeSlotPackage.duration, slot)
-             });
-            setActiveSlotPackage(null);
-            navigate('/checkout');
-          }}
-          onCustomize={() => navigate('/contact')}
-          title={activeSlotPackage.title}
-        />
-      )}
-
       <AuthModal 
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
+
+      {/* Yoga Package Detail Modal */}
+      <AnimatePresence>
+        {selectedPackage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8 bg-forest/90 backdrop-blur-2xl"
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 40 }}
+              className="bg-[#FAF9F6] rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col border border-white/20 relative"
+              data-lenis-prevent
+            >
+              {/* Background Texture Overlay */}
+              <div className="absolute inset-0 opacity-[0.05] pointer-events-none grayscale invert" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }} />
+
+              {/* Immersive Img */}
+              <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
+                <ImageSlider 
+                  images={((selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
+                    ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                    : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
+                  alt={selectedPackage.title}
+                  className="h-full w-full"
+                  autoSwipe={true}
+                  interval={4000}
+                />
+                
+                {/* Decorative Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
+                
+                <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Divine Healing</span>
+                    <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
+                      {selectedPackage.title.split(' ').map((word: string, i: number) => (
+                        <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
+                      ))}
+                    </h2>
+                  </motion.div>
+                  
+                  <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-terracotta fill-current" />
+                      <span>{selectedPackage.rating || '4.9'} / 5.0</span>
+                    </div>
+                    <div className="w-1 h-1 rounded-full bg-terracotta" />
+                    <span>{selectedPackage.focus || 'Wellness'}</span>
+                  </div>
+                </div>
+
+                {/* Close & Share */}
+                <div className="absolute top-6 right-6 flex gap-3 z-50">
+                  <button 
+                    onClick={() => handleShare(selectedPackage)}
+                    className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-terracotta transition-all"
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </button>
+                  <button 
+                    onClick={() => setSelectedPackage(null)} 
+                    className="bg-white/10 backdrop-blur-md p-3 rounded-full border border-white/20 text-white hover:bg-white hover:text-forest transition-all"
+                  >
+                    <Plus className="h-5 w-5 rotate-45" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="flex-grow bg-[#FAF9F6] relative">
+                <div className="p-8 md:p-16">
+                  <div className="max-w-3xl mx-auto space-y-16">
+                    
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      {[
+                        { icon: Clock, label: 'Duration', value: selectedPackage.duration, sub: 'Healing Time' },
+                        { icon: Sun, label: 'Sessions', value: 'Sunrise/Sunset', sub: 'Guided Flow' },
+                        { icon: Heart, label: 'Level', value: 'All Levels', sub: 'Everyone Welcome' },
+                        { icon: Flower2, label: 'Atmosphere', value: 'Mountain Zen', sub: 'Sacred Vibe' }
+                      ].map((stat, i) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 + (i * 0.1) }}
+                          className="bg-white p-6 rounded-[2rem] border border-forest/5 shadow-sm text-center group hover:border-terracotta/20 transition-all font-sans"
+                        >
+                          <div className="bg-terracotta/5 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            {stat.icon && <stat.icon className="h-5 w-5 text-terracotta" />}
+                          </div>
+                          <div className="text-[10px] font-black text-forest/30 uppercase tracking-widest mb-1">{stat.label}</div>
+                          <div className="text-sm font-bold text-forest mb-1">{stat.value}</div>
+                          <div className="text-[8px] font-bold text-forest/20 uppercase">{stat.sub}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Features Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(selectedPackage.features || []).map((f: string, i: number) => (
+                        <motion.div 
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className="flex items-center text-xs font-bold text-forest/70 bg-white p-5 rounded-[1.5rem] border border-forest/5 group hover:border-terracotta/20 transition-all"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-4 shrink-0" />
+                          {f}
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Description */}
+                    <section>
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="h-px flex-grow bg-forest/5" />
+                        <span className="font-fluid text-2xl text-terracotta">Soul Healing</span>
+                        <div className="h-px flex-grow bg-forest/5" />
+                      </div>
+                      <p className="text-forest/70 text-base leading-[1.8] font-medium italic mb-8">
+                         "{selectedPackage.description || "A transformative yoga experience set against the serene backdrop of the Himalayas. Reconnect with your true self through ancient practices and modern wisdom."}"
+                      </p>
+
+                      {/* Experience Path Header */}
+                      <div className="bg-forest/5 rounded-2xl p-6 border border-forest/10 mb-8 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-terracotta/20 p-3 rounded-full">
+                            <Flower2 className="h-6 w-6 text-terracotta" />
+                          </div>
+                          <div>
+                            <h4 className="text-xl font-bold text-forest uppercase tracking-tight">The Practice</h4>
+                            <p className="text-[10px] text-forest/50 font-medium font-sans">A daily flow of movement and stillnes.</p>
+                          </div>
+                        </div>
+                        <Sparkles className="h-6 w-6 text-terracotta" />
+                      </div>
+                    </section>
+
+                    {/* Experience Detail */}
+                    {selectedPackage.theExperience && (
+                      <section className="bg-forest/[0.02] p-10 rounded-[3rem] border border-forest/5 relative overflow-hidden">
+                        <div className="absolute -right-20 -top-20 w-64 h-64 bg-terracotta/[0.03] rounded-full blur-3xl pointer-events-none" />
+                        <div className="flex items-center justify-between mb-10">
+                          <h4 className="font-playfair text-3xl font-black italic text-forest">The Retreat Path</h4>
+                          <Sparkles className="h-8 w-8 text-terracotta animate-pulse" />
+                        </div>
+                        
+                        <div className="space-y-8 relative">
+                          <div className="absolute left-4 top-2 bottom-2 w-px bg-forest/10" />
+                          
+                          {selectedPackage.theExperience.split('\n').map((line: string, i: number) => {
+                            if (!line.trim()) return null;
+                            const isDay = line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step');
+                            return (
+                              <div key={i} className={cn("relative", isDay ? "pl-12 mt-10 first:mt-0" : "pl-12 mt-2")}>
+                                {isDay && <div className="absolute left-3 top-1.5 w-2 h-2 rounded-full bg-terracotta z-10" />}
+                                <div className={cn("text-xs leading-relaxed", isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-1" : "text-forest/60 font-medium")}>
+                                  {line.trim()}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    )}
+
+                    {/* Booking Footer */}
+                    <div className="border-t border-forest/5 bg-white shadow-[0_-15px_40px_rgba(0,0,0,0.03)] -mx-8 sm:-mx-10 md:-mx-16 p-6 sm:p-8 md:p-10">
+                      <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
+                        <div className="text-center lg:text-left flex flex-col sm:flex-row lg:flex-col items-center lg:items-start gap-1 sm:gap-4 lg:gap-0">
+                          <div className="font-fluid text-lg xs:text-xl text-terracotta -mb-1">Energy Exchange</div>
+                          <div className="text-3xl xs:text-4xl font-playfair font-black italic text-forest leading-none">
+                            {selectedPackage.price}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                          {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
+                            <div className="relative group w-full sm:w-auto">
+                              <select 
+                                value={selectedSlots[selectedPackage.id] || ''}
+                                onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
+                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                              >
+                                <option value="">Pick Retreat Slot</option>
+                                {selectedPackage.slots.map((slot: any, i: number) => (
+                                  <option key={i} value={i}>
+                                    {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  </option>
+                                ))}
+                              </select>
+                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                            </div>
+                          ) : (
+                            <div className="relative group w-full sm:w-auto">
+                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                <Calendar className="h-4 w-4" />
+                              </div>
+                              <input
+                                type="date"
+                                min={new Date().toISOString().split('T')[0]}
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                              />
+                            </div>
+                          )}
+
+                          <Button 
+                            onClick={() => {
+                              if (!user) {
+                                setShowAuthModal(true);
+                                return;
+                              }
+                              const slotIndex = selectedSlots[selectedPackage.id];
+                              const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
+                              
+                              globalAddToCart({
+                                id: `yoga-${selectedPackage.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
+                                name: selectedPackage.title,
+                                price: selectedPackage.price,
+                                type: 'Yoga Retreat',
+                                image: selectedPackage.image,
+                                dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
+                              });
+                              setSelectedPackage(null);
+                              navigate('/checkout');
+                            }}
+                            disabled={
+                              selectedPackage.isAvailable === false || 
+                              (selectedPackage.slots && selectedPackage.slots.length > 0 
+                                ? !selectedSlots[selectedPackage.id] 
+                                : !selectedDate)
+                            }
+                            className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                            Secure Retreat
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
