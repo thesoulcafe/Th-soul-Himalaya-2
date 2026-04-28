@@ -1,14 +1,84 @@
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useSearchParams } from 'react-router-dom';
 import { REGIONAL_GUIDE } from '@/constants';
-import { MapPin, Clock, Router, Wallet, Sun, CloudRain, Snowflake, ArrowRight } from 'lucide-react';
+import { 
+  MapPin, 
+  Clock, 
+  Router, 
+  Wallet, 
+  Sun, 
+  CloudRain, 
+  Snowflake, 
+  ArrowRight,
+  Search,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  MessageCircle,
+  Info
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+const FAQS = [
+  {
+    question: "What should I pack for my Parvati Valley expedition?",
+    answer: "Pack layered clothing, sturdy trekking boots, a raincoat (even in summer), a power bank, and a basic medical kit. Don't forget your spirit of adventure!",
+    category: "Preparation"
+  },
+  {
+    question: "Is there mobile connectivity in the higher villages like Tosh or Pulga?",
+    answer: "Jio and Airtel work reasonably well in Kasol and Tosh. However, in Pulga and Kalga, connectivity can be spotty. BSNL is your best bet for remote locations.",
+    category: "Logistics"
+  },
+  {
+    question: "How do I handle cash requirements in the mountains?",
+    answer: "ATMs are available in Kasol and Manikaran, but they often run out of cash or have long queues. We strongly recommend carrying enough physical cash from Bhuntar or Kullu.",
+    category: "Logistics"
+  },
+  {
+    question: "Is it safe to trek solo in Parvati Valley?",
+    answer: "While main trails are generally safe, we recommend hiring a local Soul Guide for offbeat routes. Always inform your base camp or hostel about your planned path and expected return time.",
+    category: "Safety"
+  },
+  {
+    question: "What is the best time for the Kheerganga trek?",
+    answer: "April to June and September to November are ideal. Winters see heavy snow, making the trail challenging but magical for experienced trekkers.",
+    category: "Adventure"
+  },
+  {
+    question: "Are there medical facilities available in the valley?",
+    answer: "Basic clinics are available in Kasol and Manikaran. For anything serious, the nearest major hospital is in Kullu, which is about 2-3 hours away.",
+    category: "Safety"
+  }
+];
+
 export default function Guide() {
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const filteredFaqs = FAQS.filter(faq => 
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      setSearchQuery(q);
+      // If there's a specific query, maybe expand the first matching FAQ
+      if (filteredFaqs.length > 0) {
+        setExpandedIndex(0);
+      }
+    }
+  }, [searchParams]);
+
   return (
-    <div className="min-h-screen bg-cream pb-32">
+    <div className="min-h-screen bg-cream pb-32 font-sans">
       {/* Hero Section */}
       <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
@@ -168,6 +238,100 @@ export default function Guide() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </section>
+
+        {/* FAQ & Search Section */}
+        <section className="mb-20">
+          <div className="bg-white rounded-[3rem] shadow-2xl shadow-forest/5 p-8 md:p-16 border border-forest/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-[0.03]">
+              <HelpCircle className="h-64 w-64 text-forest" />
+            </div>
+
+            <div className="relative z-10 max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="flex items-center justify-center gap-2 text-terracotta mb-4">
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Wisdom Repository</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-playfair font-black italic text-forest uppercase tracking-tighter mb-4">Soul Support</h2>
+                <p className="text-forest/40 text-xs font-bold uppercase tracking-widest max-w-md mx-auto leading-relaxed">
+                  Decipher the mysteries of the valley through our curated frequently asked revelations.
+                </p>
+              </div>
+
+              {/* Manual Search */}
+              <div className="relative mb-12 group">
+                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-forest/20 group-focus-within:text-terracotta transition-colors">
+                  <Search className="h-6 w-6" />
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Search for wisdom, logistics, or safety..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-20 bg-forest/5 rounded-[2rem] pl-16 pr-8 text-lg font-bold text-forest placeholder:text-forest/20 focus:outline-none focus:ring-4 focus:ring-forest/5 border-2 border-transparent focus:border-forest/10 transition-all"
+                />
+              </div>
+
+              {/* FAQ List */}
+              <div className="space-y-4">
+                <AnimatePresence>
+                  {filteredFaqs.map((faq, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="border-b border-forest/5 last:border-none"
+                    >
+                      <button 
+                        onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                        className="w-full py-6 flex items-center justify-between text-left group"
+                      >
+                        <div className="flex items-center gap-6">
+                           <div className="h-10 w-10 rounded-xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">
+                             <Info className="h-4 w-4" />
+                           </div>
+                           <div>
+                             <span className="text-[8px] font-black text-terracotta uppercase tracking-[0.2em] block mb-1">{faq.category}</span>
+                             <h4 className="text-lg font-bold text-forest leading-tight">{faq.question}</h4>
+                           </div>
+                        </div>
+                        {expandedIndex === index ? (
+                          <ChevronUp className="h-5 w-5 text-terracotta shrink-0" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-forest/20 group-hover:text-terracotta shrink-0 transition-colors" />
+                        )}
+                      </button>
+                      <AnimatePresence>
+                        {expandedIndex === index && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-8 pl-[64px] pr-12">
+                              <p className="text-forest/60 text-sm font-medium leading-relaxed italic">
+                                "{faq.answer}"
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                
+                {filteredFaqs.length === 0 && (
+                  <div className="py-20 text-center">
+                    <HelpCircle className="h-16 w-16 text-forest/10 mx-auto mb-4" />
+                    <p className="text-forest/40 font-bold uppercase tracking-widest text-xs">No matching wisdom found.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -19,7 +19,9 @@ import {
   Sparkles,
   Edit2,
   Check,
-  X
+  X,
+  Share2,
+  HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -115,6 +117,26 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const handleShare = (e: React.MouseEvent, booking: Booking) => {
+    e.stopPropagation();
+    const shareData = {
+      title: 'My Soul Journey Booking',
+      text: `Excited about my upcoming journey: ${booking.item}!`,
+      url: `${window.location.origin}/dashboard/booking/${booking.id}`,
+    };
+    if (navigator.share) {
+      navigator.share(shareData).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(`${window.location.origin}/dashboard/booking/${booking.id}`);
+      toast.success("Link Copied", { description: "Journey URL copied to clipboard." });
+    }
+  };
+
+  const handleHelp = (e: React.MouseEvent, booking: Booking) => {
+    e.stopPropagation();
+    navigate(`/guide?q=${encodeURIComponent(booking.item)}`);
   };
 
   if (!user) return null;
@@ -214,7 +236,10 @@ export default function Dashboard() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                   >
-                    <Card className="border-none bg-white rounded-[2rem] shadow-xl shadow-forest/[0.03] hover:shadow-2xl hover:shadow-forest/[0.08] transition-all group overflow-hidden">
+                    <Card 
+                      className="border-none bg-white rounded-[2rem] shadow-xl shadow-forest/[0.03] hover:shadow-2xl hover:shadow-forest/[0.08] transition-all group overflow-hidden cursor-pointer"
+                      onClick={() => navigate(`/dashboard/booking/${booking.id}`)}
+                    >
                       <CardContent className="p-0">
                         <div className="flex flex-col md:flex-row md:items-center">
                           <div className="w-full md:w-48 h-48 relative overflow-hidden shrink-0">
@@ -227,7 +252,7 @@ export default function Dashboard() {
                             <div className="absolute inset-0 bg-gradient-to-t from-forest/40 to-transparent" />
                           </div>
                           <div className="flex-1 p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                            <div>
+                            <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-3 mb-2">
                                 <Badge className="bg-forest/5 text-forest/40 border-none px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
                                   {booking.type || 'Journey'}
@@ -240,13 +265,13 @@ export default function Dashboard() {
                                   {booking.status || 'Reserved'}
                                 </Badge>
                               </div>
-                              <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-4">
+                              <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-4 truncate">
                                 {booking.item}
                               </h3>
                               <div className="flex flex-wrap items-center gap-6 text-[10px] text-forest/40 font-black uppercase tracking-widest">
                                 <span className="flex items-center gap-2">
                                   <Calendar className="h-3 w-3 text-terracotta" />
-                                  {booking.createdAt?.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  {booking.createdAt?.toDate ? booking.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}
                                 </span>
                                 <span className="flex items-center gap-2">
                                   <Hash className="h-3 w-3 text-terracotta" />
@@ -254,14 +279,32 @@ export default function Dashboard() {
                                 </span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-8 justify-between lg:justify-end border-t lg:border-none pt-8 lg:pt-0">
+                            <div className="flex items-center gap-4 lg:gap-8 justify-between lg:justify-end border-t lg:border-none pt-8 lg:pt-0">
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost" 
+                                  className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-terracotta hover:text-white transition-all text-forest/20"
+                                  onClick={(e) => handleShare(e, booking)}
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  size="icon" 
+                                  variant="ghost" 
+                                  className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-forest hover:text-white transition-all text-forest/20"
+                                  onClick={(e) => handleHelp(e, booking)}
+                                >
+                                  <HelpCircle className="h-4 w-4" />
+                                </Button>
+                              </div>
                               <div className="text-right">
                                 <p className="text-3xl font-black text-forest tracking-tighter mb-1">{booking.price}</p>
                                 <p className="text-[8px] text-forest/20 uppercase tracking-[0.3em] font-black">Expedition Value</p>
                               </div>
-                              <Button size="icon" variant="ghost" className="h-14 w-14 rounded-2xl bg-forest/5 hover:bg-forest hover:text-white transition-all text-forest/40">
+                              <div className="h-14 w-14 rounded-2xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">
                                  <ArrowRight className="h-5 w-5" />
-                              </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
