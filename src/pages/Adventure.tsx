@@ -30,10 +30,11 @@ export default function Adventure() {
   const [activeSlotActivity, setActiveSlotActivity] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
   
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal is open
   useEffect(() => {
     if (activeSlotActivity) {
       document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); // Reset to top when opening slots
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -171,6 +172,9 @@ export default function Adventure() {
         // Auto open if it matches
         setActiveSlotActivity(activity);
       }
+    } else if (!id) {
+      setActiveSlotActivity(null);
+      document.body.style.overflow = 'unset';
     }
   }, [activities]);
 

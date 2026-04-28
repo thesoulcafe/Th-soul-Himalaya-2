@@ -30,6 +30,19 @@ export default function WFH() {
   const [config, setConfig] = useState<any>(null);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity } = useCart();
 
+  // Scroll lock and reset when modal/pkg detail is open
+  useEffect(() => {
+    if (selectedPackage || activeSlotPackage) {
+      document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); 
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPackage, activeSlotPackage]);
+
   const [packageList, setPackageList] = useState<any[]>([]); // Using packages state but adding search params
   const [searchParams] = useSearchParams();
   const [seo, setSeo] = useState<any>(null);
@@ -154,6 +167,9 @@ export default function WFH() {
         // Auto open if it matches
         setActiveSlotPackage(pkg);
       }
+    } else if (!id) {
+      setActiveSlotPackage(null);
+      document.body.style.overflow = 'unset';
     }
   }, [searchParams, packages]);
 

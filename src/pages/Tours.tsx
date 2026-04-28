@@ -70,10 +70,11 @@ export default function Tours() {
 
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal/tour detail is open
   useEffect(() => {
     if (selectedTour || activeSlotTour) {
       document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); // Reset to top when opening details
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -264,6 +265,11 @@ export default function Tours() {
           path: `/tours?id=${id}`
         });
       }
+    } else if (!id) {
+      // Reset state if ID is removed (Back button)
+      setSelectedTour(null);
+      setActiveSlotTour(null);
+      document.body.style.overflow = 'unset';
     }
   }, [searchParams, tours]);
 

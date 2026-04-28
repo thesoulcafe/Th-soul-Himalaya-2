@@ -35,10 +35,11 @@ export default function Meditation() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
-  // Scroll lock when modal is open
+  // Scroll lock and reset when modal/tour detail is open
   useEffect(() => {
     if (selectedPackage || activeSlotPackage) {
       document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0); // Reset to top when opening details
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -158,6 +159,10 @@ export default function Meditation() {
           path: `/meditation?id=${id}`
         });
       }
+    } else if (!id) {
+      setSelectedPackage(null);
+      setActiveSlotPackage(null);
+      document.body.style.overflow = 'unset';
     }
   }, [searchParams, packageList]);
 
