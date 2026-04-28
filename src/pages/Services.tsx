@@ -13,7 +13,7 @@ import { DEFAULT_SERVICES } from '@/constants';
 
 export default function Services() {
   const { profile } = useAuth();
-  const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
+  const [services, setServices] = useState<any[]>([]);
 
   const getIcon = (title: string) => {
     const t = title.toLowerCase();
@@ -30,36 +30,34 @@ export default function Services() {
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'service'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const dbServices = snapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data().data
-          }))
-          .filter(service => {
-            const title = (service.title || '').toLowerCase();
-            return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
-          })
-          .sort((a, b) => {
-            // Force Macramé Shop to the end
-            const aTitle = (a.title || '').toLowerCase();
-            const bTitle = (b.title || '').toLowerCase();
-            const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
-            const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
-            if (aIsMacrame && !bIsMacrame) return 1;
-            if (!aIsMacrame && bIsMacrame) return -1;
+      const dbServices = snapshot.empty ? [] : snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data().data
+        }))
+        .filter(service => {
+          const title = (service.title || '').toLowerCase();
+          return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
+        })
+        .sort((a, b) => {
+          // Force Macramé Shop to the end
+          const aTitle = (a.title || '').toLowerCase();
+          const bTitle = (b.title || '').toLowerCase();
+          const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
+          const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
+          if (aIsMacrame && !bIsMacrame) return 1;
+          if (!aIsMacrame && bIsMacrame) return -1;
 
-            const aAvail = a.isAvailable !== false;
-            const bAvail = b.isAvailable !== false;
-            if (aAvail && !bAvail) return -1;
-            if (!aAvail && bAvail) return 1;
+          const aAvail = a.isAvailable !== false;
+          const bAvail = b.isAvailable !== false;
+          if (aAvail && !bAvail) return -1;
+          if (!aAvail && bAvail) return 1;
 
-            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-            return aOrder - bOrder;
-          });
-        setServices(dbServices);
-      }
+          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+          return aOrder - bOrder;
+        });
+      setServices(dbServices);
     });
 
     return () => unsubscribe();

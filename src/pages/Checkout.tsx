@@ -45,7 +45,6 @@ export default function SoulCart() {
   
   const [step, setStep] = useState<CheckoutStep>('details');
   const [paymentMethod] = useState<'online' | 'reserve'>('reserve');
-  const [plantTree, setPlantTree] = useState(false);
   const [note, setNote] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,9 +73,8 @@ export default function SoulCart() {
   }, [profile, user]);
 
   const subtotal = totalPrice;
-  const ecoFee = plantTree ? 100 : 0;
   const taxes = Math.round(subtotal * 0.05);
-  const finalTotal = subtotal + taxes + ecoFee;
+  const finalTotal = subtotal + taxes;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -143,7 +141,6 @@ export default function SoulCart() {
         })),
         totalPrice: finalTotal,
         note: note || '',
-        ecoDonation: plantTree,
         status: 'reserved', // Mark as reserved
         paymentMethod: 'reserve',
         createdAt: serverTimestamp(),
@@ -348,7 +345,7 @@ export default function SoulCart() {
                   <div className="bg-forest/5 rounded-[2.5rem] p-8 border border-forest/10 space-y-6">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-forest/10 flex items-center justify-center text-forest shadow-inner">
-                        <Leaf className="h-6 w-6" />
+                        <PenTool className="h-6 w-6" />
                       </div>
                       <div>
                         <h3 className="font-heading font-bold text-slate-900">Soulful Touch</h3>
@@ -356,23 +353,7 @@ export default function SoulCart() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className={cn(
-                        "p-6 rounded-3xl border-2 transition-all cursor-pointer group hover:shadow-xl",
-                        plantTree ? "bg-forest border-forest shadow-forest/20" : "bg-white border-white hover:border-forest/20"
-                      )}
-                      onClick={() => setPlantTree(!plantTree)}
-                      >
-                        <div className="flex justify-between items-start mb-4">
-                          <Leaf className={cn("h-8 w-8", plantTree ? "text-emerald-300" : "text-emerald-500 group-hover:scale-110 transition-transform")} />
-                          <div className={cn("h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all", plantTree ? "border-emerald-300 bg-white" : "border-slate-100")}>
-                            {plantTree && <div className="h-3 w-3 rounded-full bg-forest" />}
-                          </div>
-                        </div>
-                        <h4 className={cn("text-lg font-bold mb-1", plantTree ? "text-white" : "text-slate-900")}>Plant a Cedar</h4>
-                        <p className={cn("text-xs", plantTree ? "text-white/70" : "text-slate-500")}>Add ₹100 to plant a Himalayan Cedar tree in your name.</p>
-                      </div>
-
+                    <div className="grid grid-cols-1 gap-6">
                       <div className={cn(
                         "p-6 rounded-3xl border-2 bg-white border-white hover:border-forest/20 group hover:shadow-xl transition-all"
                       )}>
@@ -530,18 +511,6 @@ export default function SoulCart() {
                     <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest group-hover/row:text-forest transition-colors">Abundance Tax (5%)</span>
                     <span className="font-mono font-black text-forest">₹{taxes.toLocaleString()}</span>
                   </div>
-                  {plantTree && (
-                    <motion.div 
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex justify-between items-center p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10"
-                    >
-                      <span className="flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
-                        <Leaf className="h-4 w-4" /> Cedar Contribution
-                      </span>
-                      <span className="font-mono font-black text-emerald-600">₹100</span>
-                    </motion.div>
-                  )}
                   
                   <div className="h-px bg-forest/5 relative">
                     <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[8px] font-black text-forest/10 uppercase tracking-[0.5em]">The Balance</div>

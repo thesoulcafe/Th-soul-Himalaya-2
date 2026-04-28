@@ -110,20 +110,7 @@ export default function Trekks() {
         originalType: doc.data().type
       }));
 
-      // Merge defaults with DB items
-      let combined = [...dbTrekks];
-      DEFAULT_TREKKS.forEach(def => {
-        const exists = dbTrekks.some(dbItem => {
-          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
-          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
-          return dbItem.id === def.id || dbTitle === defTitle;
-        });
-        if (!exists) {
-          combined.push({ ...def, originalType: 'trekk' });
-        }
-      });
-
-      const sortedTrekks = combined.sort((a, b) => {
+      const sortedTrekks = dbTrekks.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;
@@ -311,136 +298,19 @@ export default function Trekks() {
                         </div>
                       </div>
 
-                      {/* Slot Selection - Now links to booking page */}
-                      {trekk.slots && trekk.slots.length > 0 && (
-                        <div className="mb-8" onClick={(e) => e.stopPropagation()}>
-                          <button 
-                            onClick={() => navigate(`/trekks/${trekk.id}/book`)}
-                            className="w-full bg-forest/[0.03] border border-forest/5 rounded-2xl p-4 text-xs text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Calendar className="h-4 w-4 text-terracotta" />
-                              <span className="text-forest/30 text-xs">Select Date</span>
-                            </div>
-                            <ChevronDown className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-colors" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-auto pt-6 flex items-center justify-between gap-6">
-                      <Button 
-                        variant="ghost" 
-                        className="text-forest hover:text-terracotta p-0 font-bold text-sm uppercase tracking-widest"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTrekk(trekk);
-                        }}
-                      >
-                        Details
-                      </Button>
-
-                      <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
-                        {(() => {
-                          const slotIndex = selectedSlots[trekk.id];
-                          const baseId = `trekk-${trekk.title.toLowerCase().replace(/\s+/g, '-')}`;
-                          const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
-                          const quantity = getItemQuantity(currentItemId);
-                          
-                          const handleBookAction = () => {
-                            if (trekk.slots && trekk.slots.length > 0) {
-                              navigate(`/trekks/${trekk.id}/book`);
-                              return;
-                            }
-
-                            if (!user) {
-                              setPendingCartItem({
-                                id: currentItemId,
-                                name: trekk.title,
-                                price: trekk.price,
-                                type: 'Trekk',
-                                image: trekk.image,
-                                dateRange: formatDateRange(selectedDate, trekk.duration)
-                              });
-                              setShowAuthModal(true);
-                              return;
-                            }
-
-                            globalAddToCart({
-                              id: currentItemId,
-                              name: trekk.title,
-                              price: trekk.price,
-                              type: 'Trekk',
-                              image: trekk.image,
-                              dateRange: formatDateRange(selectedDate, trekk.duration)
-                            });
-                          };
-
-                          return (
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                {quantity > 0 && (
-                                  <div className="flex items-center gap-2 bg-forest/5 p-1 rounded-full">
-                                    <Button 
-                                      size="icon" 
-                                      variant="ghost" 
-                                      className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        globalUpdateQuantity(currentItemId, quantity - 1);
-                                      }}
-                                    >
-                                      <Minus className="h-4 w-4" />
-                                    </Button>
-                                    <span className="font-bold text-forest text-sm px-2">{quantity}</span>
-                                    <Button 
-                                      size="icon" 
-                                      variant="ghost" 
-                                      className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleBookAction();
-                                      }}
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                )}
-
-                                {quantity === 0 ? (
-                                  <Button 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleBookAction();
-                                    }}
-                                    disabled={trekk.isAvailable === false}
-                                    className={cn(
-                                      "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
-                                      trekk.isAvailable === false 
-                                        ? "bg-forest/10 text-forest/30 cursor-not-allowed border-none" 
-                                        : "bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20"
-                                    )}
-                                  >
-                                    {trekk.isAvailable === false ? 'Season Ended' : 'Join Trekk'}
-                                  </Button>
-                                ) : (
-                                  <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
-                                    <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-forest hover:bg-forest/90 text-white shadow-lg shadow-forest/20 flex items-center justify-center gap-2">
-                                      <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
-                                    </Button>
-                                  </Link>
-                                )}
-                              </div>
-                              {quantity > 0 && (
-                                <p className="text-[9px] text-center text-forest/40 font-bold uppercase tracking-tighter">
-                                  In journey
-                                </p>
-                              )}
-                            </div>
-                          );
-                        })()}
+                      <div className="mt-auto">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTrekk(trekk);
+                          }}
+                        >
+                          Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
-                    </div>
+                      </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -691,68 +561,125 @@ export default function Trekks() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                        {selectedTrekk.slots && selectedTrekk.slots.length > 0 ? (
-                          <div className="relative group w-full sm:w-auto">
-                            <select 
-                              value={selectedSlots[selectedTrekk.id] || ''}
-                              onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTrekk.id]: e.target.value })}
-                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                            >
-                              <option value="">Pick Date Slot</option>
-                              {selectedTrekk.slots.map((slot: any, i: number) => (
-                                <option key={i} value={i}>
-                                  {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                </option>
-                              ))}
-                            </select>
-                            <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                          </div>
-                        ) : (
-                          <div className="relative group w-full sm:w-auto">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                              <Calendar className="h-4 w-4" />
-                            </div>
-                            <input
-                              type="date"
-                              min={new Date().toISOString().split('T')[0]}
-                              value={selectedDate}
-                              onChange={(e) => setSelectedDate(e.target.value)}
-                              className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
-                            />
-                          </div>
-                        )}
+                        {(() => {
+                          const slotIndex = selectedSlots[selectedTrekk.id];
+                          const baseId = `trekk-${selectedTrekk.id}`;
+                          const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
+                          const quantity = getItemQuantity(currentItemId);
 
-                        <Button 
-                          onClick={() => {
-                            if (!user) {
-                              setShowAuthModal(true);
-                              return;
-                            }
-                            const slotIndex = selectedSlots[selectedTrekk.id];
-                            const slot = slotIndex !== undefined ? selectedTrekk.slots?.[parseInt(slotIndex)] : undefined;
-                            
-                            globalAddToCart({
-                              id: `trekk-${selectedTrekk.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
-                              name: selectedTrekk.title,
-                              price: selectedTrekk.price,
-                              type: 'Trekk',
-                              image: selectedTrekk.image,
-                              dateRange: formatDateRange(selectedDate, selectedTrekk.duration, slot)
-                            });
-                            setSelectedTrekk(null);
-                            navigate('/checkout');
-                          }}
-                          disabled={
-                            selectedTrekk.isAvailable === false || 
-                            (selectedTrekk.slots && selectedTrekk.slots.length > 0 
-                              ? !selectedSlots[selectedTrekk.id] 
-                              : !selectedDate)
+                          if (quantity > 0) {
+                            return (
+                              <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                <div className="flex items-center gap-4 bg-forest/5 p-2 rounded-full border border-forest/10">
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                    onClick={() => globalUpdateQuantity(currentItemId, quantity - 1)}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="font-black text-forest text-lg px-2 min-w-[1.5rem] text-center">{quantity}</span>
+                                  <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                    onClick={() => globalUpdateQuantity(currentItemId, quantity + 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <Link to="/cart" className="w-full sm:w-auto">
+                                  <Button className="w-full h-14 px-8 rounded-full text-[10px] font-black uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-xl shadow-terracotta/20 flex items-center justify-center gap-3 group">
+                                    <ShoppingCart className="h-4 w-4" /> Go to Cart <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                  </Button>
+                                </Link>
+                              </div>
+                            );
                           }
-                          className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          Reserve Spot
-                        </Button>
+
+                          return (
+                            <>
+                              {selectedTrekk.slots && selectedTrekk.slots.length > 0 ? (
+                                <div className="relative group w-full sm:w-auto">
+                                  <select 
+                                    value={selectedSlots[selectedTrekk.id] || ''}
+                                    onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTrekk.id]: e.target.value })}
+                                    className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                                  >
+                                    <option value="">Pick Date Slot</option>
+                                    {selectedTrekk.slots.map((slot: any, i: number) => {
+                                      const start = new Date(slot.startDate);
+                                      let endStr = '';
+                                      if (slot.endDate) {
+                                        endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                      } else if (selectedTrekk.duration) {
+                                        const daysMatch = selectedTrekk.duration.match(/(\d+)/);
+                                        const days = daysMatch ? parseInt(daysMatch[1]) : 1;
+                                        const end = new Date(start);
+                                        end.setDate(start.getDate() + days - 1);
+                                        endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                      }
+                                      return (
+                                        <option key={i} value={i}>
+                                          {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
+                                        </option>
+                                      );
+                                    })}
+                                  </select>
+                                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                                </div>
+                              ) : (
+                                <div className="relative group w-full sm:w-auto">
+                                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                    <Calendar className="h-4 w-4" />
+                                  </div>
+                                  <input
+                                    type="date"
+                                    min={new Date().toISOString().split('T')[0]}
+                                    value={selectedDate}
+                                    onChange={(e) => setSelectedDate(e.target.value)}
+                                    className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all"
+                                  />
+                                </div>
+                              )}
+
+                              <Button 
+                                onClick={() => {
+                                  const slotIndex = selectedSlots[selectedTrekk.id];
+                                  const slot = slotIndex !== undefined ? selectedTrekk.slots?.[parseInt(slotIndex)] : undefined;
+                                  
+                                  const cartItem = {
+                                    id: currentItemId,
+                                    name: selectedTrekk.title,
+                                    price: selectedTrekk.price,
+                                    type: 'Trekk',
+                                    image: selectedTrekk.image,
+                                    dateRange: formatDateRange(selectedDate, selectedTrekk.duration, slot)
+                                  };
+
+                                  if (!user) {
+                                    setPendingCartItem(cartItem);
+                                    setShowAuthModal(true);
+                                    return;
+                                  }
+
+                                  globalAddToCart(cartItem);
+                                }}
+                                disabled={
+                                  selectedTrekk.isAvailable === false || 
+                                  (selectedTrekk.slots && selectedTrekk.slots.length > 0 
+                                    ? !selectedSlots[selectedTrekk.id] 
+                                    : !selectedDate)
+                                }
+                                className="w-full sm:min-w-[220px] h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-terracotta/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                              >
+                                <Sparkles className="h-4 w-4" />
+                                Reserve Spot
+                              </Button>
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>

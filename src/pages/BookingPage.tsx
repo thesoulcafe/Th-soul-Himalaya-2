@@ -47,12 +47,9 @@ export default function BookingPage() {
         if (docSnap.exists()) {
           setItem({ id: docSnap.id, ...docSnap.data().data });
         } else {
-          const allDefaults = [
-            ...DEFAULT_TOURS, ...DEFAULT_TREKKS, ...DEFAULT_YOGA, 
-            ...DEFAULT_MEDITATION, ...DEFAULT_ADVENTURE, ...DEFAULT_WFH
-          ];
-          const found = allDefaults.find(p => p.id === id);
-          if (found) setItem(found);
+          toast.error("Package not found", {
+            description: "The experience you are looking for is not currently available."
+          });
         }
       } catch (error) {
         console.error("Error fetching booking item:", error);

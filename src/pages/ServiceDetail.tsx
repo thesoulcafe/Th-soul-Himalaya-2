@@ -42,24 +42,10 @@ export default function ServiceDetail() {
         if (docSnap.exists()) {
           setItem({ id: docSnap.id, ...docSnap.data().data });
         } else {
-          // 2. Try Defaults
-          const allDefaults = [
-            ...DEFAULT_TOURS,
-            ...DEFAULT_TREKKS,
-            ...DEFAULT_YOGA,
-            ...DEFAULT_MEDITATION,
-            ...DEFAULT_ADVENTURE,
-            ...DEFAULT_WFH
-          ];
-          const found = allDefaults.find(p => p.id === id);
-          if (found) {
-            setItem(found);
-          } else {
-            toast.error("Path not found", {
-              description: "The spiritual journey you seek could not be located."
-            });
-            navigate(`/${category}`);
-          }
+          toast.error("Path not found", {
+            description: "The spiritual journey you seek could not be located."
+          });
+          navigate(`/${category}`);
         }
       } catch (error) {
         console.error("Error fetching detail:", error);

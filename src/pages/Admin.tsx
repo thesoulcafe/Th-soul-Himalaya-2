@@ -1655,7 +1655,7 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {activeContentTab === 'tour' && (
+                        {(activeContentTab === 'tour' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'trekk' || activeContentTab === 'adventure') && (
                           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-3">
                               <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Rating (0-5)</label>

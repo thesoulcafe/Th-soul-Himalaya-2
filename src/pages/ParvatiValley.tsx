@@ -245,12 +245,21 @@ const ParvatiValley = () => {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="group relative rounded-[2.5rem] bg-white border border-forest/5 shadow-xl shadow-forest/5 p-10 overflow-hidden"
+            className="group relative rounded-[2.5rem] bg-white border border-forest/5 shadow-xl shadow-forest/5 overflow-hidden flex flex-col"
           >
-            <div className="absolute top-0 right-0 p-8">
-              <History className="h-8 w-8 text-forest/10 group-hover:text-blue-400/20 transition-colors" />
+            <div className="h-48 overflow-hidden relative">
+              <img 
+                src="https://images.unsplash.com/photo-1675515642414-d99b23e2d95f?q=80&w=1035&auto=format&fit=crop" 
+                alt="Manikaran Sahib Gurudwara"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
+              <div className="absolute top-0 right-0 p-6">
+                <History className="h-8 w-8 text-white group-hover:text-amber-400 transition-colors drop-shadow-lg" />
+              </div>
             </div>
-            <div className="relative z-10 space-y-4">
+            <div className="relative z-10 space-y-4 p-10 flex-1">
               <span className="text-blue-500/60 text-[10px] font-black uppercase tracking-widest">Sikh Heritage</span>
               <h3 className="text-3xl font-playfair italic font-bold text-forest">The Miracle of Manikaran</h3>
               <p className="text-[13px] text-forest/70 leading-relaxed font-medium">

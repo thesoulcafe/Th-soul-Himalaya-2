@@ -142,15 +142,25 @@ export default function Cart() {
                     <p className="text-[10px] uppercase tracking-widest font-bold text-terracotta mb-1">Total Payable</p>
                     <span className="text-3xl font-heading font-bold text-forest">₹{Math.round(totalPrice * 1.05).toLocaleString()}</span>
                   </div>
-                  <Button 
-                    nativeButton={false}
-                    render={
-                      <Link to="/checkout" state={{ cartItems: cart, total: Math.round(totalPrice * 1.05) }} className="w-full sm:w-auto">
-                        Proceed to Checkout
-                      </Link>
-                    }
-                    className="w-full sm:w-auto bg-terracotta hover:bg-terracotta/90 text-white px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-terracotta/20 flex items-center justify-center"
-                  />
+                  <div className="flex flex-col gap-3 w-full sm:w-auto">
+                    <Button 
+                      nativeButton={false}
+                      render={
+                        <Link to="/checkout" state={{ cartItems: cart, total: Math.round(totalPrice * 1.05) }} className="w-full sm:w-auto">
+                          Proceed to Checkout
+                        </Link>
+                      }
+                      className="w-full bg-terracotta hover:bg-terracotta/90 text-white px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-terracotta/20 flex items-center justify-center"
+                    />
+                    <Link to="/services" className="w-full">
+                      <Button 
+                        variant="outline" 
+                        className="w-full h-11 rounded-full border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300"
+                      >
+                        Explore More
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

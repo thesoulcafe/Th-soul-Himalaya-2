@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, MessageCircle, Instagram, Twitter, ArrowRight, User, ShieldCheck, ChevronLeft, Home as HomeIcon } from 'lucide-react';
+import { Menu, X, MessageCircle, Instagram, Twitter, ArrowRight, User, ShieldCheck, ChevronLeft, Home as HomeIcon, Compass } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -161,30 +161,30 @@ export default function Navbar() {
                 </button>
               }
             />
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-forest border-white/10 text-cream p-0">
+            <SheetContent side="right" className="w-[280px] xs:w-[320px] sm:w-[400px] bg-forest border-white/10 text-cream p-0">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <div className="p-6 pt-20 h-full flex flex-col">
-                <div className="flex flex-col space-y-1.5">
+              <div className="p-5 pt-16 h-full flex flex-col">
+                <div className="flex flex-col space-y-1">
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     whileTap={{ scale: 0.95 }}
-                    className="mb-2"
+                    className="mb-1.5"
                   >
                     <Link
                       to="/"
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-white/5 bg-white/5 text-cream',
+                        'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-200 group border border-white/5 bg-white/5 text-cream',
                         location.pathname === '/' && 'text-terracotta font-bold border-terracotta/20 bg-white/10'
                       )}
                     >
-                      <HomeIcon className="h-5 w-5 mr-4 text-terracotta/40" />
-                      <span className="text-sm font-black tracking-widest uppercase">Home</span>
+                      <HomeIcon className="h-4 w-4 mr-3 text-terracotta/40" />
+                      <span className="text-xs font-black tracking-widest uppercase">Home</span>
                     </Link>
                   </motion.div>
                   {user && (
-                    <div className="flex flex-col gap-3 mb-3">
+                    <div className="flex flex-col gap-2 mb-2">
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -194,12 +194,12 @@ export default function Navbar() {
                           to="/dashboard"
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-terracotta/30 bg-terracotta text-white shadow-xl shadow-terracotta/20',
+                            'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-200 group border border-terracotta/30 bg-terracotta text-white shadow-xl shadow-terracotta/20',
                             location.pathname === '/dashboard' && 'ring-2 ring-white/50'
                           )}
                         >
-                          <User className="h-5 w-5 mr-4" />
-                          <span className="text-sm font-black tracking-widest uppercase">Dashboard</span>
+                          <User className="h-4 w-4 mr-3" />
+                          <span className="text-xs font-black tracking-widest uppercase">Dashboard</span>
                         </Link>
                       </motion.div>
                       {profile?.role === 'admin' && (
@@ -212,12 +212,12 @@ export default function Navbar() {
                             to="/admin"
                             onClick={() => setIsOpen(false)}
                             className={cn(
-                              'flex items-center w-full px-6 py-4 rounded-2xl transition-all duration-200 group border border-white/10 bg-forest text-white shadow-lg',
+                              'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-200 group border border-white/10 bg-forest text-white shadow-lg',
                               location.pathname === '/admin' && 'ring-2 ring-white/50'
                             )}
                           >
-                            <ShieldCheck className="h-5 w-5 mr-4 text-terracotta" />
-                            <span className="text-sm font-black tracking-widest uppercase">Admin Panel</span>
+                            <ShieldCheck className="h-4 w-4 mr-3 text-terracotta" />
+                            <span className="text-xs font-black tracking-widest uppercase">Admin Panel</span>
                           </Link>
                         </motion.div>
                       )}
@@ -227,20 +227,40 @@ export default function Navbar() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mb-6"
+                      className="mb-4"
                     >
                       <Button 
                         onClick={() => {
                           login();
                           setIsOpen(false);
                         }}
-                        className="w-full bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl h-14 font-black uppercase tracking-widest shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2 group"
+                        className="w-full bg-terracotta hover:bg-terracotta/90 text-white rounded-xl h-12 font-black uppercase tracking-widest shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2 group"
                       >
-                        <User className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                        <User className="h-4 w-4 group-hover:scale-110 transition-transform" />
                         Customer Login
                       </Button>
                     </motion.div>
                   )}
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="mb-4"
+                  >
+                    <Link
+                      to="/parvati-valley"
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-200 group border border-terracotta/20 bg-terracotta/10 text-terracotta',
+                        location.pathname === '/parvati-valley' && 'ring-1 ring-terracotta'
+                      )}
+                    >
+                      <Compass className="h-4 w-4 mr-3" />
+                      <span className="text-xs font-black tracking-widest uppercase">Explore Parvati Valley</span>
+                    </Link>
+                  </motion.div>
+
                   {navLinks.map((link, i) => (
                     <motion.div
                       key={link.name}
@@ -253,28 +273,28 @@ export default function Navbar() {
                         <a
                           href={link.href}
                           className={cn(
-                            'flex items-center w-full px-6 py-4 rounded-xl transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
+                            'flex items-center w-full px-5 py-2.5 rounded-lg transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
                           )}
                         >
-                          <ArrowRight className="h-4 w-4 mr-4 text-terracotta opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <span className="text-sm font-bold tracking-widest uppercase">{link.name}</span>
+                          <ArrowRight className="h-3.5 w-3.5 mr-3 text-terracotta opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <span className="text-xs font-bold tracking-widest uppercase">{link.name}</span>
                         </a>
                       ) : (
                         <Link
                           to={link.href}
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            'flex items-center w-full px-6 py-4 rounded-xl transition-all duration-200 group border border-white/5',
+                            'flex items-center w-full px-5 py-2.5 rounded-lg transition-all duration-200 group border border-white/5',
                             location.pathname === link.href 
                               ? 'text-terracotta font-bold border-terracotta/20 bg-white/5' 
                               : 'text-cream/70 hover:text-white hover:bg-white/5'
                           )}
                         >
                           <ArrowRight className={cn(
-                            "h-4 w-4 mr-4 text-terracotta transition-opacity",
+                            "h-3.5 w-3.5 mr-3 text-terracotta transition-opacity",
                             location.pathname === link.href ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                           )} />
-                          <span className="text-sm font-bold tracking-widest uppercase">{link.name}</span>
+                          <span className="text-xs font-bold tracking-widest uppercase">{link.name}</span>
                         </Link>
                       )}
                     </motion.div>

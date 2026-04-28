@@ -158,9 +158,6 @@ export default function Tours() {
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', 'in', ['tour', 'yoga', 'meditation']));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      let combinedItems: any[] = [];
-      
-      // Merge DB items with defaults, preferring DB items if IDs match
       const dbItems = snapshot.empty ? [] : snapshot.docs.map(doc => {
         const type = doc.data().type;
         const data = doc.data().data;
@@ -176,28 +173,7 @@ export default function Tours() {
         return !title.includes('photography & cafe narrative');
       });
 
-      // Start with DB items
-      combinedItems = [...dbItems];
-      
-      // Add defaults if they don't exist in DB (by title matching or ID matching)
-      const allDefaults = [
-        ...DEFAULT_TOURS.map(t => ({ ...t, originalType: 'tour' })),
-        ...DEFAULT_YOGA.map(y => ({ ...y, originalType: 'yoga', category: 'Wellness', highlights: y.features || [] })),
-        ...DEFAULT_MEDITATION.map(m => ({ ...m, originalType: 'meditation', category: 'Wellness', highlights: m.features || [] }))
-      ];
-
-      allDefaults.forEach(def => {
-        const exists = dbItems.some(dbItem => {
-          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
-          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
-          return dbItem.id === def.id || dbTitle === defTitle;
-        });
-        if (!exists) {
-          combinedItems.push(def);
-        }
-      });
-
-      const sortedItems = combinedItems.sort((a, b) => {
+      const sortedItems = dbItems.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;
@@ -566,143 +542,19 @@ export default function Tours() {
                             </div>
                           ))}
                         </div>
-
-                        {/* Slot Selection (Conditional) - Now links to booking page */}
-                        {tour.slots && tour.slots.length > 0 && (
-                          <div className="mb-4">
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/tours/${tour.id}/book`);
-                              }}
-                              className="w-full bg-forest/[0.03] border border-forest/5 rounded-xl p-3 text-[10px] text-forest font-bold flex items-center justify-between hover:bg-white hover:border-terracotta/30 transition-all group"
-                            >
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-3.5 w-3.5 text-terracotta" />
-                                <span className="text-forest/30 text-xs">Pick Date</span>
-                              </div>
-                              <ChevronDown className="h-3 w-3 text-forest/20 group-hover:text-terracotta transition-colors" />
-                            </button>
-                          </div>
-                        )}
                       </div>
 
-                      <div className="mt-auto pt-4 border-t border-forest/5 flex items-center justify-between gap-3">
+                      <div className="mt-auto pt-5 border-t border-forest/5">
                         <Button 
                           variant="ghost" 
-                          className="text-forest hover:text-terracotta p-0 font-bold text-xs"
+                          className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedTour(tour);
                           }}
                         >
-                          Details
+                          Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                         </Button>
-
-                        <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
-                          {(() => {
-                            const slotIndex = selectedSlots[tour.id];
-                            const baseId = tour.originalType && tour.originalType !== 'tour' 
-                              ? `${tour.originalType}-${tour.title.toLowerCase().replace(/\s+/g, '-')}`
-                              : `tour-${tour.id}`;
-                            const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
-                            const quantity = getItemQuantity(currentItemId);
-                            
-                            const handleBookAction = () => {
-                              if (tour.slots && tour.slots.length > 0) {
-                                // Redirect to booking page if slots exist
-                                navigate(`/tours/${tour.id}/book`);
-                                return;
-                              }
-
-                              if (!user) {
-                                // Store pending item and open auth modal
-                                setPendingCartItem({
-                                  id: currentItemId,
-                                  name: tour.title,
-                                  price: tour.price,
-                                  type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
-                                  image: tour.image,
-                                  dateRange: formatDateRange(selectedDate, tour.duration)
-                                });
-                                setShowAuthModal(true);
-                                return;
-                              }
-
-                              globalAddToCart({
-                                id: currentItemId,
-                                  name: tour.title,
-                                  price: tour.price,
-                                  type: tour.originalType === 'yoga' ? 'Yoga Retreat' : (tour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
-                                  image: tour.image,
-                                  dateRange: formatDateRange(selectedDate, tour.duration)
-                                });
-                            };
-
-                            return (
-                              <div className="flex flex-col gap-2">
-                                <div className="flex items-center gap-2">
-                                  {quantity > 0 && (
-                                    <div className="flex items-center gap-2 bg-forest/5 p-1 rounded-full">
-                                      <Button 
-                                        size="icon" 
-                                        variant="ghost" 
-                                        className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          globalUpdateQuantity(currentItemId, quantity - 1);
-                                        }}
-                                      >
-                                        <Minus className="h-4 w-4" />
-                                      </Button>
-                                      <span className="font-bold text-forest text-sm px-2">{quantity}</span>
-                                      <Button 
-                                        size="icon" 
-                                        variant="ghost" 
-                                        className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleBookAction();
-                                        }}
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  )}
-
-                                  {quantity === 0 ? (
-                                    <Button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleBookAction();
-                                      }}
-                                      disabled={tour.isAvailable === false}
-                                      className={cn(
-                                        "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
-                                        tour.isAvailable === false 
-                                          ? "bg-forest/10 text-forest/30 cursor-not-allowed border-none" 
-                                          : "bg-forest hover:bg-forest/90 text-white shadow-lg shadow-forest/20"
-                                      )}
-                                    >
-                                      {tour.isAvailable === false ? 'Unavailable' : 'Book Now'}
-                                    </Button>
-                                  ) : (
-                                    <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
-                                      <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2">
-                                        <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
-                                      </Button>
-                                    </Link>
-                                  )}
-                                </div>
-                                {quantity > 0 && (
-                                  <p className="text-[9px] text-center text-forest/40 font-bold uppercase tracking-tighter">
-                                    Added to journey
-                                  </p>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </div>
                       </div>
                     </div>
                   </Card>
@@ -912,71 +764,127 @@ export default function Tours() {
                             {selectedTour.price}
                             <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                           </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                          {selectedTour.slots && selectedTour.slots.length > 0 ? (
-                            <div className="relative group w-full sm:w-auto">
-                              <select 
-                                value={selectedSlots[selectedTour.id] || ''}
-                                onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTour.id]: e.target.value })}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              >
-                                <option value="">Pick Date Slot</option>
-                                {selectedTour.slots.map((slot: any, i: number) => (
-                                  <option key={i} value={i}>
-                                    {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                            </div>
-                          ) : (
-                            <div className="relative group w-full sm:w-auto">
-                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                                <Calendar className="h-4 w-4" />
-                              </div>
-                              <input
-                                type="date"
-                                min={new Date().toISOString().split('T')[0]}
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              />
-                            </div>
-                          )}
-
-                          <Button 
-                            onClick={() => {
-                              if (!user) {
-                                setShowAuthModal(true);
-                                return;
-                              }
+                                                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                            {(() => {
                               const slotIndex = selectedSlots[selectedTour.id];
-                              const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
-                              
-                              globalAddToCart({
-                                id: `${selectedTour.originalType || 'tour'}-${selectedTour.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
-                                name: selectedTour.title || selectedTour.name,
-                                price: selectedTour.price,
-                                type: selectedTour.originalType === 'yoga' ? 'Yoga Retreat' : (selectedTour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
-                                image: selectedTour.image,
-                                dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
-                              });
-                              setSelectedTour(null);
-                              navigate('/checkout');
-                            }}
-                            disabled={
-                              selectedTour.isAvailable === false || 
-                              (selectedTour.slots && selectedTour.slots.length > 0 
-                                ? !selectedSlots[selectedTour.id] 
-                                : !selectedDate)
-                            }
-                            className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                            Reserve Spot
-                          </Button>
+                              const baseId = `${selectedTour.originalType || 'tour'}-${selectedTour.id}`;
+                              const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
+                              const quantity = getItemQuantity(currentItemId);
+
+                              if (quantity > 0) {
+                                return (
+                                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                    <div className="flex items-center gap-4 bg-forest/5 p-2 rounded-full border border-forest/10">
+                                      <Button 
+                                        size="icon" 
+                                        variant="ghost" 
+                                        className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                        onClick={() => globalUpdateQuantity(currentItemId, quantity - 1)}
+                                      >
+                                        <Minus className="h-4 w-4" />
+                                      </Button>
+                                      <span className="font-black text-forest text-lg px-2 min-w-[1.5rem] text-center">{quantity}</span>
+                                      <Button 
+                                        size="icon" 
+                                        variant="ghost" 
+                                        className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                        onClick={() => globalUpdateQuantity(currentItemId, quantity + 1)}
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    <Link to="/cart" className="w-full sm:w-auto">
+                                      <Button className="w-full h-14 px-8 rounded-full text-[10px] font-black uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-xl shadow-terracotta/20 flex items-center justify-center gap-3 group">
+                                        <ShoppingCart className="h-4 w-4" /> Go to Cart <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <>
+                                  {selectedTour.slots && selectedTour.slots.length > 0 ? (
+                                    <div className="relative group w-full sm:w-auto">
+                                      <select 
+                                        value={selectedSlots[selectedTour.id] || ''}
+                                        onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedTour.id]: e.target.value })}
+                                        className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                      >
+                                        <option value="">Pick Date Slot</option>
+                                        {selectedTour.slots.map((slot: any, i: number) => {
+                                          const start = new Date(slot.startDate);
+                                          let endStr = '';
+                                          if (slot.endDate) {
+                                            endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                          } else if (selectedTour.duration) {
+                                            const daysMatch = selectedTour.duration.match(/(\d+)/);
+                                            const days = daysMatch ? parseInt(daysMatch[1]) : 1;
+                                            const end = new Date(start);
+                                            end.setDate(start.getDate() + days - 1);
+                                            endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                          }
+                                          return (
+                                            <option key={i} value={i}>
+                                              {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
+                                            </option>
+                                          );
+                                        })}
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                                    </div>
+                                  ) : (
+                                    <div className="relative group w-full sm:w-auto">
+                                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                        <Calendar className="h-4 w-4" />
+                                      </div>
+                                      <input
+                                        type="date"
+                                        min={new Date().toISOString().split('T')[0]}
+                                        value={selectedDate}
+                                        onChange={(e) => setSelectedDate(e.target.value)}
+                                        className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                      />
+                                    </div>
+                                  )}
+
+                                  <Button 
+                                    onClick={() => {
+                                      const slotIndex = selectedSlots[selectedTour.id];
+                                      const slot = slotIndex !== undefined ? selectedTour.slots?.[parseInt(slotIndex)] : undefined;
+                                      
+                                      const cartItem = {
+                                        id: currentItemId,
+                                        name: selectedTour.title || selectedTour.name,
+                                        price: selectedTour.price,
+                                        type: selectedTour.originalType === 'yoga' ? 'Yoga Retreat' : (selectedTour.originalType === 'meditation' ? 'Meditation Retreat' : 'Tour'),
+                                        image: selectedTour.image,
+                                        dateRange: formatDateRange(selectedDate, selectedTour.duration, slot)
+                                      };
+
+                                      if (!user) {
+                                        setPendingCartItem(cartItem);
+                                        setShowAuthModal(true);
+                                        return;
+                                      }
+
+                                      globalAddToCart(cartItem);
+                                    }}
+                                    disabled={
+                                      selectedTour.isAvailable === false || 
+                                      (selectedTour.slots && selectedTour.slots.length > 0 
+                                        ? !selectedSlots[selectedTour.id] 
+                                        : !selectedDate)
+                                    }
+                                    className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                                  >
+                                    <Sparkles className="h-4 w-4" />
+                                    Reserve Spot
+                                  </Button>
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -1,13 +1,14 @@
 import { cn } from '@/lib/utils';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Wifi, Coffee, Laptop, Mountain, CheckCircle2, ShieldCheck, Zap, Edit2, Clock, Calendar, ChevronDown, Star, Stars, Share2 } from 'lucide-react';
+import { Plus, Minus, Wifi, Coffee, Laptop, Mountain, CheckCircle2, ShieldCheck, Zap, Edit2, Clock, Calendar, ChevronDown, Star, Stars, Share2, ShoppingCart, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
+import AuthModal from '@/components/AuthModal';
 import { toast } from 'sonner';
 import ImageSlider from '@/components/ImageSlider';
 import CustomizeTripCard from '@/components/CustomizeTripCard';
@@ -25,7 +26,8 @@ export default function WFH() {
   const [selectedSlots, setSelectedSlots] = useState<Record<string, string>>({});
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
-  const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setShowAuthModal } = useCart();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
   // Scroll lock and reset when modal is open
   useEffect(() => {
@@ -113,18 +115,7 @@ export default function WFH() {
         originalType: 'wfh'
       }));
 
-      // Merge defaults with DB items
-      let combined = [...dbItems];
-      DEFAULT_WFH.forEach(def => {
-        const exists = dbItems.some(dbItem => 
-          dbItem.id === def.id || (dbItem.title || (dbItem as any).name || '').trim().toLowerCase() === (def.title || (def as any).name || '').trim().toLowerCase()
-        );
-        if (!exists) {
-          combined.push({ ...def, originalType: 'wfh' });
-        }
-      });
-
-      const sortedPackages = combined.sort((a, b) => {
+      const sortedPackages = dbItems.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;
@@ -315,115 +306,22 @@ export default function WFH() {
                           </div>
                         ))}
                       </div>
-                    </div>
 
-                    {/* Slot Selection */}
-                    {pkg.slots && pkg.slots.length > 0 && (
-                      <div 
-                        className={`mb-6 p-4 rounded-2xl border ${pkg.popular ? 'bg-white/5 border-white/10' : 'bg-forest/[0.03] border-forest/5'}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <label className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${pkg.popular ? 'text-white/40' : 'text-forest/40'}`}>Available Slots</label>
-                        <button 
-                          onClick={() => navigate(`/wfh/${pkg.id}/book`)}
+                      <div className="mt-auto">
+                        <Button 
+                          variant="ghost" 
                           className={cn(
-                            "w-full rounded-xl p-3 text-xs font-medium flex items-center justify-between transition-all group",
-                            pkg.popular ? "bg-white/10 border border-white/10 text-white hover:bg-white/20" : "bg-white border border-forest/10 text-forest hover:border-terracotta/30"
+                            "w-full h-11 rounded-full border font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn",
+                            pkg.popular ? "border-white/20 text-white hover:bg-white hover:text-forest" : "border-forest/10 text-forest hover:bg-forest hover:text-white"
                           )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPackage(pkg);
+                          }}
                         >
-                          <div className="flex items-center gap-2">
-                            <Calendar className={cn("h-3.5 w-3.5", pkg.popular ? "text-terracotta" : "text-terracotta")} />
-                            <span className={pkg.popular ? "text-white/40" : "text-forest/40"}>Select a slot</span>
-                          </div>
-                          <ChevronDown className={cn("h-4 w-4 transition-colors", pkg.popular ? "text-white/20 group-hover:text-white" : "text-forest/20 group-hover:text-terracotta")} />
-                        </button>
+                          Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
-                    )}
-
-                    <div className="mb-6">
-                      <Button 
-                        variant="link" 
-                        className={`${pkg.popular ? 'text-white/80 hover:text-white' : 'text-forest/60 hover:text-terracotta'} p-0 font-bold`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedPackage(pkg);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                    <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    ...
-
-                      {(() => {
-                        const slotIndex = selectedSlots[pkg.id];
-                        const baseId = `wfh-${pkg.title.toLowerCase().replace(/\s+/g, '-')}`;
-                        const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
-                        const quantity = getItemQuantity(currentItemId);
-                        
-                        return (
-                          <>
-                            {quantity > 0 && pkg.isAvailable !== false && (
-                              <>
-                                <Button 
-                                  size="icon" 
-                                  variant="outline" 
-                                  className={`h-10 w-10 rounded-full ${pkg.popular ? 'border-white/20 text-white hover:bg-white/10' : 'border-forest/10 text-forest'}`}
-                                  onClick={() => globalUpdateQuantity(currentItemId, quantity - 1)}
-                                >
-                                  <Minus className="h-4 w-4" />
-                                </Button>
-                                <span className={`font-bold text-lg ${pkg.popular ? 'text-white' : 'text-forest'}`}>{quantity}</span>
-                              </>
-                            )}
-                            <motion.div
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              className={cn(
-                                "rounded-full h-12 transition-all duration-300 flex items-center justify-center overflow-hidden",
-                                quantity > 0 ? "w-12 p-0 flex-grow-0" : "flex-grow",
-                                pkg.isAvailable === false 
-                                  ? "bg-forest/10 text-forest/30 cursor-not-allowed" 
-                                  : pkg.popular ? 'bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20' : 'bg-forest hover:bg-forest/90 text-white shadow-lg hover:shadow-forest/20'
-                              )}
-                            >
-                              <Button 
-                                onClick={() => {
-                                  if (pkg.slots && pkg.slots.length > 0) {
-                                    navigate(`/wfh/${pkg.id}/book`);
-                                    return;
-                                  }
-                                  const slot = slotIndex !== undefined ? pkg.slots?.[parseInt(slotIndex)] : undefined;
-                                  globalAddToCart({
-                                    id: currentItemId,
-                                    name: pkg.title,
-                                    price: pkg.price,
-                                    type: 'WFH Stay',
-                                    image: pkg.image,
-                                    dateRange: formatDateRange(selectedDate, pkg.duration, slot)
-                                  });
-                                  navigate('/checkout');
-                                }}
-                                disabled={pkg.isAvailable === false}
-                                className="w-full h-full bg-transparent hover:bg-transparent text-inherit border-none shadow-none"
-                              >
-                                <AnimatePresence mode="wait">
-                                  <motion.div
-                                    key={quantity > 0 ? 'plus' : 'add'}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="flex items-center justify-center gap-2"
-                                  >
-                                    {pkg.isAvailable === false ? 'Unavailable' : (quantity > 0 ? <Plus className="h-5 w-5" /> : 'Add to Cart')}
-                                  </motion.div>
-                                </AnimatePresence>
-                              </Button>
-                            </motion.div>
-                          </>
-                        );
-                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -654,68 +552,125 @@ export default function WFH() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                          {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
-                            <div className="relative group w-full sm:w-auto">
-                              <select 
-                                value={selectedSlots[selectedPackage.id] || ''}
-                                onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              >
-                                <option value="">Pick Check-in Date</option>
-                                {selectedPackage.slots.map((slot: any, i: number) => (
-                                  <option key={i} value={i}>
-                                    {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                            </div>
-                          ) : (
-                            <div className="relative group w-full sm:w-auto">
-                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                                <Calendar className="h-4 w-4" />
-                              </div>
-                              <input
-                                type="date"
-                                min={new Date().toISOString().split('T')[0]}
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              />
-                            </div>
-                          )}
+                          {(() => {
+                            const slotIndex = selectedSlots[selectedPackage.id];
+                            const baseId = `wfh-${selectedPackage.id}`;
+                            const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
+                            const quantity = getItemQuantity(currentItemId);
 
-                          <Button 
-                            onClick={() => {
-                              if (!user) {
-                                setShowAuthModal(true);
-                                return;
-                              }
-                              const slotIndex = selectedSlots[selectedPackage.id];
-                              const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
-                              
-                              globalAddToCart({
-                                id: `wfh-${selectedPackage.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
-                                name: selectedPackage.title,
-                                price: selectedPackage.price,
-                                type: 'WFH Stay',
-                                image: selectedPackage.image,
-                                dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
-                              });
-                              setSelectedPackage(null);
-                              navigate('/checkout');
-                            }}
-                            disabled={
-                              selectedPackage.isAvailable === false || 
-                              (selectedPackage.slots && selectedPackage.slots.length > 0 
-                                ? !selectedSlots[selectedPackage.id] 
-                                : !selectedDate)
+                            if (quantity > 0) {
+                              return (
+                                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                  <div className="flex items-center gap-4 bg-forest/5 p-2 rounded-full border border-forest/10">
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                      onClick={() => globalUpdateQuantity(currentItemId, quantity - 1)}
+                                    >
+                                      <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="font-black text-forest text-lg px-2 min-w-[1.5rem] text-center">{quantity}</span>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                      onClick={() => globalUpdateQuantity(currentItemId, quantity + 1)}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <Link to="/cart" className="w-full sm:w-auto">
+                                    <Button className="w-full h-14 px-8 rounded-full text-[10px] font-black uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-xl shadow-terracotta/20 flex items-center justify-center gap-3 group">
+                                      <ShoppingCart className="h-4 w-4" /> Go to Cart <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                  </Link>
+                                </div>
+                              );
                             }
-                            className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                          >
-                            <Zap className="h-4 w-4" />
-                            Book Workation
-                          </Button>
+
+                            return (
+                              <>
+                                {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
+                                  <div className="relative group w-full sm:w-auto">
+                                    <select 
+                                      value={selectedSlots[selectedPackage.id] || ''}
+                                      onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
+                                      className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                    >
+                                      <option value="">Pick Check-in Date</option>
+                                      {selectedPackage.slots.map((slot: any, i: number) => {
+                                        const start = new Date(slot.startDate);
+                                        let endStr = '';
+                                        if (slot.endDate) {
+                                          endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                        } else if (selectedPackage.duration) {
+                                          const daysMatch = selectedPackage.duration.match(/(\d+)/);
+                                          const days = daysMatch ? parseInt(daysMatch[1]) : 1;
+                                          const end = new Date(start);
+                                          end.setDate(start.getDate() + days - 1);
+                                          endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                        }
+                                        return (
+                                          <option key={i} value={i}>
+                                            {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                                  </div>
+                                ) : (
+                                  <div className="relative group w-full sm:w-auto">
+                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                      <Calendar className="h-4 w-4" />
+                                    </div>
+                                    <input
+                                      type="date"
+                                      min={new Date().toISOString().split('T')[0]}
+                                      value={selectedDate}
+                                      onChange={(e) => setSelectedDate(e.target.value)}
+                                      className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                    />
+                                  </div>
+                                )}
+
+                                <Button 
+                                  onClick={() => {
+                                    const slotIndex = selectedSlots[selectedPackage.id];
+                                    const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
+                                    
+                                    const cartItem = {
+                                      id: currentItemId,
+                                      name: selectedPackage.title,
+                                      price: selectedPackage.price,
+                                      type: 'WFH Stay',
+                                      image: selectedPackage.image,
+                                      dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
+                                    };
+
+                                    if (!user) {
+                                      setPendingCartItem(cartItem);
+                                      setShowAuthModal(true);
+                                      return;
+                                    }
+
+                                    globalAddToCart(cartItem);
+                                  }}
+                                  disabled={
+                                    selectedPackage.isAvailable === false || 
+                                    (selectedPackage.slots && selectedPackage.slots.length > 0 
+                                      ? !selectedSlots[selectedPackage.id] 
+                                      : !selectedDate)
+                                  }
+                                  className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                                >
+                                  <Zap className="h-4 w-4" />
+                                  Book Workation
+                                </Button>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -726,6 +681,8 @@ export default function WFH() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 }

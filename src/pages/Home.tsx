@@ -275,19 +275,11 @@ export default function Home() {
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'instagram'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        setPosts(snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data().data
-        })).sort((a, b) => (a.order || 0) - (b.order || 0)));
-      } else {
-        setPosts([
-          { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80', order: 1 },
-          { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80', order: 2 },
-          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80', order: 3 },
-          { url: 'https://www.instagram.com/thesoulhimalaya', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80', order: 4 }
-        ]);
-      }
+      const dbPosts = snapshot.empty ? [] : snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data().data
+      })).sort((a, b) => (a.order || 0) - (b.order || 0));
+      setPosts(dbPosts);
     });
 
     return () => unsubscribe();
@@ -311,40 +303,35 @@ export default function Home() {
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'service'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) {
-        const dbServices = snapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data().data
-          }))
-          .filter(service => {
-            const title = (service.title || '').toLowerCase();
-            return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
-          })
-          .sort((a, b) => {
-            // Force Macramé Shop to the end
-            const aTitle = (a.title || '').toLowerCase();
-            const bTitle = (b.title || '').toLowerCase();
-            const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
-            const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
-            if (aIsMacrame && !bIsMacrame) return 1;
-            if (!aIsMacrame && bIsMacrame) return -1;
+      const dbServices = snapshot.empty ? [] : snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data().data
+        }))
+        .filter(service => {
+          const title = (service.title || '').toLowerCase();
+          return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
+        })
+        .sort((a, b) => {
+          // Force Macramé Shop to the end
+          const aTitle = (a.title || '').toLowerCase();
+          const bTitle = (b.title || '').toLowerCase();
+          const aIsMacrame = aTitle.includes('macramé') || aTitle.includes('macrame');
+          const bIsMacrame = bTitle.includes('macramé') || bTitle.includes('macrame');
+          if (aIsMacrame && !bIsMacrame) return 1;
+          if (!aIsMacrame && bIsMacrame) return -1;
 
-            const aAvail = a.isAvailable !== false;
-            const bAvail = b.isAvailable !== false;
-            if (aAvail && !bAvail) return -1;
-            if (!aAvail && bAvail) return 1;
+          const aAvail = a.isAvailable !== false;
+          const bAvail = b.isAvailable !== false;
+          if (aAvail && !bAvail) return -1;
+          if (!aAvail && bAvail) return 1;
 
-            const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
-            const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
-            return aOrder - bOrder;
-          });
-        setServices(dbServices);
-        setHasLoadedServices(true);
-      } else {
-        setServices(DEFAULT_SERVICES);
-        setHasLoadedServices(true);
-      }
+          const aOrder = (a.order !== undefined && a.order !== null) ? Number(a.order) : 999;
+          const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
+          return aOrder - bOrder;
+        });
+      setServices(dbServices);
+      setHasLoadedServices(true);
     });
 
     return () => unsubscribe();
@@ -422,10 +409,22 @@ export default function Home() {
               
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                 <Link 
-                  to="/about"
+                  to="/parvati-valley"
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
-                    "px-8 sm:px-10 py-6 sm:py-8 text-white border-white/20 hover:border-white hover:bg-white/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
+                    "px-8 sm:px-10 py-6 sm:py-8 text-terracotta border-terracotta/40 hover:border-terracotta hover:bg-terracotta/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
+                  )}
+                >
+                  Explore Parvati Valley
+                </Link>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                <Link 
+                  to="/about"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "lg" }),
+                    "px-8 sm:px-10 py-6 sm:py-8 text-white/70 hover:text-white rounded-full transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
                   )}
                 >
                   Our Philosophy

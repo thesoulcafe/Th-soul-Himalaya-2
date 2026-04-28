@@ -109,20 +109,7 @@ export default function Yoga() {
         originalType: 'yoga'
       }));
 
-      // Merge with defaults
-      let combined = [...dbPackages];
-      DEFAULT_YOGA.forEach(def => {
-        const exists = dbPackages.some(dbItem => {
-          const dbTitle = (dbItem.title || (dbItem as any).name || '').trim().toLowerCase();
-          const defTitle = (def.title || (def as any).name || '').trim().toLowerCase();
-          return dbItem.id === def.id || dbTitle === defTitle;
-        });
-        if (!exists) {
-          combined.push({ ...def, originalType: 'yoga' });
-        }
-      });
-
-      const sortedPackages = combined.sort((a, b) => {
+      const sortedPackages = dbPackages.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;
@@ -303,7 +290,7 @@ export default function Yoga() {
                       <div className="space-y-1 mb-4">
                         <div className="flex items-center text-yellow-500 text-xs font-bold">
                           <Star className="h-3 w-3 fill-current mr-1" />
-                          4.9 (150 reviews)
+                          {pkg.rating || '4.9'} ({pkg.reviews || '150'} reviews)
                         </div>
                         <div className="text-terracotta font-bold text-2xl">{pkg.price}</div>
                         <h3 className="text-2xl font-heading font-bold text-forest leading-tight group-hover:text-terracotta transition-colors">{pkg.title}</h3>
@@ -322,136 +309,19 @@ export default function Yoga() {
                           </div>
                         ))}
                       </div>
-                    </div>
 
-                    {/* Slot Selection - Now links to booking page */}
-                    {pkg.slots && pkg.slots.length > 0 && (
-                      <div className="mb-6 p-4 rounded-2xl bg-forest/[0.03] border border-forest/5" onClick={(e) => e.stopPropagation()}>
-                        <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2 block">Available Slots</label>
-                        <button 
-                          onClick={() => navigate(`/yoga/${pkg.id}/book`)}
-                          className="w-full bg-white border border-forest/10 rounded-xl p-3 text-xs text-forest font-medium flex items-center justify-between hover:border-terracotta/30 transition-all group"
+                      <div className="mt-auto">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPackage(pkg);
+                          }}
                         >
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-3.5 w-3.5 text-terracotta" />
-                            <span className="text-forest/40">Select a slot</span>
-                          </div>
-                          <ChevronDown className="h-4 w-4 text-forest/20 group-hover:text-terracotta transition-colors" />
-                        </button>
+                          Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                        </Button>
                       </div>
-                    )}
-
-                    <div className="mb-6">
-                      <Button 
-                        variant="link" 
-                        className="text-forest hover:text-terracotta p-0 font-bold"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedPackage(pkg);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                    <div className="flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
-                      {(() => {
-                        const slotIndex = selectedSlots[pkg.id];
-                        const baseId = `yoga-${pkg.title.toLowerCase().replace(/\s+/g, '-')}`;
-                        const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
-                        const quantity = getItemQuantity(currentItemId);
-                        
-                        const handleBookAction = () => {
-                          if (pkg.slots && pkg.slots.length > 0) {
-                            navigate(`/yoga/${pkg.id}/book`);
-                            return;
-                          }
-
-                          if (!user) {
-                            setPendingCartItem({
-                              id: currentItemId,
-                              name: pkg.title,
-                              price: pkg.price,
-                              type: 'Yoga Retreat',
-                              image: pkg.image,
-                              dateRange: formatDateRange(selectedDate, pkg.duration)
-                            });
-                            setShowAuthModal(true);
-                            return;
-                          }
-
-                          globalAddToCart({
-                            id: currentItemId,
-                            name: pkg.title,
-                            price: pkg.price,
-                            type: 'Yoga Retreat',
-                            image: pkg.image,
-                            dateRange: formatDateRange(selectedDate, pkg.duration)
-                          });
-                        };
-
-                        return (
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-2">
-                              {quantity > 0 && (
-                                <div className="flex items-center gap-2 bg-forest/5 p-1 rounded-full">
-                                  <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      globalUpdateQuantity(currentItemId, quantity - 1);
-                                    }}
-                                  >
-                                    <Minus className="h-4 w-4" />
-                                  </Button>
-                                  <span className="font-bold text-forest text-sm px-2">{quantity}</span>
-                                  <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    className="h-8 w-8 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleBookAction();
-                                    }}
-                                  >
-                                    <Plus className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              )}
-
-                              {quantity === 0 ? (
-                                <Button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleBookAction();
-                                  }}
-                                  disabled={pkg.isAvailable === false}
-                                  className={cn(
-                                    "h-10 px-8 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300 flex-grow",
-                                    pkg.isAvailable === false 
-                                      ? "bg-forest/10 text-forest/30 cursor-not-allowed border-none" 
-                                      : "bg-forest hover:bg-forest/90 text-white shadow-lg shadow-forest/20"
-                                  )}
-                                >
-                                  {pkg.isAvailable === false ? 'Unavailable' : 'Book Now'}
-                                </Button>
-                              ) : (
-                                <Link to="/checkout" className="flex-grow" onClick={(e) => e.stopPropagation()}>
-                                  <Button className="w-full h-10 px-6 rounded-full text-[10px] font-bold uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-lg shadow-terracotta/20 flex items-center justify-center gap-2">
-                                    <ShoppingCart className="h-3 w-3" /> Go to Cart <ArrowRight className="h-3 w-3" />
-                                  </Button>
-                                </Link>
-                              )}
-                            </div>
-                            {quantity > 0 && (
-                              <p className="text-[9px] text-center text-forest/40 font-bold uppercase tracking-tighter">
-                                Journey planned
-                              </p>
-                            )}
-                          </div>
-                        );
-                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -543,7 +413,7 @@ export default function Yoga() {
                   <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
                     <div className="flex items-center gap-2">
                       <Star className="h-4 w-4 text-terracotta fill-current" />
-                      <span>{selectedPackage.rating || '4.9'} / 5.0</span>
+                      <span>{selectedPackage.rating || '4.9'} / 5.0 ({selectedPackage.reviews || '150'} reviews)</span>
                     </div>
                     <div className="w-1 h-1 rounded-full bg-terracotta" />
                     <span>{selectedPackage.focus || 'Wellness'}</span>
@@ -676,71 +546,126 @@ export default function Yoga() {
                             {selectedPackage.price}
                             <span className="text-[10px] font-bold uppercase tracking-widest text-forest/20 ml-2 italic">/ Person</span>
                           </div>
-                        </div>
+                        </div>                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                          {(() => {
+                            const slotIndex = selectedSlots[selectedPackage.id];
+                            const baseId = `yoga-${selectedPackage.id}`;
+                            const currentItemId = `${baseId}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`;
+                            const quantity = getItemQuantity(currentItemId);
 
-                        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                          {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
-                            <div className="relative group w-full sm:w-auto">
-                              <select 
-                                value={selectedSlots[selectedPackage.id] || ''}
-                                onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              >
-                                <option value="">Pick Retreat Slot</option>
-                                {selectedPackage.slots.map((slot: any, i: number) => (
-                                  <option key={i} value={i}>
-                                    {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
-                            </div>
-                          ) : (
-                            <div className="relative group w-full sm:w-auto">
-                              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                                <Calendar className="h-4 w-4" />
-                              </div>
-                              <input
-                                type="date"
-                                min={new Date().toISOString().split('T')[0]}
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
-                              />
-                            </div>
-                          )}
-
-                          <Button 
-                            onClick={() => {
-                              if (!user) {
-                                setShowAuthModal(true);
-                                return;
-                              }
-                              const slotIndex = selectedSlots[selectedPackage.id];
-                              const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
-                              
-                              globalAddToCart({
-                                id: `yoga-${selectedPackage.id}${slotIndex !== undefined ? `-slot-${slotIndex}` : ''}`,
-                                name: selectedPackage.title,
-                                price: selectedPackage.price,
-                                type: 'Yoga Retreat',
-                                image: selectedPackage.image,
-                                dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
-                              });
-                              setSelectedPackage(null);
-                              navigate('/checkout');
-                            }}
-                            disabled={
-                              selectedPackage.isAvailable === false || 
-                              (selectedPackage.slots && selectedPackage.slots.length > 0 
-                                ? !selectedSlots[selectedPackage.id] 
-                                : !selectedDate)
+                            if (quantity > 0) {
+                              return (
+                                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                  <div className="flex items-center gap-4 bg-forest/5 p-2 rounded-full border border-forest/10">
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                      onClick={() => globalUpdateQuantity(currentItemId, quantity - 1)}
+                                    >
+                                      <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="font-black text-forest text-lg px-2 min-w-[1.5rem] text-center">{quantity}</span>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      className="h-10 w-10 rounded-full text-forest hover:bg-white bg-white/50 shadow-sm transition-all"
+                                      onClick={() => globalUpdateQuantity(currentItemId, quantity + 1)}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <Link to="/cart" className="w-full sm:w-auto">
+                                    <Button className="w-full h-14 px-8 rounded-full text-[10px] font-black uppercase tracking-widest bg-terracotta hover:bg-terracotta/90 text-white shadow-xl shadow-terracotta/20 flex items-center justify-center gap-3 group">
+                                      <ShoppingCart className="h-4 w-4" /> Go to Cart <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                  </Link>
+                                </div>
+                              );
                             }
-                            className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                            Secure Retreat
-                          </Button>
+
+                            return (
+                              <>
+                                {selectedPackage.slots && selectedPackage.slots.length > 0 ? (
+                                  <div className="relative group w-full sm:w-auto">
+                                    <select 
+                                      value={selectedSlots[selectedPackage.id] || ''}
+                                      onChange={(e) => setSelectedSlots({ ...selectedSlots, [selectedPackage.id]: e.target.value })}
+                                      className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] px-6 appearance-none focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                    >
+                                      <option value="">Pick Retreat Slot</option>
+                                      {selectedPackage.slots.map((slot: any, i: number) => {
+                                        const start = new Date(slot.startDate);
+                                        let endStr = '';
+                                        if (slot.endDate) {
+                                          endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                        } else if (selectedPackage.duration) {
+                                          const daysMatch = selectedPackage.duration.match(/(\d+)/);
+                                          const days = daysMatch ? parseInt(daysMatch[1]) : 1;
+                                          const end = new Date(start);
+                                          end.setDate(start.getDate() + days - 1);
+                                          endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                                        }
+                                        return (
+                                          <option key={i} value={i}>
+                                            {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 pointer-events-none group-hover:text-forest transition-colors" />
+                                  </div>
+                                ) : (
+                                  <div className="relative group w-full sm:w-auto">
+                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
+                                      <Calendar className="h-4 w-4" />
+                                    </div>
+                                    <input
+                                      type="date"
+                                      min={new Date().toISOString().split('T')[0]}
+                                      value={selectedDate}
+                                      onChange={(e) => setSelectedDate(e.target.value)}
+                                      className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.03] pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-forest/5 text-forest font-bold text-[10px] uppercase tracking-widest cursor-pointer group-hover:bg-forest/5 transition-all outline-none"
+                                    />
+                                  </div>
+                                )}
+
+                                <Button 
+                                  onClick={() => {
+                                    const slotIndex = selectedSlots[selectedPackage.id];
+                                    const slot = slotIndex !== undefined ? selectedPackage.slots?.[parseInt(slotIndex)] : undefined;
+                                    
+                                    const cartItem = {
+                                      id: currentItemId,
+                                      name: selectedPackage.title,
+                                      price: selectedPackage.price,
+                                      type: 'Yoga Retreat',
+                                      image: selectedPackage.image,
+                                      dateRange: formatDateRange(selectedDate, selectedPackage.duration, slot)
+                                    };
+
+                                    if (!user) {
+                                      setPendingCartItem(cartItem);
+                                      setShowAuthModal(true);
+                                      return;
+                                    }
+
+                                    globalAddToCart(cartItem);
+                                  }}
+                                  disabled={
+                                    selectedPackage.isAvailable === false || 
+                                    (selectedPackage.slots && selectedPackage.slots.length > 0 
+                                      ? !selectedSlots[selectedPackage.id] 
+                                      : !selectedDate)
+                                  }
+                                  className="w-full sm:min-w-[220px] h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-forest/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3"
+                                >
+                                  <Sparkles className="h-4 w-4" />
+                                  Secure Retreat
+                                </Button>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
