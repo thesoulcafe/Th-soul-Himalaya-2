@@ -197,7 +197,7 @@ export default function WFH() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
-              { icon: Wifi, title: 'Starlink Internet', desc: 'Reliable 100+ Mbps connection for your video calls.' },
+              { icon: Wifi, title: 'Free Internet', desc: 'Reliable connection for your video calls.' },
               { icon: Zap, title: 'Power Backup', desc: 'Uninterrupted power supply with solar and generator backup.' },
               { icon: Laptop, title: 'Pro Workspaces', desc: 'Ergonomic chairs and desks in every room.' },
               { icon: Mountain, title: 'Inspiring Views', desc: 'Every workstation faces the majestic snow peaks.' }
@@ -429,7 +429,7 @@ export default function WFH() {
                       <span>{selectedPackage.rating || '4.9'} / 5.0</span>
                     </div>
                     <div className="w-1 h-1 rounded-full bg-terracotta" />
-                    <span>Starlink Connect</span>
+                    <span>Free Fiber Connect</span>
                   </div>
                 </div>
 
@@ -459,7 +459,7 @@ export default function WFH() {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                       {[
                         { icon: Clock, label: 'Duration', value: selectedPackage.duration, sub: 'Total Stay' },
-                        { icon: Wifi, label: 'Internet', value: '100+ Mbps', sub: 'Starlink Pro' },
+                        { icon: Wifi, label: 'Internet', value: 'High Speed', sub: 'Free Connection' },
                         { icon: Coffee, label: 'Energy', value: 'Unlimited Brew', sub: 'Single Origin' },
                         { icon: Mountain, label: 'Vibe', value: 'Focus', sub: 'Peak Vision' }
                       ].map((stat, i) => (
