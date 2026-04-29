@@ -130,6 +130,14 @@ export default function ServiceDetail() {
                 </h1>
               </div>
             </div>
+            <div className="px-6 py-4 flex items-center justify-between text-forest/50 bg-white/50 backdrop-blur-sm rounded-full border border-forest/10 shadow-sm mx-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em]">Gallery of the Journey</span>
+              <div className="flex items-center gap-1.5">
+                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+              </div>
+            </div>
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

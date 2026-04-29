@@ -402,9 +402,10 @@ export default function Dashboard() {
                              </div>
                              <button 
                                onClick={() => setIsEditing(true)}
-                               className="p-2 rounded-full hover:bg-forest/5 text-forest/20 hover:text-terracotta transition-all opacity-0 group-hover/title:opacity-100"
+                               className="inline-flex items-center gap-2 p-2.5 rounded-xl bg-forest/5 text-forest/40 hover:text-terracotta hover:bg-terracotta/5 transition-all shadow-sm px-4"
                              >
-                               <Edit2 className="h-4 w-4" />
+                               <Edit2 className="h-3.5 w-3.5" />
+                               <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Edit Profile</span>
                              </button>
                            </>
                          )}
@@ -435,7 +436,12 @@ export default function Dashboard() {
                           { label: 'Account Level', value: profile?.role?.toUpperCase() || 'STANDARD', field: 'role' },
                           { label: 'Member Since', value: profile?.createdAt?.toDate ? profile.createdAt.toDate().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'Recent', field: 'createdAt' }
                         ].map((item) => (
-                          <div key={item.label} className="p-5 rounded-2xl bg-forest/[0.02] border border-forest/5 hover:border-terracotta/20 transition-all group relative">
+                          <div key={item.label} className={cn(
+                            "p-5 rounded-2xl bg-forest/[0.02] border transition-all group relative",
+                            isEditing && (item.field === 'displayName' || item.field === 'phone' || item.field === 'city' || item.field === 'pincode')
+                              ? "border-terracotta/30 bg-terracotta/[0.01]" 
+                              : "border-forest/5 hover:border-terracotta/20"
+                          )}>
                             <p className="text-[8px] font-black text-forest/30 uppercase tracking-tight mb-1">{item.label}</p>
                             {isEditing && (item.field === 'displayName' || item.field === 'phone' || item.field === 'city' || item.field === 'pincode') ? (
                               <input
@@ -454,7 +460,7 @@ export default function Dashboard() {
                                     if (val.length <= 6) setNewPincode(val);
                                   }
                                 }}
-                                className="bg-transparent border-none p-0 text-sm font-bold text-forest focus:ring-0 w-full"
+                                className="bg-transparent border-none p-0 text-sm font-bold text-forest focus:ring-0 w-full placeholder:text-forest/20"
                                 placeholder={`Enter your ${item.label.toLowerCase()}`}
                               />
                             ) : (
@@ -463,6 +469,38 @@ export default function Dashboard() {
                           </div>
                         ))}
                       </div>
+
+                      <AnimatePresence>
+                        {isEditing && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="pt-6 flex gap-4"
+                          >
+                            <Button 
+                              onClick={handleUpdateProfile}
+                              disabled={isSaving}
+                              className="flex-1 bg-forest text-white rounded-xl h-12 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-forest/20 hover:bg-terracotta transition-all"
+                            >
+                              {isSaving ? "Manifesting..." : "Save Changes"}
+                            </Button>
+                            <Button 
+                              variant="outline"
+                              onClick={() => {
+                                setIsEditing(false);
+                                setNewName(profile?.displayName || '');
+                                setNewPhone(profile?.phone || '');
+                                setNewCity(profile?.city || '');
+                                setNewPincode(profile?.pincode || '');
+                              }}
+                              className="flex-1 rounded-xl h-12 text-[10px] font-black uppercase tracking-widest border-forest/10 text-forest/40 hover:bg-rose-50 hover:text-rose-500 transition-all"
+                            >
+                              Discard
+                            </Button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     <div className="space-y-4">

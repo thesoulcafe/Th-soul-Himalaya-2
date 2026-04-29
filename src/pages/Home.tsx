@@ -359,7 +359,8 @@ export default function Home() {
               alt="Himalayan Mountains"
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
-              loading="lazy"
+              loading="eager"
+              fetchPriority="high"
             />
           </motion.div>
           {/* Advanced Layered Overlays */}

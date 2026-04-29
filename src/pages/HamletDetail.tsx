@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
-  ArrowLeft, 
+  ArrowLeft,
+  ArrowRight,
   MapPin, 
   History, 
   Wind, 
@@ -45,7 +46,26 @@ const HAMLET_DETAILS: Record<string, any> = {
       { label: "Ancestry", value: "Greek Roots" },
       { label: "Deity", value: "Jamlu Rishi" }
     ],
-    color: "bg-terracotta"
+    color: "bg-terracotta",
+    isHub: true,
+    hubTitle: "The Malana Intelligence Hub",
+    articles: [
+      {
+        title: "Malana: Decoding the World's Oldest Democracy",
+        excerpt: "An in-depth look at the unique social governance and the edicts of Jamlu Devta.",
+        link: "malana-democracy"
+      },
+      {
+        title: "Social Taboos: A Guide for Respectful Exploration",
+        excerpt: "Crucial intelligence on Malana's 'No-Touch' policy and how to navigate the village boundaries.",
+        link: "social-taboos"
+      },
+      {
+        title: "The Legend of Alexander: Greek DNA in the Himalayas?",
+        excerpt: "Analyzing the historical and genetic theories connecting Malana to the Macedonian army.",
+        link: "malana-heritage"
+      }
+    ]
   },
   tosh: {
     name: "Tosh",
@@ -75,7 +95,36 @@ const HAMLET_DETAILS: Record<string, any> = {
       { label: "Vibe", value: "High Alpine" },
       { label: "Key Access", value: "Tosh Glacier" }
     ],
-    color: "bg-blue-600"
+    color: "bg-blue-600",
+    isHub: true,
+    hubTitle: "The Tosh Content Hub",
+    articles: [
+      {
+        title: "The Ultimate Guide to Tosh Village (2026 Edition)",
+        excerpt: "Everything you need to know about the sentinel of the Pin Parvati Pass, updated for the current season.",
+        link: "tosh-guide-2026"
+      },
+      {
+        title: "How to Reach Tosh: Road Conditions from Barshaini (April 2026 Update)",
+        excerpt: "Critical travel intelligence on road safety, landslide zones, and taxi rates for the 2026 spring season.",
+        link: "tosh-roads-2026"
+      },
+      {
+        title: "7 Best Cafes in Tosh for Workations & Views",
+        excerpt: "Where to find the best Wi-Fi and even better views for your remote Himalayan office.",
+        link: "tosh-cafes"
+      },
+      {
+        title: "Tosh to Kheerganga Trek: Latest Rules and Camping Updates",
+        excerpt: "Forest department guidelines, campsite availability, and vital trek safety tips for 2026.",
+        link: "tosh-kheerganga-trek"
+      },
+      {
+        title: "What to Pack for Tosh in May: Temperature & Gear Guide",
+        excerpt: "Don't get caught in the mountain chill. Our curated list for the variable May climate.",
+        link: "tosh-packing"
+      }
+    ]
   },
   pulga: {
     name: "Pulga",
@@ -105,7 +154,26 @@ const HAMLET_DETAILS: Record<string, any> = {
       { label: "Forest Type", value: "Ancient Deodar" },
       { label: "Atmosphere", value: "Enchanted" }
     ],
-    color: "bg-emerald-600"
+    color: "bg-emerald-600",
+    isHub: true,
+    hubTitle: "The Pulga Wisdom Hub",
+    articles: [
+      {
+        title: "The Fairy Forest: A Botanical & Spiritual Study",
+        excerpt: "Exploring the ancient deodar groves where the sunlight meets the spirit of the woods.",
+        link: "fairy-forest-pulga"
+      },
+      {
+        title: "Slow Living: The Pulga Architecture Manual",
+        excerpt: "A deep dive into Kath-Kuni wooden houses and the philosophy of Himalayan timber construction.",
+        link: "pulga-architecture"
+      },
+      {
+        title: "Digital Nomads in the Woods: Internet & Power Guide",
+        excerpt: "Practical logistics for remote workers seeking the solitude of Pulga's forest cafes.",
+        link: "pulga-nomads"
+      }
+    ]
   },
   kheerganga: {
     name: "Kheerganga",
@@ -135,7 +203,26 @@ const HAMLET_DETAILS: Record<string, any> = {
       { label: "Trek Level", value: "Moderate" },
       { label: "Holy Site", value: "Kartikeya Cave" }
     ],
-    color: "bg-indigo-600"
+    color: "bg-indigo-600",
+    isHub: true,
+    hubTitle: "The Kheerganga Portal",
+    articles: [
+      {
+        title: "The Legend of Kartikeya: Sacred Peaks & Silence",
+        excerpt: "Tracing the spiritual path of the Son of Shiva to the high plateau of Kheerganga.",
+        link: "kheerganga-legend"
+      },
+      {
+        title: "Thermal Sanctity: The Science & Myth of the Springs",
+        excerpt: "Understanding the healing properties and the milky-white waters of the natural baths.",
+        link: "hot-springs"
+      },
+      {
+        title: "High Altitude Survival: The 12km Spiritual Trek",
+        excerpt: "A comprehensive guide to the trekking route, safety zones, and weather windows.",
+        link: "trekking-guide"
+      }
+    ]
   }
 };
 
@@ -271,6 +358,104 @@ export default function HamletDetail() {
             </div>
           </motion.div>
         </div>
+
+        {/* Content Hub Section for Tosh */}
+        {data.isHub && (
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 space-y-12"
+          >
+            <div className="text-center space-y-4">
+              <span className="text-terracotta text-[10px] font-black uppercase tracking-[0.4em]">Expert Intelligence</span>
+              <h2 className="text-4xl md:text-6xl font-heading font-black text-forest italic tracking-tighter uppercase">{data.hubTitle}</h2>
+              <p className="text-forest/40 text-sm font-bold uppercase tracking-widest max-w-xl mx-auto">
+                Deciphering the mysteries of Tosh through deep regional insights and 2026 ground-truth data.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.articles.map((article: any, i: number) => (
+                <div 
+                  key={i}
+                  className="bg-white p-8 rounded-[2rem] border border-forest/5 shadow-xl shadow-forest/5 hover:border-terracotta/20 transition-all group flex flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="h-10 w-10 rounded-xl bg-forest/5 flex items-center justify-center text-forest group-hover:bg-terracotta group-hover:text-white transition-all">
+                      <History className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-xl font-heading font-bold text-forest leading-tight group-hover:text-terracotta transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-sm text-forest/50 leading-relaxed font-medium line-clamp-3">
+                      {article.excerpt}
+                    </p>
+                  </div>
+                  <div className="pt-6 mt-auto">
+                    <Button 
+                      asChild
+                      variant="ghost" 
+                      className="p-0 h-auto text-[10px] font-black uppercase tracking-widest text-terracotta flex items-center gap-2 hover:bg-transparent hover:translate-x-2 transition-transform"
+                    >
+                      <Link to={`/hamlet/${data.name}/article/${article.link}`}>
+                        Read Full Article <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Content Preview Section */}
+            <div id="content-hub-anchor" className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="space-y-6">
+                <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-forest/5 relative group">
+                  <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=1000&auto=format&fit=crop" alt="Road to Tosh" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white font-black uppercase tracking-widest text-xs">Read Article</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="text-2xl font-heading font-bold text-forest italic">The Road to Barshaini: 2026 Intelligence</h4>
+                  <p className="text-sm text-forest/60 leading-relaxed">
+                    The April 2026 update confirms that the bridge near Barshaini has been reinforced, however, the last 2km to Tosh remains a 'high-clearance only' zone during evening rain.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-forest/5 relative group">
+                  <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop" alt="Tosh Cafes" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white font-black uppercase tracking-widest text-xs">Read Article</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="text-2xl font-heading font-bold text-forest italic">The Workation Revolution in Tosh</h4>
+                  <p className="text-sm text-forest/60 leading-relaxed">
+                    Seven cafes have now installed dedicated 5G repeaters, making Tosh the highest 'stable-internet' hub in the Parvati Valley. Discover where to sit for the best sunset Zoom calls.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategic Internal Links & SEO Anchor */}
+            <div className="bg-stone-100 rounded-[2.5rem] p-10 border border-forest/10">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="space-y-2">
+                  <h5 className="text-xs font-black text-terracotta uppercase tracking-[0.3em]">Plan Your Tosh Visit</h5>
+                  <p className="text-forest/70 font-medium italic">"Tosh is more than a destination; it is a spiritual geography."</p>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  <Link to="/trekks" className="text-[10px] font-black uppercase tracking-widest text-forest border-b-2 border-terracotta/30 hover:border-terracotta transition-all py-1">Kheerganga Route</Link>
+                  <Link to="/wfh" className="text-[10px] font-black uppercase tracking-widest text-forest border-b-2 border-terracotta/30 hover:border-terracotta transition-all py-1">Workation Stay</Link>
+                  <Link to="/tours" className="text-[10px] font-black uppercase tracking-widest text-forest border-b-2 border-terracotta/30 hover:border-terracotta transition-all py-1">Tosh Glacier Tour</Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </section>
     </div>
   );

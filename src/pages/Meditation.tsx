@@ -444,8 +444,17 @@ export default function Meditation() {
                 </div>
               </div>
 
+              <div className="px-6 py-4 flex items-center justify-between text-forest/50 bg-forest/5 backdrop-blur-sm rounded-full border border-forest/10 shadow-sm mx-8 -mt-6 relative z-[60]">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Gallery of the Journey</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                </div>
+              </div>
+
               {/* Details */}
-              <div className="flex-grow bg-[#FAF9F6] relative">
+              <div className="flex-grow bg-[#FAF9F6] relative pt-10">
                 <div className="p-8 md:p-16">
                   <div className="max-w-3xl mx-auto space-y-16">
                     

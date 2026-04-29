@@ -49,6 +49,9 @@
         "loyaltyPoints": { "type": "number", "description": "Points earned for repeat visits." },
         "soulPoints": { "type": "number", "description": "Points for the multiplayer leaderboard." },
         "isBlocked": { "type": "boolean" },
+        "phone": { "type": "string" },
+        "city": { "type": "string" },
+        "pincode": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" },
         "lastActive": { "type": "string", "format": "date-time", "description": "Last time the user was active." },
         "trekPreferences": {

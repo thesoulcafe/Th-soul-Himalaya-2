@@ -339,7 +339,13 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
         
         // Inject dynamic tags
         const finalHtml = await injectMetaTags(req, transformedHtml);
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+        res.status(200)
+           .set({ 
+             'Content-Type': 'text/html',
+             'Accept-Ranges': 'none',
+             'Cache-Control': 'public, max-age=300'
+           })
+           .send(finalHtml);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);
         console.error("[Dev] HTML Transformation error:", e);
@@ -355,7 +361,13 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       try {
         const html = await fs.promises.readFile(path.join(distPath, 'index.html'), 'utf-8');
         const finalHtml = await injectMetaTags(req, html);
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+        res.status(200)
+           .set({ 
+             'Content-Type': 'text/html',
+             'Accept-Ranges': 'none',
+             'Cache-Control': 'public, max-age=3600'
+           })
+           .send(finalHtml);
       } catch (e) {
         console.error("[Prod] Failed to serve index.html:", e);
         res.status(500).send("Internal Server Error");

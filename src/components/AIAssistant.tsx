@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
-import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind, Star, Clock, CheckCircle2, ShoppingBag, Edit2, Zap, Heart } from 'lucide-react';
+import { MessageSquare, Send, X, Sparkles, Map, Calendar, ArrowRight, User, Bot, Flower2, Compass, Share2, Home as HomeIcon, Wind, Star, Clock, CheckCircle2, ShoppingBag, Edit2, Zap, Heart, MessageCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { cn } from '@/lib/utils';
@@ -181,8 +181,33 @@ export default function AIAssistant() {
     }
   }, [isOpen]);
 
+  const FAQ_RESPONSES: Record<string, string> = {
+    "What should I pack?": "For a Himalayan journey in 2026, we recommend: \n1. Layered clothing (Thermal, Fleece, Down Jacket)\n2. Sturdy trekking boots with good grip\n3. Personal first-aid kit and hydration bladder\n4. Power bank and universal adapter\n5. Sun protection (high SPF sunscreen, polarized glasses)",
+    "Mobile connectivity?": "In Parvati Valley, BSNL and Jio offer the best coverage. Kasol and Tosh have decent 4G/5G, but expect signal drops during treks like Kheerganga. Most cafes now offer Starlink or localized high-speed fiber.",
+    "Is solo trekking safe?": "Yes, but with caution. Major trails like Kheerganga are well-marked. However, for offbeat routes to Bunbuni or Pin Parvati, we strongly recommend a local Soul Guide. Always register your departure at the local check-post.",
+    "How to handle cash?": "Carry sufficient cash. ATMs in Kasol/Manikaran are often out of service or have long queues. While many cafes now accept UPI, network issues can make digital payments unreliable in higher hamlets like Tosh or Grahan.",
+    "Track my macrame order": "To track your artisanal macrame decor, please visit the 'Dashboard' section of your profile. Shipping usually takes 5-7 business days across India. For international orders, allow 14-21 days.",
+    "Cancellation & Refund policy": "Packaged Tours: Full refund if cancelled 15 days before departure. 50% refund between 7-14 days. No refund within 7 days. \nProducts: 7-day return policy for unused items with original tags.",
+    "How to book a customized trip?": "You can use our 'Tailor Made' page to build your own itinerary. Alternatively, message us on WhatsApp with your budget, group size, and preferred vibe, and a Soul Guide will assist you manually.",
+    "Contact customer support": "Our Soul Guides are available 24/7 via WhatsApp at +91 7878200632. You can also email us at help@thesoulhimalaya.com for complex queries regarding bulk bookings.",
+    "Check my booking status": "Access your 'Dashboard' to view real-time status of your expeditions. 'Confirmed' means logistics are locked. 'Pending' means our guides are verifying trail conditions.",
+    "Payment options for tours": "We accept all major Credit/Debit cards, UPI, and Netbanking. For high-value expeditions, we offer 0% EMI options through our payment partners.",
+    "Shipping time for products": "Artisanal products usually ship within 48 hours. Standard delivery: 3-5 days for metros, 5-10 days for other regions. All items are shipped in eco-friendly, plastic-free packaging.",
+    "Group discount query": "We offer special rates for groups of 6 or more. Please use the WhatsApp button to connect with our logistics lead for a custom corporate or student group quote.",
+    "Report a technical issue": "Namaste! If the path has bugs, please email tech@thesoulhimalaya.com with a screenshot. Our digital sherpas will fix the trail immediately.",
+    "Talk to a human friend": "Sometimes a machine can't feel the mountains. Click the WhatsApp button below to speak directly with Rohit or Priya, our lead explorers on the ground."
+  };
+
   const handleStarterClick = async (question: string) => {
     setShowStarters(false);
+    
+    // Check if we have a pre-generated answer
+    if (FAQ_RESPONSES[question]) {
+      const userMessage = { id: Date.now().toString(), role: 'user', content: question };
+      const assistantMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: FAQ_RESPONSES[question] };
+      setMessages(prev => [...prev, userMessage, assistantMessage]);
+      return;
+    }
     
     // Use append if available (standard way for non-form triggers)
     if (typeof append === 'function') {
@@ -222,6 +247,21 @@ export default function AIAssistant() {
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!safeInput.trim() || isLoading) return;
+
+    const userQuery = safeInput.trim();
+    
+    // SEO & Speed Optimization: Catch FAQ queries before calling API
+    const matchedFaq = Object.keys(FAQ_RESPONSES).find(q => 
+      userQuery.toLowerCase().includes(q.toLowerCase().replace('?', ''))
+    );
+
+    if (matchedFaq) {
+      setInput('');
+      const userMessage = { id: Date.now().toString(), role: 'user', content: userQuery };
+      const assistantMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: FAQ_RESPONSES[matchedFaq] };
+      setMessages(prev => [...prev, userMessage, assistantMessage]);
+      return;
+    }
     
     setShowStarters(false);
     try {
@@ -350,7 +390,77 @@ export default function AIAssistant() {
 
               <div 
                 className="flex-1 p-6 overflow-y-auto space-y-6 no-scrollbar bg-cream/20"
+                ref={scrollRef}
               >
+                {/* Wisdom Repository & Soul Support Section */}
+                <div className="space-y-6">
+                  <div className="text-center mb-4">
+                    <div className="flex items-center justify-center gap-2 text-terracotta mb-2">
+                      <MessageCircle className="h-3 w-3" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.4em]">Wisdom Repository</span>
+                    </div>
+                    <h2 className="text-2xl font-playfair font-black italic text-forest uppercase tracking-tighter mb-2">Soul Support</h2>
+                    <p className="text-forest/40 text-[9px] font-bold uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">
+                      Decipher the mysteries of the valley through our curated frequently asked revelations.
+                    </p>
+                  </div>
+
+                  {/* Strategic Portfolio Summary Quick Stats */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {[
+                      { label: 'Market Segments', value: '06' },
+                      { label: 'Strategic Packages', value: '40' },
+                      { label: 'Adventure Rating', value: 'A+' },
+                      { label: 'Wellness Focus', value: 'Deep' }
+                    ].map(stat => (
+                      <div key={stat.label} className="bg-white/80 backdrop-blur-sm p-3 rounded-2xl border border-forest/5 shadow-sm text-center">
+                        <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-forest/40 mb-0.5">{stat.label}</p>
+                        <p className="text-lg font-heading font-black text-terracotta">{stat.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Quick FAQs as interactive bubbles */}
+                  <div className="space-y-2">
+                    {[
+                      "What should I pack?", 
+                      "Mobile connectivity?", 
+                      "Is solo trekking safe?",
+                      "How to handle cash?"
+                    ].map((q, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => handleStarterClick(q)}
+                        className="w-full text-left p-4 rounded-3xl bg-white border border-forest/5 shadow-sm hover:border-terracotta/30 transition-all group flex items-center justify-between"
+                      >
+                        <span className="text-xs font-bold text-forest group-hover:text-terracotta transition-colors">{q}</span>
+                        <ArrowRight className="h-3 w-3 text-forest/20 group-hover:text-terracotta transition-all group-hover:translate-x-1" />
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-4 border-t border-forest/5">
+                    <p className="text-[8px] text-center text-forest/30 font-black uppercase tracking-[0.3em] mb-4">Chat History</p>
+                    {messages.map((m, idx) => (
+                      <div 
+                        key={m.id || idx} 
+                        className={cn(
+                          "mb-4 flex flex-col",
+                          m.role === 'user' ? "items-end" : "items-start"
+                        )}
+                      >
+                        <div className={cn(
+                          "max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed",
+                          m.role === 'user' 
+                            ? "bg-forest text-white rounded-tr-none" 
+                            : "bg-white text-forest rounded-tl-none border border-forest/5 shadow-sm"
+                        )}>
+                          {m.content}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="p-4 bg-white border-t border-forest/5 shrink-0 px-6 pb-10 md:pb-8">

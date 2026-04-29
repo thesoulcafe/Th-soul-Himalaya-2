@@ -1,30 +1,6 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Tours from './pages/Tours';
-import Trekks from './pages/Trekks';
-import WFH from './pages/WFH';
-import Yoga from './pages/Yoga';
-import Meditation from './pages/Meditation';
-import Adventure from './pages/Adventure';
-import Shop from './pages/Shop';
-import Blueberry from './pages/Blueberry';
-import About from './pages/About';
-import Guide from './pages/Guide';
-import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
-import Services from './pages/Services';
-import TailorMade from './pages/TailorMade';
-import Admin from './pages/Admin';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Dashboard from './pages/Dashboard';
-import BookingDetails from './pages/BookingDetails';
-import ParvatiValley from './pages/ParvatiValley';
-import HamletDetail from './pages/HamletDetail';
-import CosmicManifestation from './pages/CosmicManifestation';
-import ServiceDetail from './pages/ServiceDetail';
-import BookingPage from './pages/BookingPage';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
@@ -32,6 +8,43 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import SmoothScroll from './components/SmoothScroll';
 import { Toaster } from 'sonner';
+
+// Lazy load pages for better mobile performance
+const Home = lazy(() => import('./pages/Home'));
+const Tours = lazy(() => import('./pages/Tours'));
+const Trekks = lazy(() => import('./pages/Trekks'));
+const WFH = lazy(() => import('./pages/WFH'));
+const Yoga = lazy(() => import('./pages/Yoga'));
+const Meditation = lazy(() => import('./pages/Meditation'));
+const Adventure = lazy(() => import('./pages/Adventure'));
+const Shop = lazy(() => import('./pages/Shop'));
+const Blueberry = lazy(() => import('./pages/Blueberry'));
+const About = lazy(() => import('./pages/About'));
+const Guide = lazy(() => import('./pages/Guide'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Services = lazy(() => import('./pages/Services'));
+const TailorMade = lazy(() => import('./pages/TailorMade'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const BookingDetails = lazy(() => import('./pages/BookingDetails'));
+const ParvatiValley = lazy(() => import('./pages/ParvatiValley'));
+const HamletDetail = lazy(() => import('./pages/HamletDetail'));
+const CosmicManifestation = lazy(() => import('./pages/CosmicManifestation'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
+const BookingPage = lazy(() => import('./pages/BookingPage'));
+const ArticleDetail = lazy(() => import('./pages/ArticleDetail'));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-cream">
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-12 w-12 border-4 border-forest/10 border-t-terracotta rounded-full animate-spin" />
+      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-forest/40">Manifesting...</span>
+    </div>
+  </div>
+);
 
 export default function App() {
   return (
@@ -43,7 +56,8 @@ export default function App() {
             <Toaster position="top-center" richColors />
             <Router>
               <ScrollToTop />
-              <Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                   <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path="tours" element={<Tours />} />
@@ -70,12 +84,14 @@ export default function App() {
                     <Route path="parvati-valley" element={<ParvatiValley />} />
                     <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
                     <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
+                    <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
                   </Route>
                 </Routes>
-              </Router>
-            </CartProvider>
-          </AuthProvider>
-        </ErrorBoundary>
+              </Suspense>
+            </Router>
+          </CartProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </HelmetProvider>
   );
 }

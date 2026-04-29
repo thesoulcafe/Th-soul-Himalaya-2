@@ -238,7 +238,7 @@ export default function Admin() {
       const msg = `Invalid file type (${file.type}). Please upload a JPEG, PNG, or WebP image.`;
       console.error(msg);
       setNotification({ message: msg, type: 'error' });
-      e.target.value = '';
+      if (e.target) e.target.value = '';
       return;
     }
 
@@ -247,13 +247,13 @@ export default function Admin() {
       const msg = `File too large (${(file.size / (1024 * 1024)).toFixed(2)} MB). Max 10MB allowed.`;
       console.error(msg);
       setNotification({ message: msg, type: 'error' });
-      e.target.value = '';
+      if (e.target) e.target.value = '';
       return;
     }
 
     // 2. Prepare Upload
     setIsUploading(true);
-    setUploadProgress(10); // Start with some progress
+    setUploadProgress(5); // Start with a lower value to see progress move
     
     try {
       if (!storage) {
@@ -268,66 +268,65 @@ export default function Admin() {
       const storageRef = ref(storage, storagePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // Listen for progress
-      const unsubscribe = uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(Math.max(10, Math.round(progress)));
-        }, 
-        (error) => {
-          console.error("Firebase Storage Error:", error);
-          setNotification({ message: `Upload Failed: ${error.message}`, type: 'error' });
-          setIsUploading(false);
-          setUploadProgress(0);
-          unsubscribe();
-        }, 
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            console.log("File uploaded to Storage:", downloadURL);
-            
-            setUploadProgress(100);
-            
-            setFormData(prev => {
-              const updated = { ...prev };
-              if (fieldName === 'image') {
-                updated.image = downloadURL;
-              } else if (fieldName === 'tempLink') {
-                updated.tempLink = downloadURL;
-              } else if (fieldName === 'images' && typeof index === 'number') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                currentImages[index] = downloadURL;
-                updated.images = currentImages;
-              } else if (fieldName === 'new_image') {
-                const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
-                updated.images = [...currentImages, downloadURL];
-              }
-              return updated;
-            });
-
-            setNotification({ message: 'Media synced to Cloud!', type: 'success' });
-            setIsUploading(false);
-            setTimeout(() => setUploadProgress(0), 1000);
-            unsubscribe();
-          } catch (urlErr: any) {
-            console.error("Error fetching URL:", urlErr);
-            setNotification({ message: "Store succeeded but URL retrieval failed.", type: 'error' });
-            setIsUploading(false);
-            setUploadProgress(0);
+      // Create a promise to handle the upload completion/error
+      const downloadURL = await new Promise<string>((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            if (snapshot.totalBytes > 0) {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log(`Upload progress: ${progress.toFixed(2)}%`);
+              // Ensure we show at least 5% so the user knows it started
+              setUploadProgress(Math.max(5, Math.round(progress)));
+            }
+          }, 
+          (error) => {
+            console.error("Firebase Storage Upload Error:", error);
+            reject(error);
+          }, 
+          async () => {
+            try {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            } catch (urlErr) {
+              reject(urlErr);
+            }
           }
+        );
+      });
+
+      console.log("File uploaded successfully, URL obtained:", downloadURL);
+      
+      setUploadProgress(100);
+      
+      // Update state
+      setFormData(prev => {
+        const updated = { ...prev };
+        if (fieldName === 'image') {
+          updated.image = downloadURL;
+        } else if (fieldName === 'tempLink') {
+          updated.tempLink = downloadURL;
+        } else if (fieldName === 'images' && typeof index === 'number') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          currentImages[index] = downloadURL;
+          updated.images = currentImages;
+        } else if (fieldName === 'new_image') {
+          const currentImages = Array.isArray(prev.images) ? [...prev.images] : [];
+          updated.images = [...currentImages, downloadURL];
         }
-      );
+        return updated;
+      });
+
+      setNotification({ message: 'Media synced to Cloud!', type: 'success' });
+      
     } catch (error: any) {
       console.error("UPLOAD FAILURE:", error);
-      
       setNotification({ 
         message: error.message || "Failed to upload file.", 
         type: 'error' 
       });
-      
-      setIsUploading(false);
-      setUploadProgress(0);
     } finally {
+      setIsUploading(false);
+      setTimeout(() => setUploadProgress(0), 1000);
       // Clear the input so the same file can be selected again
       if (e.target) e.target.value = '';
     }
@@ -2618,32 +2617,56 @@ export default function Admin() {
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="relative w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
+                    className="relative w-full max-w-5xl bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-auto md:max-h-[85vh]"
                   >
+                    {/* Close Button mobile */}
+                    <button 
+                      onClick={() => setSelectedUser(null)}
+                      className="absolute top-4 right-4 z-[120] md:hidden h-10 w-10 flex items-center justify-center bg-black/10 backdrop-blur-md rounded-full text-forest"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+
                     {/* Sidebar Info */}
-                    <div className="w-full md:w-80 bg-forest p-10 text-white flex flex-col items-center shrink-0">
-                      <div className="h-32 w-32 rounded-3xl overflow-hidden shadow-2xl mb-6 ring-4 ring-white/10">
+                    <div className="w-full md:w-80 bg-forest p-6 md:p-10 text-white flex flex-col items-center shrink-0 overflow-y-auto md:overflow-y-visible custom-scrollbar max-h-[40vh] md:max-h-none">
+                      <div className="h-24 w-24 md:h-32 md:w-32 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl mb-4 md:mb-6 ring-4 ring-white/10 shrink-0">
                         <img 
                           src={selectedUser.photoURL || `https://ui-avatars.com/api/?name=${selectedUser.displayName}&background=random`} 
                           alt={selectedUser.displayName}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h3 className="text-2xl font-heading font-bold mb-1 text-center">{selectedUser.displayName}</h3>
-                      <p className="text-white/40 text-xs font-mono mb-8">{selectedUser.uid}</p>
+                      <h3 className="text-xl md:text-2xl font-heading font-bold mb-1 text-center">{selectedUser.displayName}</h3>
+                      <p className="text-white/40 text-[10px] md:text-xs font-mono mb-6 md:mb-8 break-all text-center">{selectedUser.uid}</p>
                       
-                      <div className="w-full space-y-4">
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Email Address</p>
-                          <p className="text-sm font-medium truncate">{selectedUser.email}</p>
+                      <div className="w-full space-y-3 md:space-y-4">
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Email Address</p>
+                          <p className="text-xs md:text-sm font-medium truncate">{selectedUser.email}</p>
                         </div>
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Loyalty Status</p>
-                          <p className="text-sm font-medium text-amber-400">{selectedUser.loyaltyPoints} Experience Points</p>
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Contact Number</p>
+                          <p className="text-xs md:text-sm font-medium">{selectedUser.phone || 'Not Provided'}</p>
                         </div>
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Account Role</p>
-                          <Badge className="bg-terracotta text-white border-none text-[10px] uppercase font-bold px-3 py-1 rounded-full mt-1">
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Location Details</p>
+                          <p className="text-xs md:text-sm font-medium">{selectedUser.city || 'N/A'}{selectedUser.pincode ? `, ${selectedUser.pincode}` : ''}</p>
+                        </div>
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Loyalty Status</p>
+                          <p className="text-xs md:text-sm font-medium text-amber-400">{selectedUser.loyaltyPoints} Experience Points</p>
+                        </div>
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Member Since</p>
+                          <p className="text-xs md:text-sm font-medium">
+                            {selectedUser.createdAt?.toDate 
+                              ? selectedUser.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) 
+                              : 'Recent'}
+                          </p>
+                        </div>
+                        <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
+                          <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Account Role</p>
+                          <Badge className="bg-terracotta text-white border-none text-[9px] md:text-[10px] uppercase font-bold px-3 py-1 rounded-full mt-1">
                             {selectedUser.role}
                           </Badge>
                         </div>
@@ -2652,21 +2675,21 @@ export default function Admin() {
                       <Button 
                         variant="outline" 
                         onClick={() => setSelectedUser(null)}
-                        className="mt-auto w-full rounded-2xl border-white/10 text-white hover:bg-white/10 h-12 font-bold uppercase tracking-widest text-[10px]"
+                        className="mt-6 md:mt-auto w-full rounded-2xl border-white/10 text-white hover:bg-white/10 h-10 md:h-12 font-bold uppercase tracking-widest text-[10px]"
                       >
                         Close Terminal
                       </Button>
                     </div>
 
                     {/* Main Content: Order History */}
-                    <div className="flex-grow p-10 overflow-y-auto bg-cream/30">
-                      <div className="flex items-center justify-between mb-8">
+                    <div className="flex-grow p-6 md:p-10 overflow-y-auto bg-cream/30 custom-scrollbar">
+                      <div className="flex items-center justify-between mb-6 md:mb-8">
                         <div>
-                          <h4 className="text-xl font-heading font-bold text-forest">Order History</h4>
-                          <p className="text-xs text-forest/40 font-medium">Complete record of Himalayan journeys</p>
+                          <h4 className="text-lg md:text-xl font-heading font-bold text-forest">Order History</h4>
+                          <p className="text-[10px] md:text-xs text-forest/40 font-medium">Complete record of Himalayan journeys</p>
                         </div>
-                        <div className="h-12 w-12 rounded-2xl bg-forest/5 flex items-center justify-center">
-                          <History className="h-6 w-6 text-forest/40" />
+                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-forest/5 flex items-center justify-center">
+                          <History className="h-5 w-5 md:h-6 md:w-6 text-forest/40" />
                         </div>
                       </div>
 
