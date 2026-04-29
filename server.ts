@@ -190,12 +190,17 @@ async function startServer() {
 
   app.get("/robots.txt", (req, res) => {
     res.type("text/plain");
-    res.send(`User-agent: *
+    res.send(`User-agent: facebookexternalhit
 Allow: /
-User-agent: facebookexternalhit
-Allow: /
+
 User-agent: Twitterbot
-Allow: /`);
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /uploads/
+`);
   });
 
   app.post("/api/upload", (req, res) => {
