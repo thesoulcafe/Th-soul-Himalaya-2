@@ -380,8 +380,10 @@ async function injectMetaTags(req: express.Request, html: string) {
   try {
     const metaPromise = (async () => {
       const urlStr = req.originalUrl;
+      const userAgent = req.headers['user-agent'];
       const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
       const id = url.searchParams.get('id');
+      console.log(`[Meta] Request from: ${urlStr}, User-Agent: ${userAgent}`);
       
       // Get protocol and host dynamically
       const protocol = req.headers['x-forwarded-proto'] || 'https';
