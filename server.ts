@@ -188,6 +188,16 @@ async function startServer() {
     res.json({ status: "ok", message: "The Soul Himalaya API is running" });
   });
 
+  app.get("/robots.txt", (req, res) => {
+    res.type("text/plain");
+    res.send(`User-agent: *
+Allow: /
+User-agent: facebookexternalhit
+Allow: /
+User-agent: Twitterbot
+Allow: /`);
+  });
+
   app.post("/api/upload", (req, res) => {
     upload.single("file")(req, res, (err) => {
       if (err) {
