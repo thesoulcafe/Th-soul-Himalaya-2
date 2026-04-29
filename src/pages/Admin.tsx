@@ -2381,8 +2381,9 @@ export default function Admin() {
                   <thead>
                     <tr className="bg-forest/[0.02] border-b border-forest/5">
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Customer</th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Packages</th>
-                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Booking Date</th>
+                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Mobile No</th>
+                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest">Package</th>
+                      <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-center">Slot/Date</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-right">Amount</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-center">Status</th>
                       <th className="px-6 py-4 text-[10px] font-bold text-forest/40 uppercase tracking-widest text-center">Actions</th>
@@ -2393,7 +2394,9 @@ export default function Admin() {
                       b.userName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                       (b.serviceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                       b.items?.some(i => i.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                    ).map((booking, i) => (
+                    ).map((booking, i) => {
+                      const userProfile = users.find(u => u.uid === booking.userId);
+                      return (
                       <motion.tr 
                         key={booking.id}
                         initial={{ opacity: 0 }}
@@ -2413,6 +2416,11 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
+                           <p className="text-xs text-forest/50 font-medium">                            
+                             {booking.phone || userProfile?.phone || 'N/A'}
+                           </p>
+                        </td>
+                        <td className="px-6 py-4">
                           <div className="flex flex-col">
                             <span className="text-[9px] font-bold text-terracotta uppercase tracking-widest">
                               {booking.items?.[0]?.type || booking.serviceType || 'N/A'}
@@ -2424,12 +2432,11 @@ export default function Admin() {
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2 text-forest/40">
-                            <Clock className="h-3.5 w-3.5" />
-                            <span className="text-xs font-mono">
-                              {booking.createdAt?.toDate ? new Date(booking.createdAt.toDate()).toLocaleDateString() : (booking.date || 'Pending')}
-                            </span>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex flex-col items-center gap-2 text-forest/60">
+                             <span className="text-xs font-mono font-medium">
+                               {booking.items?.[0]?.dateRange || booking.date || 'Pending'}
+                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -2495,7 +2502,8 @@ export default function Admin() {
                           </div>
                         </td>
                       </motion.tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>
