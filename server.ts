@@ -381,9 +381,18 @@ async function injectMetaTags(req: express.Request, html: string) {
           highlightsStr = " Features: " + pkg.features.join(", ") + ".";
         }
 
+        let itineraryStr = "";
+        if (pkg.theExperience) {
+           const itineraryBrief = pkg.theExperience.split('\n')
+            .filter((l: string) => l.toLowerCase().startsWith('day') || l.toLowerCase().startsWith('step'))
+            .slice(0, 3)
+            .join(' | ');
+           if (itineraryBrief) itineraryStr = " Experience: " + itineraryBrief + ".";
+        }
+
         description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
                       ` Duration: ${pkg.duration || 'Flexible'}.` + 
-                      highlightsStr;
+                      highlightsStr + itineraryStr;
         
         if (description.length > 200) {
           description = description.substring(0, 197) + "...";
@@ -439,15 +448,10 @@ async function injectMetaTags(req: express.Request, html: string) {
       `;
 
       // Remove existing SEO tags to prevent duplicates which confuse crawlers
-      let cleanedHtml = html
-        .replace(/<title>.*?<\/title>/i, '')
-        .replace(/<meta name="description".*?>/i, '')
-        .replace(/<meta property="og:.*?".*?>/gi, '')
-        .replace(/<meta name="twitter:.*?".*?>/gi, '')
-        .replace(/<link rel="canonical".*?>/i, '');
+      let cleanedHtml = html;
 
-      // Inject before </head>
-      return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
+      // Inject before placeholder
+      return cleanedHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', `${metaTags}`);
     })();
 
     return await Promise.race([metaPromise, timeoutPromise]) as string;
