@@ -284,38 +284,48 @@ const ParvatiValley = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {pageData.villages.map((village, idx) => (
-              <motion.div
-                key={village.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="group h-[500px] relative rounded-[2rem] overflow-hidden border border-white/10"
+              <Link 
+                to={`/parvati-valley/${village.name.toLowerCase()}`}
+                key={village.name} 
+                className="block group h-[500px] relative rounded-[2rem] overflow-hidden border border-white/10"
               >
-                {/* Real Image of the Place */}
-                <img 
-                  src={village.image} 
-                  alt={village.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-100"
-                />
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                  <div className="relative z-10">
-                    <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-terracotta text-white shadow-xl">
-                      {village.icon}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                  className="h-full w-full"
+                >
+                  {/* Real Image of the Place */}
+                  <img 
+                    src={village.image} 
+                    alt={village.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-100"
+                  />
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  
+                  <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                    <div className="relative z-10">
+                      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-terracotta text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6">
+                        {village.icon}
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-terracotta transition-colors">{village.name}</h3>
+                      <p className="text-white/60 text-sm mb-4 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500">
+                        {village.history}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-terracotta font-black text-xs tracking-widest uppercase py-1 px-3 rounded-full bg-white/5 backdrop-blur-md self-start">
+                          {village.vibe}
+                        </span>
+                        <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                          <ExternalLink className="h-4 w-4" />
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{village.name}</h3>
-                    <p className="text-white/60 text-sm mb-4 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500">
-                      {village.history}
-                    </p>
-                    <span className="text-terracotta font-black text-xs tracking-widest uppercase py-1 px-3 rounded-full bg-white/5 backdrop-blur-md self-start">
-                      {village.vibe}
-                    </span>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>

@@ -200,7 +200,69 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /uploads/
+
+Sitemap: https://thesoulhimalaya.com/sitemap.xml
 `);
+  });
+
+  app.get("/sitemap.xml", async (req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'thesoulhimalaya.com';
+    const baseUrl = `${protocol}://${host}`;
+
+    const staticPages = [
+      '',
+      '/services',
+      '/tours',
+      '/trekks',
+      '/yoga',
+      '/meditation',
+      '/wfh',
+      '/shop',
+      '/cart',
+      '/parvati-valley',
+      '/parvati-valley/malana',
+      '/parvati-valley/tosh',
+      '/parvati-valley/pulga',
+      '/parvati-valley/kheerganga'
+    ];
+
+    let packageUrls: string[] = [];
+    try {
+      // Import constants to get all IDs
+      const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
+      // We read file directly to avoid complex import issues in this environment
+      const content = fs.readFileSync(constantsPath, 'utf-8');
+      const idMatches = content.match(/id:\s*['"](.*?)['"]/g) || [];
+      const ids = idMatches.map(m => m.split(/['"]/)[1]);
+      
+      const uniqueIds = Array.from(new Set(ids));
+      packageUrls = uniqueIds.map(id => {
+        if (id.startsWith('tour-')) return `/tours?id=${id}`;
+        if (id.startsWith('trekk-')) return `/trekks?id=${id}`;
+        if (id.startsWith('yoga-')) return `/yoga?id=${id}`;
+        if (id.startsWith('med-')) return `/meditation?id=${id}`;
+        if (id.startsWith('adv-')) return `/adventure?id=${id}`;
+        if (id.startsWith('wfh-')) return `/wfh?id=${id}`;
+        return null;
+      }).filter(Boolean) as string[];
+    } catch (e) {
+      console.error("Failed to generate package URLs for sitemap:", e);
+    }
+
+    const allUrls = [...staticPages, ...packageUrls];
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${allUrls.map(url => `
+  <url>
+    <loc>${baseUrl}${url}</loc>
+    <changefreq>${url === '' ? 'daily' : 'weekly'}</changefreq>
+    <priority>${url === '' ? '1.0' : '0.8'}</priority>
+  </url>`).join('')}
+</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
   });
 
   app.post("/api/upload", (req, res) => {
@@ -326,8 +388,8 @@ async function injectMetaTags(req: express.Request, html: string) {
       const host = req.headers.host || 'thesoulhimalaya.com';
       const absoluteUrl = `${protocol}://${host}${urlStr}`;
 
-      let title = "Soul Himalaya - Soulful Travel in Kullu & Parvati Valley";
-      let description = "Curated soulful travel experiences in the heart of the Himalayas. Explore romantic getaways, wellness retreats, and high-altitude adventures.";
+      let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
+      let description = "Discover curated soulful travel in the heart of the Himalayas. Combining spiritual wellness retreats, yoga trekks, and meditation with high-altitude adventure in Kullu & Parvati Valley.";
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
       let pkg: any = null;
@@ -385,6 +447,20 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
+      if (urlStr.startsWith('/parvati-valley/')) {
+        const hamletId = urlStr.split('/').pop()?.toLowerCase();
+        const hamletNames: Record<string, string> = {
+          malana: "Malana",
+          tosh: "Tosh",
+          pulga: "Pulga",
+          kheerganga: "Kheerganga"
+        };
+        if (hamletId && hamletNames[hamletId]) {
+          title = `${hamletNames[hamletId]} | The Hamlets of the Gods | The Soul Himalaya`;
+          description = `Explore the mystical village of ${hamletNames[hamletId]} in the Parvati Valley. Discover its unique history, culture, and ancient spiritual traditions.`;
+        }
+      }
+
       if (pkg) {
         const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
         title = `${pkgTitle} | Soul Himalaya`;
@@ -436,6 +512,92 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
+      // JSON-LD Generation
+      const logo = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=500&q=80";
+      const organizationSchema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "The Soul Himalaya",
+        "url": `${protocol}://${host}`,
+        "logo": logo,
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-7018594247",
+          "contactType": "customer service",
+          "email": "info@thesoulhimalaya.com"
+        }
+      };
+
+      const localBusinessSchema = {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "The Soul Himalaya",
+        "image": image,
+        "@id": `${protocol}://${host}`,
+        "url": `${protocol}://${host}`,
+        "telephone": "+91-7018594247",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Kullu & Parvati Valley",
+          "addressLocality": "Kullu",
+          "addressRegion": "HP",
+          "postalCode": "175101",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 31.958,
+          "longitude": 77.109
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      };
+
+      const schemas = [organizationSchema, localBusinessSchema];
+
+      if (pkg) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "TouristTrip",
+          "name": pkg.title || pkg.name,
+          "description": description,
+          "image": image,
+          "provider": {
+            "@type": "Organization",
+            "name": "The Soul Himalaya"
+          },
+          "itinerary": pkg.theExperience ? {
+            "@type": "ItemList",
+            "numberOfItems": pkg.theExperience.split('\n').filter((l: string) => l.toLowerCase().startsWith('day')).length,
+            "itemListElement": pkg.theExperience.split('\n')
+              .filter((l: string) => l.toLowerCase().startsWith('day'))
+              .map((l: string, i: number) => ({
+                "@type": "ListItem",
+                "position": i + 1,
+                "name": l.trim()
+              }))
+          } : undefined
+        } as any);
+      }
+
+      const jsonLdBlock = `
+      <script type="application/ld+json">
+        ${JSON.stringify(schemas, null, 2)}
+      </script>`;
+
       const metaTags = `
       <!-- Dynamic SEO -->
       <title>${title}</title>
@@ -460,6 +622,9 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta name="twitter:title" content="${title}">
       <meta name="twitter:description" content="${description}">
       <meta name="twitter:image" content="${image}">
+
+      <!-- JSON-LD Structured Data -->
+      ${jsonLdBlock}
       `;
 
       // Remove existing SEO tags to prevent duplicates which confuse crawlers

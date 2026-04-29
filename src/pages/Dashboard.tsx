@@ -38,6 +38,7 @@ interface Booking {
   createdAt: any;
   status: string;
   image?: string;
+  slot?: string;
 }
 
 export default function Dashboard() {
@@ -265,9 +266,12 @@ export default function Dashboard() {
                                   {booking.status || 'Reserved'}
                                 </Badge>
                               </div>
-                              <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-4 truncate">
+                              <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-2 truncate">
                                 {booking.item}
                               </h3>
+                              {booking.slot && (
+                                <p className="text-sm font-bold text-terracotta mb-4 uppercase tracking-widest">{booking.slot}</p>
+                              )}
                               <div className="flex flex-wrap items-center gap-6 text-[10px] text-forest/40 font-black uppercase tracking-widest">
                                 <span className="flex items-center gap-2">
                                   <Calendar className="h-3 w-3 text-terracotta" />
@@ -355,7 +359,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex-1 space-y-2">
-                       <div className="flex items-center gap-4 group/title">
+                      <div className="flex items-center gap-4 group/title mb-6">
                          {isEditing ? (
                            <div className="flex items-center gap-2 w-full max-w-md">
                              <input 
@@ -390,7 +394,12 @@ export default function Dashboard() {
                            </div>
                          ) : (
                            <>
-                             <h2 className="text-4xl font-heading font-black text-forest tracking-tight">{profile?.displayName || user.displayName || 'Soul Voyager'}</h2>
+                             <div className='flex flex-col'>
+                               <h2 className="text-4xl font-heading font-black text-forest tracking-tight">{profile?.displayName || user.displayName || 'Soul Voyager'}</h2>
+                               <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest mt-1">
+                                 Click edit icon to update your profile details
+                               </span>
+                             </div>
                              <button 
                                onClick={() => setIsEditing(true)}
                                className="p-2 rounded-full hover:bg-forest/5 text-forest/20 hover:text-terracotta transition-all opacity-0 group-hover/title:opacity-100"

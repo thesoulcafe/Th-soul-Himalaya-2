@@ -21,6 +21,7 @@ import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import BookingDetails from './pages/BookingDetails';
 import ParvatiValley from './pages/ParvatiValley';
+import HamletDetail from './pages/HamletDetail';
 import CosmicManifestation from './pages/CosmicManifestation';
 import ServiceDetail from './pages/ServiceDetail';
 import BookingPage from './pages/BookingPage';
@@ -67,6 +68,7 @@ export default function App() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="dashboard/booking/:id" element={<BookingDetails />} />
                     <Route path="parvati-valley" element={<ParvatiValley />} />
+                    <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
                     <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
                   </Route>
                 </Routes>
