@@ -81,6 +81,57 @@ const ARTICLE_CONTENT: Record<string, any> = {
       }
     ]
   },
+  "social-taboos": {
+    title: "Social Taboos: A Guide for Respectful Exploration",
+    category: "Cultural Intelligence",
+    readTime: "10 min read",
+    date: "April 2026",
+    image: "https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "Visiting Malana is a privilege that comes with a strict set of social requirements. In 2026, as tourism continues to grow, understanding these taboos is not just about being polite—it's about respecting a living museum of human history."
+      },
+      {
+        type: "heading",
+        text: "The 'No-Touch' Protocol"
+      },
+      {
+        type: "paragraph",
+        text: "The core of Malana's code is the prohibition of touch. You must not touch any person, temple, or dwelling. If you accidentally touch a structure, you may be asked to pay a fine (usually used for a local ritual purification)."
+      },
+      {
+        type: "list",
+        title: "Forbidden Actions",
+        items: [
+          "Handing money directly to locals (use the floor or counter).",
+          "Entering temples or sacred spaces without an explicit invitation from the oracle.",
+          "Plucking flowers or taking stones from the village boundaries."
+        ]
+      }
+    ]
+  },
+  "tosh-roads-2026": {
+    title: "The Road to Tosh: 2026 Transit Intelligence",
+    category: "Logistics",
+    readTime: "6 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "The transit corridor from Bhuntar to Tosh has seen significant improvements this season. While the road remains a high-altitude mountain pass, the frequent 'bottlenecks' near Manikaran have been eased with the new tunnel bypass."
+      },
+      {
+        type: "heading",
+        text: "Barshaini Hub Updates"
+      },
+      {
+        type: "paragraph",
+        text: "Barshaini is the final road-head. In 2026, a new multi-level parking structure has been completed, making it easier for those driving private vehicles to secure their cars before the final hike to Tosh."
+      }
+    ]
+  },
   "fairy-forest-pulga": {
     title: "The Fairy Forest: A Botanical & Spiritual Study",
     category: "Regional Wisdom",
@@ -95,6 +146,131 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "The local legends speak of forest spirits that guard the roots of the giant trees. In 2026, the forest remains one of the few 'Silent Zones' where large groups are discouraged, preserving the acoustic sanctity of the woods."
+      }
+    ]
+  },
+  "pulga-architecture": {
+    title: "Slow Living: The Pulga Architecture Manual",
+    category: "Design study",
+    readTime: "11 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1449156001437-3a144f0083bb?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "Pulga's architecture is a testament to Himalayan ingenuity. The use of 'Kath-Kuni' style—alternating layers of stone and deodar wood—allows structures to breathe and withstand seismic activity."
+      },
+      {
+        type: "heading",
+        text: "Wood as a Living Material"
+      },
+      {
+        type: "paragraph",
+        text: "In Pulga, wood isn't just a building material; it's a thermal regulator. The ancient houses are designed to keep the interiors cool in the harsh mountain sun and warm during the sub-zero winter nights."
+      }
+    ]
+  },
+  "pulga-nomads": {
+    title: "Digital Nomads in the Woods: Survival Guide",
+    category: "Intelligence",
+    readTime: "9 min read",
+    date: "June 2026",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "Pulga has emerged as the forest capital for digital nomads. With the arrival of high-speed satellite internet in 2026, the 'Fairy Forest Cafes' now offer a level of connectivity previously unthinkable in such remote terrain."
+      },
+      {
+        type: "list",
+        title: "Work-From-Woods Protocol",
+        items: [
+          "Power Backup: Carry a 20,000mAh power bank; local grids can be temperamental during monsoon.",
+          "Connectivity: Jio and BSNL are reliable, but Starlink-ready cafes are now the benchmark.",
+          "Ergonomics: Many wood-cabins now feature designated work-stations with views of the snow-peaks."
+        ]
+      }
+    ]
+  },
+  "malana-heritage": {
+    title: "The Legend of Alexander: Greek DNA in the Himalayas?",
+    category: "Genetic History",
+    readTime: "14 min read",
+    date: "March 2026",
+    image: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "The inhabitants of Malana have long claimed to be the descendants of Alexander the Great's soldiers who took shelter in this valley after the Battle of the Hydaspes. While genetic studies in the mid-2020s have shown complex results, the cultural isolation of the village remains absolute."
+      },
+      {
+        type: "heading",
+        text: "Linguistic & Cultural Markers"
+      },
+      {
+        type: "paragraph",
+        text: "The language of Malana, 'Kanashi', is a Tibeto-Burman dialect that shares zero vocabulary with the surrounding Indo-Aryan languages. This linguistic island, combined with their unique council-based governance, suggests a history of extreme isolation that predates modern statehood."
+      }
+    ]
+  },
+  "tosh-cafes": {
+    title: "7 Best Cafes in Tosh for Workations & Views",
+    category: "Lifestyle",
+    readTime: "8 min read",
+    date: "April 2026",
+    image: "https://images.unsplash.com/photo-1544120190-275d3122c366?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "Tosh's cafe culture has matured. In 2026, the focus has shifted from mere 'chill spots' to workspaces equipped with power-banks and ergonomic seating, catering to the growing influx of digital nomads."
+      },
+      {
+        type: "list",
+        title: "Top 2026 Recommends",
+        items: [
+          "Pink Floyd Cafe: Still the king of views, now with upgraded satellite internet.",
+          "Tosh Gate Cafe: Best for those who want quick transit and solid 5G coverage.",
+          "Woodside Inn: Quiet, secluded, and perfect for deep-focus deep-deodar sessions."
+        ]
+      }
+    ]
+  },
+  "tosh-kheerganga-trek": {
+    title: "Tosh to Kheerganga: Latest Rules and Updates",
+    category: "Adventure Lore",
+    readTime: "10 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "The trek from Tosh to Kheerganga is a transition from the lower alpine to the high meadows. In 2026, the trail has been consolidated with new stone-stepped sections near the Nakthan village, making the moderate climb more predictable."
+      }
+    ]
+  },
+  "tosh-packing": {
+    title: "What to Pack for Tosh in May: 2026 Gear Guide",
+    category: "Logistics",
+    readTime: "5 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "May in Tosh is a season of flux. Days can be surprisingly warm under the Himalayan sun, while nights still carry a bite from the surrounding snow-peaks. Layering is your primary strategy."
+      }
+    ]
+  },
+  "trekking-guide": {
+    title: "High Altitude Survival: The 12km Spiritual Trek",
+    category: "Adventure Logic",
+    readTime: "15 min read",
+    date: "July 2026",
+    image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000&auto=format&fit=crop",
+    content: [
+      {
+        type: "paragraph",
+        text: "Trekking in the Parvati Valley requires respect for the topography. At 2,960 meters, Kheerganga is where many trekkers first experience altitude-related fatigue. Proper hydration and a rhythmic pace are critical."
       }
     ]
   },
