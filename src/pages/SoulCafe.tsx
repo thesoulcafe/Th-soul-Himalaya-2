@@ -121,6 +121,13 @@ export default function SoulCafe() {
         >
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button 
+              className="h-auto py-8 px-10 bg-white text-forest rounded-[2rem] font-bold uppercase tracking-widest text-sm shadow-2xl hover:scale-105 transition-all flex flex-col items-center gap-2 border-2 border-transparent hover:border-terracotta/30"
+              onClick={() => navigate('/trekks?id=trekk-1&v=1777542180740')}
+            >
+               <span className="text-terracotta text-[10px] font-black tracking-widest">Adventure Ready</span>
+               Trek Glacier Point
+            </Button>
+            <Button 
               className="h-20 px-20 bg-terracotta text-white rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-2xl shadow-terracotta/40 hover:scale-105 transition-all"
               onClick={() => navigate('/#follow-our-journey-anchor')}
             >

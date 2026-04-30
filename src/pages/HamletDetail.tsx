@@ -88,6 +88,12 @@ const HAMLET_DETAILS: Record<string, any> = {
         title: "Gateway Trekking", 
         desc: "The starting point for the legendary Kutla meadows and the Pin Parvati crossing.",
         icon: <Compass />
+      },
+      { 
+        title: "Trek Glacier Point", 
+        desc: "Explore the breathtaking Glacier Point with an expert guide.",
+        icon: <Mountain />,
+        link: "/trekks?id=trekk-1&v=1777542180740"
       }
     ],
     stats: [
@@ -308,17 +314,26 @@ export default function HamletDetail() {
               </p>
 
               <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                {data.experience.map((exp: any, i: number) => (
-                  <div key={i} className="space-y-4 group">
-                    <div className="h-12 w-12 rounded-xl bg-forest/5 flex items-center justify-center text-forest group-hover:bg-terracotta group-hover:text-white transition-all duration-300">
-                      {React.cloneElement(exp.icon, { className: "h-6 w-6" })}
-                    </div>
-                    <h3 className="font-bold text-forest">{exp.title}</h3>
-                    <p className="text-sm text-forest/60 leading-relaxed italic">
-                      {exp.desc}
-                    </p>
-                  </div>
-                ))}
+                {data.experience.map((exp: any, i: number) => {
+                  const Wrapper = exp.link ? Link : 'div';
+                  const props = exp.link ? { to: exp.link, className: 'space-y-4 group block' } : { className: 'space-y-4 group' };
+                  return (
+                    <Wrapper key={i} {...props} className={exp.title === "Trek Glacier Point" ? "space-y-4 group block bg-white p-6 rounded-3xl border-2 border-terracotta/20 hover:border-terracotta hover:shadow-2xl hover:shadow-terracotta/10 transition-all duration-300 transform hover:-translate-y-2" : props.className}>
+                      <div className={`h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${exp.title === "Trek Glacier Point" ? "bg-terracotta text-white shadow-xl shadow-terracotta/20" : "bg-forest/5 text-forest group-hover:bg-terracotta group-hover:text-white"}`}>
+                        {React.cloneElement(exp.icon, { className: "h-8 w-8" })}
+                      </div>
+                      <h3 className="font-bold text-forest text-xl">{exp.title}</h3>
+                      <p className="text-sm text-forest/60 leading-relaxed italic">
+                        {exp.desc}
+                      </p>
+                      {exp.title === "Trek Glacier Point" && (
+                        <div className="pt-2 flex items-center text-terracotta font-black uppercase tracking-widest text-[10px] gap-2">
+                          Start Exploration <ArrowRight className="h-3 w-3" />
+                        </div>
+                      )}
+                    </Wrapper>
+                  );
+                })}
               </div>
             </div>
           </motion.div>

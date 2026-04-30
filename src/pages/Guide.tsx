@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSearchParams } from 'react-router-dom';
 import { REGIONAL_GUIDE } from '@/constants';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { 
   MapPin, 
   Clock, 
@@ -22,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const FAQS = [
+const DEFAULT_FAQS = [
   {
     question: "What should I pack for my Parvati Valley expedition?",
     answer: "Pack layered clothing, sturdy trekking boots, a raincoat (even in summer), a power bank, and a basic medical kit. Don't forget your spirit of adventure!",
@@ -59,8 +61,26 @@ export default function Guide() {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [dbFaqs, setDbFaqs] = useState<any[]>([]);
 
-  const filteredFaqs = FAQS.filter(faq => 
+  useEffect(() => {
+    const q = query(collection(db, 'content'), where('type', '==', 'faq'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data().data
+      }));
+      setDbFaqs(items);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const faqs = useMemo(() => {
+    if (dbFaqs.length > 0) return dbFaqs;
+    return DEFAULT_FAQS;
+  }, [dbFaqs]);
+
+  const filteredFaqs = faqs.filter(faq => 
     faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
     faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
     faq.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -110,6 +130,52 @@ export default function Guide() {
       </section>
 
       <main className="max-w-7xl mx-auto px-4 md:px-6 -mt-10 md:-mt-20 relative z-20">
+        {/* Universal Search bar for Guide/FAQ */}
+        <div className="mb-12 md:mb-20">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="relative group">
+              <div className="absolute left-8 top-1/2 -translate-y-1/2 text-terracotta/40 group-focus-within:text-terracotta transition-colors">
+                <Search className="h-6 w-6" />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search the Soul Guide (e.g. 'connectivity', 'packing', 'kheerganga')..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-24 bg-white rounded-[2.5rem] pl-20 pr-8 text-xl font-bold text-forest placeholder:text-forest/20 shadow-2xl shadow-forest/10 focus:outline-none focus:ring-8 focus:ring-terracotta/5 border-2 border-forest/5 focus:border-terracotta/20 transition-all"
+              />
+              <div className="absolute right-8 top-1/2 -translate-y-1/2">
+                <Badge className="bg-forest text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hidden sm:flex">
+                  Regional Intelligence
+                </Badge>
+              </div>
+            </div>
+            
+            {searchQuery && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 flex flex-wrap gap-2 px-8"
+              >
+                <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest mr-2 py-1">Quick Links:</span>
+                {['Connectivity', 'Safety', 'Kheerganga', 'ATMs'].map(tag => (
+                  <button 
+                    key={tag}
+                    onClick={() => setSearchQuery(tag)}
+                    className="text-[10px] font-black text-terracotta hover:text-forest uppercase tracking-widest bg-terracotta/5 px-3 py-1 rounded-full transition-colors"
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+
         {/* Transit Matrix */}
         <section className="bg-white rounded-[1.5rem] md:rounded-[3rem] shadow-2xl shadow-forest/5 p-5 md:p-16 mb-8 md:mb-20 border border-forest/5 overflow-hidden">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
@@ -258,23 +324,6 @@ export default function Guide() {
                 <p className="text-forest/40 text-xs font-bold uppercase tracking-widest max-w-md mx-auto leading-relaxed">
                   Decipher the mysteries of the valley through our curated frequently asked revelations.
                 </p>
-              </div>
-
-              {/* Manual Search */}
-              <div className="relative mb-12 group sticky top-24 z-30">
-                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-forest/20 group-focus-within:text-terracotta transition-colors">
-                  <Search className="h-6 w-6" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Ask for anything - connectivity, packing, safety..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-20 bg-white/90 backdrop-blur-xl rounded-[2rem] pl-16 pr-8 text-lg font-bold text-forest placeholder:text-forest/20 shadow-2xl shadow-forest/5 focus:outline-none focus:ring-4 focus:ring-terracotta/10 border-2 border-forest/5 focus:border-terracotta/20 transition-all"
-                />
-                <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-2">
-                  <Badge className="bg-forest/5 text-forest/40 border-none rounded-full hidden sm:flex">Cross-Category</Badge>
-                </div>
               </div>
 
               {/* FAQ List */}

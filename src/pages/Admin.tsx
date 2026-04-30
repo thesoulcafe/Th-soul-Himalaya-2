@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram
+  Share2, Send, Instagram, HelpCircle
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -781,6 +781,38 @@ export default function Admin() {
             { type: 'adventure', data: DEFAULT_ADVENTURE },
             { type: 'wfh', data: DEFAULT_WFH },
             { type: 'service', data: DEFAULT_SERVICES },
+            { type: 'faq', data: [
+              {
+                question: "What should I pack for my Parvati Valley expedition?",
+                answer: "Pack layered clothing, sturdy trekking boots, a raincoat (even in summer), a power bank, and a basic medical kit. Don't forget your spirit of adventure!",
+                category: "Preparation"
+              },
+              {
+                question: "Is there mobile connectivity in the higher villages like Tosh or Pulga?",
+                answer: "Jio and Airtel work reasonably well in Kasol and Tosh. However, in Pulga and Kalga, connectivity can be spotty. BSNL is your best bet for remote locations.",
+                category: "Logistics"
+              },
+              {
+                question: "How do I handle cash requirements in the mountains?",
+                answer: "ATMs are available in Kasol and Manikaran, but they often run out of cash or have long queues. We strongly recommend carrying enough physical cash from Bhuntar or Kullu.",
+                category: "Logistics"
+              },
+              {
+                question: "Is it safe to trek solo in Parvati Valley?",
+                answer: "While main trails are generally safe, we recommend hiring a local Soul Guide for offbeat routes. Always inform your base camp or hostel about your planned path and expected return time.",
+                category: "Safety"
+              },
+              {
+                question: "What is the best time for the Kheerganga trek?",
+                answer: "April to June and September to November are ideal. Winters see heavy snow, making the trail challenging but magical for experienced trekkers.",
+                category: "Adventure"
+              },
+              {
+                question: "Are there medical facilities available in the valley?",
+                answer: "Basic clinics are available in Kasol and Manikaran. For anything serious, the nearest major hospital is in Kullu, which is about 2-3 hours away.",
+                category: "Safety"
+              }
+            ]},
             { type: 'instagram', data: [
               { url: 'https://www.instagram.com/p/DBititYyy66/', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=600&q=80', title: 'Mountain Expedition' },
               { url: 'https://www.instagram.com/p/C-iY0yiy8XQ/', image: 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=600&q=80', title: 'Valley Life' },
@@ -805,7 +837,7 @@ export default function Admin() {
               // Check if already exists by title/name
               const existing = contentItems.find(i => 
                 i.type === mapping.type && 
-                (i.data.title === (item as any).title || i.data.name === (item as any).name)
+                (i.data.title === (item as any).title || i.data.name === (item as any).name || i.data.question === (item as any).question)
               );
               
               if (!existing) {
@@ -1266,6 +1298,7 @@ export default function Admin() {
                   { id: 'config', label: 'Config', icon: Settings, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                   { id: 'page_parvati', label: 'Parvati Page', icon: Sparkles, color: 'text-fuchsia-500', bg: 'bg-fuchsia-500/10' },
                   { id: 'all', label: 'All Assets', icon: LayoutDashboard, color: 'text-forest', bg: 'bg-forest/10' },
+                  { id: 'faq', label: 'FAQs', icon: HelpCircle, color: 'text-amber-600', bg: 'bg-amber-600/10' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -1327,7 +1360,7 @@ export default function Admin() {
                     <div className="flex-grow overflow-y-auto p-10 custom-scrollbar">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Common Fields */}
-                        {activeContentTab !== 'instagram' && (
+                        {activeContentTab !== 'instagram' && activeContentTab !== 'faq' && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
                               {activeContentTab === 'shop_item' ? 'Item Name' : 'Title'}
@@ -1848,6 +1881,41 @@ export default function Admin() {
                           </div>
                         )}
 
+                        {activeContentTab === 'faq' && (
+                          <>
+                            <div className="space-y-3">
+                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Question</label>
+                              <Input 
+                                value={formData.question || ''} 
+                                onChange={(e) => setFormData({...formData, question: e.target.value})}
+                                className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                placeholder="e.g. What should I pack?"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-3">
+                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Category</label>
+                              <Input 
+                                value={formData.category || ''} 
+                                onChange={(e) => setFormData({...formData, category: e.target.value})}
+                                className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
+                                placeholder="e.g. Preparation"
+                                required
+                              />
+                            </div>
+                            <div className="md:col-span-2 space-y-3">
+                              <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Answer</label>
+                              <textarea 
+                                value={formData.answer || ''} 
+                                onChange={(e) => setFormData({...formData, answer: e.target.value})}
+                                className="w-full min-h-[150px] rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium p-4 outline-none resize-none"
+                                placeholder="Provide a helpful answer..."
+                                required
+                              />
+                            </div>
+                          </>
+                        )}
+
                         {activeContentTab === 'service' && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Navigation Link</label>
@@ -1902,16 +1970,18 @@ export default function Admin() {
                           </div>
                         )}
 
-                        <div className="md:col-span-2 space-y-3">
-                          <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Description</label>
-                          <textarea 
-                            value={formData.description || ''} 
-                            onChange={(e) => setFormData({...formData, description: e.target.value})}
-                            className="w-full min-h-[150px] rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium p-4 outline-none resize-none"
-                            placeholder="Write a detailed description..."
-                            required
-                          />
-                        </div>
+                        {activeContentTab !== 'faq' && (
+                          <div className="md:col-span-2 space-y-3">
+                            <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Description</label>
+                            <textarea 
+                              value={formData.description || ''} 
+                              onChange={(e) => setFormData({...formData, description: e.target.value})}
+                              className="w-full min-h-[150px] rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium p-4 outline-none resize-none"
+                              placeholder="Write a detailed description..."
+                              required
+                            />
+                          </div>
+                        )}
 
                         {/* Day-by-Day Experience Editor */}
                         {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure') && (
