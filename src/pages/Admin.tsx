@@ -253,9 +253,10 @@ export default function Admin() {
 
     // 2. Prepare Upload
     setIsUploading(true);
-    setUploadProgress(5); // Start with a lower value to see progress move
+    setUploadProgress(0); 
     
     try {
+      console.log("Attempting Firebase Storage Upload...");
       if (!storage) {
         throw new Error("Firebase Storage is not initialized.");
       }
@@ -263,36 +264,67 @@ export default function Admin() {
       // Format filename to be safe
       const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
       const storagePath = `content/${Date.now()}_${safeName}`;
-      console.log(`Uploading to path: ${storagePath}`);
+      console.log(`Target Path: ${storagePath}`);
 
       const storageRef = ref(storage, storagePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // Create a promise to handle the upload completion/error
-      const downloadURL = await new Promise<string>((resolve, reject) => {
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            if (snapshot.totalBytes > 0) {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log(`Upload progress: ${progress.toFixed(2)}%`);
-              // Ensure we show at least 5% so the user knows it started
-              setUploadProgress(Math.max(5, Math.round(progress)));
+      // Handle the upload with more robustness and fallback
+      let downloadURL: string;
+      try {
+        downloadURL = await new Promise<string>((resolve, reject) => {
+          // Add a timeout for the upload start
+          const timeout = setTimeout(() => {
+            console.warn("Upload timed out or hanging at start. Switching to fallback...");
+            reject(new Error("Firebase timeout"));
+          }, 15000); // 15 seconds
+
+          uploadTask.on('state_changed', 
+            (snapshot) => {
+              if (snapshot.totalBytes > 0) {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log(`[Firebase] Progress: ${progress.toFixed(2)}% (${snapshot.bytesTransferred}/${snapshot.totalBytes})`);
+                setUploadProgress(Math.round(progress));
+              }
+            }, 
+            (error) => {
+              clearTimeout(timeout);
+              console.error("Firebase Storage Upload Error:", error);
+              reject(error);
+            }, 
+            async () => {
+              clearTimeout(timeout);
+              try {
+                const url = await getDownloadURL(uploadTask.snapshot.ref);
+                resolve(url);
+              } catch (urlErr) {
+                reject(urlErr);
+              }
             }
-          }, 
-          (error) => {
-            console.error("Firebase Storage Upload Error:", error);
-            reject(error);
-          }, 
-          async () => {
-            try {
-              const url = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(url);
-            } catch (urlErr) {
-              reject(urlErr);
-            }
-          }
-        );
-      });
+          );
+        });
+      } catch (firebaseErr: any) {
+        console.warn("Firebase upload failed, attempting local fallback...", firebaseErr);
+        
+        // FALLBACK: Use local server upload API
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Local fallback upload failed");
+        }
+        
+        const data = await response.json();
+        downloadURL = data.url;
+        console.log("Local fallback upload success:", downloadURL);
+        setUploadProgress(100);
+      }
 
       console.log("File uploaded successfully, URL obtained:", downloadURL);
       
