@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useInView, LayoutGroup } from 'motion/react';
-import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles, Coffee } from 'lucide-react';
+import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles, Coffee, Image } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -258,15 +258,15 @@ const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
                 whileHover={{ y: -8 }}
                 className="group/item relative aspect-square rounded-[2rem] overflow-hidden shadow-xl"
               >
-                <a href={post.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                <Link to="/gallery" className="block w-full h-full">
                   <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/0 transition-colors duration-500 z-10" />
                   <img src={post.image || (post as any).img} alt="Outdoor Adventure" className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" referrerPolicy="no-referrer" />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 z-20">
                     <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30">
-                      <Instagram className="text-white h-6 w-6" />
+                      <Image className="text-white h-6 w-6" />
                     </div>
                   </div>
-                </a>
+                </Link>
               </motion.div>
             ))}
           </AnimatePresence>
