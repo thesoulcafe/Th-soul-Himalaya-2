@@ -228,9 +228,13 @@ const ARTICLE_CONTENT: Record<string, any> = {
         type: "list",
         title: "Top 2026 Recommends",
         items: [
-          "Pink Floyd Cafe: Still the king of views, now with upgraded satellite internet.",
-          "Tosh Gate Cafe: Best for those who want quick transit and solid 5G coverage.",
-          "Woodside Inn: Quiet, secluded, and perfect for deep-focus deep-deodar sessions."
+          "The Soul Cafe: A sanctuary for dreamers and nomads, serving local organic ingredients with world-class coffee and resonance.",
+          "Pink Floyd Cafe: Still the king of views, now with upgraded satellite internet and a legendary sunset terrace.",
+          "Tosh Gate Cafe: Best for those who want quick transit and solid 5G coverage right at the entrance of the village.",
+          "Woodside Inn: Quiet, secluded, and perfect for deep-focus deep-deodar sessions away from the main trail.",
+          "Cafe 360: Offers uninterrupted 360-degree views of the glaciers and the valley below.",
+          "Shiva Garden: A legendary garden setting known for its authentic Israeli cuisine and spiritual vibes.",
+          "Hilltop Cafe: Perched at the highest point of Tosh, offering the pure silence of the high Himalayas."
         ]
       }
     ]
