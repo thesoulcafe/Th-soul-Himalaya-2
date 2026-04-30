@@ -36,6 +36,7 @@ const CosmicManifestation = lazy(() => import('./pages/CosmicManifestation'));
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 const BookingPage = lazy(() => import('./pages/BookingPage'));
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail'));
+const SoulCafe = lazy(() => import('./pages/SoulCafe'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-cream">
@@ -84,6 +85,7 @@ export default function App() {
                     <Route path="parvati-valley" element={<ParvatiValley />} />
                     <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
                     <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
+                    <Route path="soul-cafe" element={<SoulCafe />} />
                     <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
                   </Route>
                 </Routes>

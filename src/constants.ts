@@ -663,7 +663,8 @@ export const DEFAULT_SERVICES = [
   { id: 'service-meditation', title: 'Meditation Retreats', description: 'Deep silence and mindfulness in Kutla meadows.', link: '/meditation' },
   { id: 'service-meditation-packages', title: 'Meditation Packages', description: 'Curated spiritual and healing journeys across the valley.', link: '/meditation' },
   { id: 'service-4', title: 'Digital Workation', description: 'Productive stays for the modern nomad.', link: '/wfh' },
-  { id: 'service-5', title: 'Macramé Shop', description: 'Handcrafted art from the heart of the valley.', link: '/shop' }
+  { id: 'service-5', title: 'Macramé Shop', description: 'Handcrafted art from the heart of the valley.', link: '/shop' },
+  { id: 'service-6', title: 'The Soul Cafe', description: 'Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.', link: '/soul-cafe', image: 'https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg' }
 ];
 
 export const REGIONAL_GUIDE = {

@@ -9,16 +9,44 @@ function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
-function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+function DialogTrigger({ nativeButton, ...props }: DialogPrimitive.Trigger.Props & { nativeButton?: boolean }) {
+  const { asChild, aschild, children, render, ...rest } = props as any
+  const isAsChild = !!(asChild || aschild)
+  const resolvedNativeButton = isAsChild ? false : nativeButton
+  const resolvedRender = isAsChild ? children : render
+
+  return (
+    <DialogPrimitive.Trigger
+      data-slot="dialog-trigger"
+      {...(resolvedNativeButton !== undefined ? { nativeButton: resolvedNativeButton } : {})}
+      {...rest}
+      render={resolvedRender}
+    >
+      {!resolvedRender && children}
+    </DialogPrimitive.Trigger>
+  )
 }
 
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
-function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+function DialogClose({ nativeButton, ...props }: DialogPrimitive.Close.Props & { nativeButton?: boolean }) {
+  const { asChild, aschild, children, render, ...rest } = props as any
+  const isAsChild = !!(asChild || aschild)
+  const resolvedNativeButton = isAsChild ? false : nativeButton
+  const resolvedRender = isAsChild ? children : render
+
+  return (
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      {...(resolvedNativeButton !== undefined ? { nativeButton: resolvedNativeButton } : {})}
+      {...rest}
+      render={resolvedRender}
+    >
+      {!resolvedRender && children}
+    </DialogPrimitive.Close>
+  )
 }
 
 function DialogOverlay({

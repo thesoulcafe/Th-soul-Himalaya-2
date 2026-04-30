@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://thesoulhimalaya.com", "https://www.thesoulhimalaya.com", "http://localhost:3000"],
+    "method": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+    "responseHeader": ["Content-Type", "Authorization", "x-goog-resumable"],
+    "maxAgeSeconds": 3600
+  }
+]

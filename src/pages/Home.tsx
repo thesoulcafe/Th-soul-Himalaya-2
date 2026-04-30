@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useInView, LayoutGroup } from 'motion/react';
-import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles } from 'lucide-react';
+import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles, Coffee } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -27,6 +27,7 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
     if (t.includes('trekk')) return Compass;
     if (t.includes('shop')) return ShoppingBag;
     if (t.includes('adventure')) return Wind;
+    if (t.includes('cafe')) return Coffee;
     return Compass;
   };
 
@@ -78,8 +79,8 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
           ) : (
             services.map((service, index) => (
               <motion.div
-                key={service.id || service.title}
-              initial={{ opacity: 0, scale: 0.9 }}
+                key={`${service.id || service.title}-${index}`}
+               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.02 }}
@@ -207,24 +208,36 @@ const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
   }, [isInView, displayPosts.length]);
 
   return (
-    <div ref={containerRef} className="max-w-7xl mx-auto px-6">
+    <div id="follow-our-journey-anchor" ref={containerRef} className="max-w-7xl mx-auto px-6">
       <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
         <div>
           <h2 className="text-4xl font-heading font-bold text-forest mb-2">Follow Our Journey</h2>
           <p className="text-forest/60">Join our community on Instagram <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-terracotta font-bold hover:underline">@thesoulhimalaya</a></p>
         </div>
-        <a 
-          href="https://www.instagram.com/thesoulhimalaya" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
-          )}
-        >
-          <Instagram className="h-4 w-4" />
-          Follow Us
-        </a>
+        <div className="flex items-center gap-4">
+          <Link to="/gallery">
+            <Button 
+              variant="outline" 
+              className="border-forest text-forest hover:bg-forest hover:text-white rounded-full flex items-center gap-2 group/all"
+            >
+              <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+              Show All Photos
+            </Button>
+          </Link>
+
+          <a 
+            href="https://www.instagram.com/thesoulhimalaya" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
+            )}
+          >
+            <Instagram className="h-4 w-4" />
+            Follow Us
+          </a>
+        </div>
       </div>
 
       <LayoutGroup>
@@ -337,6 +350,29 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
+  const allServices = useMemo(() => {
+    // Robust deduplication
+    const seen = new Set();
+    const result = [];
+    
+    // Add manual entry if not in database
+    const hasDbCafe = services.some(s => s.title?.trim().toLowerCase() === 'the soul cafe');
+    if (!hasDbCafe) {
+      result.push({ title: 'The Soul Cafe', link: '/soul-cafe', isAvailable: true });
+      seen.add('the soul cafe');
+    }
+
+    services.forEach(s => {
+      const normalizedTitle = s.title?.trim().toLowerCase();
+      if (normalizedTitle && !seen.has(normalizedTitle)) {
+        result.push(s);
+        seen.add(normalizedTitle);
+      }
+    });
+
+    return result;
+  }, [services]);
+
   return (
     <div className="w-full overflow-hidden">
       {seo && <SEO title={seo.title || "The Soul Himalaya"} description={seo.description || "Discover curated retreats, adventures, and artisan crafts in the Himalayas."} keywords={seo.keyword} />}
@@ -447,7 +483,7 @@ export default function Home() {
       </section>
 
       {/* Mini Services Scroll (Above Final CTA) */}
-      <HorizontalServiceRow services={services} hasLoadedServices={hasLoadedServices} />
+      <HorizontalServiceRow services={allServices} hasLoadedServices={hasLoadedServices} />
 
       {/* Special Packages Section */}
       <section className="py-32 px-6 bg-[#FDFCFB] relative overflow-hidden">

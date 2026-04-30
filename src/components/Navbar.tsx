@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge';
 const navLinks = [
   { name: 'TOUR PACKAGES', href: '/tours' },
   { name: 'MOUNTAIN TREKKS', href: '/trekks' },
+  { name: 'THE SOUL CAFE', href: '/soul-cafe' },
+  { name: 'GALLERY', href: '/gallery' },
   { name: 'GUIDE', href: '/guide' },
   { name: 'YOGA', href: '/yoga' },
   { name: 'MEDITATION', href: '/meditation' },

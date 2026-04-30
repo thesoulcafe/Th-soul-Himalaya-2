@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Map, Coffee, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,7 +37,7 @@ export default function Services() {
         }))
         .filter(service => {
           const title = (service.title || '').toLowerCase();
-          return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
+          return !title.includes('food') && !title.includes('photography & cafe narrative');
         })
         .sort((a, b) => {
           // Force Macramé Shop to the end
@@ -83,6 +83,29 @@ export default function Services() {
     return 'text-forest/70';
   };
 
+  const finalServices = useMemo(() => {
+    // Robust deduplication
+    const seen = new Set();
+    const result = [];
+    
+    // Add manual entry if not in database
+    const hasDbCafe = services.some(s => s.title?.trim().toLowerCase() === 'the soul cafe');
+    if (!hasDbCafe) {
+      result.push({ title: 'The Soul Cafe', link: '/soul-cafe', description: 'A culinary sanctuary in the heart of Tosh.', isAvailable: true });
+      seen.add('the soul cafe');
+    }
+
+    services.forEach(s => {
+      const normalizedTitle = s.title?.trim().toLowerCase();
+      if (normalizedTitle && !seen.has(normalizedTitle)) {
+        result.push(s);
+        seen.add(normalizedTitle);
+      }
+    });
+
+    return result;
+  }, [services]);
+
   return (
     <div className="pt-24 pb-24 px-6 bg-cream min-h-screen">
       <div className="max-w-7xl mx-auto">
@@ -92,9 +115,9 @@ export default function Services() {
           <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Soulful Himalayan Journeys</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {services.map((service, index) => (
+          {finalServices.map((service, index) => (
             <motion.div
-              key={service.title}
+              key={`${service.title}-${index}`}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               whileHover={{ y: -5, scale: 1.02 }}

@@ -261,17 +261,20 @@ export default function Guide() {
               </div>
 
               {/* Manual Search */}
-              <div className="relative mb-12 group">
+              <div className="relative mb-12 group sticky top-24 z-30">
                 <div className="absolute left-6 top-1/2 -translate-y-1/2 text-forest/20 group-focus-within:text-terracotta transition-colors">
                   <Search className="h-6 w-6" />
                 </div>
                 <input 
                   type="text" 
-                  placeholder="Search for wisdom, logistics, or safety..."
+                  placeholder="Ask for anything - connectivity, packing, safety..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-20 bg-forest/5 rounded-[2rem] pl-16 pr-8 text-lg font-bold text-forest placeholder:text-forest/20 focus:outline-none focus:ring-4 focus:ring-forest/5 border-2 border-transparent focus:border-forest/10 transition-all"
+                  className="w-full h-20 bg-white/90 backdrop-blur-xl rounded-[2rem] pl-16 pr-8 text-lg font-bold text-forest placeholder:text-forest/20 shadow-2xl shadow-forest/5 focus:outline-none focus:ring-4 focus:ring-terracotta/10 border-2 border-forest/5 focus:border-terracotta/20 transition-all"
                 />
+                <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-2">
+                  <Badge className="bg-forest/5 text-forest/40 border-none rounded-full hidden sm:flex">Cross-Category</Badge>
+                </div>
               </div>
 
               {/* FAQ List */}

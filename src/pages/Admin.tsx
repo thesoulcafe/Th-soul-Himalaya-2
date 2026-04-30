@@ -216,16 +216,9 @@ export default function Admin() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
-    // 0. Safety Check
+  const processFile = async (file: File, fieldName: string, index?: number, targetElement?: HTMLInputElement) => {
     if (isUploading) {
       console.warn("Upload already in progress. Ignoring request.");
-      return;
-    }
-
-    const file = e.target.files?.[0];
-    if (!file) {
-      console.warn("No file selected.");
       return;
     }
 
@@ -238,7 +231,7 @@ export default function Admin() {
       const msg = `Invalid file type (${file.type}). Please upload a JPEG, PNG, or WebP image.`;
       console.error(msg);
       setNotification({ message: msg, type: 'error' });
-      if (e.target) e.target.value = '';
+      if (targetElement) targetElement.value = '';
       return;
     }
 
@@ -247,7 +240,7 @@ export default function Admin() {
       const msg = `File too large (${(file.size / (1024 * 1024)).toFixed(2)} MB). Max 10MB allowed.`;
       console.error(msg);
       setNotification({ message: msg, type: 'error' });
-      if (e.target) e.target.value = '';
+      if (targetElement) targetElement.value = '';
       return;
     }
 
@@ -274,8 +267,9 @@ export default function Admin() {
       try {
         downloadURL = await new Promise<string>((resolve, reject) => {
           const timeout = setTimeout(() => {
-            reject(new Error("Firebase connection timeout. This often happens if CORS is not configured for your domain."));
-          }, 30000); // 30 seconds
+            const corsError = new Error("Firebase Upload Timeout. \n\nACTION REQUIRED: Since you are using a custom domain (thesoulhimalaya.com), you MUST configure CORS in Firebase Storage for your domain. \n\n1. Install gsutil\n2. Run: gsutil cors set cors.json gs://gen-lang-client-0435454443.firebasestorage.app\n\nWhere cors.json contains: [{\"origin\": [\"https://thesoulhimalaya.com\"], \"method\": [\"GET\", \"POST\", \"PUT\", \"DELETE\", \"HEAD\"], \"maxAgeSeconds\": 3600}]");
+            reject(corsError);
+          }, 45000); // 45 seconds to be safe
 
           uploadTask.on('state_changed', 
             (snapshot) => {
@@ -316,7 +310,6 @@ export default function Admin() {
       }
 
       console.log("File uploaded successfully, URL obtained:", downloadURL);
-      
       setUploadProgress(100);
       
       // Update state
@@ -348,8 +341,29 @@ export default function Admin() {
     } finally {
       setIsUploading(false);
       setTimeout(() => setUploadProgress(0), 1000);
-      // Clear the input so the same file can be selected again
-      if (e.target) e.target.value = '';
+      if (targetElement) targetElement.value = '';
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: string, index?: number) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      console.warn("No file selected.");
+      return;
+    }
+    await processFile(file, fieldName, index, e.target);
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent, fieldName: string, index?: number) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          console.log("Pasted image detected, processing...");
+          await processFile(file, fieldName, index);
+        }
+      }
     }
   };
   const [searchTerm, setSearchTerm] = useState('');
@@ -1215,6 +1229,7 @@ export default function Admin() {
                         />
                         <Button 
                           onClick={() => document.getElementById('media-center-upload')?.click()}
+                          onPaste={(e) => handlePaste(e, 'tempLink')}
                           disabled={isUploading}
                           className="h-24 w-64 rounded-[2rem] bg-forest text-white hover:bg-forest/90 font-bold text-lg shadow-2xl shadow-forest/20 flex flex-col items-center justify-center gap-2 group transition-all"
                         >
@@ -1395,6 +1410,7 @@ export default function Admin() {
                               <Input 
                                 value={formData.image || ''} 
                                 onChange={(e) => setFormData({...formData, image: e.target.value})}
+                                onPaste={(e) => handlePaste(e, 'image')}
                                 className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium flex-grow"
                                 placeholder={activeContentTab === 'instagram' ? "Paste direct image link or upload below..." : "Paste image link here..."}
                                 required={activeContentTab !== 'service' && activeContentTab !== 'config'}
@@ -1459,6 +1475,7 @@ export default function Admin() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => galleryInputRef.current?.click()}
+                                  onPaste={(e) => handlePaste(e, 'new_image')}
                                   disabled={isUploading}
                                   className="h-8 rounded-full border border-forest/10 text-forest hover:bg-forest/5 px-4 flex items-center text-[11px] font-bold gap-2 relative overflow-hidden"
                                 >
@@ -1495,6 +1512,7 @@ export default function Admin() {
                                         currentImages[index] = e.target.value;
                                         setFormData({ ...formData, images: currentImages });
                                       }}
+                                      onPaste={(e) => handlePaste(e, 'images', index)}
                                       className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium flex-grow"
                                       placeholder={`Gallery URL ${index + 1}`}
                                     />
@@ -1506,7 +1524,10 @@ export default function Admin() {
                                         accept="image/*"
                                         onChange={(e) => handleFileUpload(e, 'images', index)}
                                       />
-                                      <div className="h-14 w-14 rounded-2xl bg-forest/[0.02] flex items-center justify-center text-forest/30 hover:bg-forest/10 transition-colors relative overflow-hidden">
+                                      <div 
+                                        className="h-14 w-14 rounded-2xl bg-forest/[0.02] flex items-center justify-center text-forest/30 hover:bg-forest/10 transition-colors relative overflow-hidden"
+                                        onPaste={(e) => handlePaste(e, 'images', index)}
+                                      >
                                         {isUploading ? (
                                           <span className="text-[9px] font-mono font-bold">{uploadProgress}%</span>
                                         ) : (
@@ -1549,6 +1570,7 @@ export default function Admin() {
                                 <Input 
                                   value={formData.narrativeImage || ''} 
                                   onChange={(e) => setFormData({...formData, narrativeImage: e.target.value})}
+                                  onPaste={(e) => handlePaste(e, 'narrativeImage')}
                                   className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                   placeholder="Image URL"
                                 />
@@ -1558,6 +1580,7 @@ export default function Admin() {
                                 <Input 
                                   value={formData.malanaImage || ''} 
                                   onChange={(e) => setFormData({...formData, malanaImage: e.target.value})}
+                                  onPaste={(e) => handlePaste(e, 'malanaImage')}
                                   className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                   placeholder="Image URL"
                                 />
@@ -1567,6 +1590,7 @@ export default function Admin() {
                                 <Input 
                                   value={formData.toshImage || ''} 
                                   onChange={(e) => setFormData({...formData, toshImage: e.target.value})}
+                                  onPaste={(e) => handlePaste(e, 'toshImage')}
                                   className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                   placeholder="Image URL"
                                 />
@@ -1576,6 +1600,7 @@ export default function Admin() {
                                 <Input 
                                   value={formData.pulgaImage || ''} 
                                   onChange={(e) => setFormData({...formData, pulgaImage: e.target.value})}
+                                  onPaste={(e) => handlePaste(e, 'pulgaImage')}
                                   className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                   placeholder="Image URL"
                                 />
@@ -1585,6 +1610,7 @@ export default function Admin() {
                                 <Input 
                                   value={formData.kheergangaImage || ''} 
                                   onChange={(e) => setFormData({...formData, kheergangaImage: e.target.value})}
+                                  onPaste={(e) => handlePaste(e, 'kheergangaImage')}
                                   className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                                   placeholder="Image URL"
                                 />
@@ -2144,10 +2170,6 @@ export default function Admin() {
                     if (activeContentTab === 'trekk') return i.type === 'trekk' || i.type === 'trek';
                     return i.type === activeContentTab;
                   })
-                  .filter(i => {
-                  const title = (i.data.title || i.data.name || '').toLowerCase();
-                  return !title.includes('cafe') && !title.includes('food');
-                })
                 .filter(i => {
                   if (!searchTerm) return true;
                   const search = searchTerm.toLowerCase();

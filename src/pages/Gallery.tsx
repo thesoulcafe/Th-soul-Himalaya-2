@@ -1,77 +1,169 @@
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Camera, Instagram, Maximize2 } from 'lucide-react';
+import { Instagram, ExternalLink, ArrowLeft, Camera, Sparkles, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
-const images = [
-  { url: 'https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=800&q=80', title: 'Tosh Village' },
-  { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80', title: 'Kheerganga Peak' },
-  { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80', title: 'Yoga in the Wild' },
-  { url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80', title: 'Himalayan Retreat' },
-  { url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80', title: 'Macramé Art' },
-  { url: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80', title: 'WFH Views' },
-  { url: 'https://images.unsplash.com/photo-1533387558684-6297b785d177?auto=format&fit=crop&w=800&q=80', title: 'Paragliding' },
-  { url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80', title: 'Valley Sunset' },
-  { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80', title: 'Starlit Skies' },
+const CATEGORIES = [
+  { id: 'all', label: 'All Artifacts' },
+  { id: 'landscape', label: 'Landscapes' },
+  { id: 'culture', label: 'Culture' },
+  { id: 'expeditions', label: 'Expeditions' },
 ];
 
 export default function Gallery() {
-  return (
-    <div className="pt-20">
-      {/* Hero */}
-      <section className="py-20 bg-cream text-center px-6">
-        <div className="max-w-3xl mx-auto">
-          <Camera className="h-12 w-12 text-terracotta mx-auto mb-6" />
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-forest mb-4">Himalayan Frames</h1>
-          <p className="text-forest/60 text-lg">A visual journey through the soul of Parvati Valley.</p>
-        </div>
-      </section>
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('all');
 
-      {/* Masonry Grid */}
-      <section className="py-12 px-6 bg-cream min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-            {images.map((img, i) => (
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        // We fetch from the 'content' collection where type is 'instagram'
+        const q = query(
+          collection(db, 'content'), 
+          where('type', '==', 'instagram'),
+          orderBy('updatedAt', 'desc'), 
+          limit(50)
+        );
+        const snapshot = await getDocs(q);
+        const fetchedPosts = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return { 
+            id: doc.id, 
+            ...data.data, // Admin saves actual post data inside a 'data' field
+            timestamp: data.updatedAt 
+          };
+        });
+        
+        if (fetchedPosts.length > 0) {
+          setPosts(fetchedPosts);
+        } else {
+          // Fallback static data if firestore is empty
+          setPosts([
+            { id: 1, image: 'https://images.unsplash.com/photo-1598335624134-4067980cdb24', url: 'https://instagram.com', category: 'landscape' },
+            { id: 2, image: 'https://images.unsplash.com/photo-1590050752117-23a9d7fc2140', url: 'https://instagram.com', category: 'culture' },
+            { id: 3, image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23', url: 'https://instagram.com', category: 'expeditions' },
+            { id: 4, image: 'https://images.unsplash.com/photo-1544120190-275d3122c366', url: 'https://instagram.com', category: 'landscape' },
+            { id: 5, image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24', url: 'https://instagram.com', category: 'culture' },
+          ]);
+        }
+      } catch (error) {
+        console.error("Gallery Fetch Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  const filteredPosts = activeCategory === 'all' 
+    ? posts 
+    : posts.filter(p => p.category === activeCategory);
+
+  return (
+    <div className="min-h-screen bg-cream selection:bg-terracotta selection:text-white pb-20">
+      {/* Navigation - Hidden per request */}
+      <div className="pt-20" />
+
+      {/* Header */}
+      <header className="pt-40 px-6 max-w-7xl mx-auto mb-20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest/5 text-forest/40 text-[10px] font-black uppercase tracking-widest"
+            >
+              <Sparkles className="h-3 w-3" /> The Visual Manifest
+            </motion.div>
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-6xl md:text-9xl font-heading font-black text-forest italic tracking-tighter uppercase leading-[0.8]"
+            >
+              Gallery <br /> <span className="text-terracotta">Archive</span>
+            </motion.h1>
+            <Button 
+              variant="outline" 
+              className="mt-8 border-forest text-forest rounded-full h-12 px-8 font-black uppercase tracking-widest text-[10px] flex items-center gap-2 group"
+              onClick={() => window.open('https://www.instagram.com/thesoulhimalaya', '_blank')}
+            >
+              <Instagram className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+              Follow on Instagram
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Grid */}
+      <main className="px-6 max-w-7xl mx-auto">
+        {loading ? (
+          <div className="h-[60vh] flex items-center justify-center">
+            <div className="h-12 w-12 border-4 border-forest/10 border-t-terracotta rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredPosts.map((post, i) => (
               <motion.div
-                key={i}
+                key={post.id || i}
+                layoutId={`gallery-item-${post.id}`}
                 initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05 }}
-                className="relative group overflow-hidden rounded-3xl shadow-lg"
+                className="group relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-forest/5 shadow-2xl shadow-forest/5 cursor-pointer"
               >
-                <img
-                  src={img.url}
-                  alt={img.title}
-                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
+                <img 
+                  src={post.image || post.img} 
+                  alt="Gallery Artifact" 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white">
-                  <Maximize2 className="h-8 w-8 mb-2" />
-                  <span className="font-bold tracking-widest uppercase text-xs">{img.title}</span>
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-white/60 text-[10px] font-black uppercase tracking-widest">
+                      <MapPin className="h-3 w-3" /> Parvati Valley
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-white font-heading font-black italic uppercase tracking-tighter text-xl">The Soul Capture</h4>
+                      <a 
+                        href={post.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="h-10 w-10 rounded-full bg-white text-forest flex items-center justify-center hover:bg-terracotta hover:text-white transition-colors"
+                      >
+                        <Instagram className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        )}
+      </main>
 
-      {/* Instagram CTA */}
-      <section className="py-24 bg-forest text-cream text-center px-6">
-        <div className="max-w-2xl mx-auto">
-          <Instagram className="h-12 w-12 text-terracotta mx-auto mb-8" />
-          <h2 className="text-3xl font-heading font-bold mb-6">Want to see more?</h2>
-          <p className="text-cream/70 mb-10">
-            Follow us on Instagram for daily doses of mountain magic, guest stories, and live updates from the valley.
-          </p>
-          <a
-            href="https://instagram.com/thesoulhimalaya"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-3 bg-terracotta hover:bg-terracotta/90 text-white px-10 py-4 rounded-full font-bold transition-all shadow-lg shadow-terracotta/20"
+      {/* Footer Branding */}
+      <footer className="mt-40 text-center px-6">
+        <div className="max-w-2xl mx-auto space-y-8">
+          <div className="h-px w-20 bg-terracotta mx-auto" />
+          <h2 className="text-3xl font-heading font-bold text-forest italic tracking-tight">
+            Infinite frames of spiritual resonance.
+          </h2>
+          <Button 
+            className="rounded-xl h-14 px-10 bg-forest text-white hover:bg-terracotta transition-colors font-black uppercase tracking-widest text-[11px]"
+            onClick={() => window.open('https://instagram.com/thesoulhimalaya', '_blank')}
           >
-            <span>@thesoulhimalaya</span>
-          </a>
+            Live Feed @thesoulhimalaya
+          </Button>
         </div>
-      </section>
+      </footer>
     </div>
   );
 }

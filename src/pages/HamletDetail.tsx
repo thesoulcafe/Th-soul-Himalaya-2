@@ -409,35 +409,32 @@ export default function HamletDetail() {
 
             {/* Content Preview Section */}
             <div id="content-hub-anchor" className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="space-y-6">
-                <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-forest/5 relative group">
-                  <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=1000&auto=format&fit=crop" alt="Road to Tosh" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white font-black uppercase tracking-widest text-xs">Read Article</span>
+              {data.articles.slice(0, 2).map((article: any, idx: number) => (
+                <div key={idx} className="space-y-6">
+                  <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-forest/5 relative group">
+                    <img 
+                      src={idx === 0 
+                        ? "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=1000&auto=format&fit=crop" 
+                        : "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop"
+                      } 
+                      alt={article.title} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                    />
+                    <Link 
+                      to={`/hamlet/${data.name}/article/${article.link}`}
+                      className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <span className="text-white font-black uppercase tracking-widest text-xs">Read Article</span>
+                    </Link>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="text-2xl font-heading font-bold text-forest italic">{article.title}</h4>
+                    <p className="text-sm text-forest/60 leading-relaxed">
+                      {article.excerpt}
+                    </p>
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <h4 className="text-2xl font-heading font-bold text-forest italic">The Road to Barshaini: 2026 Intelligence</h4>
-                  <p className="text-sm text-forest/60 leading-relaxed">
-                    The April 2026 update confirms that the bridge near Barshaini has been reinforced, however, the last 2km to Tosh remains a 'high-clearance only' zone during evening rain.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="aspect-video rounded-[2.5rem] overflow-hidden bg-forest/5 relative group">
-                  <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop" alt="Tosh Cafes" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white font-black uppercase tracking-widest text-xs">Read Article</span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="text-2xl font-heading font-bold text-forest italic">The Workation Revolution in Tosh</h4>
-                  <p className="text-sm text-forest/60 leading-relaxed">
-                    Seven cafes have now installed dedicated 5G repeaters, making Tosh the highest 'stable-internet' hub in the Parvati Valley. Discover where to sit for the best sunset Zoom calls.
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Strategic Internal Links & SEO Anchor */}
