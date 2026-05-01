@@ -388,25 +388,35 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
 // -----------------------------------------------------------------------------
 
 async function injectMetaTags(req: express.Request, html: string) {
+  // Increase timeout to 2.5s for slower DB lookups on cold starts
   const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error("Timeout")), 1500)
+    setTimeout(() => reject(new Error("Timeout")), 2500)
   );
 
   try {
     const metaPromise = (async () => {
       const urlStr = req.originalUrl;
-      const userAgent = req.headers['user-agent'];
+      const userAgent = req.headers['user-agent'] || '';
+      console.log(`[Meta] Debug: Request path=${req.path}, originalUrl=${urlStr}, host=${req.headers.host}`);
       const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
       const id = url.searchParams.get('id');
-      console.log(`[Meta] Request from: ${urlStr}, User-Agent: ${userAgent}`);
+      console.log(`[Meta] Request for: ${urlStr}, ID: ${id || 'none'}`);
       
-      // Get protocol and host dynamically
+      // Get protocol and host dynamically, but prioritize known production domain
       const protocol = req.headers['x-forwarded-proto'] || 'https';
-      const host = req.headers.host || 'thesoulhimalaya.com';
+      let host = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
+      
+      // If we are on the production domain but host says something else (like internal IP), force it
+      if (host.includes('run.app') || host.includes('localhost')) {
+         // Keep it for dev/testing
+      } else {
+         host = 'thesoulhimalaya.com';
+      }
+      
       const absoluteUrl = `${protocol}://${host}${urlStr}`;
 
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
-      let description = "Discover curated soulful travel in the heart of the Himalayas. Combining spiritual wellness retreats, yoga trekks, and meditation with high-altitude adventure in Kullu & Parvati Valley.";
+      let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
       let pkg: any = null;
@@ -423,9 +433,16 @@ async function injectMetaTags(req: express.Request, html: string) {
         } else if (urlStr.includes('/trekks')) {
           title = "Mountain Trekks | High Altitude Adventures";
           description = "From easy waterfalls to challenging glaciers, find your path in the Himalayas.";
+        } else if (urlStr.includes('/yoga')) {
+          title = "Yoga Retreats in the Himalayas | The Soul Himalaya";
+          description = "Hatha, Vinyasa and Sadhana in the quiet hamlets of Kalga and Pulga.";
         } else if (urlStr.includes('/meditation')) {
           title = "Meditation Retreats | Find Inner Peace";
           description = "Experience deep silence and mindfulness in the remote high-altitude wilderness.";
+        } else if (urlStr.includes('/soul-cafe')) {
+          title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
+          description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";
+          image = "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg";
         }
       }
 
@@ -436,40 +453,55 @@ async function injectMetaTags(req: express.Request, html: string) {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const docData = docSnap.data();
-            console.log(`[Meta] Firestore data for ${id}:`, JSON.stringify(docData));
-            console.log(`[Meta] Keys available in Firestore data for ${id}:`, Object.keys(docData.data || docData));
+            console.log(`[Meta] Firestore data found for ${id}`);
             pkg = { id, ...(docData.data || docData) };
-            console.log(`[Meta] Processed package:`, JSON.stringify(pkg));
-          } else {
-            console.log(`[Meta] No document found in Firestore for ${id}`);
           }
         } catch (e) {
           console.error("[Meta] Firestore lookup failed:", e);
         }
       }
 
-      // 2. Try Constants Fallback (If not in Firestore)
+      // 2. Try Constants Fallback (If not in Firestore) - IMPROVED PARSING
       if (!pkg && id) {
         try {
-          const constants = await import('./src/constants.ts');
-          const allPackages = [
-            ...(constants.DEFAULT_TOURS || []),
-            ...(constants.DEFAULT_TREKKS || []),
-            ...(constants.DEFAULT_YOGA || []),
-            ...(constants.DEFAULT_MEDITATION || []),
-            ...(constants.DEFAULT_ADVENTURE || []),
-            ...(constants.DEFAULT_WFH || [])
-          ];
-          pkg = allPackages.find(p => p.id === id);
-          if (pkg) console.log(`[Meta] Found package in Constants: ${id}`);
+          const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
+          const content = fs.readFileSync(constantsPath, 'utf-8');
+          // Find the block containing the ID. We search for the ID and then look backwards for the opening brace.
+          const idIndex = content.indexOf(`id: '${id}'`) === -1 ? content.indexOf(`id: "${id}"`) : content.indexOf(`id: '${id}'`);
+          
+          if (idIndex !== -1) {
+            // Find the start of the object {
+            let startIndex = content.lastIndexOf('{', idIndex);
+            // Find the end of the object }
+            let endIndex = content.indexOf('}', idIndex);
+            
+            if (startIndex !== -1 && endIndex !== -1) {
+               const pkgStr = content.substring(startIndex, endIndex + 1);
+               
+               const titleMatch = pkgStr.match(/title:\s*['"](.*?)['"]/);
+               const nameMatch = pkgStr.match(/name:\s*['"](.*?)['"]/);
+               const imageMatch = pkgStr.match(/image:\s*['"](.*?)['"]/);
+               const imagesMatch = pkgStr.match(/images:\s*\[(.*?)\]/s);
+               const descMatch = pkgStr.match(/description:\s*['"](.*?)['"]/);
+               
+               pkg = {
+                 id,
+                 title: titleMatch ? titleMatch[1] : (nameMatch ? nameMatch[1] : 'Soul Himalaya Experience'),
+                 image: imageMatch ? imageMatch[1] : undefined,
+                 images: imagesMatch ? imagesMatch[1].split(',').map(s => s.trim().replace(/['"]/g, '')) : undefined,
+                 description: descMatch ? descMatch[1] : undefined
+               };
+               console.log(`[Meta] Found package in Constants via improved search: ${id}`);
+            }
+          }
         } catch (e) {
-          // This might fail in production if .ts files aren't pre-compiled
-          console.warn("[Meta] Could not import constants.ts, skipping local fallback.");
+          console.warn("[Meta] Could not parse constants.ts for fallback:", e);
         }
       }
 
+      // 3. Hamlet Support
       if (urlStr.startsWith('/parvati-valley/')) {
-        const hamletId = urlStr.split('/').pop()?.toLowerCase();
+        const hamletId = urlStr.split('/').pop()?.split('?')[0]?.toLowerCase();
         const hamletNames: Record<string, string> = {
           malana: "Malana",
           tosh: "Tosh",
@@ -484,41 +516,24 @@ async function injectMetaTags(req: express.Request, html: string) {
 
       if (pkg) {
         const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
-        title = `${pkgTitle} | Soul Himalaya`;
+        title = `${pkgTitle} | The Soul Himalaya`;
         
-        let highlightsStr = "";
-        if (pkg.highlights && Array.isArray(pkg.highlights)) {
-          highlightsStr = " Highlights: " + pkg.highlights.join(", ") + ".";
-        } else if (pkg.features && Array.isArray(pkg.features)) {
-          highlightsStr = " Features: " + pkg.features.join(", ") + ".";
-        }
-
-        let itineraryStr = "";
-        if (pkg.theExperience) {
-           const itineraryBrief = pkg.theExperience.split('\n')
-            .filter((l: string) => l.toLowerCase().startsWith('day') || l.toLowerCase().startsWith('step'))
-            .slice(0, 3)
-            .join(' | ');
-           if (itineraryBrief) itineraryStr = " Experience: " + itineraryBrief + ".";
-        }
-
-        description = (pkg.description || `Experience ${pkgTitle} in the Parvati Valley.`) + 
-                      ` Duration: ${pkg.duration || 'Flexible'}.` + 
-                      highlightsStr + itineraryStr;
+        let desc = pkg.description || `Experience ${pkgTitle} with The Soul Himalaya.`;
+        if (pkg.duration) desc += ` Duration: ${pkg.duration}.`;
         
+        description = desc;
         if (description.length > 200) {
           description = description.substring(0, 197) + "...";
         }
 
-        // Special Case: The Valley of Shadows & Light should ALWAYS use the specific image
+        // Image Handling
         if (pkgTitle.toLowerCase().includes('valley of shadows')) {
           image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
         } else {
           image = pkg.image || (Array.isArray(pkg.images) && pkg.images.length > 0 ? pkg.images[0] : image);
-          console.log(`[Meta] Debug: pkgTitle=${pkgTitle}, pkg.image=${pkg.image}, pkg.images=${Array.isArray(pkg.images) ? JSON.stringify(pkg.images) : 'not an array'}, finalImage=${image}`);
         }
         
-        // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
+        // Optimize Unsplash images
         if (image.includes('unsplash.com')) {
           image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
           if (!image.includes('&h=')) image += '&h=630';
@@ -526,102 +541,13 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
+      // Ensure image is absolute
       if (!image.startsWith('http')) {
-        if (image.startsWith('/')) {
-          image = `${protocol}://${host}${image}`;
-        } else {
-          image = `${protocol}://${host}/${image}`;
-        }
+        image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
-
-      // JSON-LD Generation
-      const logo = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=500&q=80";
-      const organizationSchema = {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "The Soul Himalaya",
-        "url": `${protocol}://${host}`,
-        "logo": logo,
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+91-7018594247",
-          "contactType": "customer service",
-          "email": "info@thesoulhimalaya.com"
-        }
-      };
-
-      const localBusinessSchema = {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "The Soul Himalaya",
-        "image": image,
-        "@id": `${protocol}://${host}`,
-        "url": `${protocol}://${host}`,
-        "telephone": "+91-7018594247",
-        "priceRange": "$$",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Kullu & Parvati Valley",
-          "addressLocality": "Kullu",
-          "addressRegion": "HP",
-          "postalCode": "175101",
-          "addressCountry": "IN"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": 31.958,
-          "longitude": 77.109
-        },
-        "openingHoursSpecification": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday"
-          ],
-          "opens": "00:00",
-          "closes": "23:59"
-        }
-      };
-
-      const schemas = [organizationSchema, localBusinessSchema];
-
-      if (pkg) {
-        schemas.push({
-          "@context": "https://schema.org",
-          "@type": "TouristTrip",
-          "name": pkg.title || pkg.name,
-          "description": description,
-          "image": image,
-          "provider": {
-            "@type": "Organization",
-            "name": "The Soul Himalaya"
-          },
-          "itinerary": pkg.theExperience ? {
-            "@type": "ItemList",
-            "numberOfItems": pkg.theExperience.split('\n').filter((l: string) => l.toLowerCase().startsWith('day')).length,
-            "itemListElement": pkg.theExperience.split('\n')
-              .filter((l: string) => l.toLowerCase().startsWith('day'))
-              .map((l: string, i: number) => ({
-                "@type": "ListItem",
-                "position": i + 1,
-                "name": l.trim()
-              }))
-          } : undefined
-        } as any);
-      }
-
-      const jsonLdBlock = `
-      <script type="application/ld+json">
-        ${JSON.stringify(schemas, null, 2)}
-      </script>`;
 
       const metaTags = `
-      <!-- Dynamic SEO -->
+      <!-- Dynamic SEO Tags -->
       <title>${title}</title>
       <meta name="description" content="${description}">
       <link rel="canonical" href="${absoluteUrl}">
@@ -632,39 +558,31 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta property="og:title" content="${title}">
       <meta property="og:description" content="${description}">
       <meta property="og:image" content="${image}">
+      <meta property="og:image:alt" content="${title}">
       <meta property="og:image:width" content="1200">
       <meta property="og:image:height" content="630">
-      <meta property="og:image:type" content="image/jpeg">
       <meta property="og:site_name" content="The Soul Himalaya">
-      <meta property="og:locale" content="en_IN">
 
       <!-- Twitter -->
       <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:url" content="${absoluteUrl}">
       <meta name="twitter:title" content="${title}">
       <meta name="twitter:description" content="${description}">
       <meta name="twitter:image" content="${image}">
-
-      <!-- JSON-LD Structured Data -->
-      ${jsonLdBlock}
       `;
 
-      // Remove existing SEO tags to prevent duplicates which confuse crawlers
-      let cleanedHtml = html;
-
-      // Inject meta tags before the </head> tag for robustness
-      if (cleanedHtml.includes('</head>')) {
-        console.log(`[Meta] Injecting meta tags before </head>.`);
+      // Inject before </head>
+      if (html.includes('</head>')) {
+        // Remove existing titles and descriptions from index.html during injection to avoid browser confusion
+        const cleanedHtml = html.replace(/<title>.*?<\/title>/gi, '')
+                                .replace(/<meta name="description" content=".*?">/gi, '');
         return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
-      } else {
-        console.error(`[Meta] </head> tag not found in HTML!`);
-        return cleanedHtml;
       }
+      return html;
     })();
 
     return await Promise.race([metaPromise, timeoutPromise]) as string;
   } catch (error) {
-    console.error("Meta injection failed or timed out:", error);
+    console.error("[Meta] Injection failed:", error);
     return html;
   }
 }
