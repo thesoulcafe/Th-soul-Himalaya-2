@@ -411,10 +411,10 @@ export default function HamletDetail() {
                     <Button 
                       asChild
                       variant="ghost" 
-                      className="p-0 h-auto text-[10px] font-black uppercase tracking-widest text-terracotta flex items-center gap-2 hover:bg-transparent hover:translate-x-2 transition-transform"
+                      className="p-0 h-auto text-[10px] font-black uppercase tracking-widest text-terracotta flex items-center gap-2 hover:bg-transparent hover:translate-x-2 transition-transform group/btn"
                     >
                       <Link to={`/hamlet/${data.name}/article/${article.link}`}>
-                        Read Full Article <ArrowRight className="h-3.5 w-3.5" />
+                        Read Full Article <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-1 transition-transform" />
                       </Link>
                     </Button>
                   </div>

@@ -318,8 +318,9 @@ const ParvatiValley = () => {
                         <span className="text-terracotta font-black text-xs tracking-widest uppercase py-1 px-3 rounded-full bg-white/5 backdrop-blur-md self-start">
                           {village.vibe}
                         </span>
-                        <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                          <ExternalLink className="h-4 w-4" />
+                        <div className="px-5 py-2.5 rounded-full bg-terracotta text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group-hover:bg-white group-hover:text-terracotta transition-all duration-300 shadow-lg">
+                          <span>Open Village</span>
+                          <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </div>

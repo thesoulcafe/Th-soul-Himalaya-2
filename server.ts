@@ -331,16 +331,19 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       const urlStr = req.originalUrl || req.url;
       
       // Specifically target navigation requests (HTML)
-      // We check if it doesn't look like a static asset request
-      const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map)$/i.test(urlStr);
+      // Check if the path looks like a route (no extension) or ends in .html
+      // Also avoid Vite internal paths starting with /@
+      const urlPath = urlStr.split('?')[0];
+      const isViteInternal = urlPath.startsWith('/@') || urlPath.includes('node_modules');
+      const isAsset = urlPath.includes('.') && !urlPath.endsWith('.html');
       
-      if (isAsset) {
+      if (isViteInternal || isAsset) {
         return next();
       }
 
       console.log(`[Dev] Serving HTML for: ${urlStr}`);
       try {
-        const templatePath = path.join(process.cwd(), 'index.html');
+        const templatePath = path.resolve(__dirname, 'index.html');
         if (!fs.existsSync(templatePath)) {
           console.error(`[Dev] index.html not found at ${templatePath}`);
           return next();
@@ -375,7 +378,8 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
     
     app.get('*', async (req, res) => {
       const urlStr = req.originalUrl || req.url;
-      const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map)$/i.test(urlStr);
+      const urlPath = urlStr.split('?')[0];
+      const isAsset = urlPath.includes('.') && !urlPath.endsWith('.html');
       
       if (isAsset) {
         return res.status(404).send("Not Found");
@@ -424,8 +428,11 @@ async function injectMetaTags(req: express.Request, html: string) {
       const userAgent = req.headers['user-agent'] || '';
       
       // Resilient URL parsing
-      let host = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
-      let protocol = req.headers['x-forwarded-proto'] || 'https';
+      let rawHost = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
+      let host = (Array.isArray(rawHost) ? rawHost[0] : rawHost) as string;
+      
+      let rawProto = req.headers['x-forwarded-proto'] || 'https';
+      let protocol = (Array.isArray(rawProto) ? rawProto[0] : rawProto) as string;
       
       // Ensure host doesn't have protocol
       host = host.replace(/^https?:\/\//, '');
