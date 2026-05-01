@@ -443,6 +443,9 @@ async function injectMetaTags(req: express.Request, html: string) {
           title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
           description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";
           image = "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg";
+        } else if (urlStr.includes('/guide')) {
+          title = "Soul Support | The Soul Guide | Regional Intelligence";
+          description = "Expert logistical insights, mountain dynamics, and regional intelligence for the Kullu-Parvati-Manali corridor.";
         }
       }
 

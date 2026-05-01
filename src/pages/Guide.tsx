@@ -117,13 +117,13 @@ export default function Guide() {
             transition={{ duration: 0.8 }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-terracotta text-white text-[10px] font-bold uppercase tracking-[0.2em] mb-4 md:mb-6 shadow-lg">
-              Operational Guide
+              Soul Support
             </span>
             <h1 className="text-2xl sm:text-4xl md:text-7xl font-heading font-bold text-white mb-4 md:mb-6 leading-tight">
-              Strategic Portfolio <br className="hidden md:block" /> & <span className="text-white/80 italic">Regional Intelligence</span>
+              The Soul Guide <br className="hidden md:block" /> & <span className="text-white/80 italic">Regional Intelligence</span>
             </h1>
             <p className="text-sm md:text-lg text-white/80 font-medium max-w-2xl mx-auto leading-relaxed">
-              A comprehensive analysis of the Kullu-Parvati-Manali corridor, designed for maximized regional potential and logistical precision.
+              Your spiritual compass for the Kullu-Parvati-Manali corridor. Expert logistical insights and regional mapping for the conscious traveler.
             </p>
           </motion.div>
         </div>
@@ -150,7 +150,7 @@ export default function Guide() {
               />
               <div className="absolute right-8 top-1/2 -translate-y-1/2">
                 <Badge className="bg-forest text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hidden sm:flex">
-                  Regional Intelligence
+                  Soul Intelligence
                 </Badge>
               </div>
             </div>
@@ -180,8 +180,8 @@ export default function Guide() {
         <section className="bg-white rounded-[1.5rem] md:rounded-[3rem] shadow-2xl shadow-forest/5 p-5 md:p-16 mb-8 md:mb-20 border border-forest/5 overflow-hidden">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
             <div>
-              <h2 className="text-xl md:text-3xl font-heading font-bold text-forest mb-1 md:mb-2">Transit Dynamics</h2>
-              <p className="text-forest/40 text-[9px] md:text-sm font-medium uppercase tracking-widest leading-relaxed">Seasonal Accessibility & Logistical Foundation</p>
+              <h2 className="text-xl md:text-3xl font-heading font-bold text-forest mb-1 md:mb-2">Mountain Logistics</h2>
+              <p className="text-forest/40 text-[9px] md:text-sm font-medium uppercase tracking-widest leading-relaxed">Seasonal Accessibility & Spiritual Foundation</p>
             </div>
             <div className="flex items-center gap-2 md:gap-3 px-3 py-1.5 md:px-4 md:py-2 bg-forest/5 rounded-2xl border border-forest/10">
               <Clock className="h-3 w-3 md:h-5 md:w-5 text-forest/40" />
@@ -251,8 +251,8 @@ export default function Guide() {
         {/* Seasonal Matrix */}
         <section className="mb-12 md:mb-20">
           <div className="text-center mb-10 md:mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2 md:mb-4">Seasonal Portfolio Matrix</h2>
-            <p className="text-forest/40 text-[10px] md:text-sm font-bold uppercase tracking-[0.2em]">Operational Viability & Risks</p>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2 md:mb-4">Seasonal Wisdom Matrix</h2>
+            <p className="text-forest/40 text-[10px] md:text-sm font-bold uppercase tracking-[0.2em]">Regional Viability & Natural Cycles</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -393,9 +393,9 @@ export default function Guide() {
             <div className="w-full h-full border-[60px] md:border-[100px] border-white/20 rounded-full translate-x-1/2 -translate-y-1/2" />
           </div>
           <div className="relative z-10 max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4 md:mb-6 leading-tight">The 40-Package Analysis</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4 md:mb-6 leading-tight">The 40-Soul Analysis</h2>
             <p className="text-white/60 text-sm md:text-lg leading-relaxed mb-8 md:mb-10 font-medium">
-              Our curated portfolio addresses six key market segments: Romantic Retreats, Wellness Immersions, Corporate MICE, Backpacker Expeditions, High-Altitude Adventure, and Mixed-Interest thematic tours.
+              Our curated collection addresses six key soulful segments: Romantic Retreats, Wellness Immersions, Corporate MICE, Backpacker Expeditions, High-Altitude Adventure, and Mixed-Interest thematic tours.
             </p>
             <div className="grid grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
               {[
