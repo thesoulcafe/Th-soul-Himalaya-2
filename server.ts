@@ -437,6 +437,7 @@ async function injectMetaTags(req: express.Request, html: string) {
           if (docSnap.exists()) {
             const docData = docSnap.data();
             console.log(`[Meta] Firestore data for ${id}:`, JSON.stringify(docData));
+            console.log(`[Meta] Keys available in Firestore data for ${id}:`, Object.keys(docData.data || docData));
             pkg = { id, ...(docData.data || docData) };
             console.log(`[Meta] Processed package:`, JSON.stringify(pkg));
           } else {
@@ -514,6 +515,7 @@ async function injectMetaTags(req: express.Request, html: string) {
           image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
         } else {
           image = pkg.image || (Array.isArray(pkg.images) && pkg.images.length > 0 ? pkg.images[0] : image);
+          console.log(`[Meta] Debug: pkgTitle=${pkgTitle}, pkg.image=${pkg.image}, pkg.images=${Array.isArray(pkg.images) ? JSON.stringify(pkg.images) : 'not an array'}, finalImage=${image}`);
         }
         
         // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
@@ -650,13 +652,12 @@ async function injectMetaTags(req: express.Request, html: string) {
       // Remove existing SEO tags to prevent duplicates which confuse crawlers
       let cleanedHtml = html;
 
-      // Inject before placeholder (using RegEx to handle potential whitespace)
-      const placeholderRegex = /<!--\s*SEO_TAGS_PLACEHOLDER\s*-->/;
-      if (placeholderRegex.test(cleanedHtml)) {
-        console.log(`[Meta] Placeholder found, injecting meta tags.`);
-        return cleanedHtml.replace(placeholderRegex, `${metaTags}`);
+      // Inject meta tags before the </head> tag for robustness
+      if (cleanedHtml.includes('</head>')) {
+        console.log(`[Meta] Injecting meta tags before </head>.`);
+        return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
       } else {
-        console.error(`[Meta] Placeholder not found in HTML!`);
+        console.error(`[Meta] </head> tag not found in HTML!`);
         return cleanedHtml;
       }
     })();
