@@ -513,7 +513,7 @@ async function injectMetaTags(req: express.Request, html: string) {
         if (pkgTitle.toLowerCase().includes('valley of shadows')) {
           image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
         } else {
-          image = pkg.image || image;
+          image = pkg.image || (Array.isArray(pkg.images) && pkg.images.length > 0 ? pkg.images[0] : image);
         }
         
         // Optimize unsplash image for share preview (1200x630 is optimal for WhatsApp/FB)
