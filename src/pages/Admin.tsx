@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -2880,19 +2880,276 @@ export default function Admin() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-10"
+            className="p-4 md:p-10"
           >
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-forest tracking-tight">SEO Manager</h2>
-              <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">
-                Optimize content for high-intent traffic
-              </p>
+            {/* SEO Dashboard Header */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="h-10 w-10 rounded-xl bg-terracotta/10 flex items-center justify-center">
+                    <Zap className="h-5 w-5 text-terracotta" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-forest tracking-tight">SEO Command Center</h2>
+                    <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest leading-none">Organic Growth & Index Optimization</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
+                  { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
+                  { label: 'Keyword Focus', value: seoSettings.filter(s => s.keyword).length, icon: Target, color: 'text-orange-500' },
+                  { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <stat.icon className={cn("h-3 w-3", stat.color)} />
+                      <span className="text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
+                    </div>
+                    <div className="text-lg font-bold text-forest">{stat.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="space-y-8">
-                <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-forest mb-4">Global Site Verification</h3>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Editor Column */}
+              <div className="lg:col-span-5 space-y-6">
+                <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden">
+                  <CardHeader className="bg-forest/[0.02] border-b border-forest/5 p-8">
+                    <CardTitle className="text-xl font-bold text-forest">Optimization Studio</CardTitle>
+                    <CardDescription className="text-xs text-forest/40 font-medium">Fine-tune meta dynamics for search crawlers</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-8">
+                    <form 
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        try {
+                          await addDoc(collection(db, 'seo_settings'), {
+                            ...seoFormData,
+                            updatedAt: serverTimestamp()
+                          });
+                          setNotification({ message: 'SEO dynamics updated successfully', type: 'success' });
+                          setSeoFormData({ path: '', keyword: '', title: '', description: '' });
+                        } catch (error) {
+                          handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
+                        }
+                      }}
+                      className="space-y-6"
+                    >
+                      <div className="space-y-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Page Path / Slug</label>
+                          <div className="relative">
+                            <Compass className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                            <Input 
+                              placeholder="/tours/manali-expedition" 
+                              value={seoFormData.path} 
+                              onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} 
+                              className="h-14 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium"
+                              required 
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Target Keyword</label>
+                          <div className="relative">
+                            <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                            <Input 
+                              placeholder="Manali Treks 2024" 
+                              value={seoFormData.keyword} 
+                              onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} 
+                              className="h-14 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Title</label>
+                          <div className="relative">
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-mono text-forest/20">
+                              {seoFormData.title?.length || 0}/60
+                            </div>
+                            <Input 
+                              placeholder="The Soul Himalaya | Luxury Treks" 
+                              value={seoFormData.title} 
+                              onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} 
+                              className="h-14 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-bold"
+                              maxLength={60}
+                              required 
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Description</label>
+                          <div className="relative">
+                            <div className="absolute right-4 bottom-4 text-[9px] font-mono text-forest/20">
+                              {seoFormData.description?.length || 0}/160
+                            </div>
+                            <Textarea 
+                              placeholder="Discover the mystic beauty of the Himalayas..." 
+                              value={seoFormData.description} 
+                              onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} 
+                              className="min-h-[120px] rounded-2xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium leading-relaxed resize-none p-5"
+                              maxLength={160}
+                              required 
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button type="submit" className="w-full bg-forest hover:bg-forest/90 text-white font-bold h-14 rounded-2xl shadow-lg shadow-forest/10 group transition-all" disabled={isProcessing}>
+                        {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Deploy Meta Configuration"}
+                        {!isProcessing && <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                {/* Google Preview */}
+                <div className="p-8 bg-[#f8f9fa] rounded-[2rem] border border-gray-200">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Search className="h-4 w-4 text-gray-400" />
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Engine Result Preview</span>
+                  </div>
+                  <div className="space-y-1.5 overflow-hidden">
+                    <div className="flex items-center gap-1.5 mb-1 text-sm text-[#202124]">
+                      <cite className="not-italic text-sm">https://thesoulhimalaya.com{seoFormData.path || '/...'}</cite>
+                      <span className="text-gray-400">›</span>
+                    </div>
+                    <h3 className="text-xl text-[#1a0dab] hover:underline cursor-pointer leading-tight mb-1 truncate">
+                      {seoFormData.title || 'Add a Meta Title to see preview'}
+                    </h3>
+                    <p className="text-sm text-[#4d5156] leading-relaxed line-clamp-2">
+                       <span className="font-bold text-[#70757a]">Apr 25, 2024 — </span>
+                      {seoFormData.description || 'Add a meta description to see how your page description will appear in Google search results.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status List Column */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-forest">Indexed Index</h3>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-forest/40">
+                      <Filter className="h-3 w-3 mr-2" /> Filter
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-forest/40">
+                      <Activity className="h-3 w-3 mr-2" /> Audit
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {seoSettings.map((item) => {
+                    const score = (item.title?.length > 40 ? 40 : 20) + (item.description?.length > 120 ? 40 : 20) + (item.keyword ? 20 : 0);
+                    return (
+                      <motion.div 
+                        key={item.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                      >
+                        <Card className="group border border-forest/5 shadow-sm hover:shadow-xl hover:border-forest/10 transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden p-6">
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div className="flex-grow space-y-3">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase">
+                                  {item.path}
+                                </Badge>
+                                {item.keyword && (
+                                  <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                                    {item.keyword}
+                                  </Badge>
+                                )}
+                                <div className="h-1 w-1 rounded-full bg-forest/20" />
+                                <span className={cn(
+                                  "text-[10px] font-black uppercase tracking-widest",
+                                  score > 80 ? "text-emerald-600" : score > 50 ? "text-orange-500" : "text-rose-500"
+                                )}>
+                                  Score: {score}%
+                                </span>
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-bold text-forest text-base mb-1 group-hover:text-terracotta transition-colors">{item.title}</h4>
+                                <p className="text-xs text-forest/50 font-medium leading-relaxed line-clamp-2 md:max-w-[500px]">
+                                  {item.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 self-end md:self-center">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-10 w-10 rounded-xl bg-forest/5 text-forest/40 hover:bg-forest hover:text-white"
+                                onClick={() => {
+                                  setSeoFormData({
+                                    path: item.path,
+                                    keyword: item.keyword || '',
+                                    title: item.title,
+                                    description: item.description
+                                  });
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-10 w-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white"
+                                onClick={async () => {
+                                  setConfirmModal({
+                                    message: `Permanently delete SEO configuration for ${item.path}? This will revert to site-wide defaults.`,
+                                    onConfirm: async () => {
+                                      try {
+                                        await deleteDoc(doc(db, 'seo_settings', item.id));
+                                        setNotification({ message: 'SEO dynamics purged', type: 'success' });
+                                      } catch (error) {
+                                        handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
+                                      }
+                                      setConfirmModal(null);
+                                    }
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    );
+                  })}
+                  
+                  {seoSettings.length === 0 && (
+                    <div className="text-center py-20 bg-forest/[0.01] rounded-[2rem] border border-dashed border-forest/10">
+                      <Search className="h-12 w-12 text-forest/10 mx-auto mb-4" />
+                      <h4 className="text-lg font-bold text-forest/40 mb-2">No Organic Footprint Yet</h4>
+                      <p className="text-xs text-forest/30 font-medium max-w-xs mx-auto">Start by optimizing your primary routes and high-intent landing pages.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Global Configuration Card */}
+                <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center">
+                      <Settings className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-forest">Global Index Verification</h3>
+                      <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Master site verification engine</p>
+                    </div>
+                  </div>
+                  
                   <form 
                     onSubmit={async (e) => {
                       e.preventDefault();
@@ -2901,103 +3158,25 @@ export default function Admin() {
                           googleSiteVerification: siteSettings.googleSiteVerification,
                           updatedAt: serverTimestamp()
                         }, { merge: true });
-                        setNotification({ message: 'Global settings updated', type: 'success' });
+                        setNotification({ message: 'Global index keys updated', type: 'success' });
                       } catch (error) {
                         handleFirestoreError(error, OperationType.WRITE, 'site_settings/global');
                       }
                     }}
                     className="space-y-4"
                   >
-                    <div className="space-y-2">
-                      <label className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Google Site Verification Token</label>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] text-forest/40 font-bold uppercase tracking-widest ml-1">Google Console Token</label>
                       <Input 
-                        placeholder="e.g. google-site-verification=abc123xyz" 
+                        placeholder="google-site-verification=..." 
                         value={siteSettings.googleSiteVerification || ''} 
                         onChange={e => setSiteSettings({...siteSettings, googleSiteVerification: e.target.value})} 
-                        className="h-12 rounded-lg" 
+                        className="h-14 rounded-2xl bg-white border-forest/10 font-mono text-xs" 
                       />
-                      <p className="text-[10px] text-forest/30 italic">Paste the content of your meta tag or the full verification token here.</p>
                     </div>
-                    <Button type="submit" className="bg-forest hover:bg-forest/90 text-white font-bold h-10 w-full">Update Global Settings</Button>
+                    <Button type="submit" className="w-full bg-forest text-white font-bold h-12 rounded-xl transition-all">Synchronize Verification</Button>
                   </form>
                 </Card>
-
-                <Card className="border border-forest/5 shadow-sm rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-forest mb-4">Add Page Specific SEO</h3>
-                  <form 
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      try {
-                        await addDoc(collection(db, 'seo_settings'), {
-                          ...seoFormData,
-                          updatedAt: serverTimestamp()
-                        });
-                        setNotification({ message: 'SEO data saved successfully', type: 'success' });
-                        setSeoFormData({ path: '', keyword: '', title: '', description: '' });
-                      } catch (error) {
-                        handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
-                      }
-                    }}
-                    className="space-y-4"
-                  >
-                    <Input placeholder="Page Path or Slug (e.g., /tours)" value={seoFormData.path} onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} className="h-12 rounded-lg" required />
-                    <Input placeholder="Target Keyword" value={seoFormData.keyword} onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} className="h-12 rounded-lg" />
-                    <Input placeholder="SEO Title" value={seoFormData.title} onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} className="h-12 rounded-lg" required />
-                    <Textarea placeholder="Meta Description" value={seoFormData.description} onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} className="rounded-lg" required />
-                    <Button type="submit" className="bg-terracotta hover:bg-terracotta/90 text-white font-bold h-10 w-full">Save SEO Data</Button>
-                  </form>
-                </Card>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-forest">Existing Page Settings</h3>
-                <div className="grid gap-4">
-                  {seoSettings.map((item) => (
-                    <Card key={item.id} className="border border-forest/5 shadow-sm rounded-xl p-6 bg-white">
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-forest/5 text-forest border-none font-mono text-[10px]">
-                              {item.path}
-                            </Badge>
-                            {item.keyword && (
-                              <Badge variant="outline" className="bg-terracotta/5 text-terracotta border-none font-mono text-[10px]">
-                                {item.keyword}
-                              </Badge>
-                            )}
-                          </div>
-                          <h4 className="font-bold text-forest">{item.title}</h4>
-                          <p className="text-sm text-forest/60 line-clamp-2">{item.description}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-forest/40 hover:text-terracotta"
-                            onClick={async () => {
-                              if (window.confirm('Delete this SEO setting?')) {
-                                try {
-                                  await deleteDoc(doc(db, 'seo_settings', item.id));
-                                  setNotification({ message: 'SEO setting deleted', type: 'success' });
-                                } catch (error) {
-                                  handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
-                                }
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                  {seoSettings.length === 0 && (
-                    <div className="text-center py-12 bg-white rounded-xl border border-dashed border-forest/20">
-                      <Search className="h-8 w-8 text-forest/20 mx-auto mb-3" />
-                      <p className="text-forest/40 font-bold uppercase tracking-widest text-[10px]">No SEO data found</p>
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
           </motion.div>
