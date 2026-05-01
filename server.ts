@@ -32,6 +32,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  console.log(`[Server] Starting in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`[Server] Working directory: ${process.cwd()}`);
+
   app.use(express.json());
 
   // Ensure uploads directory exists
