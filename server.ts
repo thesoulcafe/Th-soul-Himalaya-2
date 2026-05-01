@@ -615,11 +615,18 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta name="twitter:image" content="${image}">
       `;
 
-      // Inject before </head>
-      if (html.includes('</head>')) {
-        // Remove existing titles and descriptions from index.html during injection to avoid browser confusion
-        const cleanedHtml = html.replace(/<title>.*?<\/title>/gi, '')
-                                .replace(/<meta name="description" content=".*?">/gi, '');
+      // Clean existing tags to avoid duplication
+      let cleanedHtml = html.replace(/<title>.*?<\/title>/gi, '')
+                            .replace(/<meta name="description" content=".*?">/gi, '')
+                            .replace(/<meta property="og:.*?" content=".*?">/gi, '')
+                            .replace(/<meta name="twitter:.*?" content=".*?">/gi, '');
+
+      // Inject into placeholder if exists, otherwise right after <head>
+      if (cleanedHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {
+        return cleanedHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', metaTags);
+      } else if (cleanedHtml.includes('<head>')) {
+        return cleanedHtml.replace('<head>', `<head>\n${metaTags}`);
+      } else if (cleanedHtml.includes('</head>')) {
         return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
       }
       return html;

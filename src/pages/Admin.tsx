@@ -376,7 +376,10 @@ export default function Admin() {
   // Custom Notifications & Confirmations
   const [isSyncing, setIsSyncing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [seoFormData, setSeoFormData] = useState({ path: '', keyword: '', title: '', description: '' });
+  const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '' });
+  const [seoSearchTerm, setSeoSearchTerm] = useState('');
+  const [isSeoFilterVisible, setIsSeoFilterVisible] = useState(false);
+  const [isSeoAuditActive, setIsSeoAuditActive] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void | Promise<void> } | null>(null);
 
@@ -3037,52 +3040,120 @@ export default function Admin() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-forest">Indexed Index</h3>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-forest/40">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className={cn(
+                        "h-8 rounded-lg text-[10px] font-black uppercase tracking-widest",
+                        isSeoFilterVisible ? "bg-forest text-white" : "text-forest/40"
+                      )}
+                      onClick={() => setIsSeoFilterVisible(!isSeoFilterVisible)}
+                    >
                       <Filter className="h-3 w-3 mr-2" /> Filter
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest text-forest/40">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className={cn(
+                        "h-8 rounded-lg text-[10px] font-black uppercase tracking-widest",
+                        isSeoAuditActive ? "bg-terracotta text-white shadow-lg shadow-terracotta/20" : "text-forest/40"
+                      )}
+                      onClick={() => {
+                        setIsSeoAuditActive(!isSeoAuditActive);
+                        if (!isSeoAuditActive) {
+                          setNotification({ message: 'SEO Health Audit Active: Highlighting issues', type: 'success' });
+                        }
+                      }}
+                    >
                       <Activity className="h-3 w-3 mr-2" /> Audit
                     </Button>
                   </div>
                 </div>
 
+                {isSeoFilterVisible && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4"
+                  >
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-forest/20" />
+                      <Input 
+                        placeholder="Search by path or keyword..." 
+                        value={seoSearchTerm}
+                        onChange={(e) => setSeoSearchTerm(e.target.value)}
+                        className="h-10 pl-9 rounded-xl border-forest/10 focus:ring-0 focus:border-forest/30 text-xs"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
                 <div className="grid gap-4 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {seoSettings.map((item) => {
-                    const score = (item.title?.length > 40 ? 40 : 20) + (item.description?.length > 120 ? 40 : 20) + (item.keyword ? 20 : 0);
-                    return (
-                      <motion.div 
-                        key={item.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                      >
-                        <Card className="group border border-forest/5 shadow-sm hover:shadow-xl hover:border-forest/10 transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden p-6">
-                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div className="flex-grow space-y-3">
-                              <div className="flex flex-wrap items-center gap-3">
-                                <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase">
-                                  {item.path}
-                                </Badge>
-                                {item.keyword && (
-                                  <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
-                                    {item.keyword}
+                  {seoSettings
+                    .filter(item => {
+                      if (!seoSearchTerm) return true;
+                      const term = seoSearchTerm.toLowerCase();
+                      return item.path.toLowerCase().includes(term) || 
+                             item.keyword?.toLowerCase().includes(term) ||
+                             item.title.toLowerCase().includes(term);
+                    })
+                    .map((item) => {
+                      const titleLen = item.title?.length || 0;
+                      const descLen = item.description?.length || 0;
+                      
+                      // Audit flags
+                      const hasTitleIssue = titleLen < 30 || titleLen > 60;
+                      const hasDescIssue = descLen < 70 || descLen > 160;
+                      const isHighPriority = isSeoAuditActive && (hasTitleIssue || hasDescIssue);
+
+                      const score = (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
+                                   (descLen > 120 && descLen <= 160 ? 40 : 20) + 
+                                   (item.keyword ? 20 : 0);
+                      
+                      return (
+                        <motion.div 
+                          key={item.id}
+                          layout
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                        >
+                          <Card className={cn(
+                            "group border shadow-sm hover:shadow-xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden p-6",
+                            isHighPriority ? "border-rose-500/50 bg-rose-50/30" : "border-forest/5 hover:border-forest/10"
+                          )}>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                              <div className="flex-grow space-y-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase">
+                                    {item.path}
                                   </Badge>
-                                )}
-                                <div className="h-1 w-1 rounded-full bg-forest/20" />
-                                <span className={cn(
-                                  "text-[10px] font-black uppercase tracking-widest",
-                                  score > 80 ? "text-emerald-600" : score > 50 ? "text-orange-500" : "text-rose-500"
-                                )}>
-                                  Score: {score}%
-                                </span>
+                                  {item.keyword && (
+                                    <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                                      {item.keyword}
+                                    </Badge>
+                                  )}
+                                  <div className="h-1 w-1 rounded-full bg-forest/20" />
+                                  <span className={cn(
+                                    "text-[10px] font-black uppercase tracking-widest",
+                                    score > 80 ? "text-emerald-600" : score > 50 ? "text-orange-500" : "text-rose-500"
+                                  )}>
+                                    Score: {score}%
+                                  </span>
+                                  {isSeoAuditActive && (
+                                    <div className="flex gap-2">
+                                      {hasTitleIssue && <Badge variant="outline" className="text-[8px] border-rose-200 text-rose-500 bg-rose-50">Title Len</Badge>}
+                                      {hasDescIssue && <Badge variant="outline" className="text-[8px] border-rose-200 text-rose-500 bg-rose-50">Desc Len</Badge>}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                <div>
+                                  <h4 className="font-bold text-forest text-base mb-1 group-hover:text-terracotta transition-colors">{item.title}</h4>
+                                  <p className="text-xs text-forest/50 font-medium leading-relaxed line-clamp-2 md:max-w-[500px]">
+                                    {item.description}
+                                  </p>
+                                </div>
                               </div>
-                              
-                              <div>
-                                <h4 className="font-bold text-forest text-base mb-1 group-hover:text-terracotta transition-colors">{item.title}</h4>
-                                <p className="text-xs text-forest/50 font-medium leading-relaxed line-clamp-2 md:max-w-[500px]">
-                                  {item.description}
-                                </p>
-                              </div>
-                            </div>
 
                             <div className="flex items-center gap-2 self-end md:self-center">
                               <Button 
