@@ -650,8 +650,15 @@ async function injectMetaTags(req: express.Request, html: string) {
       // Remove existing SEO tags to prevent duplicates which confuse crawlers
       let cleanedHtml = html;
 
-      // Inject before placeholder
-      return cleanedHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', `${metaTags}`);
+      // Inject before placeholder (using RegEx to handle potential whitespace)
+      const placeholderRegex = /<!--\s*SEO_TAGS_PLACEHOLDER\s*-->/;
+      if (placeholderRegex.test(cleanedHtml)) {
+        console.log(`[Meta] Placeholder found, injecting meta tags.`);
+        return cleanedHtml.replace(placeholderRegex, `${metaTags}`);
+      } else {
+        console.error(`[Meta] Placeholder not found in HTML!`);
+        return cleanedHtml;
+      }
     })();
 
     return await Promise.race([metaPromise, timeoutPromise]) as string;
