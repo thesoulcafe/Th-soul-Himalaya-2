@@ -321,54 +321,79 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
-      appType: "spa",
+      appType: "custom", // Use custom to handle index.html manually for meta injection
     });
     
     app.use(vite.middlewares);
 
-    // Dynamic Meta Tag Fallback for crawlers and link previews
-    app.use('*', async (req, res, next) => {
-      const url = req.originalUrl;
-      const isHtml = req.headers.accept?.includes('text/html') || !url.includes('.');
+    // Dynamic Meta Tag handler for development
+    app.get('*', async (req, res, next) => {
+      const urlStr = req.originalUrl || req.url;
       
-      if (req.method !== 'GET' || !isHtml) {
+      // Specifically target navigation requests (HTML)
+      // We check if it doesn't look like a static asset request
+      const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map)$/i.test(urlStr);
+      
+      if (isAsset) {
         return next();
       }
 
-      console.log(`[Dev] Serving transformed HTML for: ${url}`);
+      console.log(`[Dev] Serving HTML for: ${urlStr}`);
       try {
-        const html = await fs.promises.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
-        const transformedHtml = await vite.transformIndexHtml(url, html);
+        const templatePath = path.join(process.cwd(), 'index.html');
+        if (!fs.existsSync(templatePath)) {
+          console.error(`[Dev] index.html not found at ${templatePath}`);
+          return next();
+        }
+        
+        const template = await fs.promises.readFile(templatePath, 'utf-8');
+        const transformedHtml = await vite.transformIndexHtml(urlStr, template);
         
         // Inject dynamic tags
         const finalHtml = await injectMetaTags(req, transformedHtml);
+        
         res.status(200)
            .set({ 
              'Content-Type': 'text/html',
-             'Accept-Ranges': 'none',
-             'Cache-Control': 'public, max-age=300'
+             'Cache-Control': 'no-cache',
+             'X-Powered-By': 'The Soul Himalaya Server'
            })
            .send(finalHtml);
       } catch (e) {
-        vite.ssrFixStacktrace(e as Error);
+        if (vite) {
+          vite.ssrFixStacktrace(e as Error);
+        }
         console.error("[Dev] HTML Transformation error:", e);
-        next(e);
+        res.status(500).send("Transformation Error: " + (e as Error).message);
       }
     });
 
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    // Serve static files first
     app.use(express.static(distPath, { index: false }));
     
     app.get('*', async (req, res) => {
+      const urlStr = req.originalUrl || req.url;
+      const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map)$/i.test(urlStr);
+      
+      if (isAsset) {
+        return res.status(404).send("Not Found");
+      }
+
       try {
-        const html = await fs.promises.readFile(path.join(distPath, 'index.html'), 'utf-8');
+        const indexPath = path.join(distPath, 'index.html');
+        if (!fs.existsSync(indexPath)) {
+          return res.status(500).send("Build artifact index.html missing. Please run build.");
+        }
+        
+        const html = await fs.promises.readFile(indexPath, 'utf-8');
         const finalHtml = await injectMetaTags(req, html);
         res.status(200)
            .set({ 
              'Content-Type': 'text/html',
-             'Accept-Ranges': 'none',
-             'Cache-Control': 'public, max-age=3600'
+             'Cache-Control': 'public, max-age=3600',
+             'X-Powered-By': 'The Soul Himalaya Server (Prod)'
            })
            .send(finalHtml);
       } catch (e) {
@@ -388,26 +413,36 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
 // -----------------------------------------------------------------------------
 
 async function injectMetaTags(req: express.Request, html: string) {
-  // Increase timeout to 2.5s for slower DB lookups on cold starts
+  // Increase timeout to 3s for slower DB lookups on cold starts
   const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error("Timeout")), 2500)
+    setTimeout(() => reject(new Error("Timeout")), 3000)
   );
 
   try {
     const metaPromise = (async () => {
-      const urlStr = req.originalUrl;
+      const urlStr = req.originalUrl || req.url;
       const userAgent = req.headers['user-agent'] || '';
-      console.log(`[Meta] Debug: Request path=${req.path}, originalUrl=${urlStr}, host=${req.headers.host}`);
-      const url = new URL(urlStr, `http://${req.headers.host || 'localhost'}`);
+      
+      // Resilient URL parsing
+      let host = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
+      let protocol = req.headers['x-forwarded-proto'] || 'https';
+      
+      // Ensure host doesn't have protocol
+      host = host.replace(/^https?:\/\//, '');
+
+      let url: URL;
+      try {
+        url = new URL(urlStr, `${protocol}://${host}`);
+      } catch (e) {
+        console.warn(`[Meta] Invalid URL construction for ${urlStr} on ${host}, falling back to defaults.`);
+        url = new URL('/', 'https://thesoulhimalaya.com');
+      }
+
       const id = url.searchParams.get('id');
       console.log(`[Meta] Request for: ${urlStr}, ID: ${id || 'none'}`);
       
-      // Get protocol and host dynamically, but prioritize known production domain
-      const protocol = req.headers['x-forwarded-proto'] || 'https';
-      let host = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
-      
       // If we are on the production domain but host says something else (like internal IP), force it
-      if (host.includes('run.app') || host.includes('localhost')) {
+      if (host.includes('run.app') || host.includes('localhost') || host.includes('127.0.0.1')) {
          // Keep it for dev/testing
       } else {
          host = 'thesoulhimalaya.com';
