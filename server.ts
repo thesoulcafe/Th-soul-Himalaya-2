@@ -436,8 +436,11 @@ async function injectMetaTags(req: express.Request, html: string) {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const docData = docSnap.data();
-            pkg = { id, ...docData.data };
-            console.log(`[Meta] Found package in Firestore: ${id}`);
+            console.log(`[Meta] Firestore data for ${id}:`, JSON.stringify(docData));
+            pkg = { id, ...(docData.data || docData) };
+            console.log(`[Meta] Processed package:`, JSON.stringify(pkg));
+          } else {
+            console.log(`[Meta] No document found in Firestore for ${id}`);
           }
         } catch (e) {
           console.error("[Meta] Firestore lookup failed:", e);
