@@ -123,6 +123,9 @@ export default function Trekks() {
 
       setTrekkList(sortedTrekks);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("Trekks content snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -134,6 +137,8 @@ export default function Trekks() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

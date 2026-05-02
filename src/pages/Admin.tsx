@@ -431,36 +431,48 @@ export default function Admin() {
       if (configItem?.data?.tourCategories) {
         setTourCategories(configItem.data.tourCategories);
       }
+    }, (error) => {
+      console.error("Admin content snapshot failed:", error);
     });
 
     // Bookings Listener
     const bookingsQuery = query(collection(db, 'bookings'), orderBy('createdAt', 'desc'));
     const unsubscribeBookings = onSnapshot(bookingsQuery, (snapshot) => {
       setBookings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Booking[]);
+    }, (error) => {
+      console.error("Admin bookings snapshot failed:", error);
     });
 
     // Users Listener
     const usersQuery = query(collection(db, 'users'), limit(100));
     const unsubscribeUsers = onSnapshot(usersQuery, (snapshot) => {
       setUsers(snapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id })) as UserProfile[]);
+    }, (error) => {
+      console.error("Admin users snapshot failed:", error);
     });
 
     // Messages Listener
     const messagesQuery = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
     const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
       setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Message[]);
+    }, (error) => {
+      console.error("Admin messages snapshot failed:", error);
     });
 
     // SEO Settings Listener
     const seoQuery = query(collection(db, 'seo_settings'), orderBy('updatedAt', 'desc'));
     const unsubscribeSeo = onSnapshot(seoQuery, (snapshot) => {
       setSeoSettings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Admin SEO snapshot failed:", error);
     });
 
     const unsubscribeSite = onSnapshot(doc(db, 'site_settings', 'global'), (doc) => {
       if (doc.exists()) {
         setSiteSettings(doc.data());
       }
+    }, (error) => {
+      console.error("Admin site settings snapshot failed:", error);
     });
 
     return () => {

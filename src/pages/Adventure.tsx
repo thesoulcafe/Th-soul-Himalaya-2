@@ -50,6 +50,8 @@ export default function Adventure() {
     const q = query(collection(db, 'seo_settings'), where('path', '==', '/adventure'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    }, (error) => {
+      console.error("SEO settings snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -99,6 +101,9 @@ export default function Adventure() {
 
       setActivities(sortedActivities);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("Adventure content snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -110,6 +115,8 @@ export default function Adventure() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

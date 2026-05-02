@@ -70,6 +70,8 @@ export default function ReviewsDialog({ serviceId, serviceType, serviceName, tri
         ...doc.data()
       })) as Review[];
       setReviews(fetchedReviews);
+    }, (error) => {
+      console.error("Reviews snapshot failed:", error);
     });
 
     return () => unsubscribe();

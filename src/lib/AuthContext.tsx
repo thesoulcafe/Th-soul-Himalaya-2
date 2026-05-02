@@ -35,43 +35,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setProfile(data);
-          if (data.isBlocked) {
-            setIsBlocked(true);
-            await signOut(auth);
+        try {
+          const docRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setProfile(data);
+            if (data.isBlocked) {
+              setIsBlocked(true);
+              await signOut(auth);
+            } else {
+              setIsBlocked(false);
+            }
           } else {
-            setIsBlocked(false);
+            // Create initial profile
+            const initialProfile = {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+              role: 'user',
+              loyaltyPoints: 0,
+              soulPoints: 0,
+              isBlocked: false,
+              createdAt: serverTimestamp(),
+              lastActive: serverTimestamp()
+            };
+            try {
+              await setDoc(docRef, initialProfile);
+              setProfile({
+                ...initialProfile,
+                createdAt: new Date().toISOString(),
+                lastActive: new Date().toISOString()
+              });
+              setIsBlocked(false);
+            } catch (e) {
+              console.error("Error creating user profile:", e);
+            }
           }
-        } else {
-          // Create initial profile
-          const initialProfile = {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            role: 'user',
-            loyaltyPoints: 0,
-            soulPoints: 0,
-            isBlocked: false,
-            createdAt: serverTimestamp(),
-            lastActive: serverTimestamp()
-          };
-          try {
-            await setDoc(docRef, initialProfile);
-            setProfile({
-              ...initialProfile,
-              createdAt: new Date().toISOString(),
-              lastActive: new Date().toISOString()
-            });
-            setIsBlocked(false);
-          } catch (e) {
-            console.error("Error creating user profile:", e);
-          }
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+          // Don't crash the app, just set profile to null
+          setProfile(null);
         }
       } else {
         setProfile(null);

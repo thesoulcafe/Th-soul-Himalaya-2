@@ -88,6 +88,8 @@ export default function Tours() {
     const q = query(collection(db, 'seo_settings'), where('path', '==', '/tours'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    }, (error) => {
+      console.error("SEO settings snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -186,6 +188,9 @@ export default function Tours() {
 
       setTours(sortedItems);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("Content snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -197,6 +202,8 @@ export default function Tours() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

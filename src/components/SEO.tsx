@@ -18,6 +18,8 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image }: SEOPr
       if (doc.exists()) {
         setSiteSettings(doc.data());
       }
+    }, (error) => {
+      console.error("SEO site settings snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

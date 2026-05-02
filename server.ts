@@ -618,25 +618,23 @@ async function injectMetaTags(req: express.Request, html: string) {
         image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
 
-      const metaTags = `
-      <title>${title}</title>
-      <meta name="description" content="${description}">
-      <link rel="canonical" href="${absoluteUrl}">
-      <meta property="og:site_name" content="The Soul Himalaya">
-      <meta property="og:title" content="${title}">
-      <meta property="og:description" content="${description}">
-      <meta property="og:image" content="${image}">
-      <meta property="og:image:secure_url" content="${image}">
-      <meta property="og:image:type" content="image/jpeg">
-      <meta property="og:image:width" content="1200">
-      <meta property="og:image:height" content="630">
-      <meta property="og:url" content="${absoluteUrl}">
-      <meta property="og:type" content="website">
-      <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:site" content="@thesoulhimalaya">
-      <meta name="twitter:title" content="${title}">
-      <meta name="twitter:description" content="${description}">
-      <meta name="twitter:image" content="${image}">`;
+      const metaTags = `<title>${title}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="${absoluteUrl}">
+<meta property="og:site_name" content="The Soul Himalaya">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:image" content="${image}">
+<meta property="og:image:secure_url" content="${image}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="${absoluteUrl}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@thesoulhimalaya">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
+<meta name="twitter:image" content="${image}">`;
 
       // Only add Open Graph prefix if the <html> tag exists and doesn't have it
       let finalHtml = html;
@@ -644,12 +642,11 @@ async function injectMetaTags(req: express.Request, html: string) {
         finalHtml = finalHtml.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
       }
 
-      // Filter out existing SEO tags to prevent conflicts before injecting new ones
-      // We are more selective with regex here to avoid touching other elements
+      // Filter out existing SEO tags more aggressively
       finalHtml = finalHtml
         .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-        .replace(/<meta\s+(?:name|property)=["'](?:description|og:[^"']*|twitter:[^"']*)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
-        .replace(/<link\s+rel=["']canonical["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
+        .replace(/<meta\s+(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|image|title)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
+        .replace(/<link\s+rel=["'](?:canonical|image_src)["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
 
       // Inject the meta tags into the designated placeholder or fall back to head
       if (finalHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {

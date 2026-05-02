@@ -332,6 +332,8 @@ export default function Home() {
         ...doc.data().data
       })).sort((a, b) => (a.order || 0) - (b.order || 0));
       setPosts(dbPosts);
+    }, (error) => {
+      console.error("Instagram posts snapshot failed:", error);
     });
 
     return () => unsubscribe();
@@ -348,6 +350,8 @@ export default function Home() {
     const q = query(collection(db, 'seo_settings'), where('path', '==', '/'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    }, (error) => {
+      console.error("SEO settings snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -383,6 +387,9 @@ export default function Home() {
           return aOrder - bOrder;
         });
       setServices(dbServices);
+      setHasLoadedServices(true);
+    }, (error) => {
+      console.error("Services snapshot failed:", error);
       setHasLoadedServices(true);
     });
 

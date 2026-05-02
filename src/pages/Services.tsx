@@ -58,6 +58,8 @@ export default function Services() {
           return aOrder - bOrder;
         });
       setServices(dbServices);
+    }, (error) => {
+      console.error("Services snapshot failed:", error);
     });
 
     return () => unsubscribe();
