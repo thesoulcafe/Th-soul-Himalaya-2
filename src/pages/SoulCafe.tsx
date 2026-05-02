@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Coffee, Utensils, Music, Wifi, MapPin, Clock, ArrowLeft, Star, Heart, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import HeroSection from '@/components/HeroSection';
+import { SEO } from '@/components/SEO';
 
 const GALLERY = [
   "https://images.unsplash.com/photo-1559925393-8be0ec41b50d?q=80&w=2000&auto=format&fit=crop"
@@ -10,56 +14,44 @@ const GALLERY = [
 
 export default function SoulCafe() {
   const navigate = useNavigate();
+  const [seo, setSeo] = useState<any>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/soul-cafe'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#faf9f6] selection:bg-terracotta selection:text-white">
-      {/* Hero Section */}
-      <section className="relative h-[85vh] overflow-hidden">
-        <motion.div 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0"
-        >
-          <img 
-            src="https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg" 
-            alt="The Soul Cafe Interior"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#faf9f6]" />
-        </motion.div>
-
-        <nav className="absolute top-0 left-0 right-0 z-50 p-8 flex justify-between items-center">
+      {seo && <SEO title={seo.title} description={seo.description} keywords={seo.keyword} />}
+      
+      {/* Dynamic Hero Section */}
+      <HeroSection
+        backgroundImage={seo?.heroImage || "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg"}
+        height="h-[85vh]"
+        subtitle="Authentic Himalayan Retreat"
+        title={
+          <div className="flex flex-col items-center">
+            <span className="opacity-90">THE SOUL</span>
+            <span className="text-terracotta">CAFE</span>
+          </div>
+        }
+        description="Est. 2024 • Tosh, Parvati Valley"
+        overlayClassName="bg-gradient-to-b from-black/40 via-transparent to-[#faf9f6]"
+      >
+        <nav className="absolute top-0 left-0 right-0 z-50 p-8 flex justify-between items-center pointer-events-none">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="text-white hover:bg-white/20 rounded-full h-12 px-6 backdrop-blur-md border border-white/20 font-black uppercase tracking-widest text-[10px]"
+            className="pointer-events-auto text-white hover:bg-white/20 rounded-full h-12 px-6 backdrop-blur-md border border-white/20 font-black uppercase tracking-widest text-[10px]"
           >
             <ArrowLeft className="h-4 w-4 mr-2" /> Back home
           </Button>
         </nav>
-
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-6 pt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="space-y-4"
-          >
-            <span className="text-terracotta font-black uppercase tracking-[0.6em] text-[10px] md:text-xs drop-shadow-md bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">Authentic Himalayan Retreat</span>
-            <div className="flex flex-col items-center">
-              <h1 className="text-6xl md:text-[9rem] font-heading font-black text-white italic leading-[0.8] tracking-tighter uppercase drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                The Soul
-              </h1>
-              <h1 className="text-6xl md:text-[9rem] font-heading font-black text-terracotta italic leading-[0.8] tracking-tighter uppercase drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] mt-2">
-                Cafe
-              </h1>
-            </div>
-            <p className="text-white/80 font-medium tracking-[0.2em] uppercase text-[10px] mt-8 max-w-sm mx-auto drop-shadow-md italic">Est. 2024 • Tosh, Parvati Valley</p>
-          </motion.div>
-        </div>
-      </section>
+      </HeroSection>
 
       {/* Info Section */}
       <section className="py-32 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">

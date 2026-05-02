@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, query, collection, where, getDocs } from "firebase/firestore";
 
 dotenv.config();
 
@@ -189,6 +189,21 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", message: "The Soul Himalaya API is running" });
+  });
+
+  app.get("/api/seo-debug", async (req, res) => {
+    const path = req.query.path as string || "/";
+    try {
+      const seoQuery = query(collection(db, "seo_settings"), where("path", "==", path));
+      const seoSnap = await getDocs(seoQuery);
+      if (!seoSnap.empty) {
+        res.json({ success: true, path, data: seoSnap.docs[0].data() });
+      } else {
+        res.json({ success: false, path, message: "No settings found" });
+      }
+    } catch (e) {
+      res.status(500).json({ error: (e as Error).message });
+    }
   });
 
   app.get("/robots.txt", (req, res) => {
@@ -455,7 +470,7 @@ async function injectMetaTags(req: express.Request, html: string) {
          host = 'thesoulhimalaya.com';
       }
       
-      const absoluteUrl = `${protocol}://${host}${urlStr}`;
+      const absoluteUrl = `${protocol}://${host}${urlStr.split('?')[0]}`;
 
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
       let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
@@ -489,6 +504,24 @@ async function injectMetaTags(req: express.Request, html: string) {
           title = "Soul Support | The Soul Guide | Regional Intelligence";
           description = "Expert logistical insights, mountain dynamics, and regional intelligence for the Kullu-Parvati-Manali corridor.";
         }
+      }
+
+      // 0.5 Check SEO Settings collection by Path (Admin configured)
+      try {
+        const cleanPath = url.pathname === '/' ? '/' : url.pathname.replace(/\/$/, '');
+        const seoQuery = query(collection(db, "seo_settings"), where("path", "==", cleanPath));
+        const seoSnap = await getDocs(seoQuery);
+        if (!seoSnap.empty) {
+          const seoData = seoSnap.docs[0].data();
+          console.log(`[Meta] SEO settings found for path: ${cleanPath}`, seoData);
+          if (seoData.title) title = seoData.title;
+          if (seoData.description) description = seoData.description;
+          if (seoData.heroImage) image = seoData.heroImage;
+        } else {
+          console.log(`[Meta] No SEO settings found in Firestore for path: ${cleanPath}`);
+        }
+      } catch (e) {
+        console.error("[Meta] SEO settings lookup failed:", e);
       }
 
       // 1. Try Firestore First (Most up to date)
@@ -618,22 +651,29 @@ async function injectMetaTags(req: express.Request, html: string) {
         image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
 
-      const metaTags = `<title>${title}</title>
-<meta name="description" content="${description}">
+      // Escape helper
+      const esc = (s: string) => s.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]!));
+      
+      const metaTags = `
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${absoluteUrl}">
 <meta property="og:site_name" content="The Soul Himalaya">
-<meta property="og:title" content="${title}">
-<meta property="og:description" content="${description}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${image}">
 <meta property="og:image:secure_url" content="${image}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="${absoluteUrl}">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_IN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@thesoulhimalaya">
-<meta name="twitter:title" content="${title}">
-<meta name="twitter:description" content="${description}">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${image}">`;
 
       // Only add Open Graph prefix if the <html> tag exists and doesn't have it

@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
-import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import GalleryArchive from '@/components/GalleryArchive';
+import HeroSection from '@/components/HeroSection';
+import { SEO } from '@/components/SEO';
 
 export default function Gallery() {
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [seo, setSeo] = useState<any>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'seo_settings'), where('path', '==', '/gallery'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -44,24 +55,22 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="pt-32 pb-16 px-6 max-w-7xl mx-auto text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-100 text-neutral-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-6"
-        >
-          <Sparkles className="h-3 w-3" /> The Visual Manifest
-        </motion.div>
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-6xl md:text-8xl font-serif text-neutral-900 tracking-tight"
-        >
-          Gallery <span className="italic text-[#A0522D]">Archive</span>
-        </motion.h1>
-      </header>
+      {seo && <SEO title={seo.title} description={seo.description} keywords={seo.keyword} />}
+      
+      {/* Dynamic Hero Header */}
+      <HeroSection
+        backgroundImage={seo?.heroImage}
+        height="h-[60vh] min-h-[400px]"
+        subtitle="The Visual Manifest"
+        title={
+          <>
+            Gallery <span className="italic text-terracotta font-playfair">Archive</span>
+          </>
+        }
+        description="A timeless collection of spiritual resonance and Himalayan beauty."
+        overlayClassName="bg-gradient-to-b from-black/60 via-transparent to-white"
+        fallbackImage="https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1920&q=80"
+      />
 
       {/* Gallery Component */}
       <main>

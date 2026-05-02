@@ -276,6 +276,8 @@ const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
   );
 };
 
+import HeroSection from '@/components/HeroSection';
+
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [seo, setSeo] = useState<any>(null);
@@ -283,7 +285,6 @@ export default function Home() {
   const { user } = useAuth();
   const [services, setServices] = useState<any[]>([]);
   const [hasLoadedServices, setHasLoadedServices] = useState(false);
-  const heroRef = useRef<HTMLElement>(null);
 
   // JSON-LD for LocalBusiness & Organization
   const jsonLd = {
@@ -338,13 +339,6 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
     const q = query(collection(db, 'seo_settings'), where('path', '==', '/'));
@@ -429,107 +423,57 @@ export default function Home() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
       />
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative h-screen min-h-[600px] w-full flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <motion.div 
-            style={{ y }}
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 10, ease: "easeOut" }}
-            className="w-full h-full"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1920&q=80"
-              alt="The Soul Himalaya - Majestic Parvati Valley Mountain View"
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-              loading="eager"
-              fetchPriority="high"
-            />
-          </motion.div>
-          {/* Advanced Layered Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-forest/40 via-transparent to-forest/90" />
-          <div className="absolute inset-0 bg-black/30 mix-blend-multiply" />
-          <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-forest to-transparent" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 flex flex-col items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <motion.p 
-              initial={{ opacity: 0, letterSpacing: "0.5em" }}
-              animate={{ opacity: 1, letterSpacing: "0.2em" }}
-              transition={{ delay: 0.2, duration: 1 }}
-              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-0 mb-4 tracking-[0.2em] drop-shadow-sm"
+      {/* Dynamic Hero Section */}
+      <HeroSection
+        backgroundImage={seo?.heroImage}
+        subtitle="Parvati Valley & Beyond"
+        title={
+          <>
+            <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
+            <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
+          </>
+        }
+        description="A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts."
+      >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-0">
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+            <Link 
+              to="/services"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "group relative px-8 sm:px-10 py-6 sm:py-8 bg-white text-forest hover:text-white overflow-hidden rounded-full transition-all duration-500 shadow-2xl w-full sm:w-auto"
+              )}
             >
-              Parvati Valley & Beyond
-            </motion.p>
-            
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
-              <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
-              <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
-            </h1>
-
-            <p className="text-xs xs:text-sm md:text-base text-cream/80 mb-8 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px] px-4">
-              A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-0">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Link 
-                  to="/services"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "group relative px-8 sm:px-10 py-6 sm:py-8 bg-white text-forest hover:text-white overflow-hidden rounded-full transition-all duration-500 shadow-2xl w-full sm:w-auto"
-                  )}
-                >
-                  <span className="relative z-10 font-bold text-base sm:text-lg">Start Your Journey</span>
-                  <div className="absolute inset-0 bg-terracotta translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                </Link>
-              </motion.div>
-              
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Link 
-                  to="/parvati-valley"
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "px-8 sm:px-10 py-6 sm:py-8 text-terracotta border-terracotta/40 hover:border-terracotta hover:bg-terracotta/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
-                  )}
-                >
-                  Explore Parvati Valley
-                </Link>
-              </motion.div>
-              
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Link 
-                  to="/about"
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "lg" }),
-                    "px-8 sm:px-10 py-6 sm:py-8 text-white/70 hover:text-white rounded-full transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
-                  )}
-                >
-                  Our Philosophy
-                </Link>
-              </motion.div>
-            </div>
+              <span className="relative z-10 font-bold text-base sm:text-lg">Start Your Journey</span>
+              <div className="absolute inset-0 bg-terracotta translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            </Link>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+            <Link 
+              to="/parvati-valley"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "px-8 sm:px-10 py-6 sm:py-8 text-terracotta border-terracotta/40 hover:border-terracotta hover:bg-terracotta/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
+              )}
+            >
+              Explore Parvati Valley
+            </Link>
+          </motion.div>
+          
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+            <Link 
+              to="/about"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "lg" }),
+                "px-8 sm:px-10 py-6 sm:py-8 text-white/70 hover:text-white rounded-full transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
+              )}
+            >
+              Our Philosophy
+            </Link>
           </motion.div>
         </div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30"
-        >
-          <span className="text-[10px] text-white font-bold uppercase tracking-widest hidden sm:block">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-white to-transparent" />
-        </motion.div>
-      </section>
+      </HeroSection>
 
       {/* Mini Services Scroll (Above Final CTA) */}
       <HorizontalServiceRow services={allServices} hasLoadedServices={hasLoadedServices} />

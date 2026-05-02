@@ -7,7 +7,8 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2,
+  Image as ImageIcon
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -376,7 +377,7 @@ export default function Admin() {
   // Custom Notifications & Confirmations
   const [isSyncing, setIsSyncing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '' });
+  const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '', heroImage: '' });
   const [seoSearchTerm, setSeoSearchTerm] = useState('');
   const [isSeoFilterVisible, setIsSeoFilterVisible] = useState(false);
   const [isSeoAuditActive, setIsSeoAuditActive] = useState(false);
@@ -2942,12 +2943,13 @@ export default function Admin() {
                       onSubmit={async (e) => {
                         e.preventDefault();
                         try {
-                          await addDoc(collection(db, 'seo_settings'), {
+                          const docId = seoFormData.path.replace(/\//g, '_') || 'home';
+                          await setDoc(doc(db, 'seo_settings', docId), {
                             ...seoFormData,
                             updatedAt: serverTimestamp()
                           });
                           setNotification({ message: 'SEO dynamics updated successfully', type: 'success' });
-                          setSeoFormData({ path: '', keyword: '', title: '', description: '' });
+                          setSeoFormData({ path: '', keyword: '', title: '', description: '', heroImage: '' });
                         } catch (error) {
                           handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
                         }
@@ -2996,6 +2998,60 @@ export default function Admin() {
                               maxLength={60}
                               required 
                             />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Featured Hero Image (URL)</label>
+                          <div className="relative">
+                            <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                            <Input 
+                              placeholder="https://images.unsplash.com/..." 
+                              value={seoFormData.heroImage || ''} 
+                              onChange={e => setSeoFormData({...seoFormData, heroImage: e.target.value})} 
+                              className="h-14 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium"
+                            />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                               <label className="cursor-pointer bg-forest/5 hover:bg-forest/10 p-2 rounded-lg transition-colors flex items-center gap-2">
+                                  <Upload className="h-3 w-3 text-forest" />
+                                  <span className="text-[8px] font-black uppercase text-forest/40">Upload</span>
+                                  <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        // We need a special handler or just use the logic from processFile
+                                        // Since we are in Admin, we can reuse handleFileUpload concept
+                                        setIsUploading(true);
+                                        try {
+                                          const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                                          const storagePath = `seo/${Date.now()}_${safeName}`;
+                                          const storageRef = ref(storage, storagePath);
+                                          const uploadTask = uploadBytesResumable(storageRef, file);
+                                          
+                                          const url = await new Promise<string>((resolve, reject) => {
+                                            uploadTask.on('state_changed', 
+                                              (snow) => setUploadProgress(Math.round((snow.bytesTransferred / snow.totalBytes) * 100)),
+                                              reject,
+                                              async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
+                                            );
+                                          });
+                                          
+                                          setSeoFormData({...seoFormData, heroImage: url});
+                                          setNotification({ message: 'Hero image uploaded!', type: 'success' });
+                                        } catch (err) {
+                                          setNotification({ message: 'Upload failed', type: 'error' });
+                                        } finally {
+                                          setIsUploading(false);
+                                          setUploadProgress(0);
+                                        }
+                                      }
+                                    }}
+                                  />
+                               </label>
+                            </div>
                           </div>
                         </div>
 
@@ -3177,7 +3233,8 @@ export default function Admin() {
                                     path: item.path,
                                     keyword: item.keyword || '',
                                     title: item.title,
-                                    description: item.description
+                                    description: item.description,
+                                    heroImage: item.heroImage || ''
                                   });
                                   window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
