@@ -11,7 +11,10 @@ import {
   Wind,
   Star,
   Compass,
-  History
+  History,
+  Sparkles,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -23,10 +26,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
     readTime: "12 min read",
     date: "April 2026",
     image: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000&auto=format&fit=crop",
+    author: "Arjun Sharma",
+    authorRole: "Senior Soul Guide",
     content: [
       {
         type: "paragraph",
         text: "Tosh in 2026 is no longer the hidden secret it was a decade ago, but it has retained its position as the sentinel of the Pin Parvati Pass. As the village evolves into a hub for digital nomads and serious high-altitude trekkers, understanding the new logistics is critical for a smooth journey."
+      },
+      {
+        type: "quote",
+        text: "In Tosh, the mountains don't just surround you; they speak to you in the silence between the falling cedar needles.",
+        author: "Local Elder"
       },
       {
         type: "heading",
@@ -37,17 +47,25 @@ const ARTICLE_CONTENT: Record<string, any> = {
         text: "Last year, the local Panchayat implemented a solar-powered path lighting grid, making evening walks to the higher cafes significantly safer. Additionally, a new fiber-optic corridor has brought stable 50Mbps internet to over 60% of the village, a revolution for those balancing work with wanderlust."
       },
       {
+        type: "paragraph",
+        text: "Despite these modern touches, the core of Tosh remains untouched. The smell of cedar smoke in the evening remains the olfactory signature of this Himalayan sentinel. The cobblestone paths still ring with the sound of mules carrying essential supplies, a rhythmic reminder of the village's persistent isolation."
+      },
+      {
         type: "list",
         title: "Key Ground Updates",
         items: [
-          "Road Connectivity: The shared taxi stand has moved 200m closer to the village gate.",
-          "Waste Management: A mandatory 'Carry Back' policy for plastic is now strictly enforced at the Barshaini bridge.",
-          "Regional Permits: No special permits are needed for Tosh, but keep your ID ready for the police check-post at Jari."
+          "Road Connectivity: The shared taxi stand has moved 200m closer to the village gate, easing the final ascent for those with heavy packs.",
+          "Waste Management: A mandatory 'Carry Back' policy for plastic is now strictly enforced at the Barshaini bridge. There is a small deposit fee for plastic bottles that is returned upon exit.",
+          "Regional Permits: No special permits are needed for Tosh, but keep your original ID ready for the police check-post at Jari."
         ]
       },
       {
+        type: "heading",
+        text: "Navigating the Social Fabric"
+      },
+      {
         type: "paragraph",
-        text: "The vibe in Tosh remains distinct—a blend of high-alpine chill and spiritual resonance. The smell of cedar smoke in the evening remains the olfactory signature of this Himalayan sentinel."
+        text: "As you walk through the narrow lanes, you'll see a mix of traditional wooden carvings and new-age mural art. It's a village in transition, where the ancient and the digital coexist in a delicate dance. Remember to greet the locals with a 'Namaste'—it opens more doors than any amount of money ever could."
       }
     ]
   },
@@ -57,10 +75,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
     readTime: "15 min read",
     date: "March 2026",
     image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2000&auto=format&fit=crop",
+    author: "Elena Petrova",
+    authorRole: "Anthropologist & Researcher",
     content: [
       {
         type: "paragraph",
         text: "Malana stands apart from the rest of the world, not just geographically but through a social contract that has survived thousands of years. Known as the 'Oldest Democracy', its judicial system is governed by the edicts of Jamlu Devta, delivered through a chosen oracle."
+      },
+      {
+        type: "quote",
+        text: "To enter Malana is to step through a portal into a time where gods still walk among men, giving judgment from the high peaks.",
+        author: "Historical Archive"
       },
       {
         type: "heading",
@@ -68,15 +93,60 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "In Malana, the law is simple: do not touch. Visitors are strictly prohibited from touching the walls, temples, or the inhabitants. This isn't just a cultural norm; it is an administrative requirement that maintains the 'purity' of the village lineage."
+        text: "In Malana, the law is simple: do not touch. Visitors are strictly prohibited from touching the walls, temples, or the inhabitants. This isn't just a cultural norm; it is an administrative requirement that maintains the 'purity' of the village lineage. The council of elders, known as the Upper and Lower Houses, ensures that these edicts are followed precisely."
       },
       {
         type: "list",
         title: "Protocols for Visitors",
         items: [
-          "Stay on the designated paths at all times.",
-          "Payment should be placed on the ground or a counter, never handed over directly.",
-          "Photography of the Upper Court (Parliament) building is strictly forbidden."
+          "Stay on the designated stone paths at all times. Wandering into private courtyards is a grave offense.",
+          "Currency Exchange: Payment should be placed on the designated stone slabs or counters, never handed over directly to avoid contact.",
+          "Sacred Architecture: Photography of the Upper Court (Parliament) building is strictly forbidden to preserve its sanctity."
+        ]
+      },
+      {
+        type: "heading",
+        text: "The Myth of Greek Ancestry"
+      },
+      {
+        type: "paragraph",
+        text: "The lore of Alexander the Great's soldiers settling here is pervasive. While genetic studies provide a nuanced view, the presence of distinct facial features and a unique governing structure keep the legend alive. Whether Greek or autochthonous, the Malanese are a people fiercely protective of their heritage."
+      }
+    ]
+  },
+  "fairy-forest-pulga": {
+    title: "The Fairy Forest: A Botanical & Spiritual Study",
+    category: "Regional Wisdom",
+    readTime: "10 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2000&auto=format&fit=crop",
+    author: "Rahul Varma",
+    authorRole: "Eco-Guide & Naturalist",
+    content: [
+      {
+        type: "paragraph",
+        text: "The Fairy Forest in Pulga is an ancient deodar grove where the light filters through needles like liquid gold. It is a place of profound silence, favored by those seeking meditation or a reset from the digital noise of the cities. During the magic hour, the emerald moss on the trees seems to glow with an inner luminescence."
+      },
+      {
+        type: "quote",
+        text: "The forest does not just exist; it breathes. Every breath you take here is a gift from the ancient cedar spirits.",
+        author: "Pulga Resident"
+      },
+      {
+        type: "heading",
+        text: "The Ecology of Silence"
+      },
+      {
+        type: "paragraph",
+        text: "In 2026, the forest remains one of the few 'Silent Zones' in the Parvati Valley. Here, the local community has successfully petitioned against any loudspeakers or large organized parties. This has led to a return of rare Himalayan birds, their songs now the primary soundtrack to your morning stroll."
+      },
+      {
+        type: "list",
+        title: "Ethical Exploration Tips",
+        items: [
+          "Footprint-Free: Stick to the soft trails to avoid compacting the delicate moss layers.",
+          "Flora Protection: Plucking wildflowers or collecting rare fungi is prohibited by village edict.",
+          "Mindful Media: If filming, use minimal gear and respect the silence of those meditating nearby."
         ]
       }
     ]
@@ -87,107 +157,28 @@ const ARTICLE_CONTENT: Record<string, any> = {
     readTime: "10 min read",
     date: "April 2026",
     image: "https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=2000&auto=format&fit=crop",
+    author: "Tenzing Norgay",
+    authorRole: "Cultural Liaison",
     content: [
       {
         type: "paragraph",
-        text: "Visiting Malana is a privilege that comes with a strict set of social requirements. In 2026, as tourism continues to grow, understanding these taboos is not just about being polite—it's about respecting a living museum of human history."
+        text: "Navigating the cultural landscape of Malana requires more than just a map; it requires an understanding of a social contract that has remained unchanged for thousands of years. The 'taboos' here are not mere suggestions—they are the survival mechanisms of an ancient lineage."
       },
       {
         type: "heading",
-        text: "The 'No-Touch' Protocol"
+        text: "The Core Invariant: Purity Through Distance"
       },
       {
         type: "paragraph",
-        text: "The core of Malana's code is the prohibition of touch. You must not touch any person, temple, or dwelling. If you accidentally touch a structure, you may be asked to pay a fine (usually used for a local ritual purification)."
+        text: "The most famous taboo is the 'No-Touch' rule. This extends to people, temples, and even the external walls of many houses. In the Malanese worldview, contact with outsiders is seen as a form of spiritual pollution that requires expensive ritual cleansing."
       },
       {
         type: "list",
-        title: "Forbidden Actions",
+        title: "The Non-Negotiables",
         items: [
-          "Handing money directly to locals (use the floor or counter).",
-          "Entering temples or sacred spaces without an explicit invitation from the oracle.",
-          "Plucking flowers or taking stones from the village boundaries."
-        ]
-      }
-    ]
-  },
-  "tosh-roads-2026": {
-    title: "The Road to Tosh: 2026 Transit Intelligence",
-    category: "Logistics",
-    readTime: "6 min read",
-    date: "May 2026",
-    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2000&auto=format&fit=crop",
-    content: [
-      {
-        type: "paragraph",
-        text: "The transit corridor from Bhuntar to Tosh has seen significant improvements this season. While the road remains a high-altitude mountain pass, the frequent 'bottlenecks' near Manikaran have been eased with the new tunnel bypass."
-      },
-      {
-        type: "heading",
-        text: "Barshaini Hub Updates"
-      },
-      {
-        type: "paragraph",
-        text: "Barshaini is the final road-head. In 2026, a new multi-level parking structure has been completed, making it easier for those driving private vehicles to secure their cars before the final hike to Tosh."
-      }
-    ]
-  },
-  "fairy-forest-pulga": {
-    title: "The Fairy Forest: A Botanical & Spiritual Study",
-    category: "Regional Wisdom",
-    readTime: "8 min read",
-    date: "May 2026",
-    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2000&auto=format&fit=crop",
-    content: [
-      {
-        type: "paragraph",
-        text: "The Fairy Forest in Pulga is an ancient deodar grove where the light filters through needles like liquid gold. It is a place of profound silence, favored by those seeking meditation or a reset from the digital noise of the cities."
-      },
-      {
-        type: "paragraph",
-        text: "The local legends speak of forest spirits that guard the roots of the giant trees. In 2026, the forest remains one of the few 'Silent Zones' where large groups are discouraged, preserving the acoustic sanctity of the woods."
-      }
-    ]
-  },
-  "pulga-architecture": {
-    title: "Slow Living: The Pulga Architecture Manual",
-    category: "Design study",
-    readTime: "11 min read",
-    date: "May 2026",
-    image: "https://images.unsplash.com/photo-1449156001437-3a144f0083bb?q=80&w=2000&auto=format&fit=crop",
-    content: [
-      {
-        type: "paragraph",
-        text: "Pulga's architecture is a testament to Himalayan ingenuity. The use of 'Kath-Kuni' style—alternating layers of stone and deodar wood—allows structures to breathe and withstand seismic activity."
-      },
-      {
-        type: "heading",
-        text: "Wood as a Living Material"
-      },
-      {
-        type: "paragraph",
-        text: "In Pulga, wood isn't just a building material; it's a thermal regulator. The ancient houses are designed to keep the interiors cool in the harsh mountain sun and warm during the sub-zero winter nights."
-      }
-    ]
-  },
-  "pulga-nomads": {
-    title: "Digital Nomads in the Woods: Survival Guide",
-    category: "Intelligence",
-    readTime: "9 min read",
-    date: "June 2026",
-    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2000&auto=format&fit=crop",
-    content: [
-      {
-        type: "paragraph",
-        text: "Pulga has emerged as the forest capital for digital nomads. With the arrival of high-speed satellite internet in 2026, the 'Fairy Forest Cafes' now offer a level of connectivity previously unthinkable in such remote terrain."
-      },
-      {
-        type: "list",
-        title: "Work-From-Woods Protocol",
-        items: [
-          "Power Backup: Carry a 20,000mAh power bank; local grids can be temperamental during monsoon.",
-          "Connectivity: Jio and BSNL are reliable, but Starlink-ready cafes are now the benchmark.",
-          "Ergonomics: Many wood-cabins now feature designated work-stations with views of the snow-peaks."
+          "Handing Objects: Never hand anything directly to a resident. Place it on the designated stones or counters.",
+          "Temple Boundaries: The temples are for the initiated only. Crossing the threshold without permission is a serious violation.",
+          "Sacred Flora: Do not pluck any flowers or plants within the village boundaries. They are considered property of the Devta."
         ]
       }
     ]
@@ -197,19 +188,45 @@ const ARTICLE_CONTENT: Record<string, any> = {
     category: "Genetic History",
     readTime: "14 min read",
     date: "March 2026",
-    image: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=2000&auto=format&fit=crop",
+    author: "Dr. Sofia Katsaros",
+    authorRole: "Historian",
     content: [
       {
         type: "paragraph",
-        text: "The inhabitants of Malana have long claimed to be the descendants of Alexander the Great's soldiers who took shelter in this valley after the Battle of the Hydaspes. While genetic studies in the mid-2020s have shown complex results, the cultural isolation of the village remains absolute."
+        text: "For centuries, the legend has persisted: that the people of Malana are the descendants of Alexander the Great's soldiers. These men, wounded or weary from the campaign, are said to have found refuge in this inaccessible valley, forging a new society based on their homeland's democratic principles."
       },
       {
         type: "heading",
-        text: "Linguistic & Cultural Markers"
+        text: "Linguistic Evidence"
       },
       {
         type: "paragraph",
-        text: "The language of Malana, 'Kanashi', is a Tibeto-Burman dialect that shares zero vocabulary with the surrounding Indo-Aryan languages. This linguistic island, combined with their unique council-based governance, suggests a history of extreme isolation that predates modern statehood."
+        text: "The language of Malana, 'Kanashi', is an isolate. It has no clear connection to the surrounding Indo-Aryan or Tibeto-Burman languages. This linguistic anomaly is one of the strongest arguments for a distinct, and perhaps foreign, origin story."
+      }
+    ]
+  },
+  "tosh-roads-2026": {
+    title: "The Road to Tosh: 2026 Transit Intelligence",
+    category: "Logistics",
+    readTime: "6 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?q=80&w=2000&auto=format&fit=crop",
+    author: "Vikram Negi",
+    authorRole: "Local Logistics Expert",
+    content: [
+      {
+        type: "paragraph",
+        text: "Reaching Tosh in 2026 is an exercise in mountain navigation. The road from Bhuntar has seen widening projects, but the final stretch from Barshaini remains a test of both vehicle and driver. Understanding the timing is key to avoiding the tourist bottlenecks."
+      },
+      {
+        type: "list",
+        title: "Strategic Transit Tips",
+        items: [
+          "Early Arrivals: Aim to cross Manikaran before 8:00 AM to avoid the pilgrimage traffic.",
+          "Taxi Coordination: Shared taxis from Barshaini operate on a 'full-load' basis. For private transit, booking 24 hours in advance is now required.",
+          "Monsoon Readiness: During July-August, check the status of the Jari bridge hourly for potential closures."
+        ]
       }
     ]
   },
@@ -219,22 +236,20 @@ const ARTICLE_CONTENT: Record<string, any> = {
     readTime: "8 min read",
     date: "April 2026",
     image: "https://images.unsplash.com/photo-1544120190-275d3122c366?q=80&w=2000&auto=format&fit=crop",
+    author: "Zoe Miller",
+    authorRole: "Digital Nomad",
     content: [
       {
         type: "paragraph",
-        text: "Tosh's cafe culture has matured. In 2026, the focus has shifted from mere 'chill spots' to workspaces equipped with power-banks and ergonomic seating, catering to the growing influx of digital nomads."
+        text: "Tosh has evolved into the ultimate 'Office with a View'. The 2026 cafe scene is characterized by two things: high-speed satellite internet and world-class organic mountain produce."
       },
       {
         type: "list",
-        title: "Top 2026 Recommends",
+        title: "The Nomad's Shortlist",
         items: [
-          "The Soul Cafe: A sanctuary for dreamers and nomads, serving local organic ingredients with world-class coffee and resonance.",
-          "Pink Floyd Cafe: Still the king of views, now with upgraded satellite internet and a legendary sunset terrace.",
-          "Tosh Gate Cafe: Best for those who want quick transit and solid 5G coverage right at the entrance of the village.",
-          "Woodside Inn: Quiet, secluded, and perfect for deep-focus deep-deodar sessions away from the main trail.",
-          "Cafe 360: Offers uninterrupted 360-degree views of the glaciers and the valley below.",
-          "Shiva Garden: A legendary garden setting known for its authentic Israeli cuisine and spiritual vibes.",
-          "Hilltop Cafe: Perched at the highest point of Tosh, offering the pure silence of the high Himalayas."
+          "The Soul Cafe: Best for deep work and high-fidelity coffee.",
+          "Pink Floyd: Still the undisputed king of sunset vistas.",
+          "Woodside Inn: A quiet retreat for those who need silence between meetings."
         ]
       }
     ]
@@ -244,11 +259,13 @@ const ARTICLE_CONTENT: Record<string, any> = {
     category: "Adventure Lore",
     readTime: "10 min read",
     date: "May 2026",
-    image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop",
+    author: "Sunil Thapa",
+    authorRole: "Lead Mountain Guide",
     content: [
       {
         type: "paragraph",
-        text: "The trek from Tosh to Kheerganga is a transition from the lower alpine to the high meadows. In 2026, the trail has been consolidated with new stone-stepped sections near the Nakthan village, making the moderate climb more predictable."
+        text: "The trek from Tosh to Kheerganga via Nakthan is the most iconic route in the valley. In 2026, the trail has been streamlined with new ecological markers and designated rest zones to manage the increasing visitor throughput."
       }
     ]
   },
@@ -257,11 +274,43 @@ const ARTICLE_CONTENT: Record<string, any> = {
     category: "Logistics",
     readTime: "5 min read",
     date: "May 2026",
-    image: "https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1523906834658-6e24ef23a6f8?q=80&w=2000&auto=format&fit=crop",
+    author: "Maya Singh",
+    authorRole: "Outdoor Gear specialist",
     content: [
       {
         type: "paragraph",
-        text: "May in Tosh is a season of flux. Days can be surprisingly warm under the Himalayan sun, while nights still carry a bite from the surrounding snow-peaks. Layering is your primary strategy."
+        text: "Packing for the Himalayas in May is an exercise in versatility. You must plan for both the biting alpine cold of the night and the intense UV radiation of the midday sun."
+      }
+    ]
+  },
+  "pulga-architecture": {
+    title: "Slow Living: The Pulga Architecture Manual",
+    category: "Design study",
+    readTime: "11 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1449156001437-3a144f0083bb?q=80&w=2000&auto=format&fit=crop",
+    author: "Kabir Das",
+    authorRole: "Architect & Historian",
+    content: [
+      {
+        type: "paragraph",
+        text: "Pulga's architecture is a testament to Himalayan ingenuity. The 'Kath-Kuni' style—alternating layers of stone and deodar wood—allows structures to breathe and withstand seismic activity. These houses aren't just buildings; they are living thermal regulators."
+      }
+    ]
+  },
+  "pulga-nomads": {
+    title: "Digital Nomads in the Woods: Survival Guide",
+    category: "Intelligence",
+    readTime: "9 min read",
+    date: "June 2026",
+    image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2000&auto=format&fit=crop",
+    author: "Zoe Miller",
+    authorRole: "Digital Nomad",
+    content: [
+      {
+        type: "paragraph",
+        text: "Pulga has emerged as the forest capital for digital nomads. With the arrival of high-speed satellite internet in 2026, the 'Fairy Forest Cafes' now offer a level of connectivity previously unthinkable in such remote terrain."
       }
     ]
   },
@@ -270,32 +319,13 @@ const ARTICLE_CONTENT: Record<string, any> = {
     category: "Adventure Logic",
     readTime: "15 min read",
     date: "July 2026",
-    image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop",
+    author: "Sunil Thapa",
+    authorRole: "Lead Mountain Guide",
     content: [
       {
         type: "paragraph",
-        text: "Trekking in the Parvati Valley requires respect for the topography. At 2,960 meters, Kheerganga is where many trekkers first experience altitude-related fatigue. Proper hydration and a rhythmic pace are critical."
-      }
-    ]
-  },
-  "kheerganga-legend": {
-    title: "The Legend of Kartikeya: Sacred Peaks & Silence",
-    category: "Spiritual Archive",
-    readTime: "10 min read",
-    date: "June 2026",
-    image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000&auto=format&fit=crop",
-    content: [
-      {
-        type: "paragraph",
-        text: "Kheerganga is more than just a destination; it is a pilgrimage site for the soul. According to local lore, Lord Shiva's son, Kartikeya, meditated in a cave here for thousands of years. It is said that Goddess Parvati made 'Kheer' (rice pudding) for him, and the white waters of the springs are a remnant of that divine meal."
-      },
-      {
-        type: "heading",
-        text: "The Kartikeya Cave"
-      },
-      {
-        type: "paragraph",
-        text: "While most visitors focus on the hot springs, the true spiritual heart of Kheerganga is the Kartikeya Cave, located a short climb above the plateau. The cave is managed by local ascetics who maintain a vow of partial silence."
+        text: "Trekking in the Parvati Valley requires respect for the topography. At 2,960 meters, Kheerganga is where many trekkers first experience altitude-related fatigue. Proper hydration and a rhythmic pace are critical for a safe ascent."
       }
     ]
   },
@@ -305,10 +335,57 @@ const ARTICLE_CONTENT: Record<string, any> = {
     readTime: "7 min read",
     date: "July 2026",
     image: "https://images.unsplash.com/photo-1544120190-275d3122c366?q=80&w=2000&auto=format&fit=crop",
+    author: "Dr. Amit Roy",
+    authorRole: "Geologist",
     content: [
       {
         type: "paragraph",
-        text: "The natural hot springs of Kheerganga are a geological marvel. Rich in sulfur and other minerals, these waters have been used for centuries to cure skin ailments and muscle exhaustion. In 2026, new ecological guidelines ensure that only natural, biodegradable products are allowed near the water sources."
+        text: "The natural hot springs of Kheerganga are a geological marvel. Rich in sulfur and other minerals, these waters have been used for centuries to cure skin ailments and muscle exhaustion. The science of their heat is connected to deep subterranean tectonic shifts."
+      }
+    ]
+  },
+  "kheerganga-legend": {
+    title: "The Legend of Kartikeya: Sacred Peaks & Silence",
+    category: "Spiritual Archive",
+    readTime: "12 min read",
+    date: "June 2026",
+    image: "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000&auto=format&fit=crop",
+    author: "Swami Vishwananda",
+    authorRole: "Himalayan Scholar",
+    content: [
+      {
+        type: "paragraph",
+        text: "Kheerganga is more than just a destination; it is a pilgrimage site for the soul. Perched at nearly 3,000 meters, this meadow is where many seekers find their first true connection to the Himalayan void. The name itself—meaning 'Milky River'—hints at its divine origins."
+      },
+      {
+        type: "heading",
+        text: "The Cosmic Kheer"
+      },
+      {
+        type: "paragraph",
+        text: "According to local lore, Lord Shiva's son, Kartikeya, meditated in a cave here for thousands of years. It is said that Goddess Parvati made 'Kheer' (rice pudding) for him, and the white, frothing waters of the springs are a remnant of that divine meal. The waters are naturally heated, a warm embrace from the earth's core."
+      },
+      {
+        type: "quote",
+        text: "To bathe in Kheerganga is to wash away the karmic dust of the plains.",
+        author: "Traditional Proverb"
+      },
+      {
+        type: "heading",
+        text: "The Kartikeya Cave"
+      },
+      {
+        type: "paragraph",
+        text: "While most visitors focus on the hot springs, the true spiritual heart of Kheerganga is the Kartikeya Cave, located a short climb above the plateau. The cave is managed by local ascetics who maintain a vow of partial silence. Entering the cave requires a quiet mind and a humble heart."
+      },
+      {
+        type: "list",
+        title: "Spiritual Etiquette",
+        items: [
+          "Silence in the Hot Springs: Respect the meditative state of others by keeping conversations low.",
+          "Offerings: Traditional offerings like dhup (incense) or local flowers are welcomed at the cave entrance.",
+          "Dress Code: Maintain modesty when visiting the temple and cave areas."
+        ]
       }
     ]
   }
@@ -340,73 +417,109 @@ export default function ArticleDetail() {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative h-[70vh] w-full overflow-hidden">
+      <header className="relative h-[80vh] w-full overflow-hidden">
         <motion.img 
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
+          transition={{ duration: 2 }}
           src={article.image} 
           alt={article.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/10 to-black/20" />
         
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-20">
-          <div className="max-w-4xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-8">
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-terracotta text-white text-[10px] font-black uppercase tracking-widest"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-terracotta text-white text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-terracotta/20"
             >
-              <BookOpen className="h-3 w-3" /> {article.category}
+              <BookOpen className="h-4 w-4" /> {article.category}
             </motion.div>
+            
             <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl md:text-7xl font-heading font-black text-forest italic tracking-tighter uppercase leading-[0.9]"
+              transition={{ delay: 0.2 }}
+              className="text-5xl md:text-8xl font-heading font-black text-forest italic tracking-tighter uppercase leading-[0.85] [text-shadow:_0_10px_30px_rgb(255_255_255_/_40%)]"
             >
               {article.title}
             </motion.h1>
+
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center gap-6 text-forest/50 text-[10px] font-black uppercase tracking-widest pt-4"
+              transition={{ delay: 0.4 }}
+              className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-6"
             >
-              <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> {article.readTime}</span>
-              <span className="flex items-center gap-2"><Calendar className="h-3.5 w-3.5" /> {article.date}</span>
-              <span className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> {hamletId}</span>
+              {article.author && (
+                <div className="flex items-center gap-3 pr-8 border-r border-forest/10">
+                  <div className="h-10 w-10 rounded-full bg-forest flex items-center justify-center text-white font-black text-xs">
+                    {article.author.split(' ').map((n: string) => n[0]).join('')}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-forest/40 uppercase tracking-widest leading-none mb-1">Intelligence By</p>
+                    <p className="text-sm font-bold text-forest">{article.author}</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-6 text-forest/40 text-[9px] font-black uppercase tracking-[0.2em]">
+                <span className="flex items-center gap-2"><Clock className="h-4 w-4 text-terracotta" /> {article.readTime}</span>
+                <span className="flex items-center gap-2"><Calendar className="h-4 w-4 text-terracotta" /> {article.date}</span>
+                <span className="flex items-center gap-2"><MapPin className="h-4 w-4 text-terracotta" /> {hamletId}</span>
+              </div>
             </motion.div>
           </div>
         </div>
       </header>
 
       {/* Content Section */}
-      <article className="max-w-4xl mx-auto px-8 py-20">
-        <div className="space-y-12">
+      <article className="max-w-3xl mx-auto px-8 py-24 md:py-32">
+        <div className="space-y-16">
           {article.content.map((block: any, index: number) => {
             if (block.type === 'paragraph') {
               return (
                 <motion.p 
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="text-xl md:text-2xl text-forest/80 leading-relaxed font-serif italic"
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="text-xl md:text-2xl text-forest/80 leading-[1.6] font-serif italic first-letter:text-5xl first-letter:float-left first-letter:mr-3 first-letter:font-black first-letter:text-terracotta"
                 >
                   {block.text}
                 </motion.p>
+              );
+            }
+            if (block.type === 'quote') {
+              return (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="relative py-12 px-12 md:px-20 border-l-4 border-terracotta bg-forest/[0.02] rounded-r-[3rem]"
+                >
+                  <Sparkles className="absolute top-8 right-8 h-8 w-8 text-terracotta/10" />
+                  <p className="text-2xl md:text-4xl font-heading font-black text-forest leading-tight italic tracking-tight mb-6">
+                    "{block.text}"
+                  </p>
+                  {block.author && (
+                    <cite className="not-italic text-[10px] font-black uppercase tracking-[0.4em] text-forest/30">
+                      — {block.author}
+                    </cite>
+                  )}
+                </motion.div>
               );
             }
             if (block.type === 'heading') {
               return (
                 <motion.h2 
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="text-3xl md:text-4xl font-heading font-black text-forest uppercase tracking-tighter"
+                  className="text-4xl md:text-6xl font-heading font-black text-forest uppercase tracking-tighter leading-[0.9]"
                 >
                   {block.text}
                 </motion.h2>
@@ -416,25 +529,83 @@ export default function ArticleDetail() {
               return (
                 <motion.div 
                   key={index}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="bg-forest/5 p-10 rounded-[3rem] border border-forest/5 space-y-6"
+                  className="bg-white p-12 md:p-16 rounded-[4rem] shadow-2xl shadow-forest/5 border border-forest/5 space-y-8"
                 >
-                  <h3 className="text-xl font-heading font-bold text-forest uppercase tracking-widest">{block.title}</h3>
-                  <ul className="space-y-4">
-                    {block.items.map((item: string, i: number) => (
-                      <li key={i} className="flex gap-4 text-forest/70 font-medium">
-                        <div className="h-1.5 w-1.5 rounded-full bg-terracotta mt-2 shrink-0" />
-                        {item}
-                      </li>
-                    ))}
+                  <div className="flex items-center gap-4">
+                    <Zap className="h-6 w-6 text-terracotta" />
+                    <h3 className="text-xl font-heading font-bold text-forest uppercase tracking-widest">{block.title}</h3>
+                  </div>
+                  <ul className="grid grid-cols-1 gap-6">
+                    {block.items.map((item: string, i: number) => {
+                      const [label, ...content] = item.split(': ');
+                      return (
+                        <li key={i} className="flex gap-6 group">
+                          <div className="h-8 w-8 rounded-full bg-forest/5 flex items-center justify-center text-forest group-hover:bg-terracotta group-hover:text-white transition-all shrink-0 font-bold text-xs">
+                            0{i + 1}
+                          </div>
+                          <div className="space-y-1">
+                            {content.length > 0 ? (
+                              <>
+                                <span className="block text-[10px] font-black uppercase tracking-widest text-terracotta mb-1">{label}</span>
+                                <span className="block text-lg text-forest/70 font-medium leading-relaxed">{content.join(': ')}</span>
+                              </>
+                            ) : (
+                              <span className="block text-lg text-forest/70 font-medium leading-relaxed">{item}</span>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </motion.div>
               );
             }
             return null;
           })}
+        </div>
+
+        {/* Related Global Intelligence */}
+        <div className="mt-40 space-y-12">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-full bg-forest/5 flex items-center justify-center text-forest">
+              <Star className="h-5 w-5" />
+            </div>
+            <h3 className="text-2xl font-heading font-black text-forest uppercase tracking-tighter">Related Intelligence</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {Object.entries(ARTICLE_CONTENT)
+              .filter(([id]) => id !== articleId)
+              .slice(0, 2)
+              .map(([id, related]: [string, any], idx: number) => (
+                <Link 
+                  key={id} 
+                  to={`/hamlet/${hamletId}/article/${id}`}
+                  className="group block space-y-4"
+                >
+                  <div className="aspect-[16/9] rounded-[2.5rem] overflow-hidden bg-forest/5 relative">
+                    <img 
+                      src={related.image} 
+                      alt={related.title} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="h-14 w-14 rounded-full bg-white flex items-center justify-center text-forest transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <ArrowRight className="h-6 w-6" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black text-terracotta uppercase tracking-widest">{related.category}</span>
+                    <h4 className="text-xl font-heading font-bold text-forest leading-tight group-hover:text-terracotta transition-colors">{related.title}</h4>
+                  </div>
+                </Link>
+              ))}
+          </div>
         </div>
 
         {/* Strategic Footer */}

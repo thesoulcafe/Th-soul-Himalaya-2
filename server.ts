@@ -545,7 +545,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
 
       // 3. Hamlet Support
-      if (urlStr.startsWith('/parvati-valley/')) {
+      if (urlStr.includes('/parvati-valley/')) {
         const hamletId = urlStr.split('/').pop()?.split('?')[0]?.toLowerCase();
         const hamletNames: Record<string, string> = {
           malana: "Malana",
@@ -556,6 +556,33 @@ async function injectMetaTags(req: express.Request, html: string) {
         if (hamletId && hamletNames[hamletId]) {
           title = `${hamletNames[hamletId]} | The Hamlets of the Gods | The Soul Himalaya`;
           description = `Explore the mystical village of ${hamletNames[hamletId]} in the Parvati Valley. Discover its unique history, culture, and ancient spiritual traditions.`;
+        }
+      }
+
+      // 4. Article Support
+      if (urlStr.includes('/article/')) {
+        const articleId = urlStr.split('/').pop()?.split('?')[0]?.toLowerCase();
+        const formattedId = articleId ? articleId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Intelligence';
+        
+        if (articleId === 'malana-democracy') {
+          title = "Ancient Democracy in Malana: The Oldest in the World";
+          description = "Discover how Malana maintains its thousands-year-old democratic social contract.";
+          image = "https://images.unsplash.com/photo-1595928898133-9354334e47f4?q=80&w=2000";
+        } else if (articleId?.includes('tosh')) {
+          title = "Tosh 2026: Sentinel of the High Pass";
+          description = "Strategic guides and road intelligence for Tosh village in the 2026 season.";
+          image = "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000";
+        } else if (articleId?.includes('pulga')) {
+          title = "Pulga & The Fairy Forest: Wooden Wisdom";
+          description = "Botanical and architectural studies of the wooden hive in the ancient deodar forest.";
+          image = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2000";
+        } else if (articleId?.includes('kheerganga')) {
+          title = "The Path to Kheer: Spiritual High Meadows Guide";
+          description = "The legend of Kartikeya and high-altitude survival on the trek to Kheerganga.";
+          image = "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000";
+        } else {
+          title = `${formattedId} | Intellectual Archive | The Soul Himalaya`;
+          description = "Deep dive into Himalayan culture, logistics, and spiritual archives.";
         }
       }
 
@@ -592,40 +619,42 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
 
       const metaTags = `
-      <!-- Dynamic SEO Tags -->
       <title>${title}</title>
       <meta name="description" content="${description}">
       <link rel="canonical" href="${absoluteUrl}">
-      
-      <!-- Open Graph / Facebook -->
-      <meta property="og:type" content="website">
-      <meta property="og:url" content="${absoluteUrl}">
+      <meta property="og:site_name" content="The Soul Himalaya">
       <meta property="og:title" content="${title}">
       <meta property="og:description" content="${description}">
       <meta property="og:image" content="${image}">
-      <meta property="og:image:alt" content="${title}">
+      <meta property="og:image:secure_url" content="${image}">
+      <meta property="og:image:type" content="image/jpeg">
       <meta property="og:image:width" content="1200">
       <meta property="og:image:height" content="630">
-      <meta property="og:site_name" content="The Soul Himalaya">
-
-      <!-- Twitter -->
+      <meta property="og:url" content="${absoluteUrl}">
+      <meta property="og:type" content="website">
       <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:site" content="@thesoulhimalaya">
       <meta name="twitter:title" content="${title}">
       <meta name="twitter:description" content="${description}">
-      <meta name="twitter:image" content="${image}">
-      `;
+      <meta name="twitter:image" content="${image}">`;
 
-      // Clean existing tags to avoid duplication
-      let cleanedHtml = html.replace(/<title>.*?<\/title>/gi, '')
-                            .replace(/<meta name="description" content=".*?">/gi, '')
-                            .replace(/<meta property="og:.*?" content=".*?">/gi, '')
-                            .replace(/<meta name="twitter:.*?" content=".*?">/gi, '');
+      // Clean existing tags to avoid duplication - Robust Regex
+      let cleanedHtml = html.replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+                            .replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
+                            .replace(/<meta\s+property=["']og:[^"']*["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
+                            .replace(/<meta\s+name=["']twitter:[^"']*["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
+                            .replace(/<link\s+rel=["']canonical["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
 
-      // Inject into placeholder if exists, otherwise right after <head>
+      // Add OG prefix to html tag if not present
+      if (!cleanedHtml.includes('prefix="og: http://ogp.me/ns#"')) {
+        cleanedHtml = cleanedHtml.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
+      }
+
+      // Inject into placeholder if exists, otherwise right after <head> for priority
       if (cleanedHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {
         return cleanedHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', metaTags);
       } else if (cleanedHtml.includes('<head>')) {
-        return cleanedHtml.replace('<head>', `<head>\n${metaTags}`);
+        return cleanedHtml.replace('<head>', `<head>${metaTags}`);
       } else if (cleanedHtml.includes('</head>')) {
         return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
       }
