@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSearchParams } from 'react-router-dom';
+import Fuse from 'fuse.js';
 import { REGIONAL_GUIDE } from '@/constants';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -18,7 +19,10 @@ import {
   ChevronDown,
   ChevronUp,
   MessageCircle,
-  Info
+  Info,
+  PhoneCall,
+  MessageSquare,
+  Mail
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -80,11 +84,22 @@ export default function Guide() {
     return DEFAULT_FAQS;
   }, [dbFaqs]);
 
-  const filteredFaqs = faqs.filter(faq => 
-    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    faq.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fuse = useMemo(() => {
+    return new Fuse(faqs, {
+      keys: ['question', 'answer', 'category'],
+      threshold: 0.3,
+      includeMatches: true
+    });
+  }, [faqs]);
+
+  const filteredFaqs = useMemo(() => {
+    if (!searchQuery) return faqs;
+    const results = fuse.search(searchQuery);
+    return results.map(r => ({
+      ...r.item,
+      matches: r.matches
+    }));
+  }, [fuse, searchQuery, faqs]);
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -135,44 +150,47 @@ export default function Guide() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl mx-auto"
+            className="max-w-3xl mx-auto"
           >
             <div className="relative group">
-              <div className="absolute left-8 top-1/2 -translate-y-1/2 text-terracotta/40 group-focus-within:text-terracotta transition-colors">
-                <Search className="h-6 w-6" />
+              <div className="absolute left-10 top-1/2 -translate-y-1/2 text-terracotta/20 group-focus-within:text-terracotta/60 transition-colors">
+                <Search className="h-5 w-5 stroke-[1.5px]" />
               </div>
               <input 
                 type="text" 
-                placeholder="Search the Soul Guide (e.g. 'connectivity', 'packing', 'kheerganga')..."
+                placeholder="How can we help your soul today?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-24 bg-white rounded-[2.5rem] pl-20 pr-8 text-xl font-bold text-forest placeholder:text-forest/20 shadow-2xl shadow-forest/10 focus:outline-none focus:ring-8 focus:ring-terracotta/5 border-2 border-forest/5 focus:border-terracotta/20 transition-all"
+                className="w-full h-20 bg-white/80 backdrop-blur-xl rounded-full pl-20 pr-8 text-lg font-medium text-forest placeholder:text-forest/20 shadow-xl shadow-forest/[0.03] focus:outline-none focus:ring-4 focus:ring-terracotta/5 border border-forest/[0.05] focus:border-terracotta/20 transition-all text-center md:text-left"
               />
-              <div className="absolute right-8 top-1/2 -translate-y-1/2">
-                <Badge className="bg-forest text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hidden sm:flex">
+              <div className="absolute right-10 top-1/2 -translate-y-1/2 hidden sm:block">
+                <span className="text-[10px] font-bold text-forest/20 uppercase tracking-[0.3em]">
                   Soul Intelligence
-                </Badge>
+                </span>
               </div>
             </div>
             
-            {searchQuery && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex flex-wrap gap-2 px-8"
-              >
-                <span className="text-[10px] font-black text-forest/40 uppercase tracking-widest mr-2 py-1">Quick Links:</span>
-                {['Connectivity', 'Safety', 'Kheerganga', 'ATMs'].map(tag => (
-                  <button 
-                    key={tag}
-                    onClick={() => setSearchQuery(tag)}
-                    className="text-[10px] font-black text-terracotta hover:text-forest uppercase tracking-widest bg-terracotta/5 px-3 py-1 rounded-full transition-colors"
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </motion.div>
-            )}
+            <AnimatePresence>
+              {searchQuery && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  className="mt-6 flex flex-wrap justify-center md:justify-start gap-3 px-8"
+                >
+                  <span className="text-[9px] font-bold text-forest/30 uppercase tracking-[0.2em] mr-2 py-1">Common Inquiries:</span>
+                  {['Connectivity', 'Safety', 'Kheerganga', 'ATMs'].map(tag => (
+                    <button 
+                      key={tag}
+                      onClick={() => setSearchQuery(tag)}
+                      className="text-[9px] font-bold text-terracotta/60 hover:text-terracotta uppercase tracking-[0.2em] bg-terracotta/[0.03] px-4 py-1.5 rounded-full border border-terracotta/[0.05] transition-all hover:bg-terracotta/[0.06]"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
 
@@ -317,71 +335,139 @@ export default function Guide() {
             <div className="relative z-10 max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <div className="flex items-center justify-center gap-2 text-terracotta mb-4">
-                  <MessageCircle className="h-5 w-5" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">Wisdom Repository</span>
+                  <MessageCircle className="h-5 w-5 stroke-[1.5px]" />
+                  <span className="text-[9px] font-bold uppercase tracking-[0.4em]">Wisdom Repository</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-playfair font-black italic text-forest uppercase tracking-tighter mb-4">Soul Support</h2>
-                <p className="text-forest/40 text-xs font-bold uppercase tracking-widest max-w-md mx-auto leading-relaxed">
+                <h2 className="text-4xl md:text-5xl font-playfair font-black text-forest uppercase tracking-tighter mb-4 italic">Soul Support</h2>
+                <p className="text-forest/40 text-[10px] font-bold uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed">
                   Decipher the mysteries of the valley through our curated frequently asked revelations.
                 </p>
               </div>
 
               {/* FAQ List */}
-              <div className="space-y-4">
-                <AnimatePresence>
-                  {filteredFaqs.map((faq, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b border-forest/5 last:border-none"
-                    >
-                      <button 
-                        onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                        className="w-full py-6 flex items-center justify-between text-left group"
+              <div className="relative space-y-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredFaqs.map((faq, index) => {
+                    const highlightText = (text: string, matches?: any[], key?: string) => {
+                      if (!searchQuery || !matches) return text;
+                      const match = matches.find(m => m.key === key);
+                      if (!match) return text;
+
+                      let result = [];
+                      let lastIndex = 0;
+                      
+                      // Fuse.js matches are [start, end] pairs
+                      const indices = [...match.indices].sort((a, b) => a[0] - b[0]);
+                      
+                      indices.forEach(([start, end], i) => {
+                        result.push(text.slice(lastIndex, start));
+                        result.push(<span key={i} className="bg-terracotta/10 text-terracotta px-0.5 rounded-sm">{text.slice(start, end + 1)}</span>);
+                        lastIndex = end + 1;
+                      });
+                      result.push(text.slice(lastIndex));
+                      return result;
+                    };
+
+                    return (
+                      <motion.div
+                        key={faq.id || faq.question}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="border-b border-forest/[0.03] last:border-none"
                       >
-                        <div className="flex items-center gap-6">
-                           <div className="h-10 w-10 rounded-xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">
-                             <Info className="h-4 w-4" />
-                           </div>
-                           <div>
-                             <span className="text-[8px] font-black text-terracotta uppercase tracking-[0.2em] block mb-1">{faq.category}</span>
-                             <h4 className="text-lg font-bold text-forest leading-tight">{faq.question}</h4>
-                           </div>
-                        </div>
-                        {expandedIndex === index ? (
-                          <ChevronUp className="h-5 w-5 text-terracotta shrink-0" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-forest/20 group-hover:text-terracotta shrink-0 transition-colors" />
-                        )}
-                      </button>
-                      <AnimatePresence>
-                        {expandedIndex === index && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="pb-8 pl-[64px] pr-12">
-                              <p className="text-forest/60 text-sm font-medium leading-relaxed italic">
-                                "{faq.answer}"
-                              </p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  ))}
+                        <button 
+                          onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                          className="w-full py-6 flex items-center justify-between text-left group"
+                        >
+                          <div className="flex items-center gap-6">
+                             <div className="h-10 w-10 rounded-full bg-forest/[0.02] flex items-center justify-center text-forest/20 group-hover:bg-terracotta/5 group-hover:text-terracotta transition-all">
+                               <HelpCircle className="h-4 w-4 stroke-[1.5px]" />
+                             </div>
+                             <div>
+                               <span className="text-[8px] font-bold text-terracotta/50 uppercase tracking-[0.2em] block mb-1">
+                                 {highlightText(faq.category, (faq as any).matches, 'category')}
+                               </span>
+                               <h4 className="text-lg font-medium text-forest leading-tight">
+                                 {highlightText(faq.question, (faq as any).matches, 'question')}
+                               </h4>
+                             </div>
+                          </div>
+                          {expandedIndex === index ? (
+                            <ChevronUp className="h-5 w-5 text-terracotta shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-forest/10 group-hover:text-terracotta/40 shrink-0 transition-all" />
+                          )}
+                        </button>
+                        <AnimatePresence>
+                          {expandedIndex === index && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pb-8 pl-[64px] pr-12">
+                                <p className="text-forest/60 text-base leading-relaxed italic font-serif">
+                                  {highlightText(faq.answer, (faq as any).matches, 'answer')}
+                                </p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
                 
-                {filteredFaqs.length === 0 && (
-                  <div className="py-20 text-center">
-                    <HelpCircle className="h-16 w-16 text-forest/10 mx-auto mb-4" />
-                    <p className="text-forest/40 font-bold uppercase tracking-widest text-xs">No matching wisdom found.</p>
+                {/* Customer Care Support Section */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mt-24 bg-neutral-50 rounded-[3rem] p-12 text-center relative overflow-hidden"
+                >
+                  {/* Decorative Background Elements */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta/[0.03] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-forest/[0.03] rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />
+
+                  <div className="relative z-10 max-w-2xl mx-auto space-y-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-forest/40 text-[9px] font-bold uppercase tracking-[0.3em] shadow-sm">
+                      <PhoneCall className="h-3 w-3" /> Customer Care Support
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-3xl md:text-4xl font-playfair font-black text-forest italic">
+                        Not finding the peace you seek?
+                      </h3>
+                      <p className="text-forest/50 text-sm font-medium leading-relaxed max-w-sm mx-auto">
+                        Our dedicated Soul Guides are standing by to assist with your journey, logistics, or spiritual inquiries.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                      <a 
+                        href="https://wa.me/911234567890" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-4 bg-forest text-white rounded-full text-[11px] font-bold uppercase tracking-widest hover:bg-forest/90 transition-all shadow-xl shadow-forest/10"
+                      >
+                        <MessageSquare className="h-4 w-4" /> Start Soul Chat
+                      </a>
+                      <a 
+                        href="mailto:care@thesoulhimalaya.com" 
+                        className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-4 bg-white text-forest border border-forest/10 rounded-full text-[11px] font-bold uppercase tracking-widest hover:bg-neutral-50 transition-all shadow-md"
+                      >
+                        <Mail className="h-4 w-4" /> Send Soul Inquiry
+                      </a>
+                    </div>
+
+                    <p className="text-[9px] font-bold text-forest/20 uppercase tracking-[0.2em] pt-4">
+                      Available daily: 09:00 AM — 09:00 PM IST
+                    </p>
                   </div>
-                )}
+                </motion.div>
               </div>
             </div>
           </div>

@@ -241,7 +241,7 @@ const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
       </div>
 
       <LayoutGroup>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-6">
           <AnimatePresence mode="popLayout" initial={false}>
             {displayPosts.slice(0, 4).map((post, i) => (
               <motion.div

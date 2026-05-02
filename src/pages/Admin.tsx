@@ -3100,7 +3100,7 @@ export default function Admin() {
                   </motion.div>
                 )}
 
-                <div className="grid gap-4 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="relative grid gap-4 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
                   {seoSettings
                     .filter(item => {
                       if (!seoSearchTerm) return true;
@@ -3283,7 +3283,7 @@ export default function Admin() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="relative grid grid-cols-1 gap-4">
               {messages.length === 0 ? (
                 <Card className="border-dashed border border-forest/10 bg-transparent p-12 flex flex-col items-center justify-center text-center rounded-xl">
                   <div className="h-16 w-16 rounded-xl bg-forest/5 flex items-center justify-center mb-4">

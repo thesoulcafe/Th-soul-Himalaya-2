@@ -282,7 +282,7 @@ export default function SoulCart() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="relative space-y-4">
                       {cart.map((item) => (
                         <motion.div
                           layout

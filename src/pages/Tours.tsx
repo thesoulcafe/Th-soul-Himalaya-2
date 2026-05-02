@@ -464,7 +464,7 @@ export default function Tours() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <AnimatePresence mode="popLayout">
                   {filteredTours.map((tour, index) => (
                   <motion.div
