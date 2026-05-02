@@ -638,27 +638,28 @@ async function injectMetaTags(req: express.Request, html: string) {
       <meta name="twitter:description" content="${description}">
       <meta name="twitter:image" content="${image}">`;
 
-      // Clean existing tags to avoid duplication - Robust Regex
-      let cleanedHtml = html.replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-                            .replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
-                            .replace(/<meta\s+property=["']og:[^"']*["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
-                            .replace(/<meta\s+name=["']twitter:[^"']*["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
-                            .replace(/<link\s+rel=["']canonical["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
-
-      // Add OG prefix to html tag if not present
-      if (!cleanedHtml.includes('prefix="og: http://ogp.me/ns#"')) {
-        cleanedHtml = cleanedHtml.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
+      // Only add Open Graph prefix if the <html> tag exists and doesn't have it
+      let finalHtml = html;
+      if (finalHtml.includes('<html') && !finalHtml.includes('prefix="og: http://ogp.me/ns#"')) {
+        finalHtml = finalHtml.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
       }
 
-      // Inject into placeholder if exists, otherwise right after <head> for priority
-      if (cleanedHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {
-        return cleanedHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', metaTags);
-      } else if (cleanedHtml.includes('<head>')) {
-        return cleanedHtml.replace('<head>', `<head>${metaTags}`);
-      } else if (cleanedHtml.includes('</head>')) {
-        return cleanedHtml.replace('</head>', `${metaTags}\n</head>`);
+      // Filter out existing SEO tags to prevent conflicts before injecting new ones
+      // We are more selective with regex here to avoid touching other elements
+      finalHtml = finalHtml
+        .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+        .replace(/<meta\s+(?:name|property)=["'](?:description|og:[^"']*|twitter:[^"']*)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
+        .replace(/<link\s+rel=["']canonical["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
+
+      // Inject the meta tags into the designated placeholder or fall back to head
+      if (finalHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {
+        return finalHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', metaTags);
+      } else if (finalHtml.includes('<head>')) {
+        return finalHtml.replace('<head>', `<head>${metaTags}`);
+      } else if (finalHtml.includes('</head>')) {
+        return finalHtml.replace('</head>', `${metaTags}\n</head>`);
       }
-      return html;
+      return finalHtml;
     })();
 
     return await Promise.race([metaPromise, timeoutPromise]) as string;

@@ -30,8 +30,13 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>(() => {
-    const saved = localStorage.getItem('soul-himalaya-cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('soul-himalaya-cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to parse cart from localStorage:", e);
+      return [];
+    }
   });
   const [lastAddedTime, setLastAddedTime] = useState(0);
   const [pendingCartItem, setPendingCartItem] = useState<Omit<CartItem, 'quantity'> | null>(null);
