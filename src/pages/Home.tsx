@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useInView, LayoutGroup } from 'motion/react';
-import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles, Coffee, Image } from 'lucide-react';
+import { Mountain, LogIn, ArrowRight, Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, ChevronRight, ChevronLeft, Edit2, Zap, Star, Briefcase, Heart, Instagram, Sparkles, Coffee, Image, MapPin } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';

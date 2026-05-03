@@ -88,6 +88,7 @@ export default function Footer() {
               {[
                 { name: 'Tour Packages', href: '/tours' },
                 { name: 'Mountain Trekks', href: '/trekks' },
+                { name: 'The Soul Cafe', href: '/soul-cafe' },
                 { name: 'Yoga & Wellness', href: '/yoga' },
                 { name: 'Digital Workation', href: '/wfh' },
                 { name: 'Macramé Shop', href: '/shop' },
