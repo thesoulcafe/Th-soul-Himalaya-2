@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { cn } from '@/lib/utils';
 
-const GOOGLE_BUSINESS_LINK = "https://maps.app.goo.gl/cLi9ZTs1uWphwyJCA?g_st=ic";
+const GOOGLE_BUSINESS_LINK = "https://share.google/yoPjK9TNhDpvBlB4X";
 
 const MENU_CATEGORIES = [
   {
