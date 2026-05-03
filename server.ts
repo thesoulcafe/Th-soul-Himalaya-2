@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs } from "firebase/firestore";
 
 dotenv.config();
 
@@ -230,30 +230,39 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       '/parvati-valley/kheerganga'
     ];
 
-    let packageUrls: string[] = [];
+    let dynamicUrls: string[] = [];
     try {
-      // Import constants to get all IDs
+      // 1. Fetch from Firestore
+      const contentSnap = await getDocs(collection(db, "content"));
+      contentSnap.forEach(doc => {
+        const data = doc.data();
+        const type = data.type;
+        const id = doc.id;
+        if (type === 'tour') dynamicUrls.push(`/tours?id=${id}`);
+        else if (type === 'trekk' || type === 'trek') dynamicUrls.push(`/trekks?id=${id}`);
+        else if (type === 'yoga') dynamicUrls.push(`/yoga?id=${id}`);
+        else if (type === 'meditation') dynamicUrls.push(`/meditation?id=${id}`);
+      });
+
+      // 2. Fallback to constants if firestore is empty or missing something
       const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
-      // We read file directly to avoid complex import issues in this environment
       const content = fs.readFileSync(constantsPath, 'utf-8');
-      const idMatches = content.match(/id:\s*['"](.*?)['"]/g) || [];
-      const ids = idMatches.map(m => m.split(/['"]/)[1]);
-      
-      const uniqueIds = Array.from(new Set(ids));
-      packageUrls = uniqueIds.map(id => {
-        if (id.startsWith('tour-')) return `/tours?id=${id}`;
-        if (id.startsWith('trekk-')) return `/trekks?id=${id}`;
-        if (id.startsWith('yoga-')) return `/yoga?id=${id}`;
-        if (id.startsWith('med-')) return `/meditation?id=${id}`;
-        if (id.startsWith('adv-')) return `/adventure?id=${id}`;
-        if (id.startsWith('wfh-')) return `/wfh?id=${id}`;
-        return null;
-      }).filter(Boolean) as string[];
+      const idMatches = (content.match(/id:\s*['"](.*?)['"]/g) || []) as string[];
+      idMatches.forEach(m => {
+        const id = m.split(/['"]/)[1];
+        let url = null;
+        if (id.startsWith('tour-')) url = `/tours?id=${id}`;
+        else if (id.startsWith('trekk-')) url = `/trekks?id=${id}`;
+        else if (id.startsWith('yoga-')) url = `/yoga?id=${id}`;
+        else if (id.startsWith('med-')) url = `/meditation?id=${id}`;
+        
+        if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
+      });
     } catch (e) {
       console.error("Failed to generate package URLs for sitemap:", e);
     }
 
-    const allUrls = [...staticPages, ...packageUrls];
+    const allUrls = [...new Set([...staticPages, ...dynamicUrls])];
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${allUrls.map(url => `
@@ -331,13 +340,13 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       const urlStr = req.originalUrl || req.url;
       
       // Specifically target navigation requests (HTML)
-      // Check if the path looks like a route (no extension) or ends in .html
-      // Also avoid Vite internal paths starting with /@
+      // Only serve HTML if the request explicitly accepts it or has no extension
+      const acceptsHtml = req.headers.accept?.includes('text/html');
       const urlPath = urlStr.split('?')[0];
-      const isViteInternal = urlPath.startsWith('/@') || urlPath.includes('node_modules');
-      const isAsset = urlPath.includes('.') && !urlPath.endsWith('.html');
+      const hasExtension = urlPath.includes('.') && !urlPath.endsWith('.html');
+      const isViteInternal = urlPath.startsWith('/@') || urlPath.includes('node_modules') || urlPath.startsWith('/@id/');
       
-      if (isViteInternal || isAsset) {
+      if (isViteInternal || hasExtension || (!acceptsHtml && urlPath !== '/')) {
         return next();
       }
 
@@ -379,9 +388,12 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
     app.get('*', async (req, res) => {
       const urlStr = req.originalUrl || req.url;
       const urlPath = urlStr.split('?')[0];
-      const isAsset = urlPath.includes('.') && !urlPath.endsWith('.html');
       
-      if (isAsset) {
+      // Prevent serving HTML for missing assets (avoids MIME type errors)
+      const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map|webp|avif)$/i.test(urlPath);
+      const acceptsHtml = req.headers.accept?.includes('text/html');
+
+      if (isAsset || (!acceptsHtml && urlPath !== '/')) {
         return res.status(404).send("Not Found");
       }
 
@@ -607,8 +619,9 @@ async function injectMetaTags(req: express.Request, html: string) {
         
         // Optimize Unsplash images
         if (image.includes('unsplash.com')) {
-          image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630');
+          image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
           if (!image.includes('&h=')) image += '&h=630';
+          if (!image.includes('&q=')) image += '&q=40';
           if (!image.includes('&fit=crop')) image += '&fit=crop';
         }
       }
@@ -618,7 +631,8 @@ async function injectMetaTags(req: express.Request, html: string) {
         image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
 
-      const metaTags = `<title>${title}</title>
+      const metaTags = `
+<title>${title}</title>
 <meta name="description" content="${description}">
 <link rel="canonical" href="${absoluteUrl}">
 <meta property="og:site_name" content="The Soul Himalaya">
@@ -626,15 +640,20 @@ async function injectMetaTags(req: express.Request, html: string) {
 <meta property="og:description" content="${description}">
 <meta property="og:image" content="${image}">
 <meta property="og:image:secure_url" content="${image}">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${title}">
 <meta property="og:url" content="${absoluteUrl}">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@thesoulhimalaya">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}">
-<meta name="twitter:image" content="${image}">`;
+<meta name="twitter:image" content="${image}">
+<meta itemprop="name" content="${title}">
+<meta itemprop="description" content="${description}">
+<meta itemprop="image" content="${image}">`;
 
       // Only add Open Graph prefix if the <html> tag exists and doesn't have it
       let finalHtml = html;

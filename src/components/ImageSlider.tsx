@@ -56,12 +56,13 @@ export default function ImageSlider({
 
   if (images.length === 1) {
     return (
-      <img
-        src={images[0]}
-        alt={alt}
-        className={cn("w-full h-full object-cover", className)}
-        referrerPolicy="no-referrer"
-      />
+        <img
+          src={images[0]}
+          alt={alt}
+          className={cn("w-full h-full object-cover", className)}
+          referrerPolicy="no-referrer"
+          loading="lazy"
+        />
     );
   }
 
@@ -146,6 +147,7 @@ export default function ImageSlider({
           }}
           className="absolute inset-0 w-full h-full object-cover"
           referrerPolicy="no-referrer"
+          loading="lazy"
         />
       </AnimatePresence>
 

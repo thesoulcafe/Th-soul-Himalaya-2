@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import { SEO } from '@/components/SEO';
+
 // Enhanced Intelligence Database for 2026
 const ARTICLE_CONTENT: Record<string, any> = {
   "tosh-guide-2026": {
@@ -400,6 +402,12 @@ export default function ArticleDetail() {
 
   return (
     <div className="min-h-screen bg-cream selection:bg-terracotta selection:text-white">
+      <SEO 
+        title={article.title} 
+        description={article.content[0]?.text || "Soulful Himalayan Intelligence"} 
+        image={article.image}
+        type="article"
+      />
       {/* Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between">
         <Button 

@@ -1,0 +1,92 @@
+import { GoogleGenAI, Type } from "@google/genai";
+import { db } from "./firebase";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+/**
+ * Automate the generation of an SEO-optimized meta description using Gemini.
+ */
+export async function generateMetaDescription(pageContent: string, title: string): Promise<string> {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `You are an SEO expert. Write a compelling meta description (max 160 characters) for a travel page titled "${title}" with the following content: ${pageContent.slice(0, 500)}. Focus on benefits and search intent.`,
+    });
+    
+    return response.text?.trim() || "";
+  } catch (error) {
+    console.error("AI Meta Description Generation failed:", error);
+    return pageContent.slice(0, 160);
+  }
+}
+
+/**
+ * Generate JSON-LD Schema for different types.
+ */
+export function generateSchema(type: 'adventure' | 'cafe' | 'org', data: any) {
+  const baseUrl = window.location.origin;
+  
+  const org = {
+    "@type": "Organization",
+    "@id": `${baseUrl}/#organization`,
+    "name": "The Soul Himalaya",
+    "url": baseUrl,
+    "logo": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
+    "sameAs": ["https://www.instagram.com/thesoulhimalaya"]
+  };
+
+  if (type === 'org') return org;
+
+  if (type === 'adventure') {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "name": data.title,
+      "description": data.description,
+      "image": data.image,
+      "location": {
+        "@type": "Place",
+        "name": "Parvati Valley, Himalayas",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Kasol",
+          "addressRegion": "Himachal Pradesh",
+          "addressCountry": "IN"
+        }
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": data.price?.replace(/[^0-9]/g, ''),
+        "priceCurrency": "INR",
+        "availability": "https://schema.org/InStock",
+        "url": window.location.href
+      }
+    };
+  }
+
+  if (type === 'cafe') {
+    return {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "The Soul Cafe",
+      "image": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Tosh Village",
+        "addressLocality": "Tosh",
+        "addressRegion": "Himachal Pradesh",
+        "postalCode": "175105",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "32.0167",
+        "longitude": "77.4500"
+      },
+      "url": `${baseUrl}/soul-cafe`,
+      "telephone": "+917878200632"
+    };
+  }
+}

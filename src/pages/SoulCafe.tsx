@@ -8,11 +8,19 @@ const GALLERY = [
   "https://images.unsplash.com/photo-1559925393-8be0ec41b50d?q=80&w=2000&auto=format&fit=crop"
 ];
 
+import { SEO } from '@/components/SEO';
+
 export default function SoulCafe() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#faf9f6] selection:bg-terracotta selection:text-white">
+      <SEO 
+        title="The Soul Cafe | A Sanctuary for Dreamers in Tosh" 
+        description="Located in the mystical heights of Tosh, The Soul Cafe is a sanctuary for dreamers and trekkers serving organic Himalayan produce." 
+        image="https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg"
+        type="cafe"
+      />
       {/* Hero Section */}
       <section className="relative h-[85vh] overflow-hidden">
         <motion.div 

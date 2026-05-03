@@ -143,6 +143,7 @@ export default function GalleryArchive({
                 }}
                 className="absolute inset-0 w-full h-full object-cover"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
             </AnimatePresence>
 
@@ -208,6 +209,7 @@ export default function GalleryArchive({
                     alt={img.title} 
                     className="thumb-image w-full h-full object-cover"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                   />
                   {/* CSS Scroll-Driven Animation Trigger Area (Conceptual) */}
                   <div 

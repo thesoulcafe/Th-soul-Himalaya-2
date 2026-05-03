@@ -189,6 +189,8 @@ export default function Trekks() {
         title={seo.title || "Mountain Trekks"} 
         description={seo.description || "Discover wild paths."} 
         image={seo.image}
+        type="adventure"
+        trekData={selectedTrekk || { title: seo.title, description: seo.description }}
       />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">

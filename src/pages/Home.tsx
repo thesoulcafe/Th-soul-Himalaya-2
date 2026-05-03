@@ -285,45 +285,7 @@ export default function Home() {
   const [hasLoadedServices, setHasLoadedServices] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
 
-  // JSON-LD for LocalBusiness & Organization
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": "https://thesoulhimalaya.com/#organization",
-        "name": "The Soul Himalaya",
-        "url": "https://thesoulhimalaya.com",
-        "logo": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
-        "sameAs": [
-          "https://www.instagram.com/thesoulhimalaya"
-        ]
-      },
-      {
-        "@type": "LocalBusiness",
-        "@id": "https://thesoulhimalaya.com/#soulcafe",
-        "name": "The Soul Cafe",
-        "image": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
-        "priceRange": "$$",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Tosh Village",
-          "addressLocality": "Tosh",
-          "addressRegion": "Himachal Pradesh",
-          "postalCode": "175105",
-          "addressCountry": "IN"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": "32.0167",
-          "longitude": "77.4500"
-        },
-        "url": "https://thesoulhimalaya.com/soul-cafe",
-        "telephone": "+917878200632"
-      }
-    ]
-  };
-
+  // Instagram posts fetch
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'instagram'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -421,10 +383,13 @@ export default function Home() {
 
   return (
     <div className="w-full overflow-hidden">
-      <script type="application/ld+json">
-        {JSON.stringify(jsonLd)}
-      </script>
-      {seo && <SEO title={seo.title || "The Soul Himalaya"} description={seo.description || "Discover curated retreats, adventures, and artisan crafts in the Himalayas."} keywords={seo.keyword} />}
+      <SEO 
+        title={seo?.title || "The Soul Himalaya | Spiritual Adventures & Wellness Treks"} 
+        description={seo?.description || "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley."} 
+        keywords={seo?.keyword}
+        type="website"
+        cafeData={true}
+      />
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
