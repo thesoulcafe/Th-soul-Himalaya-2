@@ -24,7 +24,7 @@ const PARVATI_DATA = {
   hero: {
     headline: "The Valley of Shadows and Light",
     subheadline: "A Spiritual Odyssey through the heart of the Kullu Himalayas",
-    backgroundImage: "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg", // Mantra Lake representation
+    backgroundImage: "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg", // Mantra Lake representation
     parallaxIntensity: 0.5
   },
   narrative: {
@@ -118,51 +118,13 @@ const ParvatiValley = () => {
             viewport={{ once: true }}
             className="relative rounded-[2.5rem] md:rounded-[3rem] min-h-[350px] sm:min-h-[450px] flex items-center justify-center overflow-hidden bg-[#0c0603] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
           >
-            {/* Split Background Effect (Shiva/Shakti) */}
-            <div className="absolute inset-0 flex">
-              <div className="w-1/2 h-full relative overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1623492701902-47dc207df5dc?auto=format&fit=crop&w=1200" 
-                  alt="Shiva side" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
-                />
-                <div className="absolute inset-0 bg-[#0a1a2f]/80" />
-              </div>
-              <div className="w-1/2 h-full relative overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1544735032-6a71fd64446b?auto=format&fit=crop&w=1200" 
-                  alt="Shakti side" 
-                  className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
-                />
-                <div className="absolute inset-0 bg-[#2d0a1a]/80" />
-              </div>
-            </div>
-
-            {/* Immersive Background Images with Mix Blend */}
+            {/* Background Image */}
             <div className="absolute inset-0">
-              <div 
-                className="absolute inset-0 opacity-40 mix-blend-overlay transition-transform duration-[6s] group-hover/cosmic:scale-110"
-                style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop')`, // Cosmic/Texture
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
+              <img 
+                src="https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" 
+                alt="Shiva Shakti Background" 
+                className="absolute inset-0 w-full h-full object-cover opacity-60 scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
               />
-              
-              {/* Shiva Facet */}
-              <motion.div 
-                animate={{ opacity: [0.3, 0.5, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#4A7FA5]/20 to-transparent pointer-events-none" 
-              />
-              
-              {/* Shakti Facet */}
-              <motion.div 
-                animate={{ opacity: [0.3, 0.5, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity, delay: 2 }}
-                className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-terracotta/20 to-transparent pointer-events-none" 
-              />
-
               <div className="absolute inset-0 bg-black/40" />
             </div>
 

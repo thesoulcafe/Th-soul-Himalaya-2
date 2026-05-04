@@ -1,7 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { toAbsoluteUrl } from '../lib/seoTools';
 
 interface SEOProps {
   title: string;
@@ -18,6 +19,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
   cafeData?: any
 }) => {
   const [siteSettings, setSiteSettings] = useState<any>(null);
+  const [pageSeo, setPageSeo] = useState<any>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'site_settings', 'global'), (doc) => {
@@ -27,25 +29,37 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
     }, (error) => {
       console.error("SEO site settings snapshot failed:", error);
     });
-    return () => unsubscribe();
-  }, []);
 
-  const finalTitle = `${title} | Soul Himalaya`;
-  const defaultImage = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=60";
+    // Fetch page-specific SEO
+    const path = window.location.pathname;
+    const fetchPageSeo = async () => {
+      try {
+        const q = query(collection(db, 'seo_settings'), where('path', '==', path));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          setPageSeo(snapshot.docs[0].data());
+        }
+      } catch (err) {
+        console.error("Failed to fetch page SEO:", err);
+      }
+    };
+    fetchPageSeo();
+
+    return () => unsubscribe();
+  }, [window.location.pathname]);
+
+  const seoTitle = pageSeo?.title || title;
+  const seoDescription = pageSeo?.description || description;
+  const seoImage = pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+
+  const finalTitle = seoTitle.includes("Soul Himalaya") ? seoTitle : `${seoTitle} | Soul Himalaya`;
   
   // Automated Description Fallback (First 160 chars)
-  const finalDescription = description && description.length > 10 
-    ? description.slice(0, 160) 
+  const finalDescription = seoDescription && seoDescription.length > 10 
+    ? seoDescription.slice(0, 160) 
     : "Discover curated retreats, high-altitude adventures, and artisan Himalayan crafts in Parvati Valley with The Soul Himalaya.";
 
-  let finalImage = (title || "").toLowerCase().includes("valley of shadows")
-    ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"
-    : (image || defaultImage);
-
-  // Ensure absolute URL for images
-  if (finalImage.startsWith('/')) {
-    finalImage = `${window.location.origin}${finalImage}`;
-  }
+  let finalImage = toAbsoluteUrl(seoImage);
   
   // Optimize unsplash images for WhatsApp/FB (1200x630, q=40 for size)
   if (finalImage.includes('unsplash.com')) {
@@ -138,6 +152,8 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       <meta property="og:title" content={finalTitle} />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={finalImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:url" content={canonicalUrl || window.location.href} />
       <meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
       <meta property="og:site_name" content="The Soul Himalaya" />
@@ -147,6 +163,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       <meta name="twitter:title" content={finalTitle} />
       <meta name="twitter:description" content={finalDescription} />
       <meta name="twitter:image" content={finalImage} />
+      <meta name="twitter:image:alt" content={title} />
       <meta name="twitter:site" content="@soulhimalaya" />
     </Helmet>
   );

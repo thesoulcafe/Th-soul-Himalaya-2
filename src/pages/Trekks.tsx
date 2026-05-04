@@ -232,7 +232,7 @@ export default function Trekks() {
                   >
                     <ImageSlider 
                       images={((trekk.title || '').toLowerCase().includes('valley of shadows') 
-                        ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                        ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                         : [trekk.image, ...(trekk.images || [])]).filter(Boolean)} 
                       alt={trekk.title}
                       className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
@@ -421,7 +421,7 @@ export default function Trekks() {
             <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
               <ImageSlider 
                 images={((selectedTrekk.title || '').toLowerCase().includes('valley of shadows') 
-                  ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                  ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                   : [selectedTrekk.image, ...(selectedTrekk.images || [])]).filter(Boolean)} 
                 alt={selectedTrekk.title}
                 className="h-full w-full"

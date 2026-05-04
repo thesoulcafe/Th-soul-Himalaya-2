@@ -5,6 +5,16 @@ import { doc, getDoc, collection, getDocs, query, where } from "firebase/firesto
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 /**
+ * Ensures a URL is absolute by prepending the domain if necessary.
+ */
+export function toAbsoluteUrl(url: string | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  const baseUrl = 'https://thesoulhimalaya.com';
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
+/**
  * Automate the generation of an SEO-optimized meta description using Gemini.
  */
 export async function generateMetaDescription(pageContent: string, title: string): Promise<string> {
@@ -25,14 +35,14 @@ export async function generateMetaDescription(pageContent: string, title: string
  * Generate JSON-LD Schema for different types.
  */
 export function generateSchema(type: 'adventure' | 'cafe' | 'org', data: any) {
-  const baseUrl = window.location.origin;
+  const baseUrl = 'https://thesoulhimalaya.com';
   
   const org = {
     "@type": "Organization",
     "@id": `${baseUrl}/#organization`,
     "name": "The Soul Himalaya",
     "url": baseUrl,
-    "logo": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
+    "logo": toAbsoluteUrl("https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg"),
     "sameAs": ["https://www.instagram.com/thesoulhimalaya"]
   };
 
@@ -44,7 +54,7 @@ export function generateSchema(type: 'adventure' | 'cafe' | 'org', data: any) {
       "@type": "Event",
       "name": data.title,
       "description": data.description,
-      "image": data.image,
+      "image": toAbsoluteUrl(data.image),
       "location": {
         "@type": "Place",
         "name": "Parvati Valley, Himalayas",
@@ -70,7 +80,7 @@ export function generateSchema(type: 'adventure' | 'cafe' | 'org', data: any) {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "The Soul Cafe",
-      "image": "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg",
+      "image": toAbsoluteUrl("https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg"),
       "priceRange": "$$",
       "address": {
         "@type": "PostalAddress",

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import { HelmetProvider } from 'react-helmet-async';
@@ -49,53 +49,55 @@ const PageLoader = () => (
 );
 
 export default function App() {
+  useEffect(() => {
+    console.log("The Soul Himalaya: App heart beating... [v1.2.0]");
+  }, []);
+
   return (
-    <HelmetProvider>
-      <ErrorBoundary>
-        <AuthProvider>
-          <CartProvider>
-            <SmoothScroll />
-            <Toaster position="top-center" richColors />
-            <Router>
-              <ScrollToTop />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} />
-                    <Route path="tours" element={<Tours />} />
-                    <Route path="trekks" element={<Trekks />} />
-                    <Route path="wfh" element={<WFH />} />
-                    <Route path="yoga" element={<Yoga />} />
-                    <Route path="meditation" element={<Meditation />} />
-                    <Route path="adventure" element={<Adventure />} />
-                    <Route path=":category/:id" element={<ServiceDetail />} />
-                    <Route path=":category/:id/book" element={<BookingPage />} />
-                    <Route path="shop" element={<Shop />} />
-                    <Route path="cart" element={<Cart />} />
-                    <Route path="blueberry" element={<Blueberry />} />
-                    <Route path="about" element={<About />} />
-                    <Route path="guide" element={<Guide />} />
-                    <Route path="gallery" element={<Gallery />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route path="services" element={<Services />} />
-                    <Route path="tailor-made" element={<TailorMade />} />
-                    <Route path="admin" element={<Admin />} />
-                    <Route path="checkout" element={<Checkout />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="dashboard/booking/:id" element={<BookingDetails />} />
-                    <Route path="parvati-valley" element={<ParvatiValley />} />
-                    <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
-                    <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
-                    <Route path="soul-cafe" element={<SoulCafe />} />
-                    <Route path="enquiry-success" element={<Success />} />
-                    <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
-                  </Route>
-                </Routes>
-              </Suspense>
-            </Router>
-          </CartProvider>
-        </AuthProvider>
-      </ErrorBoundary>
-    </HelmetProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <CartProvider>
+          <SmoothScroll />
+          <Toaster position="top-center" richColors />
+          <Router>
+            <ScrollToTop />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="tours" element={<Tours />} />
+                  <Route path="trekks" element={<Trekks />} />
+                  <Route path="wfh" element={<WFH />} />
+                  <Route path="yoga" element={<Yoga />} />
+                  <Route path="meditation" element={<Meditation />} />
+                  <Route path="adventure" element={<Adventure />} />
+                  <Route path=":category/:id" element={<ServiceDetail />} />
+                  <Route path=":category/:id/book" element={<BookingPage />} />
+                  <Route path="shop" element={<Shop />} />
+                  <Route path="cart" element={<Cart />} />
+                  <Route path="blueberry" element={<Blueberry />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="guide" element={<Guide />} />
+                  <Route path="gallery" element={<Gallery />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="services" element={<Services />} />
+                  <Route path="tailor-made" element={<TailorMade />} />
+                  <Route path="admin" element={<Admin />} />
+                  <Route path="checkout" element={<Checkout />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="dashboard/booking/:id" element={<BookingDetails />} />
+                  <Route path="parvati-valley" element={<ParvatiValley />} />
+                  <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
+                  <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
+                  <Route path="soul-cafe" element={<SoulCafe />} />
+                  <Route path="enquiry-success" element={<Success />} />
+                  <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

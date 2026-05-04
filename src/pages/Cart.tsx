@@ -64,7 +64,7 @@ export default function Cart() {
                     <div className="w-1/3 relative overflow-hidden shrink-0">
                       {item.image ? (
                         <img 
-                          src={(item.name || "").toLowerCase().includes("valley of shadows") ? "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg" : item.image} 
+                          src={(item.name || "").toLowerCase().includes("valley of shadows") ? "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" : item.image} 
                           alt={item.name} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                         />

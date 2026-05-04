@@ -610,7 +610,7 @@ export default function Home() {
                 >
                   <div 
                     className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
-                    style={{ backgroundImage: 'url(https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg)' }}
+                    style={{ backgroundImage: 'url(https://i.postimg.cc/TYqctVvr/IMG-8144.jpg)' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
                   <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">

@@ -79,8 +79,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Safety timeout for loading state
     const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000); // 5 second safety net
+      if (loading) {
+        console.warn("AuthContext: Loading state safety net triggered after 3s. Forcing loading to false.");
+        setLoading(false);
+      }
+    }, 3000); // 3 second safety net (reduced from 5s for better UX)
 
     return () => {
       unsubscribe();

@@ -377,7 +377,8 @@ export default function Admin() {
   // Custom Notifications & Confirmations
   const [isSyncing, setIsSyncing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '' });
+  const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+  const [editingSeoId, setEditingSeoId] = useState<string | null>(null);
   const [seoSearchTerm, setSeoSearchTerm] = useState('');
   const [isSeoFilterVisible, setIsSeoFilterVisible] = useState(false);
   const [isSeoAuditActive, setIsSeoAuditActive] = useState(false);
@@ -2942,15 +2943,37 @@ export default function Admin() {
                     <form 
                       onSubmit={async (e) => {
                         e.preventDefault();
+                        setIsProcessing(true);
                         try {
-                          await addDoc(collection(db, 'seo_settings'), {
-                            ...seoFormData,
-                            updatedAt: serverTimestamp()
-                          });
-                          setNotification({ message: 'SEO dynamics updated successfully', type: 'success' });
-                          setSeoFormData({ path: '', keyword: '', title: '', description: '' });
+                          if (editingSeoId) {
+                            await updateDoc(doc(db, 'seo_settings', editingSeoId), {
+                              ...seoFormData,
+                              updatedAt: serverTimestamp()
+                            });
+                            setNotification({ message: 'SEO dynamics updated successfully', type: 'success' });
+                          } else {
+                            // Check if path already exists
+                            const existing = seoSettings.find(s => s.path === seoFormData.path);
+                            if (existing) {
+                              await updateDoc(doc(db, 'seo_settings', existing.id), {
+                                ...seoFormData,
+                                updatedAt: serverTimestamp()
+                              });
+                              setNotification({ message: 'SEO configuration merged', type: 'success' });
+                            } else {
+                              await addDoc(collection(db, 'seo_settings'), {
+                                ...seoFormData,
+                                updatedAt: serverTimestamp()
+                              });
+                              setNotification({ message: 'SEO configuration deployed', type: 'success' });
+                            }
+                          }
+                          setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+                          setEditingSeoId(null);
                         } catch (error) {
                           handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
+                        } finally {
+                          setIsProcessing(false);
                         }
                       }}
                       className="space-y-6"
@@ -3016,6 +3039,72 @@ export default function Admin() {
                             />
                           </div>
                         </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1 text-terracotta flex items-center gap-2">
+                            <Share2 className="h-3 w-3" /> OG Preview Image (1200x630)
+                          </label>
+                          <div className="flex gap-3">
+                            <div className="relative flex-1">
+                              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                              <Input 
+                                placeholder="https://i.postimg.cc/..." 
+                                value={seoFormData.ogImage} 
+                                onChange={e => setSeoFormData({...seoFormData, ogImage: e.target.value})} 
+                                className="h-14 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium"
+                              />
+                            </div>
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id="seo-og-upload"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    setIsUploading(true);
+                                    try {
+                                      const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                                      const storagePath = `seo/${Date.now()}_${safeName}`;
+                                      const storageRef = ref(storage, storagePath);
+                                      const uploadTask = uploadBytesResumable(storageRef, file);
+                                      
+                                      const downloadURL = await new Promise<string>((resolve, reject) => {
+                                        uploadTask.on('state_changed', 
+                                          (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
+                                          (error) => reject(error),
+                                          async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
+                                        );
+                                      });
+                                      
+                                      setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
+                                      setNotification({ message: 'OG Image uploaded!', type: 'success' });
+                                    } catch (err) {
+                                      console.error(err);
+                                      setNotification({ message: 'Upload failed', type: 'error' });
+                                    } finally {
+                                      setIsUploading(false);
+                                      setUploadProgress(0);
+                                    }
+                                  }
+                                }}
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="h-14 w-14 rounded-xl border-forest/10 hover:bg-forest/5 p-0"
+                                onClick={() => document.getElementById('seo-og-upload')?.click()}
+                                disabled={isUploading}
+                              >
+                                {isUploading ? <RefreshCw className="h-4 w-4 animate-spin text-terracotta" /> : <Upload className="h-4 w-4 text-forest/40" />}
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-[9px] text-forest/30 font-medium px-1">
+                            Recommended: 1200x630px, under 300KB. This image appears on WhatsApp / FB / Twitter.
+                          </p>
+                        </div>
                       </div>
 
                       <Button type="submit" className="w-full bg-forest hover:bg-forest/90 text-white font-bold h-14 rounded-2xl shadow-lg shadow-forest/10 group transition-all" disabled={isProcessing}>
@@ -3046,6 +3135,84 @@ export default function Admin() {
                     </p>
                   </div>
                 </div>
+
+                {/* Global SEO Settings */}
+                <Card className="border border-terracotta/20 shadow-xl rounded-[2rem] bg-white overflow-hidden">
+                  <CardHeader className="bg-terracotta/[0.02] border-b border-terracotta/10 p-8">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-terracotta/10 flex items-center justify-center">
+                        <Globe className="h-4 w-4 text-terracotta" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg font-bold text-forest">Global SEO Settings</CardTitle>
+                        <CardDescription className="text-[10px] text-forest/40 font-medium uppercase tracking-widest">Site-wide defaults & configuration</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-8 space-y-6">
+                    <div className="space-y-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1 text-terracotta">Global Fallback OG Image</label>
+                        <div className="flex gap-3">
+                          <Input 
+                            placeholder="https://..." 
+                            value={siteSettings.globalOgImage || ''} 
+                            onChange={e => setSiteSettings({...siteSettings, globalOgImage: e.target.value})} 
+                            className="h-12 rounded-xl bg-forest/[0.02] border-forest/10 text-xs font-medium"
+                          />
+                        </div>
+                        <p className="text-[9px] text-forest/30 font-medium">Used if a page-specific OG image is missing.</p>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Structured Data Type</label>
+                        <select 
+                          value={siteSettings.structuredDataType || 'TravelAgency'} 
+                          onChange={e => setSiteSettings({...siteSettings, structuredDataType: e.target.value})}
+                          className="w-full h-12 rounded-xl bg-forest/[0.02] border-forest/10 px-4 text-xs font-medium focus:ring-2 focus:ring-forest/5 outline-none transition-all"
+                        >
+                          <option value="TravelAgency">Travel Agency</option>
+                          <option value="Organization">Organization</option>
+                          <option value="LocalBusiness">Local Business</option>
+                          <option value="TourOperator">Tour Operator</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Google Site Verification</label>
+                        <Input 
+                          placeholder="google-site-verification=..." 
+                          value={siteSettings.googleSiteVerification || ''} 
+                          onChange={e => setSiteSettings({...siteSettings, googleSiteVerification: e.target.value})} 
+                          className="h-12 rounded-xl bg-forest/[0.02] border-forest/10 text-xs font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <Button 
+                      onClick={async () => {
+                        setIsProcessing(true);
+                        try {
+                          await setDoc(doc(db, 'site_settings', 'global'), {
+                            ...siteSettings,
+                            updatedAt: serverTimestamp()
+                          }, { merge: true });
+                          setNotification({ message: 'Global SEO settings deployed', type: 'success' });
+                        } catch (err) {
+                          console.error(err);
+                          setNotification({ message: 'Update failed', type: 'error' });
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }}
+                      className="w-full bg-forest text-white h-12 rounded-xl font-bold flex items-center justify-center gap-2"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Sync Global Configuration
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Status List Column */}
@@ -3174,11 +3341,13 @@ export default function Admin() {
                                 size="icon" 
                                 className="h-10 w-10 rounded-xl bg-forest/5 text-forest/40 hover:bg-forest hover:text-white"
                                 onClick={() => {
+                                  setEditingSeoId(item.id);
                                   setSeoFormData({
                                     path: item.path,
                                     keyword: item.keyword || '',
                                     title: item.title,
-                                    description: item.description
+                                    description: item.description,
+                                    ogImage: item.ogImage || ''
                                   });
                                   window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}

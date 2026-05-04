@@ -246,7 +246,7 @@ export default function Meditation() {
                   >
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
-                        ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                        ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                         : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"
@@ -392,7 +392,7 @@ export default function Meditation() {
               <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
                 <ImageSlider 
                   images={((selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
-                    ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                    ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                     : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
                   alt={selectedPackage.title}
                   className="h-full w-full"

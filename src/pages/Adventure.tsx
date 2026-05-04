@@ -236,7 +236,7 @@ export default function Adventure() {
                     <div className="relative h-80 overflow-hidden">
                       <ImageSlider 
                         images={((activity.title || '').toLowerCase().includes('valley of shadows') 
-                          ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                          ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                           : [activity.image, ...(activity.images || [])]).filter(Boolean)} 
                         alt={activity.title}
                         className="h-full w-full"
@@ -421,7 +421,7 @@ export default function Adventure() {
               <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
                 <ImageSlider 
                   images={((selectedActivity.title || '').toLowerCase().includes('valley of shadows') 
-                    ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
+                    ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                     : [selectedActivity.image, ...(selectedActivity.images || [])]).filter(Boolean)} 
                   alt={selectedActivity.title}
                   className="h-full w-full"
