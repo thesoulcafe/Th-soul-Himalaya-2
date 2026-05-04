@@ -240,6 +240,8 @@ export default function Adventure() {
                           : [activity.image, ...(activity.images || [])]).filter(Boolean)} 
                         alt={activity.title}
                         className="h-full w-full"
+                        showThumbnails={true}
+                        thumbnailClassName="absolute bottom-2 left-0 right-0 z-20 pointer-events-auto"
                       />
                       <div 
                         className="absolute top-6 left-6 bg-white/90 p-3 rounded-2xl shadow-lg flex items-center gap-3 z-10"
@@ -427,6 +429,8 @@ export default function Adventure() {
                   className="h-full w-full"
                   autoSwipe={true}
                   interval={4000}
+                  showThumbnails={true}
+                  thumbnailClassName="mt-4"
                 />
                 
                 {/* Decorative Overlays */}

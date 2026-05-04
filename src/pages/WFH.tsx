@@ -286,7 +286,7 @@ export default function WFH() {
                   <div className="relative h-48 overflow-hidden">
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
-                        ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
+                        ? ["https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg"] 
                         : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"

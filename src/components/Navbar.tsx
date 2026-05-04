@@ -63,7 +63,7 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <span className="flex items-baseline gap-1 xs:gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
+              <span className="flex items-baseline gap-1 xs:gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1 md:hidden">
                 <span className="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[22px] font-playfair italic font-medium text-white/90">
                   The
                 </span>

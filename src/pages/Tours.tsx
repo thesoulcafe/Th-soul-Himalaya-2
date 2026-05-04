@@ -488,6 +488,8 @@ export default function Tours() {
                           : [tour.image, ...(tour.images || [])]).filter(Boolean)} 
                         alt={tour.title}
                         className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
+                        showThumbnails={true}
+                        thumbnailClassName="absolute bottom-2 left-0 right-0 z-20 pointer-events-auto"
                       />
                       <div 
                         className="absolute top-4 left-4 flex flex-col gap-2 z-10"
@@ -633,6 +635,8 @@ export default function Tours() {
                   className="h-full w-full"
                   autoSwipe={true}
                   interval={4000}
+                  showThumbnails={true}
+                  thumbnailClassName="mt-4"
                 />
                 
                 {/* Decorative Overlays */}

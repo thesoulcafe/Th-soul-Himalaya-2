@@ -480,7 +480,7 @@ async function injectMetaTags(req: express.Request, html: string) {
         if (urlStr.includes('/parvati-valley')) {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
           description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
-          image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
+          image = "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
         } else if (urlStr.includes('/tours')) {
           title = "Curated Tours | The Soul Himalaya";
           description = "Discover our handpicked mountain journeys across the Kullu and Parvati valleys.";
