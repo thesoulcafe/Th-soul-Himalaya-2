@@ -21,72 +21,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
-    // Test Firestore connection
-    const testConnection = async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       try {
-        await getDocFromServer(doc(db, 'test', 'connection'));
-      } catch (error) {
-        // Silently handle connectivity issues to avoid confusing users with technical console logs
-        // unless they specifically check for connection state.
-      }
-    };
-    testConnection();
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        try {
-          const docRef = doc(db, 'users', user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setProfile(data);
-            if (data.isBlocked) {
-              setIsBlocked(true);
-              await signOut(auth);
+        setUser(authUser);
+        if (authUser) {
+          try {
+            const docRef = doc(db, 'users', authUser.uid);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              setProfile(data);
+              if (data.isBlocked) {
+                setIsBlocked(true);
+                await signOut(auth);
+              } else {
+                setIsBlocked(false);
+              }
             } else {
-              setIsBlocked(false);
+              // Create initial profile
+              const initialProfile = {
+                uid: authUser.uid,
+                email: authUser.email,
+                displayName: authUser.displayName,
+                photoURL: authUser.photoURL,
+                role: 'user',
+                loyaltyPoints: 0,
+                soulPoints: 0,
+                isBlocked: false,
+                createdAt: serverTimestamp(),
+                lastActive: serverTimestamp()
+              };
+              try {
+                await setDoc(docRef, initialProfile);
+                setProfile({
+                  ...initialProfile,
+                  createdAt: new Date().toISOString(),
+                  lastActive: new Date().toISOString()
+                });
+                setIsBlocked(false);
+              } catch (e) {
+                console.error("Error creating user profile:", e);
+              }
             }
-          } else {
-            // Create initial profile
-            const initialProfile = {
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName,
-              photoURL: user.photoURL,
-              role: 'user',
-              loyaltyPoints: 0,
-              soulPoints: 0,
-              isBlocked: false,
-              createdAt: serverTimestamp(),
-              lastActive: serverTimestamp()
-            };
-            try {
-              await setDoc(docRef, initialProfile);
-              setProfile({
-                ...initialProfile,
-                createdAt: new Date().toISOString(),
-                lastActive: new Date().toISOString()
-              });
-              setIsBlocked(false);
-            } catch (e) {
-              console.error("Error creating user profile:", e);
-            }
+          } catch (error) {
+            console.error("Failed to fetch user profile:", error);
+            setProfile(null);
           }
-        } catch (error) {
-          console.error("Failed to fetch user profile:", error);
-          // Don't crash the app, just set profile to null
+        } else {
           setProfile(null);
+          setIsBlocked(false);
         }
-      } else {
-        setProfile(null);
-        setIsBlocked(false);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return unsubscribe;
+    // Safety timeout for loading state
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000); // 5 second safety net
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const login = async () => {
