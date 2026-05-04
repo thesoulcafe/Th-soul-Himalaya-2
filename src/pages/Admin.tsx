@@ -5,7 +5,7 @@ import {
   Flower2, Users, History, LayoutDashboard, TrendingUp, DollarSign,
   CheckCircle2, Clock, AlertCircle, Search, Filter, ChevronRight,
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
-  MessageCircle as MessageCircleIcon, Mail, Eye, EyeOff, Activity, Calendar,
+  MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
   Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2
 } from 'lucide-react';
@@ -101,6 +101,7 @@ interface Message {
   userId: string | null;
   userName: string;
   userEmail: string;
+  userPhone?: string;
   subject: string;
   message: string;
   status: 'unread' | 'read' | 'replied';
@@ -3326,6 +3327,12 @@ export default function Admin() {
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] text-forest/30 font-mono">{msg.userEmail}</span>
                               </div>
+                              {msg.userPhone && (
+                                <div className="flex items-center gap-2 bg-green-500/5 px-2 py-0.5 rounded border border-green-500/10">
+                                  <PhoneIcon className="h-2.5 w-2.5 text-green-600" />
+                                  <span className="text-[10px] text-green-700 font-mono font-bold">{msg.userPhone}</span>
+                                </div>
+                              )}
                             </div>
                             <div className="bg-forest/[0.02] border border-forest/5 rounded-lg p-4 text-xs text-forest/70 leading-relaxed font-medium">
                               {msg.message}

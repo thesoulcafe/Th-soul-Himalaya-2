@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
+import { Zap, Phone as PhoneIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth } from '@/lib/firebase';
 
 interface CustomizeTripCardProps {
   places?: string[];
@@ -24,16 +27,19 @@ export default function CustomizeTripCard({
   title = "Customize your trip",
   description = "Tell us your preferences and we'll craft the perfect Himalayan experience for you."
 }: CustomizeTripCardProps) {
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [guests, setGuests] = useState('1');
   const [requests, setRequests] = useState('');
   const [selectedPlaces, setSelectedPlaces] = useState<string[]>([]);
   const [selectedTreks, setSelectedTreks] = useState<string[]>([]);
   const [selectedYoga, setSelectedYoga] = useState<string[]>([]);
   const [selectedMeditation, setSelectedMeditation] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleSelection = (list: string[], setList: (l: string[]) => void, item: string) => {
     if (list.includes(item)) {
@@ -57,29 +63,93 @@ export default function CustomizeTripCard({
       </div>
 
       <div className="p-8 pt-0">
-        <form className="space-y-6" onSubmit={(e) => {
+        <form className="space-y-6" onSubmit={async (e) => {
           e.preventDefault();
-          toast.success("Request Received", {
-            description: `Thank you ${fullName}! Your request for ${selectedPlaces.join(', ') || 'Himalayas'} has been received. Our guides will contact you soon.`,
-          });
+          
+          if (!fullName || !email || !phone) {
+            toast.error("Missing Information", {
+              description: "Please fill in your name, email, and phone number.",
+            });
+            return;
+          }
+
+          setIsSubmitting(true);
+
+          try {
+            const summary = `
+      Places: ${selectedPlaces.join(', ') || 'N/A'}
+      Treks: ${selectedTreks.join(', ') || 'N/A'}
+      Yoga: ${selectedYoga.join(', ') || 'N/A'}
+      Meditation: ${selectedMeditation.join(', ') || 'N/A'}
+      Dates: ${startDate} to ${endDate}
+      Guests: ${guests}
+      Special Requests: ${requests}
+            `.trim();
+
+            await addDoc(collection(db, 'messages'), {
+              userId: auth.currentUser?.uid || null,
+              userName: fullName,
+              userEmail: email,
+              userPhone: phone,
+              subject: 'Tailor-Made Journey Inquiry',
+              message: summary,
+              status: 'unread',
+              createdAt: serverTimestamp(),
+              metadata: {
+                selectedPlaces,
+                selectedTreks,
+                selectedYoga,
+                selectedMeditation,
+                startDate,
+                endDate,
+                guests,
+                source: 'TailorMadePage'
+              }
+            });
+
+            // Redirect to success page
+            navigate('/enquiry-success');
+            
+          } catch (error) {
+            console.error("Error submitting inquiry:", error);
+            toast.error("Submission Failed", {
+              description: "There was an error sending your request. Please try again later.",
+            });
+          } finally {
+            setIsSubmitting(false);
+          }
         }}>
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>
-            <Input 
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter your name" 
-              className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Full Name</label>
+              <Input 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your name" 
+                className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Email Address</label>
+              <Input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email" 
+                className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
+                required
+              />
+            </div>
           </div>
+
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Email Address</label>
+            <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Mobile Number</label>
             <Input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email" 
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your WhatsApp number (e.g. +91 ...)" 
               className="rounded-2xl border-white/10 bg-white/5 text-white placeholder:text-white/20 h-12 focus:ring-terracotta/50" 
               required
             />
@@ -199,9 +269,17 @@ export default function CustomizeTripCard({
             />
           </div>
 
-          <Button type="submit" className="w-full bg-terracotta hover:bg-terracotta/90 text-white py-8 rounded-2xl text-lg font-bold shadow-xl shadow-terracotta/20 group">
-            <Zap className="h-5 w-5 mr-2 transition-transform group-hover:scale-125" />
-            Enquire Now
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full bg-terracotta hover:bg-terracotta/90 text-white py-8 rounded-2xl text-lg font-bold shadow-xl shadow-terracotta/20 group disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+            ) : (
+              <Zap className="h-5 w-5 mr-2 transition-transform group-hover:scale-125" />
+            )}
+            {isSubmitting ? 'Submitting...' : 'Enquire Now'}
           </Button>
         </form>
         <div className="mt-8 flex items-center justify-center gap-4 text-white/40">
