@@ -4,23 +4,31 @@ import 'lenis/dist/lenis.css';
 
 export default function SmoothScroll() {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
-    });
+    let lenis: any;
+    try {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        infinite: false,
+      });
 
-    function raf(time: number) {
-      lenis.raf(time);
+      function raf(time: number) {
+        if (lenis) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
+      }
+
       requestAnimationFrame(raf);
+    } catch (error) {
+      console.error("Lenis initialization failed:", error);
+      return;
     }
-
-    requestAnimationFrame(raf);
 
     // Handle internal links for Lenis
     const handleAnchorClick = (e: MouseEvent) => {
@@ -34,6 +42,7 @@ export default function SmoothScroll() {
 
     // Watch for body overflow changes to stop/start lenis
     const observer = new MutationObserver(() => {
+      if (!lenis) return;
       if (document.body.style.overflow === 'hidden') {
         lenis.stop();
       } else {
@@ -43,10 +52,15 @@ export default function SmoothScroll() {
 
     observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
 
-    document.body.addEventListener('click', handleAnchorClick);
+    document.body.addEventListener('click', (e) => {
+      if (!lenis) return;
+      handleAnchorClick(e);
+    });
 
     return () => {
-      lenis.destroy();
+      if (lenis) {
+        lenis.destroy();
+      }
       observer.disconnect();
       document.body.removeEventListener('click', handleAnchorClick);
     };

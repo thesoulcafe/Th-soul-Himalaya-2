@@ -50,6 +50,8 @@ export default function WFH() {
     const q = query(collection(db, 'seo_settings'), where('path', '==', '/wfh'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) setSeo(snapshot.docs[0].data());
+    }, (error) => {
+      console.error("WFH SEO snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -128,6 +130,9 @@ export default function WFH() {
 
       setPackages(sortedPackages);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("WFH packages snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -139,6 +144,8 @@ export default function WFH() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("WFH config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

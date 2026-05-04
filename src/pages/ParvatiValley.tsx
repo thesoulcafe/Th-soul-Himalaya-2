@@ -90,6 +90,8 @@ const ParvatiValley = () => {
       if (!snapshot.empty) {
         setAdminData(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Parvati Valley snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

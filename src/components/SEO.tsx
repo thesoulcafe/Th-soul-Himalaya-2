@@ -48,11 +48,13 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
     return () => unsubscribe();
   }, [window.location.pathname]);
 
-  const seoTitle = pageSeo?.title || title;
-  const seoDescription = pageSeo?.description || description;
+  const seoTitle = pageSeo?.title || title || "The Soul Himalaya";
+  const seoDescription = pageSeo?.description || description || "";
   const seoImage = pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
 
-  const finalTitle = seoTitle.includes("Soul Himalaya") ? seoTitle : `${seoTitle} | Soul Himalaya`;
+  const finalTitle = (seoTitle && typeof seoTitle === 'string' && seoTitle.includes("Soul Himalaya")) 
+    ? seoTitle 
+    : `${seoTitle} | Soul Himalaya`;
   
   // Automated Description Fallback (First 160 chars)
   const finalDescription = seoDescription && seoDescription.length > 10 

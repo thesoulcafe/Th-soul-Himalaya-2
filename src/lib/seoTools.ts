@@ -2,7 +2,22 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { db } from "./firebase";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiClient) {
+    // In Vite, environment variables are typically in import.meta.env
+    // AI Studio provides GEMINI_API_KEY in the environment
+    const key = (import.meta.env?.VITE_GEMINI_API_KEY) || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+    
+    if (!key) {
+      console.warn("GEMINI_API_KEY not found. AI-powered SEO tools will be limited.");
+      return null;
+    }
+    aiClient = new GoogleGenAI(key);
+  }
+  return aiClient;
+}
 
 /**
  * Ensures a URL is absolute by prepending the domain if necessary.
@@ -19,12 +34,13 @@ export function toAbsoluteUrl(url: string | undefined): string {
  */
 export async function generateMetaDescription(pageContent: string, title: string): Promise<string> {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `You are an SEO expert. Write a compelling meta description (max 160 characters) for a travel page titled "${title}" with the following content: ${pageContent.slice(0, 500)}. Focus on benefits and search intent.`,
-    });
+    const ai = getAI();
+    if (!ai) return pageContent.slice(0, 160);
+
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(`You are an SEO expert. Write a compelling meta description (max 160 characters) for a travel page titled "${title}" with the following content: ${pageContent.slice(0, 500)}. Focus on benefits and search intent.`);
     
-    return response.text?.trim() || "";
+    return response.response.text()?.trim() || "";
   } catch (error) {
     console.error("AI Meta Description Generation failed:", error);
     return pageContent.slice(0, 160);

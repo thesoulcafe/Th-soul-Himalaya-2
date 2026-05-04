@@ -75,6 +75,8 @@ export default function Guide() {
         ...doc.data().data
       }));
       setDbFaqs(items);
+    }, (error) => {
+      console.error("Guide FAQ content snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

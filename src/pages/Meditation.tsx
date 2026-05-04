@@ -122,6 +122,9 @@ export default function Meditation() {
 
       setPackageList(sortedPackages);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("Meditation packages snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -133,6 +136,8 @@ export default function Meditation() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Meditation config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);

@@ -122,6 +122,9 @@ export default function Yoga() {
 
       setPackageList(sortedPackages);
       setHasLoaded(true);
+    }, (error) => {
+      console.error("Yoga packages snapshot failed:", error);
+      setHasLoaded(true);
     });
 
     return () => unsubscribe();
@@ -133,6 +136,8 @@ export default function Yoga() {
       if (!snapshot.empty) {
         setConfig(snapshot.docs[0].data().data);
       }
+    }, (error) => {
+      console.error("Yoga config snapshot failed:", error);
     });
     return () => unsubscribe();
   }, []);
