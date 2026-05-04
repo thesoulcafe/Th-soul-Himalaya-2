@@ -23,12 +23,8 @@ const GOOGLE_BUSINESS_LINK = "https://share.google/yoPjK9TNhDpvBlB4X";
 export default function SoulCafe() {
   const navigate = useNavigate();
   const [reservationSuccess, setReservationSuccess] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  const { scrollYProgress } = useScroll();
 
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.1]);
@@ -40,7 +36,7 @@ export default function SoulCafe() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#faf9f6] selection:bg-terracotta selection:text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#faf9f6] selection:bg-terracotta selection:text-white font-sans overflow-x-hidden">
       <SEO 
         title="The Soul Cafe | A Sanctuary for Dreamers in Tosh" 
         description="Experience the finest organic Himalayan cuisine and artisan coffee at The Soul Cafe, Tosh. A curated sanctuary for explorers in the Parvati Valley." 
