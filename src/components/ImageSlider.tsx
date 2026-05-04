@@ -118,8 +118,13 @@ export default function ImageSlider({
     setCurrentIndex(index);
   };
 
-  // Prefetch next and previous images
+  // Pre-fetch images and handle index bounds
   useEffect(() => {
+    if (currentIndex >= images.length) {
+      setCurrentIndex(0);
+      return;
+    }
+    
     if (images.length <= 1) return;
     const nextIndex = (currentIndex + 1) % images.length;
     const prevIndex = (currentIndex - 1 + images.length) % images.length;
@@ -138,16 +143,10 @@ export default function ImageSlider({
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Hidden prefetcher for all images */}
-        <div className="hidden">
-          {images.map((src, i) => (
-            <link key={i} rel="prefetch" href={src} />
-          ))}
-        </div>
         <AnimatePresence initial={false} custom={direction}>
           <motion.img
             key={currentIndex}
-            src={images[currentIndex]}
+            src={images[currentIndex] || images[0]}
             alt={`${alt} - ${currentIndex + 1}`}
             custom={direction}
             variants={variants}
