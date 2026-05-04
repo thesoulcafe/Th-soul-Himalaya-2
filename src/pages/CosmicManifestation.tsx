@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const COSMIC_SECTIONS = [
   {
     id: "mantalai",
-    title: "Parvati Mata Janma Bhoomi",
+    title: "Mantalai : Parvati Mata Janma Bhoomi",
     subtitle: "The Source of the Divine River",
     image: "https://i.postimg.cc/63Qg07Xh/IMG-8098.jpg",
     paragraphs: [
