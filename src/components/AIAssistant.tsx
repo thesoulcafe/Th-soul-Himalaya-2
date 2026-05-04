@@ -15,12 +15,24 @@ import { toast } from 'sonner';
 // This hook preserves the chat history even if the component is visually hidden/unmounted in some flows.
 function useActivityState<T>(key: string, initialState: T) {
   const [state, setState] = useState<T>(() => {
-    const saved = sessionStorage.getItem(`activity_${key}`);
-    return saved ? JSON.parse(saved) : initialState;
+    try {
+      const saved = typeof window !== 'undefined' ? sessionStorage.getItem(`activity_${key}`) : null;
+      if (!saved) return initialState;
+      return JSON.parse(saved);
+    } catch (error) {
+      console.error(`Failed to parse activity state for ${key}:`, error);
+      return initialState;
+    }
   });
 
   useEffect(() => {
-    sessionStorage.setItem(`activity_${key}`, JSON.stringify(state));
+    try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(`activity_${key}`, JSON.stringify(state));
+      }
+    } catch (error) {
+      console.error(`Failed to save activity state for ${key}:`, error);
+    }
   }, [key, state]);
 
   return [state, setState] as const;
