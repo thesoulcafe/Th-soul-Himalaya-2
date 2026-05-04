@@ -64,13 +64,13 @@ export default function Navbar() {
                 />
               </div>
               <span className="flex items-baseline gap-1 xs:gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1">
-                <span className="text-[12px] xs:text-[14px] sm:text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
+                <span className="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[22px] font-playfair italic font-medium text-white/90">
                   The
                 </span>
-                <span className="text-[18px] xs:text-[22px] sm:text-[26px] md:text-[34px] font-fluid text-terracotta drop-shadow-sm px-0.5 sm:px-1">
+                <span className="text-[18px] xs:text-[22px] sm:text-[24px] md:text-[28px] lg:text-[30px] xl:text-[34px] font-fluid text-terracotta drop-shadow-sm px-0.5 sm:px-1">
                   Soul
                 </span>
-                <span className="text-[12px] xs:text-[14px] sm:text-[18px] md:text-[22px] font-playfair italic font-medium text-white/90">
+                <span className="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[22px] font-playfair italic font-medium text-white/90">
                   Himalaya
                 </span>
               </span>

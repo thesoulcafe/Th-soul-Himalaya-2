@@ -75,23 +75,24 @@ export default function SoulCafe() {
       </div>
 
       {/* Sticky Glass Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center bg-white/5 backdrop-blur-lg border-b border-white/10 transition-all duration-300">
-        <div className="flex items-center gap-6">
+      <nav className="fixed top-0 left-0 right-0 z-[100] px-4 py-4 md:px-8 md:py-6 flex justify-between items-center bg-white/5 backdrop-blur-lg border-b border-white/10 transition-all duration-300">
+        <div className="flex items-center gap-2 md:gap-6">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="text-white hover:bg-white/10 rounded-full h-10 px-4 font-black uppercase tracking-widest text-[10px]"
+            className="text-white hover:bg-white/10 rounded-full h-10 w-10 md:w-auto md:px-4 font-black uppercase tracking-widest text-[10px]"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" /> 
+            <ArrowLeft className="h-4 w-4 md:mr-2" /> 
+            <span className="hidden md:inline">Back</span>
           </Button>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#about" className="text-white text-[10px] font-black uppercase tracking-widest hover:text-terracotta transition-colors">Story</a>
-            <a href="#reserve" className="text-white text-[10px] font-black uppercase tracking-widest hover:text-terracotta transition-colors">Reserve</a>
+          <div className="hidden sm:flex items-center gap-4 md:gap-8">
+            <a href="#about" className="text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:text-terracotta transition-colors">Story</a>
+            <a href="#reserve" className="text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:text-terracotta transition-colors">Reserve</a>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
            <a href={GOOGLE_BUSINESS_LINK} target="_blank" rel="noreferrer">
-              <Button className="bg-terracotta hover:bg-white hover:text-terracotta text-white rounded-full h-10 px-6 font-black uppercase tracking-widest text-[9px] transition-all">
+              <Button className="bg-terracotta hover:bg-white hover:text-terracotta text-white rounded-full h-9 md:h-10 px-4 md:px-6 font-black uppercase tracking-widest text-[8px] md:text-[9px] transition-all shadow-lg shadow-terracotta/20">
                 Reviews
               </Button>
            </a>
@@ -151,35 +152,35 @@ export default function SoulCafe() {
       </section>
 
       {/* 2. CAFÉ STORY / ABOUT */}
-      <section id="about" className="py-32 px-6 max-w-4xl mx-auto text-center">
+      <section id="about" className="py-20 md:py-32 px-6 max-w-5xl mx-auto text-center">
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="space-y-12"
+          className="space-y-8 md:space-y-12"
         >
-          <div className="space-y-8">
-            <span className="text-terracotta font-black uppercase tracking-[0.4em] text-[11px] block">
+          <div className="space-y-6 md:space-y-8">
+            <span className="text-terracotta font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-[9px] md:text-[11px] block">
               Culinary Intelligence from the Heart of Parvati
             </span>
-            <h2 className="text-5xl md:text-7xl font-playfair font-black text-forest italic leading-none uppercase tracking-tighter">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-playfair font-black text-forest italic leading-none uppercase tracking-tighter">
               Find love with <span className="text-terracotta">Soul.</span>
             </h2>
           </div>
-          <p className="text-forest/70 text-xl leading-relaxed font-medium max-w-2xl mx-auto italic">
+          <p className="text-forest/70 text-base md:text-xl leading-relaxed font-medium max-w-2xl mx-auto italic">
             Perched on the edge of Tosh village, Soul Café is more than a culinary stop. It's a curated experience where every ingredient tells a story of the soil, the seasons, and the spirit of the Parvati Valley.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 pt-10">
             {[
               { icon: Coffee, val: "20+", label: "Specialty Brews" },
               { icon: Leaf, val: "100%", label: "Farm-to-Table" },
               { icon: Compass, val: "8,000", label: "Altitude (Ft)" }
             ].map((stat, idx) => (
-              <div key={idx} className="p-8 bg-white rounded-[2.5rem] border border-forest/5 text-center group hover:border-terracotta/30 transition-all shadow-sm">
-                <stat.icon className="h-6 w-6 text-terracotta mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                <div className="text-3xl font-black text-forest mb-1">{stat.val}</div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-forest/40">{stat.label}</div>
+              <div key={idx} className="p-6 md:p-8 bg-white rounded-[2rem] md:rounded-[2.5rem] border border-forest/5 text-center group hover:border-terracotta/30 transition-all shadow-sm">
+                <stat.icon className="h-5 w-5 md:h-6 md:w-6 text-terracotta mx-auto mb-3 md:mb-4 group-hover:scale-110 transition-transform" />
+                <div className="text-2xl md:text-3xl font-black text-forest mb-1">{stat.val}</div>
+                <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-forest/40">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -187,27 +188,27 @@ export default function SoulCafe() {
       </section>
 
       {/* 7. TABLE RESERVATION WIDGET */}
-      <section id="reserve" className="py-32 bg-[#faf9f6] relative">
+      <section id="reserve" className="py-20 md:py-32 bg-[#faf9f6] relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px bg-forest/10" />
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-          <div className="space-y-10">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
+          <div className="space-y-8 md:space-y-10">
              <div className="space-y-4">
-                <span className="text-terracotta font-black uppercase tracking-widest text-[11px]">Planning your visit?</span>
-                <h2 className="text-6xl font-playfair font-black text-forest italic uppercase tracking-tighter leading-none">Book Your <br /> <span className="text-terracotta">Sanctuary.</span></h2>
+                <span className="text-terracotta font-black uppercase tracking-widest text-[10px] md:text-[11px]">Planning your visit?</span>
+                <h2 className="text-5xl md:text-6xl font-playfair font-black text-forest italic uppercase tracking-tighter leading-none">Book Your <br /> <span className="text-terracotta">Sanctuary.</span></h2>
              </div>
-             <p className="text-forest/60 text-lg leading-relaxed">
+             <p className="text-forest/60 text-base md:text-lg leading-relaxed">
                While we always welcome walk-ins, reserving your table ensures you have the best seat for the sunrise or the crackle of the evening fire.
              </p>
-             <div className="grid grid-cols-2 gap-4">
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-6 bg-white rounded-3xl border border-forest/5 flex items-center gap-4">
-                   <div className="h-10 w-10 bg-forest/5 rounded-full flex items-center justify-center"><Calendar className="text-terracotta w-5 h-5" /></div>
+                   <div className="h-10 w-10 bg-forest/5 rounded-full flex items-center justify-center shrink-0"><Calendar className="text-terracotta w-5 h-5" /></div>
                    <div>
                       <h4 className="text-[10px] font-black uppercase tracking-widest">Available</h4>
                       <p className="text-[9px] text-forest/40 uppercase tracking-widest mt-1">Daily Reservations</p>
                    </div>
                 </div>
                 <div className="p-6 bg-white rounded-3xl border border-forest/5 flex items-center gap-4">
-                   <div className="h-10 w-10 bg-forest/5 rounded-full flex items-center justify-center"><Users className="text-terracotta w-5 h-5" /></div>
+                   <div className="h-10 w-10 bg-forest/5 rounded-full flex items-center justify-center shrink-0"><Users className="text-terracotta w-5 h-5" /></div>
                    <div>
                       <h4 className="text-[10px] font-black uppercase tracking-widest">Capacity</h4>
                       <p className="text-[9px] text-forest/40 uppercase tracking-widest mt-1">Up to 12 Guests</p>
@@ -217,7 +218,7 @@ export default function SoulCafe() {
           </div>
 
           <div className="relative">
-             <div className="bg-white p-12 md:p-16 rounded-[4rem] shadow-3xl border border-forest/5 relative z-10">
+             <div className="bg-white p-8 sm:p-12 md:p-16 rounded-[3rem] md:rounded-[4rem] shadow-3xl border border-forest/5 relative z-10 mx-auto max-w-md lg:max-w-none">
                 <AnimatePresence mode="wait">
                   {!reservationSuccess ? (
                     <motion.form 
@@ -331,31 +332,38 @@ export default function SoulCafe() {
       </section>
 
       {/* Footer / Join the Journey */}
-      <footer className="py-32 px-6 text-center bg-white">
-        <div className="max-w-4xl mx-auto space-y-12">
+      <footer className="py-20 md:py-32 px-6 text-center bg-white overflow-hidden relative">
+        <div className="max-w-4xl mx-auto space-y-12 relative z-10">
            <div className="flex items-center justify-center gap-4">
               <div className="h-px flex-1 bg-forest/10" />
-              <Heart className="text-terracotta w-6 h-6 animate-pulse" />
+              <Heart className="text-terracotta w-5 h-5 md:w-6 md:h-6 animate-pulse" />
               <div className="h-px flex-1 bg-forest/10" />
            </div>
-           <h2 className="text-7xl md:text-9xl font-playfair font-black text-forest italic uppercase tracking-tighter opacity-[0.03] absolute left-1/2 -translate-x-1/2 pointer-events-none select-none">The Soul Himalaya</h2>
-           <div className="space-y-6 relative z-10">
-              <h3 className="text-4xl font-playfair font-bold italic tracking-tight">Join the Soul Community</h3>
-              <p className="text-forest/60 text-sm uppercase tracking-[0.3em] font-medium max-w-sm mx-auto leading-relaxed">Daily mountain inspiration and curated Himalayan recipes.</p>
-              <div className="flex justify-center gap-4 pt-6">
-                <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="border-forest/10 text-forest hover:bg-forest hover:text-white rounded-full h-16 w-16 p-0 group overflow-hidden">
-                    <Instagram className="h-6 w-6 group-hover:scale-110 transition-transform" />
+           <h2 className="text-5xl sm:text-7xl md:text-9xl font-playfair font-black text-forest italic uppercase tracking-tighter opacity-[0.03] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none w-full whitespace-nowrap">
+             The Soul Himalaya
+           </h2>
+           <div className="space-y-6 md:space-y-8 relative z-10">
+              <h3 className="text-3xl md:text-5xl font-playfair font-bold italic tracking-tight text-forest">Join the Soul Community</h3>
+              <p className="text-forest/60 text-[10px] md:text-sm uppercase tracking-[0.3em] font-medium max-w-sm mx-auto leading-relaxed italic">
+                Daily mountain inspiration and curated Himalayan recipes.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6 pt-6">
+                <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-16 h-14 sm:h-16 border-forest/10 text-forest hover:bg-forest hover:text-white rounded-full p-0 group overflow-hidden transition-all duration-500">
+                    <Instagram className="h-5 w-5 md:h-6 md:w-6 animate-in zoom-in group-hover:scale-125 transition-transform" />
+                    <span className="sm:hidden ml-2 font-black uppercase tracking-widest text-[10px]">Instagram</span>
                   </Button>
                 </a>
-                <a href="/" className="flex-1 max-w-[200px]">
-                  <Button className="w-full h-16 bg-forest text-white rounded-full font-black uppercase tracking-widest text-[10px]">
+                <a href="/" className="w-full sm:flex-1 sm:max-w-[200px]">
+                  <Button className="w-full h-14 sm:h-16 bg-forest text-white hover:bg-terracotta rounded-full font-black uppercase tracking-widest text-[10px] transition-all duration-500 shadow-xl shadow-forest/10">
                     Back to Home
                   </Button>
                 </a>
               </div>
            </div>
-           <p className="text-forest/20 text-[9px] font-black uppercase tracking-[0.5em] pt-20">Part of The Soul Himalaya Collective • Tosh Village</p>
+           <p className="text-forest/30 text-[8px] md:text-[9px] font-black uppercase tracking-[0.5em] pt-16 md:pt-24 italic">
+             Part of The Soul Himalaya Collective • Tosh Village
+           </p>
         </div>
       </footer>
     </div>
