@@ -448,18 +448,12 @@ export default function Guide() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                       <a 
-                        href="https://wa.me/911234567890" 
+                        href="https://wa.me/917878200632" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-4 bg-forest text-white rounded-full text-[11px] font-bold uppercase tracking-widest hover:bg-forest/90 transition-all shadow-xl shadow-forest/10"
                       >
                         <MessageSquare className="h-4 w-4" /> Start Soul Chat
-                      </a>
-                      <a 
-                        href="mailto:care@thesoulhimalaya.com" 
-                        className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-4 bg-white text-forest border border-forest/10 rounded-full text-[11px] font-bold uppercase tracking-widest hover:bg-neutral-50 transition-all shadow-md"
-                      >
-                        <Mail className="h-4 w-4" /> Send Soul Inquiry
                       </a>
                     </div>
 
