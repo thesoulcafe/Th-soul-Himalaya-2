@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -30,10 +30,11 @@ import { useAuth } from '@/lib/AuthContext';
 import { auth, db, storage } from '@/lib/firebase';
 import { 
   collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, 
-  query, where, serverTimestamp, orderBy, limit, getDoc, setDoc
+  query, where, serverTimestamp, orderBy, limit, getDoc, setDoc, getDocs
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { cn } from '@/lib/utils';
+import { generateSEODataFromContent, generateSlug } from '@/lib/seoTools';
 
 enum OperationType {
   CREATE = 'create',
@@ -688,6 +689,35 @@ export default function Admin() {
       if (Array.isArray(processedData.itinerary)) {
         processedData.itinerary = processedData.itinerary.filter((item: any) => item && item.description && item.description.trim() !== '');
       }
+
+      // Automated SEO Generation
+      const seoData = await generateSEODataFromContent(
+        processedData.title || processedData.name || '',
+        processedData.description || '',
+        activeContentTab,
+        processedData.image
+      );
+
+      // Slug Uniqueness Check
+      let finalSlug = seoData.slug;
+      let slugConflict = false;
+      
+      const q = query(collection(db, 'content'), where('data.slug', '==', finalSlug));
+      const querySnapshot = await getDocs(q);
+      
+      querySnapshot.forEach((doc) => {
+        if (isEditing === 'new' || doc.id !== isEditing) {
+          slugConflict = true;
+        }
+      });
+
+      if (slugConflict) {
+        finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
+        seoData.slug = finalSlug;
+      }
+
+      processedData.slug = finalSlug;
+      processedData.seoData = seoData;
 
       if (isEditing === 'new') {
         await addDoc(collection(db, 'content'), {
@@ -2184,6 +2214,59 @@ export default function Admin() {
                             </Button>
                           </div>
                         )}
+
+                        {/* Automated SEO Preview Section */}
+                        {(formData.title || formData.name) && (
+                          <div className="md:col-span-2 space-y-6 border-t border-forest/5 pt-8 mt-4 bg-terracotta/[0.02] p-8 rounded-[2.5rem] border border-terracotta/5">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Zap className="h-5 w-5 text-terracotta" />
+                              <div>
+                                <h4 className="text-sm font-bold text-forest uppercase tracking-widest">Automated SEO Intelligence</h4>
+                                <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Powered by Gemini AI Engine</p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Page Slug (Unique)</label>
+                                <Input 
+                                  value={formData.slug || generateSlug(formData.title || formData.name || '')} 
+                                  readOnly
+                                  className="h-12 rounded-xl bg-white border-forest/10 font-mono text-[10px] text-forest/40"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Target Keyword</label>
+                                <Input 
+                                  value={formData.seoData?.targetKeyword || `${formData.title || formData.name || ''} ${activeContentTab}`} 
+                                  readOnly
+                                  className="h-12 rounded-xl bg-white border-forest/10 text-xs font-bold text-forest/40"
+                                />
+                              </div>
+                              <div className="md:col-span-2 space-y-1.5">
+                                <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Title</label>
+                                <Input 
+                                  value={formData.seoData?.metaTitle || `${formData.title || formData.name || ''} | The Soul Himalaya`} 
+                                  readOnly
+                                  className="h-12 rounded-xl bg-white border-forest/10 text-xs font-bold text-forest/40"
+                                />
+                              </div>
+                              <div className="md:col-span-2 space-y-1.5">
+                                <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Description (Generated)</label>
+                                <textarea 
+                                  value={formData.seoData?.metaDescription || formData.description?.slice(0, 160) || ''} 
+                                  readOnly
+                                  className="w-full min-h-[80px] rounded-xl bg-white border-forest/10 p-4 text-xs font-medium text-forest/40 resize-none outline-none"
+                                />
+                              </div>
+                            </div>
+                            <div className="p-4 bg-white/50 rounded-2xl border border-forest/5">
+                              <p className="text-[9px] text-forest/30 font-bold uppercase tracking-widest flex items-center gap-2">
+                                <Info className="h-3 w-3" /> Note: SEO fields are automatically optimized based on your content. To manually override, use the SEO Manager.
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -2913,21 +2996,59 @@ export default function Admin() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
-                  { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
-                  { label: 'Keyword Focus', value: seoSettings.filter(s => s.keyword).length, icon: Target, color: 'text-orange-500' },
-                  { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
-                ].map((stat, i) => (
-                  <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-1">
-                      <stat.icon className={cn("h-3 w-3", stat.color)} />
-                      <span className="text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
+              <div className="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
+                <Button 
+                  onClick={async () => {
+                    setIsSyncing(true);
+                    try {
+                      let count = 0;
+                      for (const item of contentItems) {
+                        if (!item.data.seoData || !item.data.slug) {
+                          const seoData = await generateSEODataFromContent(
+                            item.data.title || item.data.name || '',
+                            item.data.description || '',
+                            item.type,
+                            item.data.image
+                          );
+                          
+                          await updateDoc(doc(db, 'content', item.id), {
+                            'data.seoData': seoData,
+                            'data.slug': item.data.slug || seoData.slug,
+                            updatedAt: serverTimestamp()
+                          });
+                          count++;
+                        }
+                      }
+                      setNotification({ message: `Successfully optimized ${count} items!`, type: 'success' });
+                    } catch (err) {
+                      setNotification({ message: 'Sync failed', type: 'error' });
+                    } finally {
+                      setIsSyncing(false);
+                    }
+                  }}
+                  disabled={isSyncing}
+                  className="h-12 px-6 rounded-xl bg-terracotta text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-terracotta/20 border-none"
+                >
+                  {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                  Generate Content SEO
+                </Button>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
+                    { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
+                    { label: 'Keyword Focus', value: seoSettings.filter(s => s.keyword).length, icon: Target, color: 'text-orange-500' },
+                    { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center gap-2 mb-1">
+                        <stat.icon className={cn("h-3 w-3", stat.color)} />
+                        <span className="text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
+                      </div>
+                      <div className="text-lg font-bold text-forest">{stat.value}</div>
                     </div>
-                    <div className="text-lg font-bold text-forest">{stat.value}</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
 

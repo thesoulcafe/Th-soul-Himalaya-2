@@ -11,12 +11,19 @@ interface SEOProps {
   canonicalUrl?: string;
 }
 
-export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 'website', articleData, trekData, cafeData }: SEOProps & { 
+export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 'website', articleData, trekData, cafeData, seoData }: SEOProps & { 
   image?: string, 
   type?: 'website' | 'article' | 'adventure' | 'cafe',
   articleData?: any,
   trekData?: any,
-  cafeData?: any
+  cafeData?: any,
+  seoData?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    targetKeyword?: string;
+    ogImageUrl?: string;
+    slug?: string;
+  }
 }) => {
   const [siteSettings, setSiteSettings] = useState<any>(null);
   const [pageSeo, setPageSeo] = useState<any>(null);
@@ -30,27 +37,30 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       console.error("SEO site settings snapshot failed:", error);
     });
 
-    // Fetch page-specific SEO
-    const path = window.location.pathname;
-    const fetchPageSeo = async () => {
-      try {
-        const q = query(collection(db, 'seo_settings'), where('path', '==', path));
-        const snapshot = await getDocs(q);
-        if (!snapshot.empty) {
-          setPageSeo(snapshot.docs[0].data());
+    // Fetch page-specific SEO if no direct seoData is provided
+    if (!seoData) {
+      const path = window.location.pathname;
+      const fetchPageSeo = async () => {
+        try {
+          const q = query(collection(db, 'seo_settings'), where('path', '==', path));
+          const snapshot = await getDocs(q);
+          if (!snapshot.empty) {
+            setPageSeo(snapshot.docs[0].data());
+          }
+        } catch (err) {
+          console.error("Failed to fetch page SEO:", err);
         }
-      } catch (err) {
-        console.error("Failed to fetch page SEO:", err);
-      }
-    };
-    fetchPageSeo();
+      };
+      fetchPageSeo();
+    }
 
     return () => unsubscribe();
-  }, [window.location.pathname]);
+  }, [window.location.pathname, seoData]);
 
-  const seoTitle = pageSeo?.title || title || "The Soul Himalaya";
-  const seoDescription = pageSeo?.description || description || "";
-  const seoImage = pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+  const seoTitle = seoData?.metaTitle || pageSeo?.title || title || "The Soul Himalaya";
+  const seoDescription = seoData?.metaDescription || pageSeo?.description || description || "";
+  const seoImage = seoData?.ogImageUrl || pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+  const seoKeywords = seoData?.targetKeyword || keywords;
 
   const finalTitle = (seoTitle && typeof seoTitle === 'string' && seoTitle.includes("Soul Himalaya")) 
     ? seoTitle 
@@ -138,7 +148,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
     <Helmet>
       <title>{finalTitle}</title>
       <meta name="description" content={finalDescription} />
-      {keywords && <meta name="keywords" content={keywords} />}
+      {seoKeywords && <meta name="keywords" content={seoKeywords} />}
       <link rel="canonical" href={canonicalUrl || window.location.href} />
       
       {siteSettings?.googleSiteVerification && (

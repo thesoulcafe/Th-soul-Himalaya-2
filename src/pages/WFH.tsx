@@ -173,7 +173,8 @@ export default function WFH() {
           title: pkg.title || pkg.name,
           description: fullDescription,
           image: pkg.image || pkg.images?.[0],
-          path: `${window.location.origin}/wfh?id=${id}`
+          path: `${window.location.origin}/wfh?id=${id}`,
+          seoData: pkg.seoData
         });
       }
     }
@@ -192,6 +193,7 @@ export default function WFH() {
         title={seo.title || "Work from Himalaya"} 
         description={seo.description || "Mountain offices for the soulful worker."} 
         image={seo.image}
+        seoData={seo.seoData}
       />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
@@ -302,9 +304,17 @@ export default function WFH() {
                   <CardContent className="p-8 flex-grow flex flex-col">
                     <div>
                       <div className="space-y-1 mb-4">
-                        <div className="flex items-center text-yellow-500 text-xs font-bold">
-                          <Star className="h-3 w-3 fill-current mr-1" />
-                          4.9 (45 reviews)
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center text-yellow-500 text-[10px] font-black bg-yellow-500/10 px-3 py-1 rounded-full ring-1 ring-yellow-500/20">
+                            A
+                          </div>
+                          <Link 
+                            to="/gallery" 
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[9px] font-black text-terracotta hover:text-forest transition-colors uppercase tracking-[0.2em] underline underline-offset-4 decoration-terracotta/30"
+                          >
+                            Review
+                          </Link>
                         </div>
                         <div className="text-terracotta font-bold text-2xl">{pkg.price}</div>
                         <h3 className="text-2xl font-heading font-bold leading-tight group-hover:text-terracotta transition-colors">{pkg.title}</h3>

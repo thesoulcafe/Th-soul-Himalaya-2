@@ -170,7 +170,8 @@ export default function Trekks() {
           title: trekk.title,
           description: detailedDesc,
           image: trekk.image,
-          path: `${window.location.origin}/trekks?id=${id}`
+          path: `${window.location.origin}/trekks?id=${id}`,
+          seoData: trekk.seoData
         });
       }
     }
@@ -191,6 +192,7 @@ export default function Trekks() {
         image={seo.image}
         type="adventure"
         trekData={selectedTrekk || { title: seo.title, description: seo.description }}
+        seoData={seo.seoData}
       />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
@@ -279,20 +281,23 @@ export default function Trekks() {
                     >
                       <Share2 className="h-4 w-4 text-forest group-hover/share:text-terracotta transition-colors" />
                     </button>
-
-                    {/* Floating Price Tag */}
-                    <div className="absolute bottom-4 right-4 bg-terracotta text-white px-4 py-1.5 rounded-full font-bold text-sm shadow-xl z-10">
-                      {trekk.price}
-                    </div>
                   </div>
 
                   {/* Right Side: Details */}
                   <CardContent className="p-8 md:p-12 w-full md:w-1/2 flex flex-col">
                     <div className="flex-grow cursor-pointer" onClick={() => setSelectedTrekk(trekk)}>
                       <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center text-yellow-500 text-[10px] font-bold bg-yellow-500/5 px-2 py-1 rounded-full">
-                          <Star className="h-3 w-3 fill-current mr-1" />
-                          4.8 (120 reviews)
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center text-yellow-500 text-[10px] font-black bg-yellow-500/10 px-3 py-1 rounded-full ring-1 ring-yellow-500/20">
+                            A
+                          </div>
+                          <Link 
+                            to="/gallery" 
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[9px] font-black text-terracotta hover:text-forest transition-colors uppercase tracking-[0.2em] underline underline-offset-4 decoration-terracotta/30"
+                          >
+                            Review
+                          </Link>
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-forest/40 uppercase tracking-widest">
                           <Clock className="h-3 w-3 text-terracotta" />
@@ -304,20 +309,26 @@ export default function Trekks() {
                         {trekk.title}
                       </h3>
 
+                      <div className="flex items-start justify-between gap-4 mb-8">
+                        <div className="flex flex-wrap gap-6 flex-grow">
+                          <div className="flex items-center text-xs font-bold text-forest">
+                            <Mountain className="h-4 w-4 text-terracotta mr-3 shrink-0" />
+                            {trekk.altitude}
+                          </div>
+                          <div className="flex items-center text-xs font-bold text-forest">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-3 shrink-0" />
+                            Expert Guides
+                          </div>
+                        </div>
+                        <div className="shrink-0 bg-terracotta/5 px-4 py-2 rounded-2xl border border-terracotta/5 flex flex-col items-center justify-center">
+                          <span className="text-[8px] font-black text-terracotta/40 uppercase tracking-tighter mb-1">Exchange</span>
+                          <span className="text-lg font-black text-terracotta">{trekk.price}</span>
+                        </div>
+                      </div>
+
                       <p className="text-forest/60 text-sm leading-relaxed mb-8 line-clamp-3">
                         {trekk.description}
                       </p>
-
-                      <div className="flex flex-wrap gap-6 mb-8 pb-8 border-b border-forest/5">
-                        <div className="flex items-center text-xs font-bold text-forest">
-                          <Mountain className="h-4 w-4 text-terracotta mr-3 shrink-0" />
-                          {trekk.altitude}
-                        </div>
-                        <div className="flex items-center text-xs font-bold text-forest">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mr-3 shrink-0" />
-                          Expert Guides
-                        </div>
-                      </div>
 
                       <div className="mt-auto">
                         <Button 
@@ -429,33 +440,6 @@ export default function Trekks() {
                 interval={4000}
               />
               
-              {/* Decorative Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
-              
-              <div className="absolute bottom-10 left-10 right-10 text-white z-10">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-md mb-2 block text-center md:text-left">Wild Spirit</span>
-                  <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-4 uppercase text-center md:text-left">
-                    {selectedTrekk.title.split(' ').map((word: string, i: number) => (
-                      <span key={i} className={i % 2 !== 0 ? 'text-white/40' : ''}>{word} </span>
-                    ))}
-                  </h2>
-                </motion.div>
-                
-                <div className="flex items-center justify-center md:justify-start gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-terracotta" />
-                    <span>Safety First</span>
-                  </div>
-                  <div className="w-1 h-1 rounded-full bg-terracotta" />
-                  <span>Certified Path</span>
-                </div>
-              </div>
-
               {/* Close & Share */}
               <div className="absolute top-6 right-6 flex gap-3 z-50">
                 <button 
@@ -479,6 +463,33 @@ export default function Trekks() {
                   <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
                   <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
                   <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                </div>
+              </div>
+
+              {/* Header Details Below Gallery Bar */}
+              <div className="px-8 md:px-16 pt-10 text-center md:text-left">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="font-fluid text-2xl md:text-3xl text-terracotta drop-shadow-sm mb-2 block">Wild Spirit</span>
+                  <h2 className="text-3xl xs:text-4xl md:text-7xl font-playfair font-black italic leading-[0.9] tracking-tighter mb-6 uppercase text-forest">
+                    {selectedTrekk.title.split(' ').map((word: string, i: number) => (
+                      <span key={i} className={i % 2 !== 0 ? 'text-forest/30' : ''}>{word} </span>
+                    ))}
+                  </h2>
+                </motion.div>
+                
+                <div className="flex items-center justify-center md:justify-start gap-4 text-forest/40 text-[10px] md:text-xs font-black uppercase tracking-widest">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-terracotta" />
+                    <span className="text-forest/80">Safety First</span>
+                  </div>
+                  <div className="w-1.5 h-1.5 rounded-full bg-terracotta/20" />
+                  <span className="text-forest/80 font-bold">Certified Path</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-terracotta/20" />
+                  <span className="text-terracotta font-black">Adventure</span>
                 </div>
               </div>
 

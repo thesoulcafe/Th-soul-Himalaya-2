@@ -99,6 +99,7 @@ export default function ServiceDetail() {
         title={`${item.title || item.name} | The Soul Himalaya`}
         description={item.description}
         image={item.image}
+        seoData={item.seoData}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -113,29 +114,31 @@ export default function ServiceDetail() {
                 autoSwipe={true}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent pointer-events-none" />
-              
-              <div className="absolute top-6 left-6 flex flex-col gap-2">
-                <Badge className="bg-white/90 backdrop-blur-md text-forest border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
-                  {item.category || 'Curated Path'}
-                </Badge>
+            </div>
+
+            <div className="px-6 py-4 flex flex-col md:flex-row md:items-center justify-between text-forest/50 bg-white/50 backdrop-blur-sm rounded-[2rem] border border-forest/10 shadow-sm mx-4 gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] mb-1">Gallery of the Journey</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
+                </div>
               </div>
 
-              <div className="absolute bottom-8 left-8 right-8 text-white">
-                <div className="flex items-center gap-2 text-white/70 text-[10px] font-black uppercase tracking-[0.3em] mb-2">
-                  <MapPin className="h-4 w-4 text-terracotta" />
-                  <span>The Soul Himalaya</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge className="bg-forest text-white border-none px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
+                    {item.category || item.originalType || 'Himalayan Path'}
+                  </Badge>
+                  <div className="flex items-center text-yellow-500 text-[10px] font-black">
+                    <Star className="h-3 w-3 fill-current mr-1" />
+                    {item.rating || '5.0'} soul journey
+                  </div>
                 </div>
-                <h1 className="text-4xl md:text-6xl font-playfair font-black italic leading-none tracking-tighter uppercase">
+                <h1 className="text-3xl md:text-5xl font-playfair font-black italic leading-none tracking-tighter uppercase text-forest">
                   {item.title || item.name}
                 </h1>
-              </div>
-            </div>
-            <div className="px-6 py-4 flex items-center justify-between text-forest/50 bg-white/50 backdrop-blur-sm rounded-full border border-forest/10 shadow-sm mx-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]">Gallery of the Journey</span>
-              <div className="flex items-center gap-1.5">
-                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
-                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
-                <div className="h-1.5 w-1.5 rounded-full bg-forest/30" />
               </div>
             </div>
 

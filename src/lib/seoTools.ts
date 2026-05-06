@@ -18,6 +18,53 @@ function getAI() {
 }
 
 /**
+ * Generate a URL-friendly slug from a title.
+ */
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s\s-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Generate a complete SEO data object from content details.
+ */
+export async function generateSEODataFromContent(title: string, description: string, type: string, image?: string) {
+  const brand = "The Soul Himalaya";
+  const slug = generateSlug(title);
+  
+  // Custom keyword logic based on type
+  let targetKeyword = title;
+  const typeLabels: Record<string, string> = {
+    'tour': 'Tour Package',
+    'trekk': 'Himalayan Trek',
+    'service': 'Service',
+    'yoga': 'Yoga Retreat',
+    'meditation': 'Meditation Session',
+    'adventure': 'Adventure Activity',
+    'wfh': 'Work from Mountains'
+  };
+
+  if (typeLabels[type]) {
+    targetKeyword = `${title} ${typeLabels[type]}`;
+  }
+
+  const metaTitle = `${title} | ${brand}`;
+  const metaDescription = await generateMetaDescription(description, title);
+  
+  return {
+    slug,
+    targetKeyword,
+    metaTitle,
+    metaDescription: metaDescription || description.slice(0, 160),
+    ogImageUrl: image || ""
+  };
+}
+
+/**
  * Ensures a URL is absolute by prepending the domain if necessary.
  */
 export function toAbsoluteUrl(url: string | undefined): string {

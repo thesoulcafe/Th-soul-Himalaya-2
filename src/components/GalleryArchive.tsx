@@ -257,7 +257,7 @@ export default function GalleryArchive({
           >
             {images[activeIndex].description} 
             Experience a symphony of spiritual resonance where every frame tells a story as old as the peaks themselves. 
-            Our curated archive captures the ephemeral moments of transcendence that define the path of the Soul Himalaya. 
+            Our curated review gallery captures the ephemeral moments of transcendence that define the path of the Soul Himalaya. 
             From the first blush of morning light on frozen summits to the deep, silent wisdom of ancient cedar forests, 
             these artifacts are designed to transport you to a realm of unqiue peace and monumental beauty.
           </motion.p>

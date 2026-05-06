@@ -59,7 +59,7 @@ export default function Gallery() {
           transition={{ delay: 0.1 }}
           className="text-6xl md:text-8xl font-serif text-neutral-900 tracking-tight"
         >
-          Gallery <span className="italic text-[#A0522D]">Archive</span>
+          Review <span className="italic text-[#A0522D]">Gallery</span>
         </motion.h1>
       </header>
 
