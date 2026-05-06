@@ -32,7 +32,7 @@ export function generateSlug(title: string): string {
 /**
  * Generate a complete SEO data object from content details.
  */
-export async function generateSEODataFromContent(title: string, description: string, type: string, image?: string) {
+export async function generateSEODataFromContent(title: string, description: string, type: string, image?: string, seoImage?: string) {
   const brand = "The Soul Himalaya";
   const slug = generateSlug(title);
   
@@ -60,7 +60,7 @@ export async function generateSEODataFromContent(title: string, description: str
     targetKeyword,
     metaTitle,
     metaDescription: metaDescription || description.slice(0, 160),
-    ogImageUrl: image || ""
+    ogImageUrl: seoImage || image || ""
   };
 }
 

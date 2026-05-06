@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Share2, Expand } from 'lucide-react';
+import React from 'react';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 interface GalleryImage {
@@ -72,229 +71,48 @@ export default function GalleryArchive({
   title = "Visual Manifest",
   propertyName = "The Soul Himalaya"
 }: GalleryArchiveProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const thumbnailsRef = useRef<HTMLDivElement>(null);
-  const [direction, setDirection] = useState(0);
-
-  const nextImage = () => {
-    setDirection(1);
-    setActiveIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setDirection(-1);
-    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const selectImage = (index: number) => {
-    setDirection(index > activeIndex ? 1 : -1);
-    setActiveIndex(index);
-  };
-
-  // Scroll active thumbnail into view
-  useEffect(() => {
-    const activeThumb = thumbnailsRef.current?.children[activeIndex] as HTMLElement;
-    if (activeThumb && thumbnailsRef.current) {
-      const container = thumbnailsRef.current;
-      const scrollLeft = activeThumb.offsetLeft - container.offsetWidth / 2 + activeThumb.offsetWidth / 2;
-      container.scrollTo({
-        left: scrollLeft,
-        behavior: 'smooth'
-      });
-    }
-  }, [activeIndex]);
-
-  const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 300 : -300,
-      opacity: 0,
-    }),
-  };
 
   return (
     <div className="w-full bg-white py-12 px-4 md:px-6">
       <div className="max-w-7xl mx-auto space-y-12">
-        {/* Main Gallery Container */}
-        <div className="relative group">
-          {/* Main Viewport */}
-          <div className="relative aspect-[3/4] md:aspect-[4/5] mx-auto w-full max-w-[600px] rounded-[2rem] overflow-hidden bg-neutral-100 shadow-2xl">
-            <AnimatePresence initial={false} custom={direction}>
-              <motion.img
-                key={activeIndex}
-                src={images[activeIndex].url}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                  x: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.2 },
-                }}
-                className="absolute inset-0 w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-                loading="lazy"
-              />
-            </AnimatePresence>
-
-            {/* Pagination Overlay */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-              <div className="px-6 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-white font-mono text-xs tracking-widest shadow-lg">
-                {activeIndex + 1} <span className="opacity-50 mx-1">/</span> {images.length}
-              </div>
-            </div>
-
-            {/* Navigation Arrows */}
-            <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
-              <button 
-                onClick={prevImage}
-                className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/30 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all group pointer-events-auto"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="h-6 w-6 text-white group-hover:-translate-x-0.5 transition-transform" />
-              </button>
-              <button 
-                onClick={nextImage}
-                className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/30 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all group pointer-events-auto"
-                aria-label="Next image"
-              >
-                <ChevronRight className="h-6 w-6 text-white group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            </div>
-
-            {/* Top Controls Overlay */}
-            <div className="absolute top-6 right-6 flex gap-3 z-20">
-              <button className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-all">
-                <Share2 className="h-4 w-4" />
-              </button>
-              <button className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-all">
-                <Expand className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Thumbnail Strip */}
-          <div className="mt-8 relative max-w-4xl mx-auto">
-            <div 
-              ref={thumbnailsRef}
-              className="relative flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {images.map((img, idx) => (
+            <motion.div
+              key={img.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="group bg-white rounded-3xl p-4 border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
             >
-              {images.map((img, idx) => (
-                <button
-                  key={img.id}
-                  onClick={() => selectImage(idx)}
-                  className={cn(
-                    "thumb-scroll-item relative flex-shrink-0 w-20 h-28 md:w-24 md:h-32 rounded-xl overflow-hidden snap-center transition-all duration-300",
-                    activeIndex === idx 
-                      ? "ring-2 ring-[#A0522D] ring-offset-2 scale-105 z-10" 
-                      : "opacity-40 hover:opacity-100"
-                  )}
-                >
-                  <img 
-                    src={img.url} 
-                    alt={img.title} 
-                    className="thumb-image w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
-                  {/* CSS Scroll-Driven Animation Trigger Area (Conceptual) */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      // Note: Standard CSS scroll-driven animations are still emerging
-                      // animation: 'scale 1s linear both',
-                      // animationTimeline: 'view()',
-                    }}
-                  />
-                </button>
-              ))}
-              
-              {/* View More Trigger */}
-              <button className="flex-shrink-0 w-24 h-32 rounded-xl bg-neutral-50 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center gap-2 group hover:border-[#A0522D]/30 transition-colors">
-                <div className="h-8 w-8 rounded-full bg-neutral-100 flex items-center justify-center group-hover:bg-[#A0522D]/10 text-neutral-400 group-hover:text-[#A0522D] transition-colors">
-                  <Expand className="h-4 w-4" />
+              {/* Image Container */}
+              <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden mb-4 relative">
+                <img 
+                  src={img.url} 
+                  alt={img.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-neutral-900/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+
+              {/* Text / Review */}
+              <div className="space-y-2 px-2">
+                <h3 className="font-serif text-lg font-bold text-neutral-900">{img.title}</h3>
+                <p className="text-sm text-neutral-600 line-clamp-3 leading-relaxed">
+                  "{img.description}"
+                </p>
+                <div className="pt-2 text-[10px] font-bold text-[#A0522D] uppercase tracking-widest flex items-center gap-2">
+                  <span className="h-1 w-4 bg-[#A0522D] rounded-full" />
+                  Successful Traveller Review
                 </div>
-                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-neutral-400">View All</span>
-              </button>
-            </div>
-            
-            {/* Gradient Fades for Scroll */}
-            <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
-            <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-
-        {/* Discover Section */}
-        <section className="max-w-3xl mx-auto text-center space-y-6 pt-8 pb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-serif text-neutral-900"
-          >
-            Discover {propertyName}
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-lg text-neutral-600 leading-relaxed text-justify px-4"
-          >
-            {images[activeIndex].description} 
-            Experience a symphony of spiritual resonance where every frame tells a story as old as the peaks themselves. 
-            Our curated review gallery captures the ephemeral moments of transcendence that define the path of the Soul Himalaya. 
-            From the first blush of morning light on frozen summits to the deep, silent wisdom of ancient cedar forests, 
-            these artifacts are designed to transport you to a realm of unqiue peace and monumental beauty.
-          </motion.p>
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="pt-6"
-          >
-            <button className="px-10 py-4 bg-[#A0522D] text-white rounded-full font-sans font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-[#8B4513] transition-all shadow-xl shadow-[#A0522D]/20">
-              Explore Experience
-            </button>
-          </motion.div>
-        </section>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        
-        @supports (animation-timeline: view()) {
-          .thumb-scroll-item {
-            animation: linear thumb-scale both;
-            animation-timeline: view(inline);
-            animation-range: entry 0% cover 50%, cover 50% exit 100%;
-          }
-
-          @keyframes thumb-scale {
-            0% { transform: scale(0.85); opacity: 0.4; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.85); opacity: 0.4; }
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -695,7 +695,8 @@ export default function Admin() {
         processedData.title || processedData.name || '',
         processedData.description || '',
         activeContentTab,
-        processedData.image
+        processedData.image,
+        processedData.seoImage
       );
 
       // Slug Uniqueness Check
@@ -2227,6 +2228,15 @@ export default function Admin() {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">SEO Image URL</label>
+                                <Input 
+                                  value={formData.seoImage || ''} 
+                                  onChange={(e) => setFormData({ ...formData, seoImage: e.target.value })}
+                                  placeholder="Enter SEO image URL"
+                                  className="h-12 rounded-xl bg-white border-forest/10 text-xs text-forest"
+                                />
+                              </div>
                               <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Page Slug (Unique)</label>
                                 <Input 
