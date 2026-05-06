@@ -587,43 +587,46 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Parvati Valley Spotlight - Glassmorphism Card Integration */}
+        {/* Parvati Valley Spotlight - Redesigned to be more beautiful with text below image */}
         <div className="max-w-7xl mx-auto mt-32 px-4 sm:px-6">
-          <div className="flex flex-col lg:flex-row items-center gap-16 p-8 md:p-16 rounded-[4rem] bg-forest/5 border border-forest/10 overflow-hidden relative group">
+          <div className="flex flex-col items-center p-8 md:p-16 rounded-[4rem] bg-forest/5 border border-forest/10 overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[100px] -mr-64 -mt-64" />
             
-            <div className="flex-1 space-y-8 relative z-10 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/5 text-forest text-[10px] font-black uppercase tracking-widest">
-                <Zap className="h-4 w-4 text-terracotta" /> Regional Spotlight
+            <div className="w-full flex flex-col lg:flex-row items-center gap-12 relative z-10">
+              <div className="flex-1 space-y-8 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/5 text-forest text-[10px] font-black uppercase tracking-widest">
+                  <Zap className="h-4 w-4 text-terracotta" /> Regional Spotlight
+                </div>
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-montserrat font-extrabold text-forest tracking-tighter leading-[1.1]">The Valley of <br />Shadows & Light</h2>
+                <p className="text-forest/60 text-lg md:text-xl leading-relaxed max-w-xl font-medium">
+                  Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
+                </p>
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-extrabold text-forest tracking-tighter leading-[1.1]">The Valley of <br />Shadows & Light</h2>
-              <p className="text-forest/60 text-lg leading-relaxed max-w-xl font-medium">
-                Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
-              </p>
-            </div>
 
-            <div className="flex justify-center relative z-10">
-              <Link to="/parvati-valley" className="block cursor-pointer">
-                <motion.div 
-                  whileHover={{ scale: 1.05, rotate: -2 }}
-                  className="w-[280px] h-[360px] md:w-[350px] md:h-[450px] relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] group/pv"
-                >
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
-                    style={{ backgroundImage: 'url(https://i.postimg.cc/TYqctVvr/IMG-8144.jpg)' }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
-                  <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 bg-white/5 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3 md:gap-6">
-                    <div>
-                      <h4 className="text-xl md:text-3xl font-heading font-bold text-white tracking-tighter">Parvati Deep Dive</h4>
-                      <p className="text-white/60 text-[9px] md:text-[10px] font-black mt-1 uppercase tracking-[0.2em]">A Spiritual Odyssey</p>
+              <div className="flex-1 w-full max-w-lg">
+                <Link to="/parvati-valley" className="block cursor-pointer">
+                  <motion.div 
+                    whileHover={{ scale: 1.02 }}
+                    className="relative rounded-[3rem] overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] bg-white group/pv"
+                  >
+                    <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
+                        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=1200&q=80)' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
-                    <div className="w-full h-10 md:h-14 bg-terracotta hover:bg-terracotta/90 text-white rounded-xl md:rounded-2xl font-bold text-xs md:text-md shadow-xl shadow-terracotta/20 flex items-center justify-center transition-all">
-                        Explore the Valley
+                    
+                    <div className="p-8 md:p-12 bg-forest text-white text-center">
+                      <h4 className="text-2xl md:text-4xl font-heading font-bold text-white tracking-tighter mb-2">Parvati Deep Dive</h4>
+                      <p className="text-terracotta text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] mb-8">A Spiritual Odyssey</p>
+                      <div className="w-full py-4 md:py-6 bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl font-black text-xs md:text-sm shadow-xl shadow-terracotta/20 flex items-center justify-center transition-all uppercase tracking-widest">
+                          Explore the Valley
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </Link>
+                  </motion.div>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

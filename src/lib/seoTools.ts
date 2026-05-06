@@ -1,20 +1,18 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "./firebase";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
-let aiClient: GoogleGenAI | null = null;
+let aiClient: GoogleGenerativeAI | null = null;
 
 function getAI() {
   if (!aiClient) {
-    // In Vite, environment variables are typically in import.meta.env
-    // AI Studio provides GEMINI_API_KEY in the environment
     const key = (import.meta.env?.VITE_GEMINI_API_KEY) || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
     
     if (!key) {
       console.warn("GEMINI_API_KEY not found. AI-powered SEO tools will be limited.");
       return null;
     }
-    aiClient = new GoogleGenAI(key);
+    aiClient = new GoogleGenerativeAI(key);
   }
   return aiClient;
 }

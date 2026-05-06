@@ -119,29 +119,28 @@ const ParvatiValley = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-[2.5rem] md:rounded-[3rem] min-h-[350px] sm:min-h-[450px] flex items-center justify-center overflow-hidden bg-transparent shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10"
+            className="relative rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-forest shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col"
           >
-            {/* Background Image */}
-            <div className="absolute inset-0">
+            {/* Image Container */}
+            <div className="relative h-[300px] sm:h-[450px] overflow-hidden">
               <img 
                 src="https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" 
                 alt="Shiva Shakti Background" 
                 className="absolute inset-0 w-full h-full object-cover opacity-100 scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
               />
-            </div>
-
-            {/* Centered Divine Motif */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="relative h-64 w-64 md:h-96 md:w-96 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center animate-[spin_20s_linear_infinite]">
-                 {/* Visual energy rings */}
-                 <div className="absolute inset-4 rounded-full border border-terracotta/20" />
-                 <div className="absolute inset-8 rounded-full border border-[#4A7FA5]/20" />
+              {/* Centered Divine Motif */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="relative h-48 w-48 md:h-80 md:w-80 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center animate-[spin_20s_linear_infinite]">
+                   <div className="absolute inset-4 rounded-full border border-terracotta/20" />
+                   <div className="absolute inset-8 rounded-full border border-[#4A7FA5]/20" />
+                </div>
               </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-forest to-transparent opacity-60" />
             </div>
 
-            {/* Content Plate - Completely Transparent as requested */}
-            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-8 md:p-16">
-              <div className="max-w-3xl w-full space-y-8 text-center p-8 md:p-12">
+            {/* Content Plate - Below Image */}
+            <div className="relative z-10 w-full flex flex-col items-center justify-center p-8 md:p-12 bg-forest text-white">
+              <div className="max-w-3xl w-full space-y-6 text-center">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
@@ -154,23 +153,23 @@ const ParvatiValley = () => {
                     <div className="h-px w-12 bg-white/40 self-center" />
                   </div>
 
-                  <h2 className="font-playfair text-5xl xs:text-6xl md:text-8xl lg:text-9xl text-white font-black italic tracking-tighter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] uppercase text-wrap">
+                  <h2 className="font-playfair text-5xl xs:text-6xl md:text-8xl text-white font-black italic tracking-tighter uppercase">
                     Shiva Shakti
                   </h2>
 
                   <div className="flex items-center justify-center gap-4 text-white/60 uppercase tracking-[0.3em] text-[10px] font-bold">
-                    <span>Masculline</span>
+                    <span>Masculine</span>
                     <div className="h-1.5 w-1.5 rounded-full bg-terracotta" />
                     <span>Feminine</span>
                   </div>
                 </motion.div>
 
-                <p className="font-playfair italic text-xl md:text-2xl text-white leading-relaxed max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                <p className="font-playfair italic text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
                   "Where the silent meditation of Shiva meets the vibrant dance of Parvati—discover the eternal balance in the shadows of the cedars."
                 </p>
 
-                <motion.div whileHover={{ scale: 1.05 }} className="inline-block mt-8">
-                  <div className="relative px-10 py-5 rounded-full bg-terracotta text-white font-black uppercase tracking-[0.25em] text-[12px] flex items-center gap-4 group/btn overflow-hidden transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                <motion.div whileHover={{ scale: 1.05 }} className="inline-block mt-4">
+                  <div className="relative px-10 py-4 rounded-full bg-terracotta text-white font-black uppercase tracking-[0.25em] text-[11px] flex items-center gap-4 group/btn overflow-hidden transition-all shadow-xl">
                     <span className="relative z-10">Experience the Cosmic</span>
                     <ArrowRight className="relative z-10 h-5 w-5 group-hover/btn:translate-x-2 transition-transform duration-300" />
                   </div>
@@ -318,65 +317,41 @@ const ParvatiValley = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-8">
-              <div className="relative aspect-video rounded-[3rem] overflow-hidden group shadow-2xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=1200&q=80" 
-                  alt="Kath-Kuni Architecture Detail" 
-                  className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-[6s] group-hover:grayscale-0 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-forest via-transparent to-transparent opacity-80" />
-                
-                {/* Visual Label Tags */}
-                <div className="absolute top-10 left-10 space-y-4">
-                  <div className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl flex items-center gap-3 border border-forest/5">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-forest uppercase tracking-widest">Interlocking Cedar</span>
-                  </div>
-                  <div className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl flex items-center gap-3 border border-forest/5 ml-8">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-forest uppercase tracking-widest">Dry-Stacked Stone</span>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Seismic Flex",
+                desc: "The 'Kath' (timber) and 'Kuni' (corner) technique allows the structure to shift up to 10cm during a tremor without structural failure.",
+                icon: Shield
+              },
+              {
+                title: "Solar Ritual",
+                desc: "South-facing timber balconies act as heat traps, absorbing the fierce Himalayan sun to keep core rooms 15°C warmer than the gale outside.",
+                icon: Sun
+              },
+              {
+                title: "Wind Logic",
+                desc: "Steep-pitched slate roofs are engineered to shed 3 feet of snow in a single morning, preventing roof-collapse in extreme winter.",
+                icon: Wind
+              }
+            ].map((item, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-forest/5 p-8 rounded-[2.5rem] border border-forest/10 group hover:bg-forest transition-all duration-500 shadow-sm hover:shadow-xl"
+              >
+                <div className="h-14 w-14 rounded-2xl bg-white flex items-center justify-center mb-6 group-hover:bg-terracotta transition-colors shadow-sm">
+                  <item.icon className="h-7 w-7 text-terracotta group-hover:text-white transition-colors" />
                 </div>
-
-                <div className="absolute bottom-10 left-10 right-10">
-                  <h4 className="text-3xl font-playfair italic font-black text-white mb-2">Resilience by Design</h4>
-                  <p className="text-white/70 text-sm font-medium max-w-xl">
-                    By eliminating mortar, the buildings gain a magical property: elasticity. They dance with the tectonic plates of the Indian sub-continent.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-4 flex flex-col gap-6">
-              {[
-                {
-                  title: "Seismic Flex",
-                  desc: "The 'Kath' (timber) and 'Kuni' (corner) technique allows the structure to shift up to 10cm during a tremor without structural failure.",
-                  icon: Shield
-                },
-                {
-                  title: "Solar Ritual",
-                  desc: "South-facing timber balconies act as heat traps, absorbing the fierce Himalayan sun to keep core rooms 15°C warmer than the gale outside.",
-                  icon: Sun
-                },
-                {
-                  title: "Wind Logic",
-                  desc: "Steep-pitched slate roofs are engineered to shed 3 feet of snow in a single morning, preventing roof-collapse in extreme winter.",
-                  icon: Wind
-                }
-              ].map((item, i) => (
-                <div key={i} className="bg-forest/5 p-8 rounded-[2rem] border border-forest/5 group hover:bg-forest transition-all duration-500">
-                  <item.icon className="h-8 w-8 text-terracotta mb-4 group-hover:text-white transition-colors" />
-                  <h5 className="text-xl font-bold text-forest group-hover:text-white transition-colors mb-2">{item.title}</h5>
-                  <p className="text-forest/60 text-xs font-medium leading-relaxed group-hover:text-white/60 transition-colors">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+                <h5 className="text-2xl font-bold text-forest group-hover:text-white transition-colors mb-4">{item.title}</h5>
+                <p className="text-forest/60 text-sm font-medium leading-relaxed group-hover:text-white/70 transition-colors">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
