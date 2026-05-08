@@ -52,15 +52,16 @@ export async function generateSEODataFromContent(title: string, description: str
     targetKeyword = `${title} ${typeLabels[type]}`;
   }
 
-  const metaTitle = `${title} | ${brand}`;
-  const metaDescription = await generateMetaDescription(description, title);
+  const metaTitle = title.length > 57 ? `${title.slice(0, 57)}...` : `${title} | ${brand}`;
+  const metaDescriptionRaw = await generateMetaDescription(description, title);
+  const metaDescription = metaDescriptionRaw.length > 157 ? `${metaDescriptionRaw.slice(0, 157)}...` : metaDescriptionRaw;
   
   return {
     slug,
     targetKeyword,
     metaTitle,
-    metaDescription: metaDescription || description.slice(0, 160),
-    ogImageUrl: seoImage || image || ""
+    metaDescription: metaDescription || description.slice(0, 157) + "...",
+    ogImageUrl: seoImage || (image && image.startsWith('http') ? image : "")
   };
 }
 
@@ -69,7 +70,13 @@ export async function generateSEODataFromContent(title: string, description: str
  */
 export function toAbsoluteUrl(url: string | undefined): string {
   if (!url) return '';
-  if (url.startsWith('http')) return url;
+  if (url.startsWith('http')) {
+    // If it's an unsplash image, optimize it here too
+    if (url.includes('unsplash.com')) {
+      return url.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
+    }
+    return url;
+  }
   const baseUrl = 'https://thesoulhimalaya.com';
   return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
 }
@@ -80,15 +87,17 @@ export function toAbsoluteUrl(url: string | undefined): string {
 export async function generateMetaDescription(pageContent: string, title: string): Promise<string> {
   try {
     const ai = getAI();
-    if (!ai) return pageContent.slice(0, 160);
+    if (!ai) return pageContent.slice(0, 157) + "...";
 
     const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const response = await model.generateContent(`You are an SEO expert. Write a compelling meta description (max 160 characters) for a travel page titled "${title}" with the following content: ${pageContent.slice(0, 500)}. Focus on benefits and search intent.`);
+    const response = await model.generateContent(`You are an SEO expert. Write a compelling meta description (strictly under 160 characters) for a travel page titled "${title}". Focus on benefits and search intent. Use this content: ${pageContent.slice(0, 500)}`);
     
-    return response.response.text()?.trim() || "";
+    let text = response.response.text()?.trim() || "";
+    if (text.length > 157) text = text.slice(0, 157) + "...";
+    return text;
   } catch (error) {
     console.error("AI Meta Description Generation failed:", error);
-    return pageContent.slice(0, 160);
+    return pageContent.slice(0, 157) + "...";
   }
 }
 

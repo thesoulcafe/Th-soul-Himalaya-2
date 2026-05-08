@@ -720,12 +720,15 @@ export default function Admin() {
       processedData.slug = finalSlug;
       processedData.seoData = seoData;
 
+      let docId = isEditing === 'new' ? null : isEditing;
+
       if (isEditing === 'new') {
-        await addDoc(collection(db, 'content'), {
+        const docRef = await addDoc(collection(db, 'content'), {
           type: activeContentTab,
           data: processedData,
           updatedAt: serverTimestamp()
         });
+        docId = docRef.id;
         setNotification({ message: 'Content created successfully', type: 'success' });
       } else if (isEditing) {
         await updateDoc(doc(db, 'content', isEditing), {
@@ -734,6 +737,38 @@ export default function Admin() {
         });
         setNotification({ message: 'Content updated successfully', type: 'success' });
       }
+
+      // --- Programmatic SEO Sync ---
+      if (docId) {
+        const pathMap: Record<string, string> = {
+          'tour': '/tours',
+          'trekk': '/trekks',
+          'trek': '/trekks',
+          'service': '/services',
+          'yoga': '/yoga',
+          'meditation': '/meditation',
+          'wfh': '/wfh'
+        };
+        const basePath = pathMap[activeContentTab] || '/services';
+        const fullPath = `${basePath}?id=${docId}`;
+
+        // Get first image for OG if none provided
+        const ogImage = processedData.seoImage || 
+                        (processedData.images && processedData.images.length > 0 ? processedData.images[0] : null) || 
+                        processedData.image;
+
+        await setDoc(doc(db, 'seo_settings', `content-${docId}`), {
+          path: fullPath,
+          title: processedData.seoData?.metaTitle || `${processedData.title || processedData.name} | The Soul Himalaya`,
+          description: processedData.seoData?.metaDescription || processedData.description?.slice(0, 160) || "",
+          ogImage: ogImage || "",
+          contentId: docId,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        console.log(`[Admin] SEO automated record updated for ${fullPath}`);
+      }
+
       setIsEditing(null);
       setFormData({});
     } catch (error) {

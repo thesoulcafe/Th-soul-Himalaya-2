@@ -62,14 +62,18 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
   const seoImage = seoData?.ogImageUrl || pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
   const seoKeywords = seoData?.targetKeyword || keywords;
 
-  const finalTitle = (seoTitle && typeof seoTitle === 'string' && seoTitle.includes("Soul Himalaya")) 
+  let finalTitle = (seoTitle && typeof seoTitle === 'string' && seoTitle.includes("Soul Himalaya")) 
     ? seoTitle 
     : `${seoTitle} | Soul Himalaya`;
   
+  if (finalTitle.length > 60) finalTitle = finalTitle.slice(0, 57) + "...";
+  
   // Automated Description Fallback (First 160 chars)
-  const finalDescription = seoDescription && seoDescription.length > 10 
-    ? seoDescription.slice(0, 160) 
+  let finalDescription = seoDescription && seoDescription.length > 10 
+    ? seoDescription 
     : "Discover curated retreats, high-altitude adventures, and artisan Himalayan crafts in Parvati Valley with The Soul Himalaya.";
+
+  if (finalDescription.length > 160) finalDescription = finalDescription.slice(0, 157) + "...";
 
   let finalImage = toAbsoluteUrl(seoImage);
   

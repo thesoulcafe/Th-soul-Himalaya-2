@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 dotenv.config();
 
@@ -437,243 +437,135 @@ async function injectMetaTags(req: express.Request, html: string) {
   try {
     const metaPromise = (async () => {
       const urlStr = req.originalUrl || req.url;
+      const urlPath = urlStr.split('?')[0];
       const userAgent = req.headers['user-agent'] || '';
       
-      // Resilient URL parsing
+      // Resilient host/proto detection
       let rawHost = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
       let host = (Array.isArray(rawHost) ? rawHost[0] : rawHost) as string;
-      
       let rawProto = req.headers['x-forwarded-proto'] || 'https';
       let protocol = (Array.isArray(rawProto) ? rawProto[0] : rawProto) as string;
-      
-      // Ensure host doesn't have protocol
       host = host.replace(/^https?:\/\//, '');
 
       let url: URL;
       try {
         url = new URL(urlStr, `${protocol}://${host}`);
       } catch (e) {
-        console.warn(`[Meta] Invalid URL construction for ${urlStr} on ${host}, falling back to defaults.`);
         url = new URL('/', 'https://thesoulhimalaya.com');
       }
 
       const id = url.searchParams.get('id');
-      console.log(`[Meta] Request for: ${urlStr}, ID: ${id || 'none'}`);
-      
-      // If we are on the production domain but host says something else (like internal IP), force it
-      if (host.includes('run.app') || host.includes('localhost') || host.includes('127.0.0.1')) {
-         // Keep it for dev/testing
-      } else {
-         host = 'thesoulhimalaya.com';
-      }
-      
       const absoluteUrl = `${protocol}://${host}${urlStr}`;
 
+      // Default Values
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
       let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
 
-      let pkg: any = null;
-
-      // 0. Handle Path-based defaults (if no ID)
-      if (!id) {
-        if (urlStr.includes('/parvati-valley')) {
-          title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
-          description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
-          image = "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
-        } else if (urlStr.includes('/tours')) {
-          title = "Curated Tours | The Soul Himalaya";
-          description = "Discover our handpicked mountain journeys across the Kullu and Parvati valleys.";
-        } else if (urlStr.includes('/trekks')) {
-          title = "Mountain Trekks | High Altitude Adventures";
-          description = "From easy waterfalls to challenging glaciers, find your path in the Himalayas.";
-        } else if (urlStr.includes('/yoga')) {
-          title = "Yoga Retreats in the Himalayas | The Soul Himalaya";
-          description = "Hatha, Vinyasa and Sadhana in the quiet hamlets of Kalga and Pulga.";
-        } else if (urlStr.includes('/meditation')) {
-          title = "Meditation Retreats | Find Inner Peace";
-          description = "Experience deep silence and mindfulness in the remote high-altitude wilderness.";
-        } else if (urlStr.includes('/soul-cafe')) {
-          title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
-          description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";
-          image = "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg";
-        } else if (urlStr.includes('/guide')) {
-          title = "Soul Support | The Soul Guide | Regional Intelligence";
-          description = "Expert logistical insights, mountain dynamics, and regional intelligence for the Kullu-Parvati-Manali corridor.";
+      // --- STEP 1: Check seo_settings collection (Programmatic SEO) ---
+      try {
+        const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
+        const seoSnap = await getDocs(seoQuery);
+        if (!seoSnap.empty) {
+          const seoData = seoSnap.docs[0].data();
+          title = seoData.title || seoData.metaTitle || title;
+          description = seoData.description || seoData.metaDescription || description;
+          image = seoData.ogImage || seoData.ogImageUrl || image;
+          console.log(`[Meta] SEO record found in seo_settings for path: ${urlStr}`);
+        } else {
+          // Check for path-only match (without query params)
+          const pQuery = query(collection(db, "seo_settings"), where("path", "==", urlPath));
+          const pSnap = await getDocs(pQuery);
+          if (!pSnap.empty) {
+            const pData = pSnap.docs[0].data();
+            title = pData.title || pData.metaTitle || title;
+            description = pData.description || pData.metaDescription || description;
+            image = pData.ogImage || pData.ogImageUrl || image;
+            console.log(`[Meta] SEO record found in seo_settings for path only: ${urlPath}`);
+          }
         }
+      } catch (e) {
+        console.warn("[Meta] seo_settings lookup failed:", e);
       }
 
-      // 1. Try Firestore First (Most up to date)
-      if (id) {
+      // --- STEP 2: Content-based overrides (Tours/Trekks details) ---
+      if (id && (!title || title.includes("The Soul Himalaya | Spiritual"))) {
         try {
           const docRef = doc(db, "content", id);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            const docData = docSnap.data();
-            console.log(`[Meta] Firestore data found for ${id}`);
-            pkg = { id, ...(docData.data || docData) };
-          }
-        } catch (e) {
-          console.error("[Meta] Firestore lookup failed:", e);
-        }
-      }
-
-      // 2. Try Constants Fallback (If not in Firestore) - IMPROVED PARSING
-      if (!pkg && id) {
-        try {
-          const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
-          const content = fs.readFileSync(constantsPath, 'utf-8');
-          // Find the block containing the ID. We search for the ID and then look backwards for the opening brace.
-          const idIndex = content.indexOf(`id: '${id}'`) === -1 ? content.indexOf(`id: "${id}"`) : content.indexOf(`id: '${id}'`);
-          
-          if (idIndex !== -1) {
-            // Find the start of the object {
-            let startIndex = content.lastIndexOf('{', idIndex);
-            // Find the end of the object }
-            let endIndex = content.indexOf('}', idIndex);
+            const pkg = docSnap.data();
+            title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
+            description = pkg.seoData?.metaDescription || pkg.description || description;
             
-            if (startIndex !== -1 && endIndex !== -1) {
-               const pkgStr = content.substring(startIndex, endIndex + 1);
-               
-               const titleMatch = pkgStr.match(/title:\s*['"](.*?)['"]/);
-               const nameMatch = pkgStr.match(/name:\s*['"](.*?)['"]/);
-               const imageMatch = pkgStr.match(/image:\s*['"](.*?)['"]/);
-               const imagesMatch = pkgStr.match(/images:\s*\[(.*?)\]/s);
-               const descMatch = pkgStr.match(/description:\s*['"](.*?)['"]/);
-               
-               pkg = {
-                 id,
-                 title: titleMatch ? titleMatch[1] : (nameMatch ? nameMatch[1] : 'Soul Himalaya Experience'),
-                 image: imageMatch ? imageMatch[1] : undefined,
-                 images: imagesMatch ? imagesMatch[1].split(',').map(s => s.trim().replace(/['"]/g, '')) : undefined,
-                 description: descMatch ? descMatch[1] : undefined
-               };
-               console.log(`[Meta] Found package in Constants via improved search: ${id}`);
+            // Image Logic: SEO specific image > first in array > thumb image
+            let pkgImg = pkg.seoImage || pkg.seoData?.ogImageUrl;
+            if (!pkgImg && pkg.images && Array.isArray(pkg.images) && pkg.images.length > 0) {
+              pkgImg = pkg.images[0];
             }
+            if (!pkgImg) pkgImg = pkg.image;
+            
+            image = pkgImg || image;
+            console.log(`[Meta] Content found for ${id}, injecting dynamic tags`);
           }
         } catch (e) {
-          console.warn("[Meta] Could not parse constants.ts for fallback:", e);
+          console.warn("[Meta] Content lookup failed:", e);
         }
       }
 
-      // 3. Hamlet Support
-      if (urlStr.includes('/parvati-valley/')) {
-        const hamletId = urlStr.split('/').pop()?.split('?')[0]?.toLowerCase();
-        const hamletNames: Record<string, string> = {
-          malana: "Malana",
-          tosh: "Tosh",
-          pulga: "Pulga",
-          kheerganga: "Kheerganga"
-        };
-        if (hamletId && hamletNames[hamletId]) {
-          title = `${hamletNames[hamletId]} | The Hamlets of the Gods | The Soul Himalaya`;
-          description = `Explore the mystical village of ${hamletNames[hamletId]} in the Parvati Valley. Discover its unique history, culture, and ancient spiritual traditions.`;
+      // --- STEP 3: Path-based Hardcoded Fallbacks ---
+      if (!id && (title.includes("The Soul Himalaya | Spiritual"))) {
+        if (urlPath.includes('/parvati-valley')) {
+          title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
+          description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
+          image = "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+        } else if (urlPath.includes('/soul-cafe')) {
+          title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
+          description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";
+          image = "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg";
         }
       }
 
-      // 4. Article Support
-      if (urlStr.includes('/article/')) {
-        const articleId = urlStr.split('/').pop()?.split('?')[0]?.toLowerCase();
-        const formattedId = articleId ? articleId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Intelligence';
-        
-        if (articleId === 'malana-democracy') {
-          title = "Ancient Democracy in Malana: The Oldest in the World";
-          description = "Discover how Malana maintains its thousands-year-old democratic social contract.";
-          image = "https://images.unsplash.com/photo-1595928898133-9354334e47f4?q=80&w=2000";
-        } else if (articleId?.includes('tosh')) {
-          title = "Tosh 2026: Sentinel of the High Pass";
-          description = "Strategic guides and road intelligence for Tosh village in the 2026 season.";
-          image = "https://images.unsplash.com/photo-1598091383021-15ddea10925d?q=80&w=2000";
-        } else if (articleId?.includes('pulga')) {
-          title = "Pulga & The Fairy Forest: Wooden Wisdom";
-          description = "Botanical and architectural studies of the wooden hive in the ancient deodar forest.";
-          image = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2000";
-        } else if (articleId?.includes('kheerganga')) {
-          title = "The Path to Kheer: Spiritual High Meadows Guide";
-          description = "The legend of Kartikeya and high-altitude survival on the trek to Kheerganga.";
-          image = "https://images.unsplash.com/photo-1618572425332-29ada2e188a5?q=80&w=2000";
-        } else {
-          title = `${formattedId} | Intellectual Archive | The Soul Himalaya`;
-          description = "Deep dive into Himalayan culture, logistics, and spiritual archives.";
-        }
-      }
-
-      if (pkg) {
-        const pkgTitle = pkg.title || pkg.name || "Soul Himalaya Experience";
-        title = `${pkgTitle} | The Soul Himalaya`;
-        
-        let desc = pkg.description || `Experience ${pkgTitle} with The Soul Himalaya.`;
-        if (pkg.duration) desc += ` Duration: ${pkg.duration}.`;
-        
-        description = desc;
-        if (description.length > 200) {
-          description = description.substring(0, 197) + "...";
-        }
-
-        // Image Handling
-        if (pkgTitle.toLowerCase().includes('valley of shadows')) {
-          image = "https://i.postimg.cc/3RsgZk5r/20260405-134046.jpg";
-        } else {
-          image = pkg.image || (Array.isArray(pkg.images) && pkg.images.length > 0 ? pkg.images[0] : image);
-        }
-        
-        // Optimize Unsplash images
-        if (image.includes('unsplash.com')) {
-          image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
-          if (!image.includes('&h=')) image += '&h=630';
-          if (!image.includes('&q=')) image += '&q=40';
-          if (!image.includes('&fit=crop')) image += '&fit=crop';
-        }
-      }
-
+      // --- Final Polish & Injection ---
       // Ensure image is absolute
-      if (!image.startsWith('http')) {
+      if (image && !image.startsWith('http')) {
         image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
+      
+      // Optimize unsplash
+      if (image.includes('unsplash.com')) {
+        image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
+        if (!image.includes('&h=')) image += '&h=630';
+        if (!image.includes('&q=')) image += '&q=40';
+        if (!image.includes('&fit=crop')) image += '&fit=crop';
+      }
+
+      // Respect limits
+      if (title.length > 60) title = title.substring(0, 57) + "...";
+      if (description.length > 160) description = description.substring(0, 157) + "...";
 
       const metaTags = `
 <title>${title}</title>
 <meta name="description" content="${description}">
-<link rel="canonical" href="${absoluteUrl}">
 <meta property="og:site_name" content="The Soul Himalaya">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:image" content="${image}">
-<meta property="og:image:secure_url" content="${image}">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${title}">
 <meta property="og:url" content="${absoluteUrl}">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@thesoulhimalaya">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}">
-<meta name="twitter:image" content="${image}">
-<meta itemprop="name" content="${title}">
-<meta itemprop="description" content="${description}">
-<meta itemprop="image" content="${image}">`;
+<meta name="twitter:image" content="${image}">`;
 
-      // Only add Open Graph prefix if the <html> tag exists and doesn't have it
       let finalHtml = html;
-      if (finalHtml.includes('<html') && !finalHtml.includes('prefix="og: http://ogp.me/ns#"')) {
-        finalHtml = finalHtml.replace('<html', '<html prefix="og: http://ogp.me/ns#"');
-      }
-
-      // Filter out existing SEO tags more aggressively
+      // Filter existing tags
       finalHtml = finalHtml
         .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-        .replace(/<meta\s+(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|image|title)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '')
-        .replace(/<link\s+rel=["'](?:canonical|image_src)["']\s+href=["'][\s\S]*?["']\s*\/?>/gi, '');
+        .replace(/<meta\s+(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|image|title)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
 
-      // Inject the meta tags into the designated placeholder or fall back to head
-      if (finalHtml.includes('<!-- SEO_TAGS_PLACEHOLDER -->')) {
-        return finalHtml.replace('<!-- SEO_TAGS_PLACEHOLDER -->', metaTags);
-      } else if (finalHtml.includes('<head>')) {
+      if (finalHtml.includes('<head>')) {
         return finalHtml.replace('<head>', `<head>${metaTags}`);
-      } else if (finalHtml.includes('</head>')) {
-        return finalHtml.replace('</head>', `${metaTags}\n</head>`);
       }
       return finalHtml;
     })();
