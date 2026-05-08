@@ -326,6 +326,26 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
     res.json(bookings);
   });
 
+  // Helper to determine if we should serve HTML for a given request
+  function isHtmlRequest(req: express.Request, urlPath: string): boolean {
+    if (urlPath === '/') return true;
+
+    const accept = req.headers.accept || '';
+    if (accept.includes('text/html') || accept.includes('*/*')) return true;
+
+    const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+    const botKeywords = [
+      'facebookexternalhit', 'twitterbot', 'slackbot', 'discordbot', 
+      'googlebot', 'bot', 'crawler', 'spider', 'whatsapp', 'linkedinbot'
+    ];
+    
+    if (botKeywords.some(keyword => userAgent.includes(keyword))) {
+      return true;
+    }
+
+    return false;
+  }
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -338,15 +358,11 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
     // Dynamic Meta Tag handler for development
     app.get('*', async (req, res, next) => {
       const urlStr = req.originalUrl || req.url;
-      
-      // Specifically target navigation requests (HTML)
-      // Only serve HTML if the request explicitly accepts it or has no extension
-      const acceptsHtml = req.headers.accept?.includes('text/html');
       const urlPath = urlStr.split('?')[0];
       const hasExtension = urlPath.includes('.') && !urlPath.endsWith('.html');
       const isViteInternal = urlPath.startsWith('/@') || urlPath.includes('node_modules') || urlPath.startsWith('/@id/');
       
-      if (isViteInternal || hasExtension || (!acceptsHtml && urlPath !== '/')) {
+      if (isViteInternal || hasExtension || !isHtmlRequest(req, urlPath)) {
         return next();
       }
 
@@ -391,9 +407,8 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       
       // Prevent serving HTML for missing assets (avoids MIME type errors)
       const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|map|webp|avif)$/i.test(urlPath);
-      const acceptsHtml = req.headers.accept?.includes('text/html');
 
-      if (isAsset || (!acceptsHtml && urlPath !== '/')) {
+      if (isAsset || !isHtmlRequest(req, urlPath)) {
         return res.status(404).send("Not Found");
       }
 
@@ -446,6 +461,11 @@ async function injectMetaTags(req: express.Request, html: string) {
       let rawProto = req.headers['x-forwarded-proto'] || 'https';
       let protocol = (Array.isArray(rawProto) ? rawProto[0] : rawProto) as string;
       host = host.replace(/^https?:\/\//, '');
+
+      // Force secure protocol for production domain
+      if (host.includes('thesoulhimalaya.com')) {
+        protocol = 'https';
+      }
 
       let url: URL;
       try {

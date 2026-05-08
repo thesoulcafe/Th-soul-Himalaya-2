@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -774,6 +774,140 @@ export default function Admin() {
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'content');
     }
+  };
+
+  const handleDownloadSEO = () => {
+    try {
+      if (seoSettings.length === 0) {
+        setNotification({ message: 'No SEO records to download', type: 'error' });
+        return;
+      }
+
+      // Create CSV Headers
+      const headers = ['Path', 'Title', 'Description', 'OG Image', 'Target Keyword', 'Platform Slug', 'Created At'];
+      
+      // Map data to rows
+      const rows = seoSettings.map(setting => {
+        // Safe access to data and cleaning for CSV
+        const title = (setting.title || setting.metaTitle || '').replace(/"/g, '""');
+        const desc = (setting.description || setting.metaDescription || '').replace(/"/g, '""');
+        const kw = (setting.targetKeyword || '').replace(/"/g, '""');
+        
+        return [
+          `"${setting.path || ''}"`,
+          `"${title}"`,
+          `"${desc}"`,
+          `"${setting.ogImage || setting.ogImageUrl || ''}"`,
+          `"${kw}"`,
+          `"${setting.slug || ''}"`,
+          `"${setting.updatedAt?.toDate ? setting.updatedAt.toDate().toISOString() : ''}"`
+        ];
+      });
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `soul_himalaya_seo_index_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setNotification({ message: 'SEO Index downloaded successfully', type: 'success' });
+    } catch (err) {
+      console.error('Download failed:', err);
+      setNotification({ message: 'Download failed', type: 'error' });
+    }
+  };
+
+  const handleUploadSEO = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        if (!text) return;
+
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+        if (lines.length <= 1) {
+          setNotification({ message: 'File is empty or only contains headers', type: 'error' });
+          return;
+        }
+
+        // Simple CSV parser that handles quotes
+        const parseCSVLine = (line: string) => {
+          const result = [];
+          let current = '';
+          let inQuotes = false;
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              if (inQuotes && line[i + 1] === '"') {
+                current += '"';
+                i++;
+              } else {
+                inQuotes = !inQuotes;
+              }
+            } else if (char === ',' && !inQuotes) {
+              result.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          result.push(current.trim());
+          return result;
+        };
+
+        const headers = parseCSVLine(lines[0]);
+        // Map headers to indices
+        const headerMap: Record<string, number> = {};
+        headers.forEach((h, i) => headerMap[h.toLowerCase().trim()] = i);
+
+        const records = lines.slice(1).map(line => parseCSVLine(line));
+        let count = 0;
+
+        for (const row of records) {
+          const path = row[headerMap['path'] || 0];
+          if (!path) continue;
+
+          const title = row[headerMap['title'] || 1];
+          const description = row[headerMap['description'] || 2];
+          const ogImage = row[headerMap['og image'] || 3] || row[headerMap['ogimage'] || 3];
+          const targetKeyword = row[headerMap['target keyword'] || 4] || row[headerMap['keyword'] || 4];
+          const slug = row[headerMap['platform slug'] || 5] || row[headerMap['slug'] || 5];
+
+          // Generate a stable ID based on path
+          const docId = path.replace(/[^a-z0-9]/gi, '-').toLowerCase().substring(0, 100);
+
+          await setDoc(doc(db, 'seo_settings', `bulk-${docId}`), {
+            path,
+            title: title || '',
+            description: description || '',
+            ogImage: ogImage || '',
+            targetKeyword: targetKeyword || '',
+            slug: slug || '',
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+          
+          count++;
+        }
+
+        setNotification({ message: `Successfully updated ${count} SEO records`, type: 'success' });
+        // Clear input
+        e.target.value = '';
+      } catch (err) {
+        console.error('Upload failed:', err);
+        setNotification({ message: 'Failed to process CSV file', type: 'error' });
+      }
+    };
+    reader.readAsText(file);
   };
 
   const updateBookingStatus = async (id: string, status: string) => {
@@ -3077,6 +3211,31 @@ export default function Admin() {
                   {isSyncing ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                   Generate Content SEO
                 </Button>
+                
+                <Button 
+                  onClick={handleDownloadSEO}
+                  className="h-12 px-6 rounded-xl bg-forest text-white font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-forest/20 border-none"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Index List
+                </Button>
+
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleUploadSEO}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    id="seo-upload"
+                  />
+                  <Button 
+                    variant="outline"
+                    className="h-12 px-6 rounded-xl border-forest/10 bg-white text-forest font-bold text-[10px] uppercase tracking-widest shadow-sm hover:bg-forest/5"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Index List
+                  </Button>
+                </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
