@@ -541,9 +541,6 @@ export default function Tours() {
                       <div className="flex-grow cursor-pointer" onClick={() => setSelectedTour(tour)}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="flex items-center text-yellow-500 text-[10px] font-black bg-yellow-500/10 px-3 py-1 rounded-full ring-1 ring-yellow-500/20">
-                              A
-                            </div>
                             <Link 
                               to="/gallery" 
                               onClick={(e) => e.stopPropagation()}

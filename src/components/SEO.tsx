@@ -11,12 +11,14 @@ interface SEOProps {
   canonicalUrl?: string;
 }
 
-export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 'website', articleData, trekData, cafeData, seoData }: SEOProps & { 
+export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 'website', articleData, trekData, cafeData, seoData, faqs, reviews }: SEOProps & { 
   image?: string, 
-  type?: 'website' | 'article' | 'adventure' | 'cafe',
+  type?: 'website' | 'article' | 'adventure' | 'cafe' | 'tour' | 'service',
   articleData?: any,
   trekData?: any,
   cafeData?: any,
+  faqs?: { question: string; answer: string }[],
+  reviews?: { author: string; rating: number; text: string }[],
   seoData?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -99,11 +101,11 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
     ]
   };
 
-  if (type === 'adventure' && trekData) {
+  if ((type === 'adventure' || type === 'tour') && trekData) {
     jsonLd["@graph"].push({
-      "@type": "Event",
-      "name": trekData.title,
-      "description": trekData.description,
+      "@type": type === 'tour' ? "TouristTrip" : "Event",
+      "name": trekData.title || title,
+      "description": trekData.description || description,
       "image": finalImage,
       "location": {
         "@type": "Place",
@@ -117,7 +119,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       },
       "offers": {
         "@type": "Offer",
-        "price": trekData.price?.replace(/[^0-9]/g, ''),
+        "price": trekData.price?.toString().replace(/[^0-9]/g, '') || "0",
         "priceCurrency": "INR",
         "availability": "https://schema.org/InStock"
       }
@@ -145,6 +147,43 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       },
       "url": `${window.location.origin}/soul-cafe`,
       "telephone": "+917878200632"
+    });
+  }
+
+  if (faqs && faqs.length > 0) {
+    jsonLd["@graph"].push({
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    });
+  }
+
+  if (reviews && reviews.length > 0) {
+    // Generate an aggregate rating if we have reviews
+    const avgRating = reviews.reduce((acc, rev) => acc + rev.rating, 0) / reviews.length;
+    jsonLd["@graph"].push({
+      "@type": "Review", // Or we can attach it to the parent Product/Service, but we'll push independent Review objects or an AggregateRating
+      // Let's bind it to a local business or product
+      "itemReviewed": {
+        "@type": "Organization",
+        "name": "The Soul Himalaya"
+      },
+      "author": {
+        "@type": "Person",
+        "name": reviews[0].author
+      },
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": reviews[0].rating,
+        "bestRating": "5"
+      },
+      "reviewBody": reviews[0].text
     });
   }
 
