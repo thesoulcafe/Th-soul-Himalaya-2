@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Flower2, Sun, Moon, Wind, Heart, Sparkles, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, ShoppingCart, ArrowRight, Share2 } from 'lucide-react';
+import { Plus, Minus, Flower2, Sun, Moon, Wind, Heart, Sparkles, CheckCircle2, Home as HomeIcon, Edit2, Clock, Star, Zap, Calendar, ChevronDown, ShoppingCart, ArrowRight, Share2, Search, X } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
@@ -33,6 +33,7 @@ export default function Yoga() {
   const [activeSlotPackage, setActiveSlotPackage] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { cart: globalCart, addToCart: globalAddToCart, updateQuantity: globalUpdateQuantity, setPendingCartItem } = useCart();
 
   // Scroll lock and reset when modal/tour detail is open
@@ -175,9 +176,23 @@ export default function Yoga() {
   const filteredPackages = useMemo(() => {
     return packageList.filter(pkg => {
       if (profile?.role !== 'admin' && pkg.isAvailable === false) return false;
-      return true;
+      const title = String(pkg.title || pkg.name || '').toLowerCase();
+      const description = String(pkg.description || '').toLowerCase();
+      
+      const itineraryText = Array.isArray(pkg.itinerary) 
+        ? pkg.itinerary.map((day: any) => `${day.title || ''} ${day.activities || ''} ${day.description || ''}`).join(' ').toLowerCase()
+        : (typeof pkg.theExperience === 'string' ? pkg.theExperience.toLowerCase() : '');
+        
+      const highlightsText = Array.isArray(pkg.highlights) || Array.isArray(pkg.features)
+        ? [...(pkg.highlights || []), ...(pkg.features || [])].join(' ').toLowerCase()
+        : '';
+
+      const searchContent = `${title} ${description} ${itineraryText} ${highlightsText}`;
+      const query = searchQuery.toLowerCase();
+
+      return searchContent.includes(query);
     });
-  }, [packageList, profile?.role]);
+  }, [packageList, profile?.role, searchQuery]);
 
   return (
     <div className="pt-24">
@@ -188,9 +203,60 @@ export default function Yoga() {
         seoData={seo.seoData}
       />}
       {/* Tagline */}
-      <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+      <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Yoga Retreats</h1>
-        <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Heal Your Soul</p>
+        <p className="text-terracotta font-medium tracking-widest uppercase text-xs mb-8">Heal Your Soul</p>
+        
+        {/* Search input */}
+        <div className="relative group md:max-w-md mx-auto transition-all duration-300 z-50">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 group-focus-within:text-terracotta transition-colors" />
+          <input 
+            type="text"
+            placeholder="FIND YOUR RETREAT..."
+            value={searchQuery || ''}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-10 py-3 bg-white border border-forest/10 rounded-full text-xs font-black text-forest placeholder:text-forest/20 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all tracking-widest uppercase shadow-sm"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-forest/20 hover:text-terracotta transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+          
+          {/* Search Suggestions Dropdown */}
+          {searchQuery && filteredPackages.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-xl border border-forest/10 overflow-hidden max-h-[60vh] overflow-y-auto text-left">
+              {filteredPackages.slice(0, 5).map(pkg => (
+                <div 
+                  key={pkg.id}
+                  className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
+                  onClick={() => {
+                    setSelectedPackage(pkg);
+                    setSearchQuery('');
+                  }}
+                >
+                  <img 
+                    src={pkg.image || pkg.images?.[0] || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b'} 
+                    alt={pkg.title || pkg.name} 
+                    className="w-12 h-12 rounded-xl object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className="text-xs font-black text-forest">{pkg.title || pkg.name}</h4>
+                    <p className="text-[10px] text-forest/60 line-clamp-2 mt-1">{pkg.description}</p>
+                  </div>
+                </div>
+              ))}
+              {filteredPackages.length > 5 && (
+                <div className="p-3 text-center text-[10px] uppercase tracking-widest font-black text-forest/40 bg-forest/5">
+                  +{filteredPackages.length - 5} more results
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Philosophy */}

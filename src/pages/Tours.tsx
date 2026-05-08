@@ -229,10 +229,20 @@ export default function Tours() {
 
       const title = String(tour.title || tour.name || '').toLowerCase();
       const description = String(tour.description || '').toLowerCase();
+      
+      const itineraryText = Array.isArray(tour.itinerary) 
+        ? tour.itinerary.map((day: any) => `${day.title || ''} ${day.activities || ''} ${day.description || ''}`).join(' ').toLowerCase()
+        : '';
+        
+      const highlightsText = Array.isArray(tour.highlights) || Array.isArray(tour.features)
+        ? [...(tour.highlights || []), ...(tour.features || [])].join(' ').toLowerCase()
+        : '';
+
+      const searchContent = `${title} ${description} ${itineraryText} ${highlightsText}`;
       const query = searchQuery.toLowerCase();
 
       const matchesCategory = activeCategory === 'All' || tour.category === activeCategory;
-      const matchesSearch = title.includes(query) || description.includes(query);
+      const matchesSearch = searchContent.includes(query);
       
       const priceVal = parsePrice(tour.price || '0');
       const matchesPrice = priceVal <= maxPrice;
@@ -297,7 +307,7 @@ export default function Tours() {
             {/* Middle Section: Integrated Search & Categories */}
             <div className="flex items-center gap-2 md:gap-4 flex-grow w-full md:w-auto">
               {/* Search input - Sleek */}
-              <div className="relative group flex-grow md:max-w-xs transition-all duration-300">
+              <div className="relative group flex-grow md:max-w-xs transition-all duration-300 z-50">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-forest/20 group-focus-within:text-terracotta transition-colors" />
                 <input 
                   type="text"
@@ -313,6 +323,44 @@ export default function Tours() {
                   >
                     <X className="h-3 w-3" />
                   </button>
+                )}
+                
+                {/* Search Suggestions Dropdown */}
+                {searchQuery && filteredTours.length > 0 && (
+                  <div className="absolute top-full mt-2 w-[calc(100vw-2rem)] right-[-1rem] md:right-auto md:w-[400px] bg-white rounded-2xl shadow-xl border border-forest/10 overflow-hidden max-h-[60vh] overflow-y-auto">
+                    {filteredTours.slice(0, 5).map(tour => (
+                      <div 
+                        key={tour.id}
+                        className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
+                        onClick={() => {
+                          setSelectedTour(tour);
+                          setSearchQuery('');
+                        }}
+                      >
+                        <img 
+                          src={tour.image || tour.images?.[0] || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b'} 
+                          alt={tour.title || tour.name} 
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                        <div className="flex-1">
+                          <h4 className="text-xs font-black text-forest">{tour.title || tour.name}</h4>
+                          <p className="text-[10px] text-forest/60 line-clamp-2 mt-1">{tour.description}</p>
+                          <div className="flex gap-2 mt-2">
+                             {(tour.category || tour.type) && (
+                               <span className="text-[8px] uppercase tracking-widest font-black text-terracotta bg-terracotta/10 px-2 py-0.5 rounded-sm">
+                                 {tour.category || tour.type}
+                               </span>
+                             )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredTours.length > 5 && (
+                      <div className="p-3 text-center text-[10px] uppercase tracking-widest font-black text-forest/40 bg-forest/5">
+                        +{filteredTours.length - 5} more results
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 

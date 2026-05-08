@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as HomeIcon, Star, Stars, Edit2, Calendar, Compass, ChevronDown, Clock, Sparkles, CheckCircle2, ShoppingCart, Share2 } from 'lucide-react';
+import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as HomeIcon, Star, Stars, Edit2, Calendar, Compass, ChevronDown, Clock, Sparkles, CheckCircle2, ShoppingCart, Share2, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +30,7 @@ export default function Adventure() {
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [activeSlotActivity, setActiveSlotActivity] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Scroll lock and reset when modal is open
   useEffect(() => {
@@ -190,9 +191,23 @@ export default function Adventure() {
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
       if (profile?.role !== 'admin' && activity.isAvailable === false) return false;
-      return true;
+      const title = String(activity.title || activity.name || '').toLowerCase();
+      const description = String(activity.description || '').toLowerCase();
+      
+      const itineraryText = Array.isArray(activity.itinerary) 
+        ? activity.itinerary.map((day: any) => `${day.title || ''} ${day.activities || ''} ${day.description || ''}`).join(' ').toLowerCase()
+        : (typeof activity.theExperience === 'string' ? activity.theExperience.toLowerCase() : '');
+        
+      const highlightsText = Array.isArray(activity.highlights) || Array.isArray(activity.features)
+        ? [...(activity.highlights || []), ...(activity.features || [])].join(' ').toLowerCase()
+        : '';
+
+      const searchContent = `${title} ${description} ${itineraryText} ${highlightsText}`;
+      const query = searchQuery.toLowerCase();
+
+      return searchContent.includes(query);
     });
-  }, [activities, profile?.role]);
+  }, [activities, profile?.role, searchQuery]);
 
   return (
     <div className="pt-24">
@@ -203,9 +218,60 @@ export default function Adventure() {
         seoData={seo.seoData}
       />}
       {/* Tagline */}
-      <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+      <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Adventure Sports</h1>
-        <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Feel The Adrenaline</p>
+        <p className="text-terracotta font-medium tracking-widest uppercase text-xs mb-8">Feel The Adrenaline</p>
+        
+        {/* Search input */}
+        <div className="relative group md:max-w-md mx-auto transition-all duration-300 z-50">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20 group-focus-within:text-terracotta transition-colors" />
+          <input 
+            type="text"
+            placeholder="FIND YOUR ADVENTURE..."
+            value={searchQuery || ''}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-10 py-3 bg-white border border-forest/10 rounded-full text-xs font-black text-forest placeholder:text-forest/20 focus:outline-none focus:ring-4 focus:ring-forest/5 focus:border-terracotta/30 transition-all tracking-widest uppercase shadow-sm"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-forest/20 hover:text-terracotta transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+          
+          {/* Search Suggestions Dropdown */}
+          {searchQuery && filteredActivities.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-xl border border-forest/10 overflow-hidden max-h-[60vh] overflow-y-auto text-left">
+              {filteredActivities.slice(0, 5).map(activity => (
+                <div 
+                  key={activity.id}
+                  className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
+                  onClick={() => {
+                    setSelectedActivity(activity);
+                    setSearchQuery('');
+                  }}
+                >
+                  <img 
+                    src={activity.image || activity.images?.[0] || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b'} 
+                    alt={activity.title || activity.name} 
+                    className="w-12 h-12 rounded-xl object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className="text-xs font-black text-forest">{activity.title || activity.name}</h4>
+                    <p className="text-[10px] text-forest/60 line-clamp-2 mt-1">{activity.description}</p>
+                  </div>
+                </div>
+              ))}
+              {filteredActivities.length > 5 && (
+                <div className="p-3 text-center text-[10px] uppercase tracking-widest font-black text-forest/40 bg-forest/5">
+                  +{filteredActivities.length - 5} more results
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Activities Grid */}
