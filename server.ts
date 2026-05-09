@@ -483,17 +483,20 @@ async function injectMetaTags(req: express.Request, html: string) {
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
       let metaOverridden = false;
 
-      // --- STEP 1: Content-based overrides (Tours/Trekks details) - HIGHEST PRIORITY ---
+      // --- STEP 1: Content-based overrides (Tours/Trekks details) - PRIORITY 1 ---
       if (id) {
         try {
           const docRef = doc(db, "content", id);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            const pkg = docSnap.data();
+            const docData = docSnap.data();
+            // CRITICAL FIX: Extract properties from the nested 'data' field!
+            const pkg = docData?.data || {};
+            
             title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
             description = pkg.seoData?.metaDescription || pkg.description || description;
             
-            // Image Logic: SEO specific image > first in array > thumb image
+            // Image Logic: SEO specific image > first image in array > thumb image
             let pkgImg = pkg.seoImage || pkg.seoData?.ogImageUrl;
             if (!pkgImg && pkg.images && Array.isArray(pkg.images) && pkg.images.length > 0) {
               pkgImg = pkg.images[0];
@@ -502,14 +505,16 @@ async function injectMetaTags(req: express.Request, html: string) {
             
             image = pkgImg || image;
             metaOverridden = true;
-            console.log(`[Meta] Specific Content found for ${id}, injecting dynamic meta tags`);
+            console.log(`[Meta] Dynamic content injected for id: ${id}, title: ${title}, image: ${image}`);
+          } else {
+            console.log(`[Meta] Content doc not found in Firestore for id: ${id}`);
           }
         } catch (e) {
           console.warn("[Meta] Content lookup failed:", e);
         }
       }
 
-      // --- STEP 2: Check seo_settings collection (Programmatic SEO) - SECOND PRIORITY ---
+      // --- STEP 2: Check seo_settings collection (Programmatic SEO) - PRIORITY 2 ---
       if (!metaOverridden) {
         try {
           const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
@@ -539,7 +544,7 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
-      // --- STEP 3: Path-based Hardcoded Fallbacks - THIRD PRIORITY ---
+      // --- STEP 3: Path-based Hardcoded Fallbacks - PRIORITY 3 ---
       if (!metaOverridden) {
         if (urlPath.includes('/parvati-valley')) {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
@@ -559,7 +564,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
       
       // Optimize unsplash
-      if (image.includes('unsplash.com')) {
+      if (image && image.includes('unsplash.com')) {
         image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
         if (!image.includes('&h=')) image += '&h=630';
         if (!image.includes('&q=')) image += '&q=40';
@@ -567,8 +572,8 @@ async function injectMetaTags(req: express.Request, html: string) {
       }
 
       // Respect limits
-      if (title.length > 60) title = title.substring(0, 57) + "...";
-      if (description.length > 160) description = description.substring(0, 157) + "...";
+      if (title && title.length > 60) title = title.substring(0, 57) + "...";
+      if (description && description.length > 160) description = description.substring(0, 157) + "...";
 
       const metaTags = `
 <title>${title}</title>
