@@ -228,7 +228,7 @@ export default function ReviewsOfFame() {
                     {formData.mediaType === 'video' ? (
                       <video src={formData.mediaPreview} className="w-full h-full object-cover opacity-80" controls />
                     ) : (
-                      <img src={formData.mediaPreview} className="w-full h-full object-cover" />
+                      <img src={formData.mediaPreview} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     )}
                     <button type="button" onClick={() => { fileInputRef.current?.click(); }} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white font-bold backdrop-blur-sm">
                       Change File
@@ -333,7 +333,7 @@ export default function ReviewsOfFame() {
                         {traveller.mediaType === 'video' ? (
                           <video src={traveller.mediaUrl} className="w-full h-full object-contain bg-black max-h-[300px]" controls preload="metadata" />
                         ) : (
-                          <img src={traveller.mediaUrl} className="w-full h-full object-cover max-h-[300px]" loading="lazy" />
+                          <img src={traveller.mediaUrl} className="w-full h-full object-cover max-h-[300px]" loading="lazy" referrerPolicy="no-referrer" />
                         )}
                       </div>
                     )}
