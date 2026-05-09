@@ -593,7 +593,7 @@ export default function Tours() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <Link 
-                              to="/reviews-of-fame" 
+                              to="/gallery" 
                               onClick={(e) => e.stopPropagation()}
                               className="text-[9px] font-black text-terracotta hover:text-forest transition-colors uppercase tracking-[0.2em] underline underline-offset-4 decoration-terracotta/30"
                             >

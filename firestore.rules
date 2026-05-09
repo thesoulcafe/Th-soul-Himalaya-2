@@ -179,33 +179,6 @@ service cloud.firestore {
     }
 
     // ===============================================================
-    // VALIDATION BLUEPRINT: Wall of Fame Reviews
-    // ===============================================================
-
-    function isValidWallOfFameReview(data) {
-      let requiredKeys = ['name', 'testimonial', 'rating', 'trips', 'badges', 'status'];
-      return data.keys().hasAll(requiredKeys) &&
-             data.name is string && data.name.size() <= 100 &&
-             data.testimonial is string && data.testimonial.size() <= 2000 &&
-             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
-             data.trips is number && data.trips >= 1 &&
-             data.badges is list && data.badges.size() <= 10 &&
-             data.status in ['pending', 'approved'] &&
-             (!('createdAt' in data) || data.createdAt is timestamp) &&
-             (!('updatedAt' in data) || data.updatedAt is timestamp) &&
-             (!('mediaUrl' in data) || (data.mediaUrl is string && data.mediaUrl.size() <= 1000)) &&
-             (!('mediaType' in data) || data.mediaType in ['image', 'video']) &&
-             (!('image' in data) || (data.image is string && data.image.size() <= 1000));
-    }
-
-    match /wall_of_fame_reviews/{reviewId} {
-      allow read: if true;
-      allow create: if isValidWallOfFameReview(incoming()) && incoming().createdAt == request.time && (isAdmin() ? true : incoming().status == 'pending');
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    // ===============================================================
     // VALIDATION BLUEPRINT: Content
     // ===============================================================
 

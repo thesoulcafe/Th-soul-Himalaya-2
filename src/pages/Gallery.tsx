@@ -10,7 +10,6 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
     const fetchPosts = async () => {
       try {
         const q = query(
@@ -24,24 +23,23 @@ export default function Gallery() {
           const data = doc.data();
           return { 
             id: doc.id, 
-            url: data.data?.image || data.data?.img || '',
-            title: data.data?.title || 'Soul Himalaya Artifact',
-            description: data.data?.description || 'A timeless capture of spiritual resonance.'
+            url: data.data.image || data.data.img,
+            title: data.data.title || 'Soul Himalaya Artifact',
+            description: data.data.description || 'A timeless capture of spiritual resonance.'
           };
         });
         
-        if (fetchedPosts.length > 0 && isMounted) {
+        if (fetchedPosts.length > 0) {
           setImages(fetchedPosts);
         }
       } catch (error) {
         console.error("Gallery Fetch Error:", error);
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchPosts();
-    return () => { isMounted = false; };
   }, []);
 
   return (

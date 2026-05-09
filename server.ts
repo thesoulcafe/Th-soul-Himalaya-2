@@ -57,12 +57,12 @@ async function startServer() {
 
   const upload = multer({
     storage: storage,
-    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
+      if (file.mimetype.startsWith("image/")) {
         cb(null, true);
       } else {
-        cb(new Error("Only images and videos are allowed"));
+        cb(new Error("Only images are allowed"));
       }
     },
   });
@@ -278,25 +278,19 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
   });
 
   app.post("/api/upload", (req, res) => {
-    console.log("[Server] Received upload request");
-    
     upload.single("file")(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         return res.status(400).json({ error: err.message });
       }
       
-      console.log("[Server] Upload parsed. File:", req.file ? req.file.originalname : "none");
-      
       try {
         if (!req.file) {
-          console.error("[Server] No file uploaded in request");
           return res.status(400).json({ error: "No file uploaded" });
         }
 
         // Construct the URL to access the uploaded file
         const fileUrl = `/uploads/${req.file.filename}`;
-        console.log(`[Server] File saved successfully: ${fileUrl}`);
 
         res.json({
           url: fileUrl,
