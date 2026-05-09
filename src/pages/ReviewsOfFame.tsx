@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Search, Star, ChevronRight, User, Upload, Plus, Trash2, Edit2, Play, Pause } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -68,22 +69,16 @@ export default function ReviewsOfFame() {
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    // Perform upload
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Upload failed: ${res.status} ${errorText}`);
+    try {
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `reviews/${filename}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (err) {
+      console.error("Firebase Storage Upload Error:", err);
+      throw err;
     }
-    
-    const data = await res.json();
-    return data.url;
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
