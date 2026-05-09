@@ -225,7 +225,7 @@ const ParvatiValley = () => {
         </div>
       </section>
 
-      {/* 3. Interactive Village Grid (The Hamlets of the Gods) */}
+      {/* 3. Interactive Village Grid (The Hamlets of Parvati valley) */}
       <section className="py-24 bg-forest border-y border-white/5 relative overflow-hidden">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[120px]" />
@@ -233,7 +233,7 @@ const ParvatiValley = () => {
 
         <div className="px-6 max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-heading font-bold text-white tracking-tight">The Hamlets of the Gods</h2>
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-white tracking-tight">The Hamlets of Parvati valley</h2>
             <p className="text-white/40 text-lg max-w-2xl mx-auto uppercase tracking-widest font-black text-xs">Four Pillars of the Parvati Experience</p>
           </div>
 
@@ -242,7 +242,7 @@ const ParvatiValley = () => {
               <Link 
                 to={`/parvati-valley/${village.name.toLowerCase()}`}
                 key={village.name} 
-                className="block group h-[500px] relative rounded-[2rem] overflow-hidden border border-white/10"
+                className="block group h-[500px] relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl"
               >
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -255,29 +255,28 @@ const ParvatiValley = () => {
                   <img 
                     src={village.image} 
                     alt={village.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-100"
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-700 scale-105 group-hover:scale-110"
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
                   
                   <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                    <div className="relative z-10">
-                      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-terracotta text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6">
+                    <div className="relative z-10 space-y-4">
+                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-terracotta text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6">
                         {village.icon}
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-terracotta transition-colors">{village.name}</h3>
-                      <p className="text-white/60 text-sm mb-4 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500">
+                      <h3 className="text-2xl font-bold text-white group-hover:text-terracotta transition-colors">{village.name}</h3>
+                      <p className="text-white/70 text-sm leading-relaxed line-clamp-3 group-hover:line-clamp-4 transition-all duration-500">
                         {village.history}
                       </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-terracotta font-black text-xs tracking-widest uppercase py-1 px-3 rounded-full bg-white/5 backdrop-blur-md self-start">
+                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                        <span className="text-terracotta font-black text-[10px] tracking-widest uppercase py-1.5 px-3 rounded-full bg-white/10 backdrop-blur-md">
                           {village.vibe}
                         </span>
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
-                          <div className="px-6 py-2.5 rounded-full bg-white text-terracotta text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl hover:bg-terracotta hover:text-white transition-colors cursor-pointer">
-                            <span>View</span>
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </div>
+                        
+                        <div className="px-5 py-2 rounded-full bg-terracotta text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(217,119,87,0.3)] group-hover:bg-white group-hover:text-terracotta transition-all duration-300">
+                          <span>Explore</span>
+                          <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </div>
