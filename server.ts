@@ -57,12 +57,12 @@ async function startServer() {
 
   const upload = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith("image/")) {
+      if (file.mimetype.startsWith("image/") || file.mimetype.startsWith("video/")) {
         cb(null, true);
       } else {
-        cb(new Error("Only images are allowed"));
+        cb(new Error("Only images and videos are allowed"));
       }
     },
   });
@@ -278,19 +278,25 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
   });
 
   app.post("/api/upload", (req, res) => {
+    console.log("[Server] Received upload request");
+    
     upload.single("file")(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         return res.status(400).json({ error: err.message });
       }
       
+      console.log("[Server] Upload parsed. File:", req.file ? req.file.originalname : "none");
+      
       try {
         if (!req.file) {
+          console.error("[Server] No file uploaded in request");
           return res.status(400).json({ error: "No file uploaded" });
         }
 
         // Construct the URL to access the uploaded file
         const fileUrl = `/uploads/${req.file.filename}`;
+        console.log(`[Server] File saved successfully: ${fileUrl}`);
 
         res.json({
           url: fileUrl,
@@ -453,7 +459,6 @@ async function injectMetaTags(req: express.Request, html: string) {
     const metaPromise = (async () => {
       const urlStr = req.originalUrl || req.url;
       const urlPath = urlStr.split('?')[0];
-      const userAgent = req.headers['user-agent'] || '';
       
       // Resilient host/proto detection
       let rawHost = req.headers['x-forwarded-host'] || req.headers.host || 'thesoulhimalaya.com';
@@ -481,9 +486,10 @@ async function injectMetaTags(req: express.Request, html: string) {
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
       let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
+      
       let metaOverridden = false;
 
-      // --- STEP 1: Content-based overrides (Tours/Trekks details) - PRIORITY 1 ---
+      // --- PRIORITY 1: Dynamic Content Overrides (Tours/Trekks details from Firestore 'content' collection) ---
       if (id) {
         try {
           const docRef = doc(db, "content", id);
@@ -493,28 +499,35 @@ async function injectMetaTags(req: express.Request, html: string) {
             // CRITICAL FIX: Extract properties from the nested 'data' field!
             const pkg = docData?.data || {};
             
-            title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
-            description = pkg.seoData?.metaDescription || pkg.description || description;
+            const pkgTitle = pkg.title || pkg.name;
+            if (pkgTitle) {
+              title = pkg.seoData?.metaTitle || `${pkgTitle} | The Soul Himalaya`;
+            }
+            if (pkg.description || pkg.seoData?.metaDescription) {
+              description = pkg.seoData?.metaDescription || pkg.description || description;
+            }
             
-            // Image Logic: SEO specific image > first image in array > thumb image
+            // Image Logic: SEO specific image > first image in array > standard image
             let pkgImg = pkg.seoImage || pkg.seoData?.ogImageUrl;
             if (!pkgImg && pkg.images && Array.isArray(pkg.images) && pkg.images.length > 0) {
               pkgImg = pkg.images[0];
             }
             if (!pkgImg) pkgImg = pkg.image;
             
-            image = pkgImg || image;
+            if (pkgImg) {
+              image = pkgImg;
+            }
             metaOverridden = true;
-            console.log(`[Meta] Dynamic content injected for id: ${id}, title: ${title}, image: ${image}`);
+            console.log(`[Meta] Dynamic content injected for ID: ${id}, Title: ${title}, Image: ${image}`);
           } else {
-            console.log(`[Meta] Content doc not found in Firestore for id: ${id}`);
+            console.log(`[Meta] Content doc not found in Firestore for ID: ${id}`);
           }
         } catch (e) {
           console.warn("[Meta] Content lookup failed:", e);
         }
       }
 
-      // --- STEP 2: Check seo_settings collection (Programmatic SEO) - PRIORITY 2 ---
+      // --- PRIORITY 2: Check seo_settings collection (Programmatic SEO) ---
       if (!metaOverridden) {
         try {
           const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
@@ -525,7 +538,7 @@ async function injectMetaTags(req: express.Request, html: string) {
             description = seoData.description || seoData.metaDescription || description;
             image = seoData.ogImage || seoData.ogImageUrl || image;
             metaOverridden = true;
-            console.log(`[Meta] SEO record found in seo_settings for path: ${urlStr}`);
+            console.log(`[Meta] SEO record found in seo_settings for full path: ${urlStr}`);
           } else {
             // Check for path-only match (without query params)
             const pQuery = query(collection(db, "seo_settings"), where("path", "==", urlPath));
@@ -544,36 +557,42 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
-      // --- STEP 3: Path-based Hardcoded Fallbacks - PRIORITY 3 ---
+      // --- PRIORITY 3: Path-based Hardcoded Fallbacks ---
       if (!metaOverridden) {
         if (urlPath.includes('/parvati-valley')) {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
           description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
           image = "https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80";
+          metaOverridden = true;
         } else if (urlPath.includes('/soul-cafe')) {
           title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
           description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";
           image = "https://i.postimg.cc/ZqYdmHND/IMG-8122.jpg";
+          metaOverridden = true;
         }
       }
 
       // --- Final Polish & Injection ---
       // Ensure image is absolute
-      if (image && !image.startsWith('http')) {
+      if (image && typeof image === 'string' && !image.startsWith('http')) {
         image = `${protocol}://${host}${image.startsWith('/') ? '' : '/'}${image}`;
       }
       
       // Optimize unsplash
-      if (image && image.includes('unsplash.com')) {
+      if (image && typeof image === 'string' && image.includes('unsplash.com')) {
         image = image.replace(/&w=\d+/, '&w=1200').replace(/&h=\d+/, '&h=630').replace(/&q=\d+/, '&q=40');
         if (!image.includes('&h=')) image += '&h=630';
         if (!image.includes('&q=')) image += '&q=40';
         if (!image.includes('&fit=crop')) image += '&fit=crop';
       }
 
-      // Respect limits
-      if (title && title.length > 60) title = title.substring(0, 57) + "...";
-      if (description && description.length > 160) description = description.substring(0, 157) + "...";
+      // Respect limits safely
+      if (title && typeof title === 'string' && title.length > 60) {
+        title = title.substring(0, 57) + "...";
+      }
+      if (description && typeof description === 'string' && description.length > 160) {
+        description = description.substring(0, 157) + "...";
+      }
 
       const metaTags = `
 <title>${title}</title>
@@ -590,10 +609,11 @@ async function injectMetaTags(req: express.Request, html: string) {
 <meta name="twitter:image" content="${image}">`;
 
       let finalHtml = html;
-      // Filter existing tags
+      
+      // Order-independent tag filtering
       finalHtml = finalHtml
         .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-        .replace(/<meta\s+(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|image|title)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
+        .replace(/<meta[^>]*(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|title|image)["'][^>]*\/?>/gi, '');
 
       if (finalHtml.includes('<head>')) {
         return finalHtml.replace('<head>', `<head>${metaTags}`);

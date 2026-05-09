@@ -482,6 +482,29 @@ export default function Home() {
                 </Link>
               </motion.div>
             </div>
+
+            {/* Travellers Stats Trigger */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="mt-12 mx-auto"
+            >
+              <Link 
+                to="/reviews-of-fame"
+                className="group relative inline-flex items-center gap-4 bg-white/10 hover:bg-white/20 backdrop-blur-md px-8 py-4 rounded-full border border-white/20 hover:border-white/40 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:-translate-y-1"
+              >
+                <div className="flex bg-amber-500/20 p-2 rounded-full border border-amber-500/30">
+                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                </div>
+                <div className="text-left">
+                  <p className="text-white font-bold leading-tight tracking-wide text-base">Reviews of Fame</p>
+                  <p className="text-amber-300 text-[10px] sm:text-xs mt-0.5 tracking-widest uppercase font-black flex items-center">
+                    HAPPY TRAVELLERS <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
 

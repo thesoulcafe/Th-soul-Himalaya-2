@@ -286,13 +286,13 @@ export default function Tours() {
 
   return (
     <div className="pt-20 px-4 sm:px-6">
-      {seo && <SEO 
-        title={seo.title || "Tour Packages"} 
-        description={seo.description || "Handpicked mountain journeys."} 
-        keywords={seo.keyword} 
-        image={seo.image}
-        seoData={seo.seoData}
-      />}
+      <SEO 
+        title={seo?.title || "Tour Packages"} 
+        description={seo?.description || "Handpicked mountain journeys."} 
+        keywords={seo?.keyword} 
+        image={seo?.image}
+        seoData={seo?.seoData}
+      />
       
       {/* Search & Filter Header (Sticky) */}
       <div className="sticky top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
@@ -593,7 +593,7 @@ export default function Tours() {
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <Link 
-                              to="/gallery" 
+                              to="/reviews-of-fame" 
                               onClick={(e) => e.stopPropagation()}
                               className="text-[9px] font-black text-terracotta hover:text-forest transition-colors uppercase tracking-[0.2em] underline underline-offset-4 decoration-terracotta/30"
                             >

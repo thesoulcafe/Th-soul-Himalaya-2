@@ -360,7 +360,7 @@ export default function Adventure() {
                       <div className="space-y-1 mb-4">
                         <div className="flex items-center gap-3">
                           <Link 
-                            to="/gallery" 
+                            to="/reviews-of-fame" 
                             onClick={(e) => e.stopPropagation()}
                             className="text-[9px] font-black text-terracotta hover:text-forest transition-colors uppercase tracking-[0.2em] underline underline-offset-4 decoration-terracotta/30"
                           >
