@@ -25,7 +25,7 @@ const PARVATI_DATA = {
   hero: {
     headline: "The Valley of Shadows and Light",
     subheadline: "A Spiritual Odyssey through the heart of the Kullu Himalayas",
-    backgroundImage: "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg", // Mantra Lake representation
+    backgroundImage: "https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80", // Mantra Lake representation
     parallaxIntensity: 0.5
   },
   narrative: {
@@ -122,12 +122,7 @@ const ParvatiValley = () => {
             className="relative rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-forest shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col"
           >
             {/* Image Container */}
-            <div className="relative h-[300px] sm:h-[450px] overflow-hidden">
-              <img 
-                src="https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" 
-                alt="Shiva Shakti Background" 
-                className="absolute inset-0 w-full h-full object-cover opacity-100 scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
-              />
+            <div className="relative h-[300px] sm:h-[450px] overflow-hidden bg-forest/80 flex items-center justify-center">
               {/* Centered Divine Motif */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="relative h-48 w-48 md:h-80 md:w-80 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center animate-[spin_20s_linear_infinite]">

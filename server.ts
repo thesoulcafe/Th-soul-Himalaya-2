@@ -549,7 +549,7 @@ async function injectMetaTags(req: express.Request, html: string) {
         if (urlPath.includes('/parvati-valley')) {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
           description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
-          image = "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+          image = "https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80";
         } else if (urlPath.includes('/soul-cafe')) {
           title = "The Soul Cafe, Tosh | A Sanctuary for Dreamers";
           description = "Located in the mystical heights of Tosh, a sanctuary for dreamers and trekkers.";

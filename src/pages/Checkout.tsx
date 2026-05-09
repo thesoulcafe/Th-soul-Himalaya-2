@@ -290,7 +290,7 @@ export default function SoulCart() {
                           className="group relative bg-white/60 backdrop-blur-md rounded-[2rem] p-4 border border-white/40 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-forest/5 transition-all flex flex-col sm:flex-row items-center gap-4"
                         >
                           <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl overflow-hidden shadow-lg shrink-0 border border-white/50">
-                            <img src={(item.name || "").toLowerCase().includes("valley of shadows") ? "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" : item.image} alt={item.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
+                            <img src={(item.name || "").toLowerCase().includes("valley of shadows") ? "https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80" : item.image} alt={item.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
                           </div>
                           <div className="flex-1 text-center sm:text-left">
                             <div className="text-[9px] font-black text-terracotta uppercase tracking-[0.2em] mb-0.5">{item.type}</div>

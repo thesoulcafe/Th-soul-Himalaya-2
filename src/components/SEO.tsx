@@ -61,7 +61,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
 
   const seoTitle = seoData?.metaTitle || pageSeo?.title || title || "The Soul Himalaya";
   const seoDescription = seoData?.metaDescription || pageSeo?.description || description || "";
-  const seoImage = seoData?.ogImageUrl || pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg";
+  const seoImage = seoData?.ogImageUrl || pageSeo?.ogImage || image || siteSettings?.globalOgImage || "https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80";
   const seoKeywords = seoData?.targetKeyword || keywords;
 
   let finalTitle = (seoTitle && typeof seoTitle === 'string' && seoTitle.includes("Soul Himalaya")) 
