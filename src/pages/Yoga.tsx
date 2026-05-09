@@ -324,7 +324,7 @@ export default function Yoga() {
                   >
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
-                        ? ["https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80"] 
+                        ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                         : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"
@@ -481,7 +481,7 @@ export default function Yoga() {
               <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
                 <ImageSlider 
                   images={((selectedPackage.title || '').toLowerCase().includes('valley of shadows') 
-                    ? ["https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80"] 
+                    ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                     : [selectedPackage.image, ...(selectedPackage.images || [])]).filter(Boolean)} 
                   alt={selectedPackage.title}
                   className="h-full w-full"

@@ -144,16 +144,6 @@ export default function Trekks() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const q = query(collection(db, 'seo_settings'), where('path', '==', '/trekks'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (!snapshot.empty) setSeo(snapshot.docs[0].data());
-    }, (error) => {
-      console.error("SEO settings snapshot failed:", error);
-    });
-    return () => unsubscribe();
-  }, []);
-
   const getItemQuantity = (id: string) => {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
@@ -211,14 +201,14 @@ export default function Trekks() {
 
   return (
     <div className="pt-24">
-      <SEO 
-        title={seo?.title || "Mountain Trekks"} 
-        description={seo?.description || "Discover wild paths."} 
-        image={seo?.image}
+      {seo && <SEO 
+        title={seo.title || "Mountain Trekks"} 
+        description={seo.description || "Discover wild paths."} 
+        image={seo.image}
         type="adventure"
-        trekData={selectedTrekk || (seo ? { title: seo.title, description: seo.description } : undefined)}
-        seoData={seo?.seoData}
-      />
+        trekData={selectedTrekk || { title: seo.title, description: seo.description }}
+        seoData={seo.seoData}
+      />}
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Mountain Trekks</h1>

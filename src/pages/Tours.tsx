@@ -286,13 +286,13 @@ export default function Tours() {
 
   return (
     <div className="pt-20 px-4 sm:px-6">
-      <SEO 
-        title={seo?.title || "Tour Packages"} 
-        description={seo?.description || "Handpicked mountain journeys."} 
-        keywords={seo?.keyword} 
-        image={seo?.image}
-        seoData={seo?.seoData}
-      />
+      {seo && <SEO 
+        title={seo.title || "Tour Packages"} 
+        description={seo.description || "Handpicked mountain journeys."} 
+        keywords={seo.keyword} 
+        image={seo.image}
+        seoData={seo.seoData}
+      />}
       
       {/* Search & Filter Header (Sticky) */}
       <div className="sticky top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
@@ -537,7 +537,7 @@ export default function Tours() {
                     >
                       <ImageSlider 
                         images={((tour.title || '').toLowerCase().includes('valley of shadows') 
-                          ? ["https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80"] 
+                          ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                           : [tour.image, ...(tour.images || [])]).filter(Boolean)} 
                         alt={tour.title}
                         className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
@@ -688,7 +688,7 @@ export default function Tours() {
               <div className="relative w-full h-[400px] md:h-[600px] shrink-0 overflow-hidden bg-forest">
                 <ImageSlider 
                   images={((selectedTour.title || '').toLowerCase().includes('valley of shadows') 
-                    ? ["https://images.unsplash.com/photo-1544333323-167bb3098522?auto=format&fit=crop&w=1200&h=630&q=80"] 
+                    ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
                     : [selectedTour.image, ...(selectedTour.images || [])]).filter(Boolean)} 
                   alt={selectedTour.title}
                   className="h-full w-full"
