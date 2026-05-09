@@ -481,35 +481,10 @@ async function injectMetaTags(req: express.Request, html: string) {
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
       let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
       let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
+      let metaOverridden = false;
 
-      // --- STEP 1: Check seo_settings collection (Programmatic SEO) ---
-      try {
-        const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
-        const seoSnap = await getDocs(seoQuery);
-        if (!seoSnap.empty) {
-          const seoData = seoSnap.docs[0].data();
-          title = seoData.title || seoData.metaTitle || title;
-          description = seoData.description || seoData.metaDescription || description;
-          image = seoData.ogImage || seoData.ogImageUrl || image;
-          console.log(`[Meta] SEO record found in seo_settings for path: ${urlStr}`);
-        } else {
-          // Check for path-only match (without query params)
-          const pQuery = query(collection(db, "seo_settings"), where("path", "==", urlPath));
-          const pSnap = await getDocs(pQuery);
-          if (!pSnap.empty) {
-            const pData = pSnap.docs[0].data();
-            title = pData.title || pData.metaTitle || title;
-            description = pData.description || pData.metaDescription || description;
-            image = pData.ogImage || pData.ogImageUrl || image;
-            console.log(`[Meta] SEO record found in seo_settings for path only: ${urlPath}`);
-          }
-        }
-      } catch (e) {
-        console.warn("[Meta] seo_settings lookup failed:", e);
-      }
-
-      // --- STEP 2: Content-based overrides (Tours/Trekks details) ---
-      if (id && (!title || title.includes("The Soul Himalaya | Spiritual"))) {
+      // --- STEP 1: Content-based overrides (Tours/Trekks details) - HIGHEST PRIORITY ---
+      if (id) {
         try {
           const docRef = doc(db, "content", id);
           const docSnap = await getDoc(docRef);
@@ -526,15 +501,46 @@ async function injectMetaTags(req: express.Request, html: string) {
             if (!pkgImg) pkgImg = pkg.image;
             
             image = pkgImg || image;
-            console.log(`[Meta] Content found for ${id}, injecting dynamic tags`);
+            metaOverridden = true;
+            console.log(`[Meta] Specific Content found for ${id}, injecting dynamic meta tags`);
           }
         } catch (e) {
           console.warn("[Meta] Content lookup failed:", e);
         }
       }
 
-      // --- STEP 3: Path-based Hardcoded Fallbacks ---
-      if (!id && (title.includes("The Soul Himalaya | Spiritual"))) {
+      // --- STEP 2: Check seo_settings collection (Programmatic SEO) - SECOND PRIORITY ---
+      if (!metaOverridden) {
+        try {
+          const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
+          const seoSnap = await getDocs(seoQuery);
+          if (!seoSnap.empty) {
+            const seoData = seoSnap.docs[0].data();
+            title = seoData.title || seoData.metaTitle || title;
+            description = seoData.description || seoData.metaDescription || description;
+            image = seoData.ogImage || seoData.ogImageUrl || image;
+            metaOverridden = true;
+            console.log(`[Meta] SEO record found in seo_settings for path: ${urlStr}`);
+          } else {
+            // Check for path-only match (without query params)
+            const pQuery = query(collection(db, "seo_settings"), where("path", "==", urlPath));
+            const pSnap = await getDocs(pQuery);
+            if (!pSnap.empty) {
+              const pData = pSnap.docs[0].data();
+              title = pData.title || pData.metaTitle || title;
+              description = pData.description || pData.metaDescription || description;
+              image = pData.ogImage || pData.ogImageUrl || image;
+              metaOverridden = true;
+              console.log(`[Meta] SEO record found in seo_settings for path only: ${urlPath}`);
+            }
+          }
+        } catch (e) {
+          console.warn("[Meta] seo_settings lookup failed:", e);
+        }
+      }
+
+      // --- STEP 3: Path-based Hardcoded Fallbacks - THIRD PRIORITY ---
+      if (!metaOverridden) {
         if (urlPath.includes('/parvati-valley')) {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
           description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";

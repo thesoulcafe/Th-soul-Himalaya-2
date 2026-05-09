@@ -27,8 +27,8 @@ export default function Success() {
         className="relative z-10 max-w-2xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-[3rem] p-12 md:p-20 text-center shadow-2xl"
       >
         <motion.div
-           initial={{ scale: 0 }}
-           animate={{ scale: 1, rotate: [0, 10, 0] }}
+           initial={{ scale: 0, rotate: -15 }}
+           animate={{ scale: 1, rotate: 0 }}
            transition={{ type: "spring", damping: 10, stiffness: 100, delay: 0.2 }}
            className="w-24 h-24 bg-terracotta rounded-full flex items-center justify-center mx-auto mb-10 shadow-xl shadow-terracotta/20"
         >
