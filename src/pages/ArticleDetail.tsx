@@ -158,7 +158,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
     category: "Cultural Intelligence",
     readTime: "10 min read",
     date: "April 2026",
-    image: "https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=2000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=2000&auto=format&fit=crop",
     author: "Tenzing Norgay",
     authorRole: "Cultural Liaison",
     content: [

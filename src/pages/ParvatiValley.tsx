@@ -112,34 +112,28 @@ const ParvatiValley = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 selection:bg-terracotta/20 font-sans overflow-x-hidden pt-24">
-      {/* 1. Cosmic Shiva Shakti Card - Enhanced Visuals */}
+      {/* 1. Cosmic Shiva Shakti Card - No Image */}
       <section className="px-6 max-w-5xl mx-auto mb-20 relative">
         <Link to="/cosmic-manifestation" className="block relative group/cosmic cursor-pointer">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-forest shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col"
+            className="relative rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-forest shadow-[0_30px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col pt-12 md:pt-20"
           >
-            {/* Image Container */}
-            <div className="relative h-[300px] sm:h-[450px] overflow-hidden">
-              <img 
-                src="https://i.postimg.cc/TYqctVvr/IMG-8144.jpg" 
-                alt="Shiva Shakti Background" 
-                className="absolute inset-0 w-full h-full object-cover opacity-100 scale-110 group-hover/cosmic:scale-100 transition-transform duration-[6s]"
-              />
-              {/* Centered Divine Motif */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="relative h-48 w-48 md:h-80 md:w-80 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center animate-[spin_20s_linear_infinite]">
+            {/* Centered Divine Motif */}
+            <div className="absolute top-0 left-0 w-full h-[300px] sm:h-[450px] overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative h-48 w-48 md:h-80 md:w-80 rounded-full border border-white/10 bg-white/[0.01] flex items-center justify-center animate-[spin_30s_linear_infinite]">
                    <div className="absolute inset-4 rounded-full border border-terracotta/20" />
                    <div className="absolute inset-8 rounded-full border border-[#4A7FA5]/20" />
                 </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-forest to-transparent opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/80 to-transparent" />
             </div>
 
-            {/* Content Plate - Below Image */}
-            <div className="relative z-10 w-full flex flex-col items-center justify-center p-8 md:p-12 bg-forest text-white">
+            {/* Content Plate */}
+            <div className="relative z-10 w-full flex flex-col items-center justify-center p-8 md:p-12 bg-transparent text-white">
               <div className="max-w-3xl w-full space-y-6 text-center">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -153,18 +147,19 @@ const ParvatiValley = () => {
                     <div className="h-px w-12 bg-white/40 self-center" />
                   </div>
 
-                  <h2 className="font-playfair text-5xl xs:text-6xl md:text-8xl text-white font-black italic tracking-tighter uppercase">
+                  <h2 className="font-playfair text-5xl xs:text-6xl md:text-8xl text-white font-black italic tracking-tighter uppercase leading-none">
                     Shiva Shakti
                   </h2>
 
                   <div className="flex items-center justify-center gap-4 text-white/60 uppercase tracking-[0.3em] text-[10px] font-bold">
                     <span>Masculine</span>
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#4A7FA5]" />
                     <div className="h-1.5 w-1.5 rounded-full bg-terracotta" />
                     <span>Feminine</span>
                   </div>
                 </motion.div>
 
-                <p className="font-playfair italic text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
+                <p className="font-playfair italic text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto py-6">
                   "Where the silent meditation of Shiva meets the vibrant dance of Parvati—discover the eternal balance in the shadows of the cedars."
                 </p>
 
@@ -179,7 +174,6 @@ const ParvatiValley = () => {
           </motion.div>
         </Link>
       </section>
-
       {/* New: Divine Duality Card (Shiva Meditation & Sikh Reverence) */}
       <section className="px-6 max-w-5xl mx-auto mb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -230,7 +224,7 @@ const ParvatiValley = () => {
         </div>
       </section>
 
-      {/* 3. Interactive Village Grid (The Hamlets of the Gods) */}
+      {/* 3. Interactive Village Grid (The Hamlets of Parvati valley) */}
       <section className="py-24 bg-forest border-y border-white/5 relative overflow-hidden">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[120px]" />
@@ -238,7 +232,7 @@ const ParvatiValley = () => {
 
         <div className="px-6 max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-heading font-bold text-white tracking-tight">The Hamlets of the Gods</h2>
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-white tracking-tight">The Hamlets of Parvati valley</h2>
             <p className="text-white/40 text-lg max-w-2xl mx-auto uppercase tracking-widest font-black text-xs">Four Pillars of the Parvati Experience</p>
           </div>
 
@@ -274,15 +268,13 @@ const ParvatiValley = () => {
                       <p className="text-white/60 text-sm mb-4 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500">
                         {village.history}
                       </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-terracotta font-black text-xs tracking-widest uppercase py-1 px-3 rounded-full bg-white/5 backdrop-blur-md self-start">
+                      <div className="flex items-center justify-between w-full mt-4">
+                        <span className="text-terracotta font-black text-[10px] tracking-widest uppercase py-2 px-4 rounded-full bg-white/10 backdrop-blur-md">
                           {village.vibe}
                         </span>
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
-                          <div className="px-6 py-2.5 rounded-full bg-white text-terracotta text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl hover:bg-terracotta hover:text-white transition-colors cursor-pointer">
-                            <span>View</span>
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </div>
+                        <div className="px-5 py-2 rounded-full bg-terracotta text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl hover:bg-white hover:text-terracotta transition-all duration-300 group-hover:scale-105 border border-white/20">
+                          <span>Explore</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
                         </div>
                       </div>
                     </div>

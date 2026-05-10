@@ -18,7 +18,7 @@ const SAMPLE_IMAGES: GalleryImage[] = [
   },
   {
     id: '2',
-    url: 'https://images.unsplash.com/photo-1590050752117-23a9d7fc2140?q=80&w=1000&auto=format&fit=crop',
+    url: 'https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=1000&auto=format&fit=crop',
     title: 'Temple of Echoes',
     description: 'An ancient stone temple stands resilient against the elements, a testament to the spiritual heritage of the Himalayas.'
   },
