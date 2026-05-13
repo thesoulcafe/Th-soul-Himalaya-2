@@ -3814,7 +3814,7 @@ export default function Admin() {
                               </span>
                             </div>
                             <h3 className="text-sm font-bold text-forest mb-1">{msg.subject}</h3>
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex flex-wrap items-center gap-4 mb-4">
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-bold text-forest/60">{msg.userName}</span>
                               </div>
@@ -3827,12 +3827,17 @@ export default function Admin() {
                                   <span className="text-[10px] text-green-700 font-mono font-bold">{msg.userPhone}</span>
                                 </div>
                               )}
+                              {msg.metadata?.source === 'TailorMadePage' && (
+                                <Badge className="bg-terracotta/10 text-terracotta border-none px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                  Tailor-Made 
+                                </Badge>
+                              )}
                             </div>
-                            <div className="bg-forest/[0.02] border border-forest/5 rounded-lg p-4 text-xs text-forest/70 leading-relaxed font-medium">
+                            <div className="bg-forest/[0.02] border border-forest/5 rounded-lg p-4 text-xs text-forest/70 leading-relaxed font-medium whitespace-pre-wrap">
                               {msg.message}
                             </div>
                           </div>
-                          <div className="flex lg:flex-col gap-2 justify-end lg:justify-start min-w-[140px]">
+                          <div className="flex flex-col gap-2 min-w-[140px]">
                             <Button
                               size="sm"
                               onClick={async () => {
@@ -3845,12 +3850,46 @@ export default function Admin() {
                                 }
                               }}
                               className={cn(
-                                "rounded-lg font-bold text-[9px] uppercase tracking-widest h-9 w-full",
-                                msg.status === 'unread' ? "bg-forest text-white" : "bg-white border border-forest/10 text-forest/40"
+                                "rounded-lg font-bold text-[9px] uppercase tracking-widest w-full",
+                                msg.status === 'unread' ? "bg-forest text-white h-9" : "bg-white border border-forest/10 text-forest/40 h-8"
                               )}
                             >
                               {msg.status === 'unread' ? 'Acknowledge' : 'Re-flag'}
                             </Button>
+                            
+                            <div className="flex gap-2 w-full">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (msg.userPhone) {
+                                    const encodedMessage = encodeURIComponent(`Namaste ${msg.userName}! 🙏 We received your inquiry regarding "${msg.subject}". `);
+                                    window.open(`https://wa.me/${msg.userPhone.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
+                                  }
+                                }}
+                                disabled={!msg.userPhone}
+                                className="flex-1 rounded-lg border-green-500/20 text-green-600 hover:bg-green-50 h-8 font-bold text-[9px]"
+                                title="Reply via WhatsApp"
+                              >
+                                WhatsApp
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (msg.userEmail) {
+                                    const encodedMessage = encodeURIComponent(`Namaste ${msg.userName},\n\nThank you for reaching out regarding "${msg.subject}".\n\n`);
+                                    window.location.href = `mailto:${msg.userEmail}?subject=Re: ${encodeURIComponent(msg.subject)}&body=${encodedMessage}`;
+                                  }
+                                }}
+                                disabled={!msg.userEmail}
+                                className="flex-1 rounded-lg border-sky-500/20 text-sky-600 hover:bg-sky-50 h-8 font-bold text-[9px]"
+                                title="Reply via Email"
+                              >
+                                Email
+                              </Button>
+                            </div>
+
                             <Button
                               size="sm"
                               variant="ghost"
@@ -3869,7 +3908,7 @@ export default function Admin() {
                                   }
                                 });
                               }}
-                              className="rounded-lg font-bold text-[9px] uppercase tracking-widest h-9 w-full text-rose-500 hover:bg-rose-500/5 mt-1"
+                              className="rounded-lg font-bold text-[9px] uppercase tracking-widest h-8 w-full text-rose-500 hover:bg-rose-500/5"
                             >
                               <Trash2 className="h-3 w-3 mr-2" /> Delete
                             </Button>
