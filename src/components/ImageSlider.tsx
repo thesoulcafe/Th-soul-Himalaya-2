@@ -205,6 +205,8 @@ export default function ImageSlider({
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
+            dragDirectionLock={true}
+            style={{ touchAction: "pan-y" }}
             dragElastic={1}
             onDragEnd={(e, { offset, velocity }) => {
               const swipeConfidenceThreshold = 10000;

@@ -46,9 +46,9 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg py-3 px-4 sm:px-6"
+      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg h-[64px] md:h-[72px] px-4 sm:px-6 flex items-center"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           <motion.div
             whileHover={{ scale: 1.05 }}

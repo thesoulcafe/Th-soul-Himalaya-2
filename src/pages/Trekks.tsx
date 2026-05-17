@@ -237,9 +237,9 @@ export default function Trekks() {
           {/* Search Suggestions Dropdown */}
           {searchQuery && filteredTrekks.length > 0 && (
             <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-xl border border-forest/10 overflow-hidden max-h-[60vh] overflow-y-auto text-left">
-              {filteredTrekks.slice(0, 5).map(trekk => (
+              {filteredTrekks.slice(0, 5).map((trekk, index) => (
                 <div 
-                  key={trekk.id}
+                  key={`search-${trekk.id || index}-${index}`}
                   className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                   onClick={() => {
                     setSelectedTrekk(trekk);
@@ -285,7 +285,7 @@ export default function Trekks() {
             ) : (
               filteredTrekks.map((trekk, index) => (
                 <motion.div
-                  key={trekk.id || trekk.title}
+                  key={`trekk-grid-${trekk.id || index}-${index}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

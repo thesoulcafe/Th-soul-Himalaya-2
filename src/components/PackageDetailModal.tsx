@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Clock, Users, Zap, Star, CheckCircle2, Compass, Sparkles, 
+  Clock, Users, Star, CheckCircle2, Compass, 
   Minus, Plus, ShoppingCart, ChevronDown, Calendar, Share2, 
-  X, MapPin, Activity, ShieldCheck, ArrowRight, Sunrise, Mountain
+  X, ArrowRight, Sunrise, Mountain
 } from 'lucide-react';
 import ImageSlider from '@/components/ImageSlider';
 import { useAuth } from '@/lib/AuthContext';
@@ -127,148 +127,158 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-forest/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8"
+        className="fixed inset-0 z-[9999] bg-forest/80 backdrop-blur-sm overflow-y-auto custom-scrollbar"
         onClick={onClose}
+        data-lenis-prevent="true"
       >
-        <motion.div 
-          initial={{ opacity: 0, y: 30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-cream w-full max-w-[1000px] max-h-[95vh] sm:max-h-[90vh] rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row relative border border-white/20"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Close Button - Desktop (Absolute) & Mobile */}
-          <button 
-            onClick={onClose}
-            className="absolute top-4 right-4 z-50 bg-white/50 backdrop-blur-md hover:bg-white text-forest p-3 rounded-full shadow-sm border border-forest/10 hover:border-terracotta/30 hover:text-terracotta transition-all"
+        <div className="min-h-full py-8 px-4 sm:py-12 sm:px-6 flex flex-col">
+          <motion.div 
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.98 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-[#FAF9F6] w-full max-w-5xl rounded-[2rem] overflow-hidden shadow-2xl relative flex flex-col mx-auto mt-4 mb-4 sm:mt-10 sm:mb-10"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="h-5 w-5" />
-          </button>
+          {/* Navigation / Close Button */}
+          <div className="absolute top-4 sm:top-6 right-4 sm:right-6 lg:right-8 z-50 flex items-center gap-3">
+             <button 
+               onClick={handleShare}
+               className="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/70 backdrop-blur-md text-forest hover:bg-white hover:text-terracotta rounded-full shadow-sm border border-forest/5 transition-all"
+             >
+               <Share2 className="h-4 w-4 lg:h-5 lg:w-5" />
+             </button>
+             <button 
+               onClick={onClose}
+               className="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center bg-white/70 backdrop-blur-md text-forest hover:bg-white hover:text-terracotta rounded-full shadow-sm border border-forest/5 transition-all"
+             >
+               <X className="h-5 w-5 lg:h-6 lg:w-6" />
+             </button>
+          </div>
 
-          {/* Left Side: Image Gallery */}
-          <div className="w-full md:w-[45%] h-[35vh] md:h-auto shrink-0 relative bg-forest overflow-hidden">
+          {/* Hero / Gallery */}
+          <div className="w-full h-[45dvh] lg:h-[55dvh] relative shrink-0">
             <ImageSlider 
               images={images} 
               alt={title}
-              className="h-full w-full object-cover opacity-90 transition-opacity duration-700"
+              className="w-full h-full object-cover"
               autoSwipe={true}
-              interval={4000}
+              interval={5000}
               showThumbnails={false}
             />
-            {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-forest/80 via-forest/20 to-transparent pointer-events-none" />
+            {/* Subtle Gradient for top tags readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-forest/40 to-transparent h-32 pointer-events-none" />
             
             {pkg.isAvailable === false && (
               <div className="absolute inset-0 bg-forest/40 flex items-center justify-center z-10 backdrop-blur-sm">
-                <Badge className="bg-white/90 text-forest border-none px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg">
+                <Badge className="bg-white/90 text-forest border-none px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-lg">
                   Currently Unavailable
                 </Badge>
               </div>
             )}
             
-            {/* Optional Top Tags */}
-            <div className="absolute top-6 left-6 flex gap-2 z-10">
-              <Badge className="bg-forest/60 backdrop-blur-md text-white border border-white/20 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-sm">
+            {/* Top Tags */}
+            <div className="absolute top-6 left-6 lg:top-8 lg:left-8 z-10">
+              <Badge className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-5 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-sm">
                 {typeLabel}
               </Badge>
             </div>
-            
-            {/* Bottom Tag Overlay */}
-            <div className="absolute bottom-6 left-6 z-10">
-               <div className="flex items-center gap-2 text-white/90 mb-1">
-                 <Star className="h-4 w-4 text-terracotta fill-current" />
-                 <span className="text-xs font-bold tracking-widest uppercase">{rating} / 5.0</span>
-               </div>
-               <div className="font-fluid text-2xl text-terracotta drop-shadow-md">The Soul Himalaya</div>
-            </div>
           </div>
 
-          {/* Right Side: Content Container */}
-          <div 
-            className="w-full md:w-[55%] flex-1 flex flex-col min-h-0 bg-[#FAF9F6] relative overflow-y-auto custom-scrollbar overscroll-contain"
-            data-lenis-prevent="true"
-            onWheel={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
-          >
-            <div className="p-8 md:p-12 lg:p-14 flex-grow">
+          {/* Body Content */}
+          <div className="w-full px-6 py-10 sm:px-12 sm:py-14 lg:px-20 lg:py-16">
+            <div className="max-w-3xl mx-auto w-full">
               
-              {/* Header Info */}
-              <div className="mb-10">
-                <div className="flex items-center flex-wrap gap-3 text-terracotta text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-                  <span className="flex items-center gap-1.5"><Compass className="h-3 w-3" /> {focus}</span>
+              {/* Header: Title & Rating Below Image */}
+              <div className="mb-12">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-1.5 bg-terracotta/10 px-3 py-1.5 rounded-full text-terracotta">
+                    <Star className="h-4 w-4 fill-terracotta" />
+                    <span className="text-sm font-bold tracking-widest uppercase">{rating}</span>
+                  </div>
                   <div className="w-1 h-1 rounded-full bg-forest/20" />
-                  <span className="flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {duration}</span>
+                  <span className="flex items-center gap-1.5 text-xs text-forest/60 font-black uppercase tracking-[0.2em]">
+                    <Compass className="h-4 w-4 shrink-0" /> {focus}
+                  </span>
                 </div>
-                <h2 className="text-3xl md:text-[2.75rem] font-playfair italic font-black text-forest tracking-tight leading-[1.1] mb-6">
+                
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-playfair italic font-black text-forest tracking-tight leading-[1.1] mb-8 break-words drop-shadow-sm">
                   {title}
                 </h2>
-                <p className="text-forest/70 font-sans leading-[1.8] text-sm md:text-[15px] font-medium">
+                
+                <p className="text-forest/80 font-sans leading-relaxed text-lg sm:text-xl font-medium max-w-2xl">
                   {description}
                 </p>
               </div>
 
-              {/* Stats / Quick Info Card */}
-              <div className="bg-white border border-forest/[0.04] rounded-3xl p-6 mb-12 shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-wrap gap-y-8 gap-x-10">
-                <div className="flex items-start gap-4">
-                  <div className="bg-cream p-3 rounded-2xl text-terracotta"><Clock className="h-5 w-5" /></div>
+              {/* Stats Card */}
+              <div className="bg-white border border-forest/[0.04] rounded-[2rem] p-6 sm:p-10 mb-14 shadow-[0_8px_30px_rgb(0,0,0,0.03)] grid grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-full">
+                <div className="flex flex-col gap-4">
+                  <div className="bg-cream/50 w-12 h-12 flex items-center justify-center rounded-2xl text-terracotta shrink-0">
+                    <Clock className="h-6 w-6" />
+                  </div>
                   <div>
-                    <div className="text-[9px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1">Duration</div>
-                    <div className="text-sm font-bold text-forest">{duration}</div>
+                    <div className="text-[10px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1.5">Duration</div>
+                    <div className="text-base sm:text-lg font-bold text-forest">{duration}</div>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="bg-cream p-3 rounded-2xl text-terracotta"><Mountain className="h-5 w-5" /></div>
+                <div className="flex flex-col gap-4">
+                  <div className="bg-cream/50 w-12 h-12 flex items-center justify-center rounded-2xl text-terracotta shrink-0">
+                    <Mountain className="h-6 w-6" />
+                  </div>
                   <div>
-                    <div className="text-[9px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1">Pace</div>
-                    <div className="text-sm font-bold text-forest">Soulful</div>
+                    <div className="text-[10px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1.5">Intensity</div>
+                    <div className="text-base sm:text-lg font-bold text-forest">Soulful</div>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="bg-cream p-3 rounded-2xl text-terracotta"><Users className="h-5 w-5" /></div>
+                <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
+                  <div className="bg-cream/50 w-12 h-12 flex items-center justify-center rounded-2xl text-terracotta shrink-0">
+                    <Users className="h-6 w-6" />
+                  </div>
                   <div>
-                    <div className="text-[9px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1">Group Size</div>
-                    <div className="text-sm font-bold text-forest">Intimate</div>
+                    <div className="text-[10px] text-forest/40 font-black uppercase tracking-[0.2em] mb-1.5">Group</div>
+                    <div className="text-base sm:text-lg font-bold text-forest">Intimate</div>
                   </div>
                 </div>
               </div>
 
-              {/* Journey Highlights */}
+              {/* Highlights */}
               {highlights?.length > 0 && (
-                <div className="mb-12">
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="h-px flex-grow bg-forest/10" />
-                    <h3 className="text-[10px] font-black text-forest uppercase tracking-[0.2em]">Journey Details</h3>
-                    <div className="h-px flex-grow bg-forest/10" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="mb-14 w-full max-w-full">
+                  <h3 className="font-playfair text-2xl sm:text-3xl font-black italic text-forest mb-8">What to Expect</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {highlights.map((h: string, i: number) => (
-                      <div key={i} className="flex items-start gap-3 bg-white p-4 rounded-2xl border border-forest/[0.04] shadow-sm hover:border-terracotta/20 transition-colors">
-                        <CheckCircle2 className="h-4 w-4 text-terracotta shrink-0 mt-0.5" />
-                        <span className="text-xs font-semibold text-forest/80 leading-snug">{h}</span>
+                      <div key={i} className="flex items-start gap-4 bg-white p-5 sm:p-6 rounded-[1.5rem] border border-forest/[0.04] shadow-sm hover:border-terracotta/20 hover:shadow-md transition-all duration-300 w-full group">
+                        <CheckCircle2 className="h-5 w-5 text-terracotta shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                        <span className="text-base font-medium text-forest/80 leading-relaxed text-balance">{h}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* The Experience */}
+              {/* Itinerary / Experience */}
               {theExperience && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-playfair text-2xl font-black italic text-forest">The Experience</h3>
-                    <Sunrise className="h-6 w-6 text-terracotta" />
-                  </div>
-                  <div className="space-y-8 relative before:absolute before:inset-y-2 before:left-[11px] before:w-px before:bg-forest/10 bg-forest/[0.02] p-8 -mx-8 sm:rounded-3xl border border-forest/[0.03]">
+                <div className="mb-14 w-full max-w-full">
+                  <h3 className="font-playfair text-2xl sm:text-3xl font-black italic text-forest mb-10 flex items-center gap-4">
+                    <Sunrise className="h-8 w-8 text-terracotta shrink-0" />
+                    The Journey
+                  </h3>
+                  
+                  <div className="space-y-10 relative before:absolute before:inset-y-4 before:left-[19px] before:w-px before:bg-forest/10 p-2 w-full">
                     {theExperience.split('\n').map((line: string, i: number) => {
                       if (!line.trim()) return null;
                       const isDay = line.toLowerCase().startsWith('day') || line.toLowerCase().startsWith('step');
                       return (
-                        <div key={i} className={cn("relative pl-10", isDay ? "mt-10 first:mt-0" : "mt-2")}>
+                        <div key={i} className={cn("relative pl-12 sm:pl-16 w-full max-w-full", isDay ? "mt-12 first:mt-2" : "mt-3")}>
                           {isDay && (
-                            <div className="absolute left-[7px] top-1.5 w-2.5 h-2.5 rounded-full bg-terracotta shadow-[0_0_0_4px_#F8F5F1]" />
+                            <div className="absolute left-[14px] top-1.5 w-3 h-3 rounded-full bg-terracotta shadow-[0_0_0_6px_#FAF9F6] ring-1 ring-terracotta/20" />
                           )}
-                          <div className={cn(isDay ? "text-[10px] font-black text-terracotta uppercase tracking-[0.2em] mb-2" : "text-[13px] font-medium text-forest/70 leading-[1.8]")}>
+                          <div className={cn(
+                            isDay 
+                              ? "text-xs font-black text-terracotta uppercase tracking-[0.2em] mb-3" 
+                              : "text-base sm:text-[17px] font-medium text-forest/70 leading-[1.8] break-words"
+                          )}>
                             {line.trim()}
                           </div>
                         </div>
@@ -277,59 +287,56 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* Fixed Footer / Booking Section */}
-            <div className="bg-white border-t border-forest/5 p-6 md:px-10 md:py-8 shrink-0 shadow-[0_-20px_40px_rgba(45,62,53,0.04)] z-10 relative">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-center md:items-start md:flex-col gap-4 md:gap-1 justify-between">
-                  <div className="text-[10px] text-forest/50 font-black uppercase tracking-[0.2em] order-2 md:order-1 flex items-center gap-2">
+              {/* Booking Section */}
+              <div className="bg-white border border-forest/10 rounded-[2rem] p-6 sm:p-10 shadow-xl shadow-forest/5 flex flex-col xl:flex-row xl:items-center justify-between gap-8 mt-16">
+                <div>
+                  <div className="text-[10px] text-forest/50 font-black uppercase tracking-[0.2em] mb-2">
                     Investment
-                    <button onClick={handleShare} className="md:hidden text-terracotta"><Share2 className="h-4 w-4" /></button>
                   </div>
-                  <div className="text-3xl lg:text-4xl font-playfair italic font-black text-forest flex items-baseline gap-2 order-1 md:order-2">
-                    {price} <span className="text-[10px] uppercase tracking-widest font-sans font-bold text-forest/30 not-italic">/ Person</span>
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-playfair italic font-black text-forest flex items-baseline gap-2">
+                    {price} <span className="text-xs uppercase tracking-widest font-sans font-bold text-forest/40 not-italic whitespace-nowrap">/ Person</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                   {quantity > 0 ? (
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                      <div className="flex items-center bg-forest/[0.03] rounded-full border border-forest/10 p-1">
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-12 w-12 rounded-full text-forest hover:bg-white hover:text-terracotta transition-all hover:shadow-sm"
-                          onClick={() => updateQuantity(currentItemId, quantity - 1)}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="font-black text-forest text-sm px-4 min-w-[2.5rem] text-center">{quantity}</span>
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-12 w-12 rounded-full text-forest hover:bg-white hover:text-terracotta transition-all hover:shadow-sm"
-                          onClick={() => updateQuantity(currentItemId, quantity + 1)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <Link to="/cart" className="w-full sm:w-auto">
-                        <Button className="w-full h-14 px-8 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-terracotta text-white hover:bg-terracotta/90 transition-all flex items-center justify-center gap-3 shadow-lg shadow-terracotta/20 hover:scale-[1.02]">
-                          <ShoppingCart className="h-4 w-4" /> Go to Cart <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
+                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+                       <div className="flex items-center justify-between bg-forest/[0.03] rounded-full border border-forest/10 p-1.5 w-full sm:w-auto shrink-0 shadow-inner">
+                         <Button 
+                           size="icon" 
+                           variant="ghost" 
+                           className="h-12 w-12 rounded-full text-forest hover:bg-white hover:text-terracotta transition-all"
+                           onClick={() => updateQuantity(currentItemId, quantity - 1)}
+                         >
+                           <Minus className="h-4 w-4" />
+                         </Button>
+                         <span className="font-black text-forest text-lg px-6 min-w-[3.5rem] text-center">{quantity}</span>
+                         <Button 
+                           size="icon" 
+                           variant="ghost" 
+                           className="h-12 w-12 rounded-full text-forest hover:bg-white hover:text-terracotta transition-all"
+                           onClick={() => updateQuantity(currentItemId, quantity + 1)}
+                         >
+                           <Plus className="h-4 w-4" />
+                         </Button>
+                       </div>
+                       <Link to="/cart" className="w-full sm:w-auto">
+                         <Button className="w-full h-14 px-10 rounded-full text-xs font-black uppercase tracking-[0.2em] bg-terracotta text-white hover:bg-terracotta/90 transition-all flex items-center justify-center gap-3 shadow-xl shadow-terracotta/20 shrink-0 hover:scale-[1.02]">
+                           <ShoppingCart className="h-5 w-5 shrink-0" /> Checkout <ArrowRight className="h-5 w-5 shrink-0" />
+                         </Button>
+                       </Link>
+                     </div>
                   ) : (
                     <>
                       {pkg.slots && pkg.slots.length > 0 ? (
-                        <div className="relative w-full sm:w-auto group">
+                        <div className="relative w-full sm:w-[240px] lg:w-[280px] group shrink-0">
                            <select 
                             value={selectedSlotIndex}
                             onChange={(e) => setSelectedSlotIndex(e.target.value)}
-                            className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.02] px-6 appearance-none focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-[10px] tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-forest/[0.05]"
+                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-6 pr-12 appearance-none focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white truncate"
                           >
-                            <option value="">Pick Journey Date</option>
+                            <option value="">Select Date</option>
                             {pkg.slots.map((slot: any, i: number) => {
                               const start = new Date(slot.startDate);
                               let endStr = '';
@@ -349,19 +356,19 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                               );
                             })}
                           </select>
-                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/40 pointer-events-none group-hover:text-forest transition-colors" />
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/40 pointer-events-none group-hover:text-forest transition-colors" />
                         </div>
                       ) : (
-                        <div className="relative w-full sm:w-auto group">
-                          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-terracotta z-10">
-                            <Calendar className="h-4 w-4" />
+                        <div className="relative w-full sm:w-[240px] lg:w-[280px] group shrink-0">
+                          <div className="absolute left-5 top-1/2 -translate-y-1/2 text-terracotta z-10 pointer-events-none">
+                            <Calendar className="h-5 w-5" />
                           </div>
                           <input
                             type="date"
                             min={new Date().toISOString().split('T')[0]}
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full sm:min-w-[200px] h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-6 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-[10px] tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-forest/[0.05]"
+                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-6 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white text-clip"
                           />
                         </div>
                       )}
@@ -369,25 +376,21 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                       <Button 
                         onClick={handleBooking}
                         disabled={!canBook}
-                        className="w-full sm:w-auto h-14 px-10 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-[10px] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl shadow-forest/20 hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full sm:w-auto h-14 px-10 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-xs uppercase transition-all flex items-center justify-center gap-3 shadow-xl shadow-forest/20 shrink-0 hover:scale-[1.02]"
                       >
-                        Book Journey
+                        Reserve Spot <ArrowRight className="h-4 w-4" />
                       </Button>
-                      
-                      <button 
-                        onClick={handleShare}
-                        className="hidden md:flex bg-forest/5 p-4 rounded-full text-forest hover:bg-terracotta hover:text-white transition-all ml-1 shrink-0"
-                      >
-                        <Share2 className="h-5 w-5" />
-                      </button>
                     </>
                   )}
                 </div>
               </div>
+              
             </div>
           </div>
         </motion.div>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
 }
+

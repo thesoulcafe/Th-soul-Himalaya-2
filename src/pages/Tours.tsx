@@ -286,7 +286,7 @@ export default function Tours() {
   }, [searchParams, tours]);
 
   return (
-    <div className="pt-20 px-4 sm:px-6">
+    <div className="pt-[64px] md:pt-[72px] px-4 sm:px-6">
       {seo && <SEO 
         title={seo.title || "Tour Packages"} 
         description={seo.description || "Handpicked mountain journeys."} 
@@ -296,7 +296,7 @@ export default function Tours() {
       />}
       
       {/* Search & Filter Header (Sticky) */}
-      <div className="sticky top-20 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
+      <div className="sticky top-[63px] md:top-[71px] z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
             {/* Page Identity - Elegant & Compact */}
@@ -365,9 +365,9 @@ export default function Tours() {
                 {/* Search Suggestions Dropdown */}
                 {searchQuery && filteredTours.length > 0 && (
                   <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-xl border border-forest/10 overflow-hidden max-h-[60vh] overflow-y-auto text-left">
-                    {filteredTours.slice(0, 5).map(tour => (
+                    {filteredTours.slice(0, 5).map((tour, idx) => (
                       <div 
-                        key={tour.id}
+                        key={`search-${tour.id || idx}-${idx}`}
                         className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                         onClick={() => {
                           setSelectedTour(tour);
@@ -522,7 +522,7 @@ export default function Tours() {
                 <AnimatePresence mode="popLayout">
                   {filteredTours.map((tour, index) => (
                   <motion.div
-                    key={tour.id}
+                    key={`tour-grid-${tour.id || index}-${index}`}
                     layout
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}

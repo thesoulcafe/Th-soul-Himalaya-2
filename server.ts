@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 
 dotenv.config();
 
@@ -515,7 +515,12 @@ async function injectMetaTags(req: express.Request, html: string) {
           const seoQuery = query(collection(db, "seo_settings"), where("path", "==", urlStr));
           const seoSnap = await getDocs(seoQuery);
           if (!seoSnap.empty) {
-            const seoData = seoSnap.docs[0].data();
+            const sortedDocs = seoSnap.docs.sort((a, b) => {
+              const aTime = a.data().createdAt?.toMillis ? a.data().createdAt.toMillis() : (a.data().createdAt || 0);
+              const bTime = b.data().createdAt?.toMillis ? b.data().createdAt.toMillis() : (b.data().createdAt || 0);
+              return bTime - aTime;
+            });
+            const seoData = sortedDocs[0].data();
             title = seoData.title || seoData.metaTitle || title;
             description = seoData.description || seoData.metaDescription || description;
             image = seoData.ogImage || seoData.ogImageUrl || image;
@@ -526,7 +531,12 @@ async function injectMetaTags(req: express.Request, html: string) {
             const pQuery = query(collection(db, "seo_settings"), where("path", "==", urlPath));
             const pSnap = await getDocs(pQuery);
             if (!pSnap.empty) {
-              const pData = pSnap.docs[0].data();
+              const sortedDocs = pSnap.docs.sort((a, b) => {
+                const aTime = a.data().createdAt?.toMillis ? a.data().createdAt.toMillis() : (a.data().createdAt || 0);
+                const bTime = b.data().createdAt?.toMillis ? b.data().createdAt.toMillis() : (b.data().createdAt || 0);
+                return bTime - aTime;
+              });
+              const pData = sortedDocs[0].data();
               title = pData.title || pData.metaTitle || title;
               description = pData.description || pData.metaDescription || description;
               image = pData.ogImage || pData.ogImageUrl || image;
@@ -570,29 +580,14 @@ async function injectMetaTags(req: express.Request, html: string) {
       if (title.length > 60) title = title.substring(0, 57) + "...";
       if (description.length > 160) description = description.substring(0, 157) + "...";
 
-      const metaTags = `
-<title>${title}</title>
-<meta name="description" content="${description}">
-<meta property="og:site_name" content="The Soul Himalaya">
-<meta property="og:title" content="${title}">
-<meta property="og:description" content="${description}">
-<meta property="og:image" content="${image}">
-<meta property="og:url" content="${absoluteUrl}">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${title}">
-<meta name="twitter:description" content="${description}">
-<meta name="twitter:image" content="${image}">`;
-
+      // Replace placeholders
       let finalHtml = html;
-      // Filter existing tags
       finalHtml = finalHtml
-        .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-        .replace(/<meta\s+(?:name|property|itemprop)=["'](?:description|og:[^"']*|twitter:[^"']*|image|title)["']\s+content=["'][\s\S]*?["']\s*\/?>/gi, '');
+          .replace(/%OG_TITLE%/g, title)
+          .replace(/%OG_DESCRIPTION%/g, description)
+          .replace(/%OG_IMAGE%/g, image)
+          .replace(/%OG_URL%/g, absoluteUrl);
 
-      if (finalHtml.includes('<head>')) {
-        return finalHtml.replace('<head>', `<head>${metaTags}`);
-      }
       return finalHtml;
     })();
 

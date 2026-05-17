@@ -4,7 +4,8 @@ import {
   signInWithPopup, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPhonePrompt, setShowPhonePrompt] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [pendingUser, setPendingUser] = useState<any>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -129,15 +132,36 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    setResetSent(false);
+    
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[400px] bg-forest border-white/10 text-cream">
         <DialogHeader>
           <DialogTitle className="text-2xl font-heading font-bold text-white">
-            {isLogin ? 'Welcome Back' : 'Join the Soul'}
+            {isForgotPassword ? 'Forgot Password' : isLogin ? 'Welcome Back' : 'Join the Soul'}
           </DialogTitle>
           <DialogDescription className="text-cream/60">
-            {isLogin ? 'Sign in to access your bookings.' : 'Create an account to start your journey.'}
+            {isForgotPassword ? '' : isLogin ? 'Sign in to access your bookings.' : 'Create an account to start your journey.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -164,6 +188,59 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <Button type="submit" className="w-full bg-terracotta text-white" disabled={loading}>
                 {loading ? 'Saving...' : 'Complete Signup'}
               </Button>
+            </form>
+          ) : isForgotPassword ? (
+            <form onSubmit={handlePasswordReset} className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-bold">Reset Password</h3>
+                <p className="text-xs text-cream/60">Enter your email address and we'll send you a link to reset your password.</p>
+              </div>
+              
+              {resetSent ? (
+                <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-md text-sm text-center mb-4">
+                  Password reset link sent! Check your email.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-cream/40" />
+                    <Input
+                      type="email"
+                      placeholder="Email Address"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/20"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+              
+              {!resetSent && (
+                <Button 
+                  type="submit" 
+                  className="w-full bg-terracotta hover:bg-terracotta/90 text-white"
+                  disabled={loading}
+                >
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                </Button>
+              )}
+              
+              <div className="text-center text-sm mt-4">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setError('');
+                    setResetSent(false);
+                  }}
+                  className="text-terracotta hover:underline"
+                >
+                  Back to Sign In
+                </button>
+              </div>
             </form>
           ) : (
             <>
@@ -245,6 +322,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             {error && <p className="text-xs text-red-400">{error}</p>}
             {isBlocked && <p className="text-xs text-red-500 font-bold">Your account has been blocked. Please contact support.</p>}
+            
+            {isLogin && (
+              <div className="text-right">
+                <button 
+                  type="button"
+                  onClick={() => setIsForgotPassword(true)}
+                  className="text-xs text-cream/60 hover:text-white transition-colors"
+                >
+                  Forgot your password?
+                </button>
+              </div>
+            )}
 
             <Button 
               type="submit" 
@@ -257,7 +346,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           <div className="text-center text-sm">
             <button 
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError('');
+              }}
               className="text-terracotta hover:underline"
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}

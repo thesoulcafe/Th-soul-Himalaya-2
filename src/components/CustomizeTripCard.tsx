@@ -226,14 +226,14 @@ export default function CustomizeTripCard({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-white/40 uppercase tracking-widest ml-1">Start Date</label>
               <Input 
                 type="date" 
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="rounded-2xl border-white/10 bg-white/5 text-white h-12 focus:ring-terracotta/50 text-xs" 
+                className="rounded-2xl border-white/10 bg-white/5 text-white h-[52px] focus:ring-terracotta/50 text-sm px-4" 
               />
             </div>
             <div className="space-y-2">
@@ -242,7 +242,7 @@ export default function CustomizeTripCard({
                 type="date" 
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="rounded-2xl border-white/10 bg-white/5 text-white h-12 focus:ring-terracotta/50 text-xs" 
+                className="rounded-2xl border-white/10 bg-white/5 text-white h-[52px] focus:ring-terracotta/50 text-sm px-4" 
               />
             </div>
           </div>
