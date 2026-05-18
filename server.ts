@@ -580,13 +580,31 @@ async function injectMetaTags(req: express.Request, html: string) {
       if (title.length > 60) title = title.substring(0, 57) + "...";
       if (description.length > 160) description = description.substring(0, 157) + "...";
 
-      // Replace placeholders
+      const metaTags = `
+<title>\${title}</title>
+<meta name="title" content="\${title}">
+<meta name="description" content="\${description}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="\${absoluteUrl}">
+<meta property="og:title" content="\${title}">
+<meta property="og:description" content="\${description}">
+<meta property="og:image" content="\${image}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="\${absoluteUrl}">
+<meta name="twitter:title" content="\${title}">
+<meta name="twitter:description" content="\${description}">
+<meta name="twitter:image" content="\${image}">`;
+
       let finalHtml = html;
+      
+      // Remove all existing meta tags in <head> related to SEO and the default title
       finalHtml = finalHtml
-          .replace(/%OG_TITLE%/g, title)
-          .replace(/%OG_DESCRIPTION%/g, description)
-          .replace(/%OG_IMAGE%/g, image)
-          .replace(/%OG_URL%/g, absoluteUrl);
+        .replace(/<title>.*?<\/title>/ims, '')
+        .replace(/<meta\s+name=["'](title|description|twitter:[a-z]+)["']\s+content=["'].*?["']\s*\/?>/gims, '')
+        .replace(/<meta\s+property=["'](og:[a-z]+)["']\s+content=["'].*?["']\s*\/?>/gims, '');
+
+      // Inject the dynamic tags just before </head>
+      finalHtml = finalHtml.replace('</head>', `\${metaTags}\n</head>`);
 
       return finalHtml;
     })();
