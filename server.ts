@@ -12,9 +12,6 @@ import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, 
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 import { streamText, tool } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { z } from "zod";
@@ -38,7 +35,7 @@ async function startServer() {
   app.use(express.json());
 
   // Ensure uploads directory exists
-  const uploadsDir = path.join(__dirname, "uploads");
+  const uploadsDir = path.join(process.cwd(), "uploads");
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
@@ -368,7 +365,7 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
 
       console.log(`[Dev] Serving HTML for: ${urlStr}`);
       try {
-        const templatePath = path.resolve(__dirname, 'index.html');
+        const templatePath = path.resolve(process.cwd(), 'index.html');
         if (!fs.existsSync(templatePath)) {
           console.error(`[Dev] index.html not found at ${templatePath}`);
           return next();

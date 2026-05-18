@@ -8,7 +8,7 @@ import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/lib/AuthContext';
 import { useCart } from '@/lib/CartContext';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, doc, getDoc } from 'firebase/firestore';
 import { Card, CardContent } from '@/components/ui/card';
 import { DEFAULT_SERVICES } from '@/constants';
 import Leaderboard from '@/components/Leaderboard';
@@ -283,6 +283,7 @@ export default function Home() {
   const { user } = useAuth();
   const [services, setServices] = useState<any[]>([]);
   const [hasLoadedServices, setHasLoadedServices] = useState(false);
+  const [featuredPackages, setFeaturedPackages] = useState<any[]>([]);
   const heroRef = useRef<HTMLElement>(null);
 
   // Instagram posts fetch
@@ -300,6 +301,52 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
+
+  // Featured Packages Fetch
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      const docSnap = await getDoc(doc(db, 'site_settings', 'global'));
+      if (docSnap.exists()) {
+        const featuredIds = docSnap.data().featuredPackages || [];
+        if (featuredIds.length > 0) {
+          const featuredPromises = featuredIds.map(async (id: string) => {
+            const itemSnap = await getDoc(doc(db, 'content', id));
+            if (itemSnap.exists()) {
+              return { id: itemSnap.id, ...itemSnap.data().data, type: itemSnap.data().type };
+            }
+            return null;
+          });
+          const featuredData = (await Promise.all(featuredPromises)).filter(Boolean);
+          setFeaturedPackages(featuredData);
+        }
+      }
+    };
+    fetchFeatured();
+    
+    // Also set up a listener for real-time updates
+    const unsubscribeSite = onSnapshot(doc(db, 'site_settings', 'global'), async (docSnap) => {
+      if (docSnap.exists()) {
+        const featuredIds = docSnap.data().featuredPackages || [];
+        if (featuredIds.length > 0) {
+          // Chunk requests if needed, but since it's only 3, Promise.all is fine
+          const featuredPromises = featuredIds.map(async (id: string) => {
+            const itemSnap = await getDoc(doc(db, 'content', id));
+            if (itemSnap.exists()) {
+              return { id: itemSnap.id, ...itemSnap.data().data, type: itemSnap.data().type };
+            }
+            return null;
+          });
+          const featuredData = (await Promise.all(featuredPromises)).filter(Boolean);
+          setFeaturedPackages(featuredData);
+        } else {
+          setFeaturedPackages([]);
+        }
+      }
+    });
+
+    return () => unsubscribeSite();
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
@@ -498,6 +545,65 @@ export default function Home() {
 
       {/* Mini Services Scroll (Above Final CTA) */}
       <HorizontalServiceRow services={allServices} hasLoadedServices={hasLoadedServices} />
+
+      {/* Featured Packages Section */}
+      {featuredPackages.length > 0 && (
+        <section className="py-24 px-6 bg-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-terracotta/20 to-transparent" />
+          <div className="max-w-7xl mx-auto">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16 px-4"
+            >
+              <div className="max-w-4xl mx-auto">
+                <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4">Top Selections</p>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-extrabold text-forest leading-[1.1] tracking-tight">Best Packages</h2>
+              </div>
+            </motion.div>
+
+            <div className={`grid grid-cols-1 md:grid-cols-${Math.min(featuredPackages.length, 3)} gap-6 lg:gap-8`}>
+              {featuredPackages.slice(0, 3).map((pkg, idx) => (
+                <motion.div
+                  key={pkg.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className="group relative h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer"
+                >
+                  <Link to={`/${pkg.type === 'tour' ? 'tours' : pkg.type === 'trekk' ? 'trekks' : pkg.type === 'service' ? 'services' : pkg.type}?id=${pkg.id}`} className="absolute inset-0 z-30" />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  <img 
+                    src={pkg.image || pkg.coverImage || 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=800'} 
+                    alt={pkg.name || pkg.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="bg-white/10 backdrop-blur-xl w-10 h-10 rounded-xl flex items-center justify-center border border-white/20">
+                        <Star className="text-terracotta h-5 w-5" />
+                      </div>
+                      <span className="text-white/80 font-bold uppercase tracking-widest text-[9px] bg-forest/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">{pkg.type}</span>
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-montserrat font-extrabold text-white mb-3 line-clamp-2 leading-tight">{pkg.name || pkg.title}</h3>
+                    <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed">
+                      {pkg.description || pkg.shortDescription || 'Experience the magic of the Himalayas with this specially curated package.'}
+                    </p>
+                    <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
+                      <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />
+                      Explore Details
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Special Packages Section */}
       <section className="py-32 px-6 bg-[#FDFCFB] relative overflow-hidden">

@@ -1411,6 +1411,61 @@ export default function Admin() {
                         </div>
                       </CardContent>
                     </Card>
+
+                    <Card className="border border-forest/5 shadow-sm rounded-xl bg-white overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="h-8 w-8 rounded-lg bg-terracotta/10 flex items-center justify-center">
+                            <Star className="h-4 w-4 text-terracotta" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-forest">Featured Packages</h3>
+                            <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Home Page Spotlight</p>
+                          </div>
+                        </div>
+                        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                          <p className="text-[10px] text-forest/60 font-medium">Select up to 3 packages to feature on the Home Page.</p>
+                          <div className="flex flex-col gap-2">
+                            {contentItems.filter(v => ['tour', 'trekk', 'service', 'yoga', 'meditation', 'adventure', 'wfh'].includes(v.type)).map(item => (
+                              <label key={item.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-forest/5 cursor-pointer border border-transparent hover:border-forest/10 transition-colors">
+                                <input 
+                                  type="checkbox" 
+                                  className="rounded border-forest/30 text-terracotta focus:ring-terracotta/50 w-4 h-4"
+                                  checked={siteSettings?.featuredPackages?.includes(item.id) || false}
+                                  onChange={async (e) => {
+                                    let featured = [...(siteSettings?.featuredPackages || [])];
+                                    if (e.target.checked) {
+                                      if (featured.length >= 3) {
+                                        setNotification({ message: 'Limit Reached. Maximum 3 packages allowed.', type: 'error' });
+                                        setTimeout(() => setNotification(null), 3000);
+                                        return;
+                                      }
+                                      featured.push(item.id);
+                                    } else {
+                                      featured = featured.filter((id: string) => id !== item.id);
+                                    }
+                                    try {
+                                      await setDoc(doc(db, 'site_settings', 'global'), { ...siteSettings, featuredPackages: featured });
+                                      setNotification({ message: 'Featured packages updated!', type: 'success' });
+                                      setTimeout(() => setNotification(null), 3000);
+                                    } catch (err) {
+                                      console.error(err);
+                                      setNotification({ message: 'Failed to update', type: 'error' });
+                                      setTimeout(() => setNotification(null), 3000);
+                                    }
+                                  }}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-bold text-forest line-clamp-1">{item.name || item.title || 'Draft Package'}</span>
+                                  <span className="text-[9px] uppercase tracking-widest text-forest/40">{item.type}</span>
+                                </div>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
                   </div>
                 </div>
               </motion.div>
