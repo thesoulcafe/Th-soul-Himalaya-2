@@ -486,16 +486,17 @@ async function injectMetaTags(req: express.Request, html: string) {
           const docRef = doc(db, "content", id);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            const pkg = docSnap.data();
-            title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
-            description = pkg.seoData?.metaDescription || pkg.description || description;
+            const rawData = docSnap.data();
+            const pkg = rawData.data || rawData; // Fallback to rawData for older structures
+            title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name || 'Tour'} | The Soul Himalaya`;
+            description = pkg.seoData?.metaDescription || pkg.shortDescription || pkg.description || description;
             
             // Image Logic: SEO specific image > first in array > thumb image
             let pkgImg = pkg.seoImage || pkg.seoData?.ogImageUrl;
             if (!pkgImg && pkg.images && Array.isArray(pkg.images) && pkg.images.length > 0) {
               pkgImg = pkg.images[0];
             }
-            if (!pkgImg) pkgImg = pkg.image;
+            if (!pkgImg) pkgImg = pkg.image || pkg.coverImage;
             
             image = pkgImg || image;
             metaOverridden = true;
@@ -578,19 +579,19 @@ async function injectMetaTags(req: express.Request, html: string) {
       if (description.length > 160) description = description.substring(0, 157) + "...";
 
       const metaTags = `
-<title>\${title}</title>
-<meta name="title" content="\${title}">
-<meta name="description" content="\${description}">
+<title>${title}</title>
+<meta name="title" content="${title}">
+<meta name="description" content="${description}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="\${absoluteUrl}">
-<meta property="og:title" content="\${title}">
-<meta property="og:description" content="\${description}">
-<meta property="og:image" content="\${image}">
+<meta property="og:url" content="${absoluteUrl}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:image" content="${image}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="\${absoluteUrl}">
-<meta name="twitter:title" content="\${title}">
-<meta name="twitter:description" content="\${description}">
-<meta name="twitter:image" content="\${image}">`;
+<meta name="twitter:url" content="${absoluteUrl}">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
+<meta name="twitter:image" content="${image}">`;
 
       let finalHtml = html;
       
