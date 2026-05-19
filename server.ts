@@ -34,6 +34,75 @@ async function startServer() {
 
   app.use(express.json());
 
+  app.get("/sitemap.xml", async (req, res) => {
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'thesoulhimalaya.com';
+    const baseUrl = `${protocol}://${host}`;
+
+    const staticPages = [
+      '',
+      '/services',
+      '/tours',
+      '/trekks',
+      '/yoga',
+      '/meditation',
+      '/wfh',
+      '/shop',
+      '/cart',
+      '/parvati-valley',
+      '/parvati-valley/malana',
+      '/parvati-valley/tosh',
+      '/parvati-valley/pulga',
+      '/parvati-valley/kheerganga'
+    ];
+
+    let dynamicUrls: string[] = [];
+    try {
+      // 1. Fetch from Firestore
+      const contentSnap = await getDocs(collection(db, "content"));
+      contentSnap.forEach(doc => {
+        const data = doc.data();
+        const type = data.type;
+        const id = doc.id;
+        if (type === 'tour') dynamicUrls.push(`/tours?id=${id}`);
+        else if (type === 'trekk' || type === 'trek') dynamicUrls.push(`/trekks?id=${id}`);
+        else if (type === 'yoga') dynamicUrls.push(`/yoga?id=${id}`);
+        else if (type === 'meditation') dynamicUrls.push(`/meditation?id=${id}`);
+      });
+
+      // 2. Fallback to constants if firestore is empty or missing something
+      const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
+      const content = fs.readFileSync(constantsPath, 'utf-8');
+      const idMatches = (content.match(/id:\s*['"](.*?)['"]/g) || []) as string[];
+      idMatches.forEach(m => {
+        const id = m.split(/['"]/)[1];
+        let url = null;
+        if (id.startsWith('tour-')) url = `/tours?id=${id}`;
+        else if (id.startsWith('trekk-')) url = `/trekks?id=${id}`;
+        else if (id.startsWith('yoga-')) url = `/yoga?id=${id}`;
+        else if (id.startsWith('med-')) url = `/meditation?id=${id}`;
+        
+        if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
+      });
+    } catch (e) {
+      console.error("Failed to generate package URLs for sitemap:", e);
+    }
+
+    const allUrls = [...new Set([...staticPages, ...dynamicUrls])];
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${allUrls.map(url => `
+  <url>
+    <loc>${baseUrl}${url}</loc>
+    <changefreq>${url === '' ? 'daily' : 'weekly'}</changefreq>
+    <priority>${url === '' ? '1.0' : '0.8'}</priority>
+  </url>`).join('')}
+</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
+
   // Ensure uploads directory exists
   const uploadsDir = path.join(process.cwd(), "uploads");
   if (!fs.existsSync(uploadsDir)) {
@@ -203,75 +272,6 @@ Disallow: /uploads/
 
 Sitemap: https://thesoulhimalaya.com/sitemap.xml
 `);
-  });
-
-  app.get("/sitemap.xml", async (req, res) => {
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers.host || 'thesoulhimalaya.com';
-    const baseUrl = `${protocol}://${host}`;
-
-    const staticPages = [
-      '',
-      '/services',
-      '/tours',
-      '/trekks',
-      '/yoga',
-      '/meditation',
-      '/wfh',
-      '/shop',
-      '/cart',
-      '/parvati-valley',
-      '/parvati-valley/malana',
-      '/parvati-valley/tosh',
-      '/parvati-valley/pulga',
-      '/parvati-valley/kheerganga'
-    ];
-
-    let dynamicUrls: string[] = [];
-    try {
-      // 1. Fetch from Firestore
-      const contentSnap = await getDocs(collection(db, "content"));
-      contentSnap.forEach(doc => {
-        const data = doc.data();
-        const type = data.type;
-        const id = doc.id;
-        if (type === 'tour') dynamicUrls.push(`/tours?id=${id}`);
-        else if (type === 'trekk' || type === 'trek') dynamicUrls.push(`/trekks?id=${id}`);
-        else if (type === 'yoga') dynamicUrls.push(`/yoga?id=${id}`);
-        else if (type === 'meditation') dynamicUrls.push(`/meditation?id=${id}`);
-      });
-
-      // 2. Fallback to constants if firestore is empty or missing something
-      const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
-      const content = fs.readFileSync(constantsPath, 'utf-8');
-      const idMatches = (content.match(/id:\s*['"](.*?)['"]/g) || []) as string[];
-      idMatches.forEach(m => {
-        const id = m.split(/['"]/)[1];
-        let url = null;
-        if (id.startsWith('tour-')) url = `/tours?id=${id}`;
-        else if (id.startsWith('trekk-')) url = `/trekks?id=${id}`;
-        else if (id.startsWith('yoga-')) url = `/yoga?id=${id}`;
-        else if (id.startsWith('med-')) url = `/meditation?id=${id}`;
-        
-        if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
-      });
-    } catch (e) {
-      console.error("Failed to generate package URLs for sitemap:", e);
-    }
-
-    const allUrls = [...new Set([...staticPages, ...dynamicUrls])];
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${allUrls.map(url => `
-  <url>
-    <loc>${baseUrl}${url}</loc>
-    <changefreq>${url === '' ? 'daily' : 'weekly'}</changefreq>
-    <priority>${url === '' ? '1.0' : '0.8'}</priority>
-  </url>`).join('')}
-</urlset>`;
-
-    res.header('Content-Type', 'application/xml');
-    res.send(sitemap);
   });
 
   app.post("/api/upload", (req, res) => {
