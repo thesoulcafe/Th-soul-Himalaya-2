@@ -3653,11 +3653,121 @@ export default function Admin() {
                           setIsProcessing(false);
                         }
                       }}
-                      className="w-full bg-forest text-white h-12 rounded-xl font-bold flex items-center justify-center gap-2"
+                      className="w-full bg-forest text-white h-12 rounded-xl font-bold flex items-center justify-center gap-2 mb-4"
                       disabled={isProcessing}
                     >
                       {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                       Sync Global Configuration
+                    </Button>
+
+                    <Button 
+                      onClick={async () => {
+                        setIsProcessing(true);
+                        const defaultImage = "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
+                        const seedData = [
+                          {
+                            path: "/",
+                            keyword: "Tour Package Himachal Pardesh, trekking in Parvati valley",
+                            title: "Soul Himalaya: Trekking & Yoga in Parvati Valley Tosh",
+                            description: "Experience the ultimate adventure and spiritual growth with our trekking, yoga, and meditation packages in Tosh and breathtaking Parvati Valley, Himachal.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/tours",
+                            keyword: "Tour Package Himachal Pardesh, corporate Tour packages",
+                            title: "Exclusive Tour Package Himachal Pradesh - Soul Himalaya",
+                            description: "Discover our exclusive tour package Himachal Pradesh offering sustainable tourism, local culture explorations, and mesmerizing adventures in Parvati Valley.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/trekks",
+                            keyword: "trekking in Parvati valley, trekking in Tosh, high-altitude trekking",
+                            title: "High Altitude Trekking in Parvati Valley & Tosh",
+                            description: "Join our expert guides for high-altitude trekking in Parvati Valley and Tosh. Discover breathtaking trails, snow-capped peaks, and unforgettable adventures.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/yoga",
+                            keyword: "yoga packages, yoga retreats Parvati Valley",
+                            title: "Transformative Yoga Retreat Packages in Parvati Valley",
+                            description: "Immerse yourself in serenity with our transformative yoga packages in the Himalayas. Rejuvenate your mind, body, and soul amidst the peaks of Parvati Valley.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/meditation",
+                            keyword: "meditation packages, mindfulness Tosh",
+                            title: "Peaceful Meditation Packages in Tosh, Himachal Pradesh",
+                            description: "Find inner peace with our soulful meditation packages in Tosh. Experience mindfulness in the tranquil environment of the Himalayas to completely rejuvenate.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/wfh",
+                            keyword: "wfh in Parvati valley, remote work mountains",
+                            title: "Work From Mountains & WFH in Parvati Valley, Tosh",
+                            description: "Upgrade your remote lifestyle with our WFH in Parvati Valley packages. Enjoy high-speed internet, comfortable stays, and stunning mountain views in Tosh.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/parvati-valley",
+                            keyword: "Parvati Valley, Tosh, adventures",
+                            title: "Explore Parvati Valley: Kasol, Tosh & Trekking Trails",
+                            description: "Explore the magic of Parvati Valley. Uncover hidden waterfalls, ancient temples, and vibrant culture. Plan your ultimate adventure and high-altitude trekking.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/soul-cafe",
+                            keyword: "Soul Cafe Tosh, Parvati Valley food",
+                            title: "The Soul Cafe Tosh: Best Food & Vibes in Parvati Valley",
+                            description: "Visit The Soul Cafe in Tosh for a soulful culinary experience. Relish delicious food, stunning mountain views, and the best hospitality in Parvati Valley.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/about",
+                            keyword: "sustainable tourism Parvati Valley, Soul Himalaya",
+                            title: "About Soul Himalaya: Sustainable Tourism in Himachal",
+                            description: "Learn about The Soul Himalaya's commitment to sustainable tourism, local community support, and providing unforgettable adventures in Tosh and Parvati.",
+                            ogImage: defaultImage
+                          },
+                          {
+                            path: "/contact",
+                            keyword: "Contact Soul Himalaya, book trekking",
+                            title: "Contact Soul Himalaya for Trekking & Tour Packages",
+                            description: "Get in touch with The Soul Himalaya to book your next tour package, corporate retreat, or trekking adventure in the majestic landscapes of Himachal Pradesh.",
+                            ogImage: defaultImage
+                          }
+                        ];
+
+                        try {
+                          let count = 0;
+                          for (const item of seedData) {
+                            const existing = seoSettings.find(s => s.path === item.path);
+                            if (existing) {
+                              await updateDoc(doc(db, 'seo_settings', existing.id), {
+                                ...item,
+                                updatedAt: serverTimestamp()
+                              });
+                            } else {
+                              await addDoc(collection(db, 'seo_settings'), {
+                                ...item,
+                                createdAt: serverTimestamp(),
+                                updatedAt: serverTimestamp()
+                              });
+                            }
+                            count++;
+                          }
+                          setNotification({ message: `Successfully optimized ${count} core pages!`, type: 'success' });
+                        } catch (err) {
+                          console.error(err);
+                          setNotification({ message: 'Failed to auto-optimize core pages', type: 'error' });
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 rounded-xl font-bold flex items-center justify-center gap-2"
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin text-white" /> : <Target className="h-4 w-4 text-white" />}
+                      Auto-Optimize Core Pages (100% SEO)
                     </Button>
                   </CardContent>
                 </Card>

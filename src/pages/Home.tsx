@@ -543,9 +543,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Mini Services Scroll (Above Final CTA) */}
-      <HorizontalServiceRow services={allServices} hasLoadedServices={hasLoadedServices} />
-
       {/* Featured Packages Section */}
       {featuredPackages.length > 0 && (
         <section className="py-24 px-6 bg-white relative overflow-hidden">
@@ -604,6 +601,9 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Mini Services Scroll (Above Final CTA) */}
+      <HorizontalServiceRow services={allServices} hasLoadedServices={hasLoadedServices} />
 
       {/* Special Packages Section */}
       <section className="py-32 px-6 bg-[#FDFCFB] relative overflow-hidden">
