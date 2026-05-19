@@ -668,7 +668,9 @@ export default function Admin() {
     e.preventDefault();
     try {
       // Process array fields if they exist
+      const isFeaturedLocalCheck = formData.isFeaturedLocal;
       const processedData = { ...formData };
+      delete processedData.isFeaturedLocal;
       
       // Ensure highlights and features are arrays of strings, filtering out empty entries
       if (Array.isArray(processedData.highlights)) {
@@ -767,6 +769,29 @@ export default function Admin() {
         }, { merge: true });
         
         console.log(`[Admin] SEO automated record updated for ${fullPath}`);
+      }
+
+      // Update global featuredPackages if checked/unchecked
+      if (docId && isFeaturedLocalCheck !== undefined) {
+        let featured = [...(siteSettings?.featuredPackages || [])];
+        const currentlyFeatured = featured.includes(docId);
+        let updatedFeatured = false;
+        
+        if (isFeaturedLocalCheck && !currentlyFeatured) {
+            featured.push(docId);
+            if (featured.length > 3) {
+               featured.shift();
+            }
+            updatedFeatured = true;
+        } else if (!isFeaturedLocalCheck && currentlyFeatured) {
+            featured = featured.filter(id => id !== docId);
+            updatedFeatured = true;
+        }
+
+        if (updatedFeatured) {
+             await setDoc(doc(db, 'site_settings', 'global'), { ...siteSettings, featuredPackages: featured }, { merge: true });
+             setSiteSettings((prev: any) => ({ ...prev, featuredPackages: featured }));
+        }
       }
 
       setIsEditing(null);
@@ -1456,7 +1481,7 @@ export default function Admin() {
                                   }}
                                 />
                                 <div className="flex flex-col">
-                                  <span className="text-xs font-bold text-forest line-clamp-1">{item.name || item.title || 'Draft Package'}</span>
+                                  <span className="text-xs font-bold text-forest line-clamp-1">{item.data.name || item.data.title || 'Draft Package'}</span>
                                   <span className="text-[9px] uppercase tracking-widest text-forest/40">{item.type}</span>
                                 </div>
                               </label>
@@ -1651,22 +1676,52 @@ export default function Admin() {
                         )}
 
                         {(activeContentTab === 'tour' || activeContentTab === 'trekk' || activeContentTab === 'shop_item' || activeContentTab === 'service' || activeContentTab === 'yoga' || activeContentTab === 'meditation' || activeContentTab === 'adventure' || activeContentTab === 'wfh') && (
-                          <div className="md:col-span-2 space-y-4 bg-forest/[0.02] p-6 rounded-[2rem] border border-forest/5 flex items-center justify-between">
-                            <div className="space-y-1">
-                              <label className="text-sm font-black text-forest uppercase tracking-widest">Available for Booking</label>
-                              <p className="text-[10px] text-forest/40 font-medium italic">Uncheck to hide this package from regular users</p>
+                          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-4 bg-forest/[0.02] p-6 rounded-[2rem] border border-forest/5 flex items-center justify-between">
+                              <div className="space-y-1">
+                                <label className="text-sm font-black text-forest uppercase tracking-widest">Available for Booking</label>
+                                <p className="text-[10px] text-forest/40 font-medium italic">Uncheck to hide this package from regular users</p>
+                              </div>
+                              <div 
+                                onClick={() => setFormData({ ...formData, isAvailable: formData.isAvailable === false ? true : false })}
+                                className={cn(
+                                  "w-14 h-8 rounded-full p-1 cursor-pointer transition-all duration-300 shrink-0",
+                                  formData.isAvailable === false ? "bg-forest/10" : "bg-terracotta"
+                                )}
+                              >
+                                <div className={cn(
+                                  "w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300",
+                                  formData.isAvailable === false ? "translate-x-0" : "translate-x-6"
+                                )} />
+                              </div>
                             </div>
-                            <div 
-                              onClick={() => setFormData({ ...formData, isAvailable: formData.isAvailable === false ? true : false })}
-                              className={cn(
-                                "w-14 h-8 rounded-full p-1 cursor-pointer transition-all duration-300",
-                                formData.isAvailable === false ? "bg-forest/10" : "bg-terracotta"
-                              )}
-                            >
-                              <div className={cn(
-                                "w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300",
-                                formData.isAvailable === false ? "translate-x-0" : "translate-x-6"
-                              )} />
+
+                            <div className="space-y-4 bg-terracotta/5 p-6 rounded-[2rem] border border-terracotta/10 flex items-center justify-between">
+                              <div className="space-y-1">
+                                <label className="text-sm font-black text-terracotta uppercase tracking-widest">Feature on Home Page</label>
+                                <p className="text-[10px] text-terracotta/60 font-medium italic">Max 3 total packages allowed on home screen</p>
+                              </div>
+                              <div 
+                                onClick={() => {
+                                  // Local toggle state to track changes before save
+                                  if (formData.isFeaturedLocal === undefined) {
+                                      // Initialize if undefined based on global settings
+                                      const currentlyFeatured = siteSettings?.featuredPackages?.includes(isEditing) || false;
+                                      setFormData({ ...formData, isFeaturedLocal: !currentlyFeatured });
+                                  } else {
+                                      setFormData({ ...formData, isFeaturedLocal: !formData.isFeaturedLocal });
+                                  }
+                                }}
+                                className={cn(
+                                  "w-14 h-8 rounded-full p-1 cursor-pointer transition-all duration-300 shrink-0",
+                                  (formData.isFeaturedLocal !== undefined ? formData.isFeaturedLocal : (siteSettings?.featuredPackages?.includes(isEditing) || false)) ? "bg-terracotta" : "bg-forest/10"
+                                )}
+                              >
+                                <div className={cn(
+                                  "w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300",
+                                  (formData.isFeaturedLocal !== undefined ? formData.isFeaturedLocal : (siteSettings?.featuredPackages?.includes(isEditing) || false)) ? "translate-x-6" : "translate-x-0"
+                                )} />
+                              </div>
                             </div>
                           </div>
                         )}
@@ -3366,7 +3421,20 @@ export default function Admin() {
                             <Input 
                               placeholder="/tours/manali-expedition" 
                               value={seoFormData.path} 
-                              onChange={e => setSeoFormData({...seoFormData, path: e.target.value})} 
+                              onChange={(e) => {
+                                const newPath = e.target.value;
+                                setSeoFormData({...seoFormData, path: newPath});
+                                
+                                if (!editingSeoId && newPath) {
+                                  const existing = seoSettings.find(s => s.path === newPath);
+                                  if (existing) {
+                                    setNotification({ 
+                                      message: `Warning: ${newPath} already exists! Submitting will overwrite its settings.`, 
+                                      type: 'warning' 
+                                    });
+                                  }
+                                }
+                              }} 
                               className="h-14 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium"
                               required 
                             />
@@ -3597,15 +3665,69 @@ export default function Admin() {
 
               {/* Status List Column */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-forest">Indexed Index</h3>
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+                  <h3 className="text-xl font-extrabold text-forest uppercase tracking-tight">Indexed Links Masterlist</h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={async () => {
+                        setIsProcessing(true);
+                        try {
+                          const pathMap = new Map();
+                          const docsToDelete: string[] = [];
+                          
+                          seoSettings.forEach(s => {
+                            if (!pathMap.has(s.path)) {
+                              pathMap.set(s.path, s);
+                            } else {
+                              const existing = pathMap.get(s.path);
+                              
+                              const calcScore = (item: any) => {
+                                const titleLen = item.title?.length || 0;
+                                const descLen = item.description?.length || 0;
+                                return (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
+                                       (descLen > 120 && descLen <= 160 ? 40 : 20) + 
+                                       (item.keyword ? 20 : 0);
+                              };
+
+                              if (calcScore(s) > calcScore(existing)) {
+                                docsToDelete.push(existing.id);
+                                pathMap.set(s.path, s);
+                              } else if (calcScore(s) === calcScore(existing)) {
+                                docsToDelete.push(s.id);
+                              } else {
+                                docsToDelete.push(s.id);
+                              }
+                            }
+                          });
+                          
+                          for (const id of docsToDelete) {
+                            await deleteDoc(doc(db, 'seo_settings', id));
+                          }
+                          
+                          if (docsToDelete.length > 0) {
+                            setNotification({ message: `Purged ${docsToDelete.length} duplicate entries!`, type: 'success' });
+                          } else {
+                            setNotification({ message: 'No duplicate entries found.', type: 'info' });
+                          }
+                        } catch (err: any) {
+                          setNotification({ message: 'Error executing deduplication', type: 'error' });
+                        } finally {
+                          setIsProcessing(false);
+                        }
+                      }}
+                      className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest border-terracotta/20 text-terracotta hover:bg-terracotta/5 hover:border-terracotta"
+                    >
+                      <RefreshCw className={cn("h-3 w-3 mr-2", isProcessing ? "animate-spin" : "")} /> 
+                      Clean Duplicates
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       className={cn(
-                        "h-8 rounded-lg text-[10px] font-black uppercase tracking-widest",
-                        isSeoFilterVisible ? "bg-forest text-white" : "text-forest/40"
+                        "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest",
+                        isSeoFilterVisible ? "bg-forest text-white" : "bg-forest/5 text-forest/70 hover:bg-forest/10"
                       )}
                       onClick={() => setIsSeoFilterVisible(!isSeoFilterVisible)}
                     >
@@ -3615,8 +3737,8 @@ export default function Admin() {
                       variant="ghost" 
                       size="sm" 
                       className={cn(
-                        "h-8 rounded-lg text-[10px] font-black uppercase tracking-widest",
-                        isSeoAuditActive ? "bg-terracotta text-white shadow-lg shadow-terracotta/20" : "text-forest/40"
+                        "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest",
+                        isSeoAuditActive ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "bg-forest/5 text-forest/70 hover:bg-forest/10"
                       )}
                       onClick={() => {
                         setIsSeoAuditActive(!isSeoAuditActive);
@@ -3678,24 +3800,34 @@ export default function Admin() {
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <Card className={cn(
-                            "group border shadow-sm hover:shadow-xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden p-6",
-                            isHighPriority ? "border-rose-500/50 bg-rose-50/30" : "border-forest/5 hover:border-forest/10"
+                            "group border shadow-sm hover:shadow-xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden relative",
+                            isHighPriority ? "border-rose-500/50 bg-rose-50/10" : "border-forest/5 hover:border-forest/20"
                           )}>
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            {/* Score indicator bar on top */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gray-100">
+                              <div 
+                                className={cn(
+                                  "h-full transition-all",
+                                  score >= 80 ? "bg-emerald-500" : score >= 50 ? "bg-amber-500" : "bg-rose-500"
+                                )} 
+                                style={{ width: `${score}%` }} 
+                              />
+                            </div>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-5 md:p-6 mt-1">
                               <div className="flex-grow space-y-3">
-                                <div className="flex flex-wrap items-center gap-3">
-                                  <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase break-all">
                                     {item.path}
                                   </Badge>
                                   {item.keyword && (
-                                    <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                                    <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest break-all">
                                       {item.keyword}
                                     </Badge>
                                   )}
-                                  <div className="h-1 w-1 rounded-full bg-forest/20" />
+                                  <div className="h-1 w-1 rounded-full bg-forest/20 hidden md:block" />
                                   <span className={cn(
                                     "text-[10px] font-black uppercase tracking-widest",
-                                    score > 80 ? "text-emerald-600" : score > 50 ? "text-orange-500" : "text-rose-500"
+                                    score >= 80 ? "text-emerald-600" : score >= 50 ? "text-amber-500" : "text-rose-500"
                                   )}>
                                     Score: {score}%
                                   </span>
@@ -3715,11 +3847,10 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                            <div className="flex items-center gap-2 self-end md:self-center">
+                              <div className="flex flex-row md:flex-col items-center justify-end gap-2 w-full md:w-auto shrink-0 border-t border-forest/5 md:border-none pt-4 md:pt-0">
                               <Button 
                                 variant="ghost" 
-                                size="icon" 
-                                className="h-10 w-10 rounded-xl bg-forest/5 text-forest/40 hover:bg-forest hover:text-white"
+                                className="h-10 flex-1 md:flex-none w-full rounded-xl bg-forest/5 text-forest/80 hover:bg-forest hover:text-white transition-colors"
                                 onClick={() => {
                                   setEditingSeoId(item.id);
                                   setSeoFormData({
@@ -3732,12 +3863,11 @@ export default function Admin() {
                                   window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
                               >
-                                <Edit2 className="h-4 w-4" />
+                                <Edit2 className="h-4 w-4 md:mr-2" /> <span className="md:inline">Edit</span>
                               </Button>
                               <Button 
                                 variant="ghost" 
-                                size="icon" 
-                                className="h-10 w-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white"
+                                className="h-10 flex-1 md:flex-none w-full rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"
                                 onClick={async () => {
                                   setConfirmModal({
                                     message: `Permanently delete SEO configuration for ${item.path}? This will revert to site-wide defaults.`,
@@ -3753,7 +3883,7 @@ export default function Admin() {
                                   });
                                 }}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4 md:mr-2" /> <span className="md:inline">Delete</span>
                               </Button>
                             </div>
                           </div>

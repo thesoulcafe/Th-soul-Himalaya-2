@@ -477,7 +477,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       // Default Values
       let title = "The Soul Himalaya | Spiritual Adventures & Wellness Treks";
       let description = "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley. Discover The Soul Cafe, Tosh.";
-      let image = "https://images.unsplash.com/photo-1506466010722-395aa2bef877?auto=format&fit=crop&w=1200&h=630&q=80";
+      let image = "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
       let metaOverridden = false;
 
       // --- STEP 1: Content-based overrides (Tours/Trekks details) - HIGHEST PRIORITY ---
