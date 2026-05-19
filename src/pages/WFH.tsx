@@ -5,7 +5,7 @@ import { Plus, Minus, Wifi, Coffee, Laptop, Mountain, CheckCircle2, ShieldCheck,
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import AuthModal from '@/components/AuthModal';
@@ -62,7 +62,7 @@ export default function WFH() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Elevate your productivity with this: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${pkg.id}&v=${Date.now()}`
     };
 
     try {
@@ -156,8 +156,9 @@ export default function WFH() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  const { id } = useParams();
+  
   useEffect(() => {
-    const id = searchParams.get('id');
     if (id && packages.length > 0) {
       const pkg = packages.find(p => p.id === id);
       if (pkg) {
@@ -175,12 +176,12 @@ export default function WFH() {
           title: pkg.title || pkg.name,
           description: fullDescription,
           image: pkg.image || pkg.images?.[0],
-          path: `${window.location.origin}/wfh?id=${id}`,
+          path: `${window.location.origin}/wfh/${id}`,
           seoData: pkg.seoData
         });
       }
     }
-  }, [searchParams, packages]);
+  }, [id, searchParams, packages]);
 
   const filteredPackages = useMemo(() => {
     return packages.filter(pkg => {
@@ -243,7 +244,7 @@ export default function WFH() {
                   key={pkg.id}
                   className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                   onClick={() => {
-                    setSelectedPackage(pkg);
+                    navigate(`/wfh/${pkg.id}`);
                     setSearchQuery('');
                   }}
                 >
@@ -319,7 +320,7 @@ export default function WFH() {
                 transition={{ delay: i * 0.1 }}
               >
                 <Card 
-                  onClick={() => setSelectedPackage(pkg)}
+                  onClick={() => navigate(`/wfh/${pkg.id}`)}
                   className={`relative h-full border-none shadow-xl rounded-[2.5rem] overflow-hidden cursor-pointer group ${pkg.popular ? 'bg-forest text-white ring-4 ring-terracotta/20' : 'bg-white text-forest'}`}
                 >
                   {pkg.popular && (
@@ -407,7 +408,7 @@ export default function WFH() {
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedPackage(pkg);
+                            navigate(`/wfh/${pkg.id}`);
                           }}
                         >
                           Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -460,7 +461,7 @@ export default function WFH() {
       </section>
       <PackageDetailModal
         isOpen={!!selectedPackage}
-        onClose={() => setSelectedPackage(null)}
+        onClose={() => { setSelectedPackage(null); navigate('/wfh'); }}
         pkg={selectedPackage}
         onRequireAuth={() => setShowAuthModal(true)}
       />

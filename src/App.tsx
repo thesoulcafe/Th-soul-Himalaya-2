@@ -66,12 +66,19 @@ export default function App() {
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
                   <Route path="tours" element={<Tours />} />
+                  <Route path="tours/:id" element={<Tours />} />
                   <Route path="trekks" element={<Trekks />} />
+                  <Route path="trekks/:id" element={<Trekks />} />
                   <Route path="wfh" element={<WFH />} />
+                  <Route path="wfh/:id" element={<WFH />} />
                   <Route path="yoga" element={<Yoga />} />
+                  <Route path="yoga/:id" element={<Yoga />} />
                   <Route path="meditation" element={<Meditation />} />
+                  <Route path="meditation/:id" element={<Meditation />} />
                   <Route path="adventure" element={<Adventure />} />
-                  <Route path=":category/:id" element={<ServiceDetail />} />
+                  <Route path="adventure/:id" element={<Adventure />} />
+                  <Route path="services" element={<Services />} />
+                  <Route path="services/:id" element={<Services />} />
                   <Route path=":category/:id/book" element={<BookingPage />} />
                   <Route path="shop" element={<Shop />} />
                   <Route path="cart" element={<Cart />} />

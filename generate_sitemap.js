@@ -33,10 +33,10 @@ try {
     idMatches.forEach(m => {
       const id = m.split(/['"]/)[1];
       let url = null;
-      if (id.startsWith('tour-')) url = `/tours?id=${id}`;
-      else if (id.startsWith('trekk-')) url = `/trekks?id=${id}`;
-      else if (id.startsWith('yoga-')) url = `/yoga?id=${id}`;
-      else if (id.startsWith('med-')) url = `/meditation?id=${id}`;
+      if (id.startsWith('tour-')) url = `/tours/${id}`;
+      else if (id.startsWith('trekk-')) url = `/trekks/${id}`;
+      else if (id.startsWith('yoga-')) url = `/yoga/${id}`;
+      else if (id.startsWith('med-')) url = `/meditation/${id}`;
       
       if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
     });

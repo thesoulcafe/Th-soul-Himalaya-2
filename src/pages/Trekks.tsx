@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 import { SEO } from '@/components/SEO';
 import PackageDetailModal from '@/components/PackageDetailModal';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useState, useEffect, useMemo } from 'react';
@@ -53,7 +53,7 @@ export default function Trekks() {
     const shareData = {
       title: `The Soul Himalaya - ${trekk.title}`,
       text: trekk.description || `Discover this wild path: ${trekk.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${trekk.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${trekk.id}&v=${Date.now()}`
     };
 
     try {
@@ -149,8 +149,9 @@ export default function Trekks() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  const { id } = useParams();
+  
   useEffect(() => {
-    const id = searchParams.get('id');
     if (id && trekkList.length > 0) {
       const trekk = trekkList.find(t => t.id === id);
       if (trekk) {
@@ -172,12 +173,12 @@ export default function Trekks() {
           title: trekk.title,
           description: detailedDesc,
           image: trekk.image,
-          path: `${window.location.origin}/trekks?id=${id}`,
+          path: `${window.location.origin}/trekks/${id}`,
           seoData: trekk.seoData
         });
       }
     }
-  }, [searchParams, trekkList]);
+  }, [id, searchParams, trekkList]);
 
   const filteredTrekks = useMemo(() => {
     return trekkList.filter(trekk => {
@@ -242,7 +243,7 @@ export default function Trekks() {
                   key={`search-${trekk.id || index}-${index}`}
                   className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                   onClick={() => {
-                    setSelectedTrekk(trekk);
+                    navigate(`/trekks/${trekk.id}`);
                     setSearchQuery('');
                   }}
                 >
@@ -297,7 +298,7 @@ export default function Trekks() {
                   {/* Left Side: Image */}
                   <div 
                     className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden cursor-pointer"
-                    onClick={() => setSelectedTrekk(trekk)}
+                    onClick={() => navigate(`/trekks/${trekk.id}`)}
                   >
                     <ImageSlider 
                       images={((trekk.title || '').toLowerCase().includes('valley of shadows') 
@@ -352,7 +353,7 @@ export default function Trekks() {
 
                   {/* Right Side: Details */}
                   <CardContent className="p-8 md:p-12 w-full md:w-1/2 flex flex-col">
-                    <div className="flex-grow cursor-pointer" onClick={() => setSelectedTrekk(trekk)}>
+                    <div className="flex-grow cursor-pointer" onClick={() => navigate(`/trekks/${trekk.id}`)}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <Link 
@@ -400,7 +401,7 @@ export default function Trekks() {
                           className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedTrekk(trekk);
+                            navigate(`/trekks/${trekk.id}`);
                           }}
                         >
                           Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -475,7 +476,7 @@ export default function Trekks() {
 
       <PackageDetailModal
         isOpen={!!selectedTrekk}
-        onClose={() => setSelectedTrekk(null)}
+        onClose={() => { setSelectedTrekk(null); navigate('/trekks'); }}
         pkg={selectedTrekk}
         onRequireAuth={() => setShowAuthModal(true)}
       />

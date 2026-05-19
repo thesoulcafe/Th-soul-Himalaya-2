@@ -571,7 +571,7 @@ export default function Home() {
                   whileHover={{ y: -5 }}
                   className="group relative h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer"
                 >
-                  <Link to={`/${pkg.type === 'tour' ? 'tours' : pkg.type === 'trekk' ? 'trekks' : pkg.type === 'service' ? 'services' : pkg.type}?id=${pkg.id}`} className="absolute inset-0 z-30" />
+                  <Link to={`/${pkg.type === 'tour' ? 'tours' : pkg.type === 'trekk' ? 'trekks' : pkg.type === 'service' ? 'services' : pkg.type}/${pkg.id}`} className="absolute inset-0 z-30" />
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
                   <img 
                     src={pkg.image || pkg.coverImage || 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=800'} 

@@ -30,7 +30,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useCart } from '@/lib/CartContext';
@@ -99,7 +99,7 @@ export default function Tours() {
     const shareData = {
       title: `The Soul Himalaya - ${tour.title}`,
       text: tour.description || `Check out this amazing journey: ${tour.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${tour.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${tour.id}&v=${Date.now()}`
     };
 
     try {
@@ -255,8 +255,9 @@ export default function Tours() {
     });
   }, [tours, activeCategory, searchQuery, maxPrice, maxDuration, profile?.role]);
 
+  const { id } = useParams();
+  
   useEffect(() => {
-    const id = searchParams.get('id');
     if (id && tours.length > 0) {
       const tour = tours.find(t => t.id === id);
       if (tour) {
@@ -278,12 +279,12 @@ export default function Tours() {
           title: tour.title || tour.name,
           description: detailedDesc,
           image: tour.image || tour.images?.[0],
-          path: `${window.location.origin}/tours?id=${id}`,
+          path: `${window.location.origin}/tours/${id}`,
           seoData: tour.seoData
         });
       }
     }
-  }, [searchParams, tours]);
+  }, [id, searchParams, tours]);
 
   return (
     <div className="pt-[64px] md:pt-[72px] px-4 sm:px-6">
@@ -370,7 +371,7 @@ export default function Tours() {
                         key={`search-${tour.id || idx}-${idx}`}
                         className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                         onClick={() => {
-                          setSelectedTour(tour);
+                          navigate(`/tours/${tour.id}`);
                           setSearchQuery('');
                         }}
                       >
@@ -534,7 +535,7 @@ export default function Tours() {
                   >
                     <div 
                       className="relative aspect-[4/3] overflow-hidden cursor-pointer"
-                      onClick={() => setSelectedTour(tour)}
+                      onClick={() => navigate(`/tours/${tour.id}`)}
                     >
                       <ImageSlider 
                         images={((tour.title || '').toLowerCase().includes('valley of shadows') 
@@ -590,7 +591,7 @@ export default function Tours() {
                     </div>
 
                     <div className="p-6 flex flex-col flex-grow bg-white relative">
-                      <div className="flex-grow cursor-pointer" onClick={() => setSelectedTour(tour)}>
+                      <div className="flex-grow cursor-pointer" onClick={() => navigate(`/tours/${tour.id}`)}>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <Link 
@@ -633,7 +634,7 @@ export default function Tours() {
                           className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedTour(tour);
+                            navigate(`/tours/${tour.id}`);
                           }}
                         >
                           Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -668,7 +669,7 @@ export default function Tours() {
 
       <PackageDetailModal
         isOpen={!!selectedTour}
-        onClose={() => setSelectedTour(null)}
+        onClose={() => { setSelectedTour(null); navigate('/tours'); }}
         pkg={selectedTour}
         onRequireAuth={() => setShowAuthModal(true)}
       />

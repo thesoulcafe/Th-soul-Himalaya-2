@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 import { SEO } from '@/components/SEO';
 import PackageDetailModal from '@/components/PackageDetailModal';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useState, useEffect, useMemo } from 'react';
@@ -54,7 +54,7 @@ export default function Yoga() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Heal your soul with this retreat: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${pkg.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${pkg.id}&v=${Date.now()}`
     };
 
     try {
@@ -148,8 +148,9 @@ export default function Yoga() {
     return globalCart.find(i => i.id === id)?.quantity || 0;
   };
 
+  const { id } = useParams();
+  
   useEffect(() => {
-    const id = searchParams.get('id');
     if (id && packageList.length > 0) {
       const pkg = packageList.find(p => p.id === id);
       if (pkg) {
@@ -167,12 +168,12 @@ export default function Yoga() {
           title: pkg.title,
           description: fullDescription,
           image: pkg.image,
-          path: `${window.location.origin}/yoga?id=${id}`,
+          path: `${window.location.origin}/yoga/${id}`,
           seoData: pkg.seoData
         });
       }
     }
-  }, [searchParams, packageList]);
+  }, [id, searchParams, packageList]);
 
   const filteredPackages = useMemo(() => {
     return packageList.filter(pkg => {
@@ -235,7 +236,7 @@ export default function Yoga() {
                   key={pkg.id}
                   className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                   onClick={() => {
-                    setSelectedPackage(pkg);
+                    navigate(`/yoga/${pkg.id}`);
                     setSearchQuery('');
                   }}
                 >
@@ -321,7 +322,7 @@ export default function Yoga() {
                 >
                   <div 
                     className="relative h-64 overflow-hidden cursor-pointer"
-                    onClick={() => setSelectedPackage(pkg)}
+                    onClick={() => navigate(`/yoga/${pkg.id}`)}
                   >
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
@@ -372,7 +373,7 @@ export default function Yoga() {
                     </div>
                   </div>
                   <CardContent className="p-8 flex-grow flex flex-col">
-                    <div className="cursor-pointer" onClick={() => setSelectedPackage(pkg)}>
+                    <div className="cursor-pointer" onClick={() => navigate(`/yoga/${pkg.id}`)}>
                       <div className="space-y-1 mb-4">
                         <div className="flex items-center gap-3">
                           <Link 
@@ -413,7 +414,7 @@ export default function Yoga() {
                           className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedPackage(pkg);
+                            navigate(`/yoga/${pkg.id}`);
                           }}
                         >
                           Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -461,7 +462,7 @@ export default function Yoga() {
 
       <PackageDetailModal
         isOpen={!!selectedPackage}
-        onClose={() => setSelectedPackage(null)}
+        onClose={() => { setSelectedPackage(null); navigate('/yoga'); }}
         pkg={selectedPackage}
         onRequireAuth={() => setShowAuthModal(true)}
       />

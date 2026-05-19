@@ -6,7 +6,7 @@ import { Plus, Minus, Wind, Waves, MapPin, Shield, Zap, ArrowRight, Home as Home
 import { Button } from '@/components/ui/button';
 import AuthModal from '@/components/AuthModal';
 import { Card, CardContent } from '@/components/ui/card';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
@@ -62,7 +62,7 @@ export default function Adventure() {
     const shareData = {
       title: `The Soul Himalaya - ${activity.title}`,
       text: activity.description || `Feel the adrenaline with this: ${activity.title}`,
-      url: `${window.location.origin}${window.location.pathname}?id=${activity.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${activity.id}&v=${Date.now()}`
     };
 
     try {
@@ -162,9 +162,9 @@ export default function Adventure() {
     }
   };
 
+  const { id } = useParams();
+  
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const id = searchParams.get('id');
     if (id && activities.length > 0) {
       const activity = activities.find(a => a.id === id);
       if (activity) {
@@ -182,12 +182,12 @@ export default function Adventure() {
           title: activity.title || activity.name,
           description: fullDescription,
           image: activity.image || activity.images?.[0],
-          path: `${window.location.origin}/adventure?id=${id}`,
+          path: `${window.location.origin}/adventure/${id}`,
           seoData: activity.seoData
         });
       }
     }
-  }, [activities]);
+  }, [id, activities]);
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
@@ -250,7 +250,7 @@ export default function Adventure() {
                   key={activity.id}
                   className="flex items-start gap-4 p-4 hover:bg-forest/5 cursor-pointer border-b border-forest/5 last:border-0 transition-colors"
                   onClick={() => {
-                    setSelectedActivity(activity);
+                    navigate(`/adventure/${activity.id}`);
                     setSearchQuery('');
                   }}
                 >
@@ -299,7 +299,7 @@ export default function Adventure() {
                 viewport={{ once: true }}
               >
                 <Card 
-                  onClick={() => setSelectedActivity(activity)}
+                  onClick={() => navigate(`/adventure/${activity.id}`)}
                   className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer"
                 >
                     <div className="relative h-80 overflow-hidden">
@@ -399,7 +399,7 @@ export default function Adventure() {
                         className="w-full h-11 rounded-full border border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300 group/btn"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedActivity(activity);
+                          navigate(`/adventure/${activity.id}`);
                         }}
                       >
                         Explore <ArrowRight className="h-3 w-3 ml-2 group-hover/btn:translate-x-1 transition-transform" />
@@ -473,7 +473,7 @@ export default function Adventure() {
 
       <PackageDetailModal
         isOpen={!!selectedActivity}
-        onClose={() => setSelectedActivity(null)}
+        onClose={() => { setSelectedActivity(null); navigate('/adventure'); }}
         pkg={selectedActivity}
         onRequireAuth={() => setShowAuthModal(true)}
       />

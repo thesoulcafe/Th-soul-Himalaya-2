@@ -752,7 +752,7 @@ export default function Admin() {
           'wfh': '/wfh'
         };
         const basePath = pathMap[activeContentTab] || '/services';
-        const fullPath = `${basePath}?id=${docId}`;
+        const fullPath = `${basePath}/${docId}`;
 
         // Get first image for OG if none provided
         const ogImage = processedData.seoImage || 
