@@ -87,7 +87,7 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
               className="w-full md:min-w-[130px] snap-center"
             >
               {service.link?.startsWith('http') ? (
-                <a href={service.link}>
+                <a href={service.link || '/services'}>
                   <Card className={cn(
                     "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
                     index % 4 === 0 ? "bg-forest text-cream" : 
@@ -130,7 +130,7 @@ const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[]
                   </Card>
                 </a>
               ) : (
-                <Link to={service.link || '#'}>
+                <Link to={service.link || '/services'}>
                   <Card className={cn(
                     "relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 rounded-[1.5rem] h-[120px] md:h-[140px] border-0 p-0 group/card",
                     index % 4 === 0 ? "bg-forest text-cream" : 
@@ -229,6 +229,7 @@ const InstagramSection = ({ posts: initialPosts }: { posts: any[] }) => {
             href="https://www.instagram.com/thesoulhimalaya" 
             target="_blank" 
             rel="noopener noreferrer" 
+            aria-label="Follow us on Instagram"
             className={cn(
               buttonVariants({ variant: "outline" }),
               "border-forest text-forest hover:bg-forest hover:text-white rounded-full group/insta flex items-center gap-2"
@@ -483,6 +484,7 @@ export default function Home() {
             </motion.p>
             
             <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
+              <span className="sr-only">Tour Package Himachal Pradesh, Trekking in Parvati Valley & Yoga Retreats in Tosh</span>
               <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
               <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
             </h1>
@@ -779,6 +781,7 @@ export default function Home() {
                   href="https://wa.me/917878200632"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Contact us on WhatsApp"
                   className={cn(
                     buttonVariants({ size: "lg" }),
                     "w-full sm:w-auto bg-[#25D366] text-white hover:bg-[#25D366]/90 px-12 py-8 text-xl font-extrabold rounded-full flex items-center justify-center gap-4 shadow-xl transition-all duration-500"

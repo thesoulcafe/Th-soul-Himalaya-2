@@ -59,8 +59,8 @@ export default function Footer() {
             From soulful stays to adventurous treks, we bring you closer to the eternal spirit of the mountains.
           </p>
           <div className="flex space-x-6 pt-2">
-            <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors"><Instagram className="h-5 w-5" /></a>
-            <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors"><Twitter className="h-5 w-5" /></a>
+            <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors" aria-label="Follow us on Instagram"><Instagram className="h-5 w-5" /></a>
+            <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer" className="text-cream/40 hover:text-terracotta transition-colors" aria-label="Follow us on X (Twitter)"><Twitter className="h-5 w-5" /></a>
           </div>
         </div>
 

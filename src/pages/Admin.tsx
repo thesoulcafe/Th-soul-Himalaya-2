@@ -3812,18 +3812,30 @@ export default function Admin() {
                             }
                           });
                           
-                          for (const id of docsToDelete) {
-                            await deleteDoc(doc(db, 'seo_settings', id));
+                          if (docsToDelete.length === 0) {
+                            setNotification({ message: 'No duplicate entries found.', type: 'success' });
+                            return;
                           }
                           
-                          if (docsToDelete.length > 0) {
-                            setNotification({ message: `Purged ${docsToDelete.length} duplicate entries!`, type: 'success' });
-                          } else {
-                            setNotification({ message: 'No duplicate entries found.', type: 'success' });
+                          let successCount = 0;
+                          for (const id of docsToDelete) {
+                            try {
+                              if (id) {
+                                await deleteDoc(doc(db, 'seo_settings', id));
+                                successCount++;
+                              }
+                            } catch (e: any) {
+                              if (e.code === 'permission-denied') {
+                                throw new Error("Firestore Permission Denied. You must log in with the correct Admin Google account, not just the Local Master Key.");
+                              }
+                              throw e;
+                            }
                           }
+                          
+                          setNotification({ message: `Purged ${successCount} duplicate entries!`, type: 'success' });
                         } catch (err: any) {
                           console.error("Deduplication error:", err);
-                          setNotification({ message: 'Error executing deduplication', type: 'error' });
+                          setNotification({ message: err.message || 'Error executing deduplication', type: 'error' });
                         } finally {
                           setIsProcessing(false);
                         }

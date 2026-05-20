@@ -63,19 +63,42 @@ async function startServer() {
 
     let dynamicUrls: string[] = [];
     try {
-      // 1. Fetch from Firestore
+      // 1. Fetch from Firestore seo_settings (Master list)
+      const seoSnap = await getDocs(collection(db, "seo_settings"));
+      seoSnap.forEach(doc => {
+        const data = doc.data();
+        let p = data.path;
+        if (p) {
+          if (p.includes('?id=')) {
+            const [base_path, qs] = p.split('?id=');
+            p = `${base_path}/${qs}`;
+          }
+          if (!dynamicUrls.includes(p)) {
+            dynamicUrls.push(p);
+          }
+        }
+      });
+
+      // 2. Fallback to Content
       const contentSnap = await getDocs(collection(db, "content"));
       contentSnap.forEach(doc => {
         const data = doc.data();
         const type = data.type;
         const id = doc.id;
-        if (type === 'tour') dynamicUrls.push(`/tours/${id}`);
-        else if (type === 'trekk' || type === 'trek') dynamicUrls.push(`/trekks/${id}`);
-        else if (type === 'yoga') dynamicUrls.push(`/yoga/${id}`);
-        else if (type === 'meditation') dynamicUrls.push(`/meditation/${id}`);
+        let urlPath = null;
+        if (type === 'tour') urlPath = `/tours/${id}`;
+        else if (type === 'trekk' || type === 'trek') urlPath = `/trekks/${id}`;
+        else if (type === 'yoga') urlPath = `/yoga/${id}`;
+        else if (type === 'meditation') urlPath = `/meditation/${id}`;
+        else if (type === 'wfh') urlPath = `/wfh/${id}`;
+        else if (type === 'service') urlPath = `/services/${id}`;
+        
+        if (urlPath && !dynamicUrls.includes(urlPath)) {
+            dynamicUrls.push(urlPath);
+        }
       });
 
-      // 2. Fallback to constants if firestore is empty or missing something
+      // 3. Fallback to constants if firestore is missing something
       const constantsPath = path.join(process.cwd(), 'src', 'constants.ts');
       const content = fs.readFileSync(constantsPath, 'utf-8');
       const idMatches = (content.match(/id:\s*['"](.*?)['"]/g) || []) as string[];
@@ -96,12 +119,18 @@ async function startServer() {
     const allUrls = [...new Set([...staticPages, ...dynamicUrls])];
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${allUrls.map(url => `
+  ${allUrls.map(url => {
+    // encode ampersands
+    const pathEncoded = url.replace(/&/g, '&amp;');
+    // Add trailing slash for main root if it's empty
+    const fullLoc = url === '' ? `${baseUrl}/` : `${baseUrl}${pathEncoded}`;
+    return `
   <url>
-    <loc>${baseUrl}${url}</loc>
+    <loc>${fullLoc}</loc>
     <changefreq>${url === '' ? 'daily' : 'weekly'}</changefreq>
     <priority>${url === '' ? '1.0' : '0.8'}</priority>
-  </url>`).join('')}
+  </url>`;
+  }).join('')}
 </urlset>`;
 
     res.header('Content-Type', 'application/xml');

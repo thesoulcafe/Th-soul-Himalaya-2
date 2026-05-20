@@ -306,12 +306,12 @@ export default function Navbar() {
                 <div className="mt-auto pt-8 border-t border-white/10">
                   <p className="text-xs text-cream/40 uppercase tracking-widest mb-4">Connect with us</p>
                   <div className="flex gap-4">
-                    <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.instagram.com/thesoulhimalaya" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
                       <Button variant="outline" size="icon" className="rounded-full border-white/20 text-white hover:bg-terracotta hover:border-terracotta">
                         <Instagram className="h-4 w-4" />
                       </Button>
                     </a>
-                    <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer">
+                    <a href="https://x.com/TheSoulhimalaya" target="_blank" rel="noopener noreferrer" aria-label="Follow us on X (Twitter)">
                       <Button variant="outline" size="icon" className="rounded-full border-white/20 text-white hover:bg-terracotta hover:border-terracotta">
                         <Twitter className="h-4 w-4" />
                       </Button>
