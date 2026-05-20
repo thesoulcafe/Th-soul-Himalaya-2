@@ -305,7 +305,7 @@ export default function Adventure() {
                     <div className="relative h-80 overflow-hidden">
                       <ImageSlider 
                         images={((activity.title || '').toLowerCase().includes('valley of shadows') 
-                          ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
+                          ? ["https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"] 
                           : [activity.image, ...(activity.images || [])]).filter(Boolean)} 
                         alt={activity.title}
                         className="h-full w-full"

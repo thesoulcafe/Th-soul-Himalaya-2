@@ -25,7 +25,7 @@ const PARVATI_DATA = {
   hero: {
     headline: "The Valley of Shadows and Light",
     subheadline: "A Spiritual Odyssey through the heart of the Kullu Himalayas",
-    backgroundImage: "https://i.postimg.cc/TYqctVvr/IMG-8144.jpg", // Mantra Lake representation
+    backgroundImage: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp", // Mantra Lake representation
     parallaxIntensity: 0.5
   },
   narrative: {

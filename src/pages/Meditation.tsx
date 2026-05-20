@@ -321,7 +321,7 @@ export default function Meditation() {
                   >
                     <ImageSlider 
                       images={((pkg.title || '').toLowerCase().includes('valley of shadows') 
-                        ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
+                        ? ["https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"] 
                         : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"

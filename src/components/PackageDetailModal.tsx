@@ -91,7 +91,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
   const focus = pkg.focus || typeLabel || 'Wellness';
   
   const images = (title?.toLowerCase().includes('valley of shadows') 
-    ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
+    ? ["https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"] 
     : [pkg.image, ...(pkg.images || [])]).filter(Boolean);
 
   const baseId = `${originalType}-${pkg.id}`;

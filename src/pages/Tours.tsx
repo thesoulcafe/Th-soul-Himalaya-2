@@ -539,7 +539,7 @@ export default function Tours() {
                     >
                       <ImageSlider 
                         images={((tour.title || '').toLowerCase().includes('valley of shadows') 
-                          ? ["https://i.postimg.cc/TYqctVvr/IMG-8144.jpg"] 
+                          ? ["https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"] 
                           : [tour.image, ...(tour.images || [])]).filter(Boolean)} 
                         alt={tour.title}
                         className="h-full w-full transition-transform duration-1000 group-hover:scale-110"
