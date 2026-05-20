@@ -3819,9 +3819,10 @@ export default function Admin() {
                           if (docsToDelete.length > 0) {
                             setNotification({ message: `Purged ${docsToDelete.length} duplicate entries!`, type: 'success' });
                           } else {
-                            setNotification({ message: 'No duplicate entries found.', type: 'info' });
+                            setNotification({ message: 'No duplicate entries found.', type: 'success' });
                           }
                         } catch (err: any) {
+                          console.error("Deduplication error:", err);
                           setNotification({ message: 'Error executing deduplication', type: 'error' });
                         } finally {
                           setIsProcessing(false);
