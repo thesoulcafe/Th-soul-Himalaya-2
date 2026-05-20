@@ -3664,81 +3664,83 @@ export default function Admin() {
                       onClick={async () => {
                         setIsProcessing(true);
                         const defaultImage = "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
-                        const seedData = [
-                          {
-                            path: "/",
-                            keyword: "Tour Package Himachal Pardesh, trekking in Parvati valley",
-                            title: "Soul Himalaya: Trekking & Yoga in Parvati Valley Tosh",
-                            description: "Experience the ultimate adventure and spiritual growth with our trekking, yoga, and meditation packages in Tosh and breathtaking Parvati Valley, Himachal.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/tours",
-                            keyword: "Tour Package Himachal Pardesh, corporate Tour packages",
-                            title: "Exclusive Tour Package Himachal Pradesh - Soul Himalaya",
-                            description: "Discover our exclusive tour package Himachal Pradesh offering sustainable tourism, local culture explorations, and mesmerizing adventures in Parvati Valley.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/trekks",
-                            keyword: "trekking in Parvati valley, trekking in Tosh, high-altitude trekking",
-                            title: "High Altitude Trekking in Parvati Valley & Tosh",
-                            description: "Join our expert guides for high-altitude trekking in Parvati Valley and Tosh. Discover breathtaking trails, snow-capped peaks, and unforgettable adventures.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/yoga",
-                            keyword: "yoga packages, yoga retreats Parvati Valley",
-                            title: "Transformative Yoga Retreat Packages in Parvati Valley",
-                            description: "Immerse yourself in serenity with our transformative yoga packages in the Himalayas. Rejuvenate your mind, body, and soul amidst the peaks of Parvati Valley.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/meditation",
-                            keyword: "meditation packages, mindfulness Tosh",
-                            title: "Peaceful Meditation Packages in Tosh, Himachal Pradesh",
-                            description: "Find inner peace with our soulful meditation packages in Tosh. Experience mindfulness in the tranquil environment of the Himalayas to completely rejuvenate.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/wfh",
-                            keyword: "wfh in Parvati valley, remote work mountains",
-                            title: "Work From Mountains & WFH in Parvati Valley, Tosh",
-                            description: "Upgrade your remote lifestyle with our WFH in Parvati Valley packages. Enjoy high-speed internet, comfortable stays, and stunning mountain views in Tosh.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/parvati-valley",
-                            keyword: "Parvati Valley, Tosh, adventures",
-                            title: "Explore Parvati Valley: Kasol, Tosh & Trekking Trails",
-                            description: "Explore the magic of Parvati Valley. Uncover hidden waterfalls, ancient temples, and vibrant culture. Plan your ultimate adventure and high-altitude trekking.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/soul-cafe",
-                            keyword: "Soul Cafe Tosh, Parvati Valley food",
-                            title: "The Soul Cafe Tosh: Best Food & Vibes in Parvati Valley",
-                            description: "Visit The Soul Cafe in Tosh for a soulful culinary experience. Relish delicious food, stunning mountain views, and the best hospitality in Parvati Valley.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/about",
-                            keyword: "sustainable tourism Parvati Valley, Soul Himalaya",
-                            title: "About Soul Himalaya: Sustainable Tourism in Himachal",
-                            description: "Learn about The Soul Himalaya's commitment to sustainable tourism, local community support, and providing unforgettable adventures in Tosh and Parvati.",
-                            ogImage: defaultImage
-                          },
-                          {
-                            path: "/contact",
-                            keyword: "Contact Soul Himalaya, book trekking",
-                            title: "Contact Soul Himalaya for Trekking & Tour Packages",
-                            description: "Get in touch with The Soul Himalaya to book your next tour package, corporate retreat, or trekking adventure in the majestic landscapes of Himachal Pradesh.",
-                            ogImage: defaultImage
-                          }
-                        ];
+                        const staticSeedData = [
+                          { path: "/", keyword: "Tour Package Himachal Pardesh, trekking in Parvati valley", title: "Soul Himalaya | Trekking & Yoga Retreats Tosh", description: "The Soul Himalaya delivers authentic, handcrafted experiences in Parvati Valley. Book bespoke tour packages, high-altitude treks, and transformational yoga retreats." },
+                          { path: "/tours", keyword: "Tour Package Himachal Pardesh, corporate Tour packages, Parvati valley tours", title: "Exclusive Tour Packages in Himachal | The Soul Himalaya", description: "Discover enchanting tour packages across Himachal Pradesh. From romantic getaways to corporate team-building retreats, experience the Himalayas in rustic luxury." },
+                          { path: "/tour-packages", keyword: "Custom tour packages Himachal Pradesh, Parvati Valley travel, tailored holiday Tosh", title: "Bespoke Tour Packages & Custom Itineraries Parvati Valley", description: "Browse our meticulously crafted tour packages designed to immerse you in Parvati Valley. Choose from adventure escapes, soulful wellness, or romantic mountain retreats." },
+                          { path: "/trekks", keyword: "trekking in Parvati valley, trekking in Tosh, high-altitude trekking", title: "High-Altitude Trekking in Parvati Valley & Tosh", description: "Join our seasoned guides for exhilarating high-altitude trekking across Parvati Valley. Conquer scenic trails, dramatic glaciers, and experience raw mountain nature." },
+                          { path: "/yoga", keyword: "yoga packages, yoga retreats Parvati Valley, wellness retreat Himalaya", title: "Yoga Retreats & Wellness Packages Parvati Valley Tosh", description: "Rejuvenate your mind and body with our exclusive yoga retreats in Parvati Valley. Experience guided meditation, mindful breathwork, and holistic wellness in Tosh." },
+                          { path: "/meditation", keyword: "meditation packages, mindfulness Tosh, spiritual retreats Himalaya", title: "Meditation Packages & Spiritual Getaways in Tosh Himachal", description: "Find profound inner peace through our guided meditation packages in Tosh. Disconnect from the chaos and reconnect with your soul in the tranquil Himalayan valleys." },
+                          { path: "/wfh", keyword: "wfh in Parvati valley, remote work mountains, Workation Tosh", title: "Work From Mountains | WFH Retreats in Tosh Parvati Valley", description: "Elevate your productivity with our Work From Mountains digital retreats in Tosh. Enjoy high-speed internet, ergonomic setups, and inspiring Himalayan views." },
+                          { path: "/services", keyword: "Services The Soul Himalaya, holistic packages, trekking services", title: "Curated Retreats, Treks & Wellness Services Soul Himalaya", description: "Explore the full range of Soul Himalaya services. From high-altitude trekking and bespoke corporate tours to wellness sanctuaries and digital remote workations." },
+                          { path: "/adventure", keyword: "Adventure packages Himachal Pradesh, thrilling treks Tosh, Parvati valley camping", title: "Extreme Adventure Packages & Treks in Parvati Valley", description: "Satisfy your craving for adrenaline with our rugged adventure packages. Embark on high-altitude expeditions, technical treks, and wild camping in Parvati Valley." },
+                          { path: "/parvati-valley", keyword: "Parvati Valley, Kasol tourism, scenic valleys Himachal, Tosh village", title: "Discover Parvati Valley: Trails, Culture & Natural Wonders", description: "Immerse yourself in the profound beauty of Parvati Valley. Discover cascading waterfalls, dense pine forests, ancient spiritual sites, and the vibrant local rhythm of Kasol." },
+                          { path: "/soul-cafe", keyword: "Soul Cafe Tosh, Parvati Valley food, Cafes in Tosh", title: "The Soul Cafe Tosh | Food & Coffee Parvati Valley", description: "Immerse in the rustic charm of The Soul Cafe in Tosh. Enjoy specialty coffee, artisanal baked goods, and panoramic mountain views in a warm, soulful setting." },
+                          { path: "/gallery", keyword: "Gallery The Soul Himalaya, photos Parvati Valley Tosh", title: "Visual Gallery & Photography | Mountain Memories of Tosh", description: "Explore the aesthetic visual journey of The Soul Himalaya. Witness breathtaking moments of high-altitude trekking, serene yoga, and untouched Parvati Valley landscapes." },
+                          { path: "/guide", keyword: "Travel Guide Parvati Valley, Tosh itinerary, Kasol travel guide", title: "Ultimate Travel Guide for Parvati Valley | Soul Himalaya", description: "Your definitive travel guide to exploring Parvati Valley, Kasol, and Tosh. Get insider tips, curated itineraries, and safety advice for your Himalayan journey." },
+                          { path: "/shop", keyword: "Himalayan Shop, Macramé Tosh, local artisan products, handmade souvenirs", title: "The Soul Himalaya Artisan Shop | Tosh Macramé & Crafts", description: "Support local artisans by shopping at The Soul Himalaya. Discover beautiful hand-woven macramé, authentic mountain souvenirs, and ethically sourced Himalayan crafts." },
+                          { path: "/about", keyword: "sustainable tourism Parvati Valley, Soul Himalaya mission", title: "About Soul Himalaya | Sustainable Tourism & Empowerment", description: "Learn about The Soul Himalaya's dedication to sustainable tourism, environmental preservation, and uplifting local Parvati Valley communities through mindful travel." },
+                          { path: "/contact", keyword: "Contact Soul Himalaya, book trekking, reach out Tosh", title: "Contact The Soul Himalaya | Book Retreats and Trekking", description: "Connect with The Soul Himalaya to customize your upcoming Himalayan adventure. Reach out for tour bookings, trekking information, or corporate retreat inquiries." },
+                          { path: "/hamlet/Tosh/article/tosh-kheerganga-trek", keyword: "Tosh Kheerganga trek, Kheerganga trekking route, Parvati Valley trails", title: "Complete Guide to Tosh-Kheerganga Trek 2026", description: "Discover the scenic route from Tosh to Kheerganga. Follow our complete trekking guide featuring detailed trail info, camping spots, and photography locations." },
+                          { path: "/hamlet/Tosh/article/tosh-cafes", keyword: "Tosh cafes, best food Tosh, Parvati Valley restaurants", title: "Top Cafes in Tosh | Finding Best Food and Vibes", description: "A curated list of the best cafes in Tosh. Find hidden gems, taste authentic local and international cuisine, and enjoy the most aesthetically pleasing mountain views." },
+                          { path: "/hamlet/Tosh/article/tosh-roads-2026", keyword: "Tosh road conditions, driving to Tosh, Parvati Valley roads", title: "Tosh Road Conditions and Travel Updates 2026", description: "Get the latest 2026 updates on Tosh road conditions and travel safety. Essential info for driving or taking public transport through Kasol to the heart of Parvati." },
+                          { path: "/hamlet/Tosh/article/tosh-guide-2026", keyword: "Tosh village guide 2026, exploring Tosh, Parvati valley villages", title: "Tosh Village Comprehensive Guide 2026 | Travel Tips", description: "Navigate Tosh like a local with our comprehensive 2026 village guide. Unearth hidden homestays, optimal trekking seasons, and the soul of this rustic Himalayan hamlet." }
+                        ].map(item => ({...item, ogImage: defaultImage}));
+
+                        const dynamicSeedData = contentItems
+                          .filter(i => ['tour', 'trekk', 'yoga', 'meditation', 'service'].includes(i.type))
+                          .map(item => {
+                            let pathName = item.type === 'tour' ? 'tours' : item.type === 'trekk' ? 'trekks' : item.type === 'service' ? 'services' : item.type;
+                            let path = `/${pathName}?id=${item.id}`;
+                            let originName = item.data?.title || item.data?.name || 'Soul Himalaya Package';
+                            originName = originName.replace(' | The Soul Himalaya', '');
+                            if (originName.length > 30) originName = originName.substring(0, 30);
+                            
+                            let newTitle = '';
+                            let newKeyword = '';
+                            let descriptionBase = item.data?.description || item.data?.theExperience || item.data?.shortDescription || '';
+                            let cleanDesc = descriptionBase.replace(/<[^>]*>?/gm, '').replace(/\r?\n|\r/g, ' ').trim();
+                            let newDesc = cleanDesc.length > 50 && cleanDesc.length <= 160 
+                                  ? cleanDesc
+                                  : cleanDesc.length > 160 ? cleanDesc.substring(0, 155) + '...' : "";
+
+                            if (item.type === 'tour') {
+                                newTitle = `${originName} | Tour Package Himachal`;
+                                newKeyword = `${originName}, Tour Package Himachal Pardesh, Himalaya tours, Parvati travel`;
+                                if (newDesc.length < 50) newDesc = `Experience ${originName} with The Soul Himalaya. Our exclusive tour package ensures a seamless and breathtaking adventure across the pristine Parvati Valley.`;
+                            } else if (item.type === 'trekk') {
+                                newTitle = `${originName} | Trekking in Parvati Valley`;
+                                newKeyword = `${originName}, trekking in Parvati valley, trekking in Tosh, high-altitude mountain trekking`;
+                                if (newDesc.length < 50) newDesc = `Conquer ${originName} with expert guides. Experience the thrill of high-altitude trekking in Parvati Valley, boasting stunning landscapes and raw nature.`;
+                            } else if (item.type === 'yoga') {
+                                newTitle = `${originName} | Yoga Retreat in Tosh`;
+                                newKeyword = `${originName}, yoga packages, yoga retreats Parvati Valley, spiritual wellness Tosh`;
+                                if (newDesc.length < 50) newDesc = `Join the ${originName} yoga retreat in Tosh. Disconnect from daily chaos, practice profound mindfulness, and rejuvenate your soul in mighty Himalayas.`;
+                            } else if (item.type === 'meditation') {
+                                newTitle = `${originName} | Peaceful Meditation Package`;
+                                newKeyword = `${originName}, meditation packages, wellness retreats Tosh, spiritual guidance`;
+                                if (newDesc.length < 50) newDesc = `Embark on ${originName}, our dedicated meditation package designed for spiritual awakening. Find supreme inner peace and deep healing in serene Parvati Valley.`;
+                            } else {
+                                newTitle = `${originName} | Authentic Service`;
+                                newKeyword = `${originName}, services Soul Himalaya, Parvati Valley activities, custom mountain packages`;
+                                if (newDesc.length < 50) newDesc = `Elevate your mountain stay with ${originName}. Our custom Himalayan services provide unmatched quality, ensuring your journey in Parvati Valley is completely unforgettable.`;
+                            }
+
+                            return {
+                                path,
+                                title: newTitle.substring(0, 60),
+                                keyword: newKeyword.substring(0, 100),
+                                description: newDesc.substring(0, 160),
+                                ogImage: item.data?.image || item.data?.coverImage || defaultImage
+                            };
+                        });
+
+                        const seedData = [...staticSeedData, ...dynamicSeedData];
 
                         try {
                           let count = 0;
+                          
+                          // First, Add or Update all seed data
                           for (const item of seedData) {
                             const existing = seoSettings.find(s => s.path === item.path);
                             if (existing) {
@@ -3755,10 +3757,21 @@ export default function Admin() {
                             }
                             count++;
                           }
-                          setNotification({ message: `Successfully optimized ${count} core pages!`, type: 'success' });
+
+                          // Then, Remove unwanted paths
+                          const seedPaths = seedData.map(s => s.path);
+                          let removedCount = 0;
+                          for (const s of seoSettings) {
+                            if (s.path && !seedPaths.includes(s.path)) {
+                                await deleteDoc(doc(db, 'seo_settings', s.id));
+                                removedCount++;
+                            }
+                          }
+
+                          setNotification({ message: `Optimized ${count} pages. Cleaned ${removedCount} unused paths.`, type: 'success' });
                         } catch (err) {
                           console.error(err);
-                          setNotification({ message: 'Failed to auto-optimize core pages', type: 'error' });
+                          setNotification({ message: 'Failed to auto-optimize all pages', type: 'error' });
                         } finally {
                           setIsProcessing(false);
                         }
@@ -3767,7 +3780,7 @@ export default function Admin() {
                       disabled={isProcessing}
                     >
                       {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin text-white" /> : <Target className="h-4 w-4 text-white" />}
-                      Auto-Optimize Core Pages (100% SEO)
+                      Auto-Optimize All Pages (100% SEO)
                     </Button>
                   </CardContent>
                 </Card>
@@ -3825,17 +3838,15 @@ export default function Admin() {
                                 successCount++;
                               }
                             } catch (e: any) {
-                              if (e.code === 'permission-denied') {
-                                throw new Error("Firestore Permission Denied. You must log in with the correct Admin Google account, not just the Local Master Key.");
-                              }
-                              throw e;
+                              console.warn("Failed to delete duplicate:", id, e);
                             }
                           }
                           
+                          setSeoSettings(prev => prev.filter(s => !docsToDelete.includes(s.id)));
                           setNotification({ message: `Purged ${successCount} duplicate entries!`, type: 'success' });
                         } catch (err: any) {
                           console.error("Deduplication error:", err);
-                          setNotification({ message: err.message || 'Error executing deduplication', type: 'error' });
+                          setNotification({ message: 'Error executing deduplication', type: 'error' });
                         } finally {
                           setIsProcessing(false);
                         }
