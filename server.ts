@@ -9,6 +9,11 @@ import multer from "multer";
 import fs from "fs";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { 
+  DEFAULT_TOURS, DEFAULT_TREKKS, DEFAULT_YOGA, 
+  DEFAULT_MEDITATION, DEFAULT_ADVENTURE, DEFAULT_WFH, 
+  DEFAULT_SERVICES 
+} from "./src/constants";
 
 dotenv.config();
 
@@ -473,7 +478,12 @@ async function injectMetaTags(req: express.Request, html: string) {
         url = new URL('/', 'https://thesoulhimalaya.com');
       }
 
-      const id = url.searchParams.get('id');
+      let id = url.searchParams.get('id');
+      const pathParts = urlPath.split('/').filter(Boolean);
+      if (!id && pathParts.length >= 2 && ['tours', 'trekks', 'yoga', 'meditation', 'adventure', 'wfh', 'service'].includes(pathParts[0])) {
+        id = pathParts[1];
+      }
+      
       const absoluteUrl = `${protocol}://${host}${urlStr}`;
 
       // Default Values
@@ -503,6 +513,21 @@ async function injectMetaTags(req: express.Request, html: string) {
             image = pkgImg || image;
             metaOverridden = true;
             console.log(`[Meta] Specific Content found for ${id}, injecting dynamic meta tags`);
+          } else {
+            // Fallback to local constants
+            const allPackages = [
+              ...DEFAULT_TOURS, ...DEFAULT_TREKKS, ...DEFAULT_YOGA,
+              ...DEFAULT_MEDITATION, ...DEFAULT_ADVENTURE, ...DEFAULT_WFH,
+              ...DEFAULT_SERVICES
+            ];
+            const pkg = allPackages.find(p => p.id === id);
+            if (pkg) {
+              title = `${pkg.title || pkg.name || 'Tour'} | The Soul Himalaya`;
+              description = pkg.shortDescription || pkg.description || description;
+              image = pkg.image || pkg.coverImage || image;
+              metaOverridden = true;
+              console.log(`[Meta] Specific Content found for ${id} in constants, injecting dynamic meta tags`);
+            }
           }
         } catch (e) {
           console.warn("[Meta] Content lookup failed:", e);
@@ -604,7 +629,7 @@ async function injectMetaTags(req: express.Request, html: string) {
         .replace(/<meta\s+property=["'](og:[a-z]+)["']\s+content=["'].*?["']\s*\/?>/gims, '');
 
       // Inject the dynamic tags just before </head>
-      finalHtml = finalHtml.replace('</head>', `\${metaTags}\n</head>`);
+      finalHtml = finalHtml.replace('</head>', `\n${metaTags}\n</head>`);
 
       return finalHtml;
     })();

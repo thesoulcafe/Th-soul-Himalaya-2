@@ -62,7 +62,7 @@ export default function Adventure() {
     const shareData = {
       title: `The Soul Himalaya - ${activity.title}`,
       text: activity.description || `Feel the adrenaline with this: ${activity.title}`,
-      url: `${window.location.origin}${window.location.pathname}/${activity.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${activity.id}?v=${Date.now()}`
     };
 
     try {

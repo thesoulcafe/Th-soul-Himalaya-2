@@ -53,7 +53,7 @@ export default function Trekks() {
     const shareData = {
       title: `The Soul Himalaya - ${trekk.title}`,
       text: trekk.description || `Discover this wild path: ${trekk.title}`,
-      url: `${window.location.origin}${window.location.pathname}/${trekk.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${trekk.id}?v=${Date.now()}`
     };
 
     try {

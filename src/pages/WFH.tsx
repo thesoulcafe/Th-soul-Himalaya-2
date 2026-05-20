@@ -62,7 +62,7 @@ export default function WFH() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Elevate your productivity with this: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}/${pkg.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${pkg.id}?v=${Date.now()}`
     };
 
     try {

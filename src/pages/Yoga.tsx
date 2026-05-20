@@ -54,7 +54,7 @@ export default function Yoga() {
     const shareData = {
       title: `The Soul Himalaya - ${pkg.title}`,
       text: pkg.description || `Heal your soul with this retreat: ${pkg.title}`,
-      url: `${window.location.origin}${window.location.pathname}/${pkg.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${pkg.id}?v=${Date.now()}`
     };
 
     try {

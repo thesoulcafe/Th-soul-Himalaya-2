@@ -93,7 +93,7 @@ const HAMLET_DETAILS: Record<string, any> = {
         title: "Trek Glacier Point", 
         desc: "Explore the breathtaking Glacier Point with an expert guide.",
         icon: <Mountain />,
-        link: "/trekks/trekk-1&v=1777542180740"
+        link: "/trekks/trekk-1?v=1777542180740"
       }
     ],
     stats: [

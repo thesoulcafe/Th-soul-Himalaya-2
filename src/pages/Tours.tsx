@@ -99,7 +99,7 @@ export default function Tours() {
     const shareData = {
       title: `The Soul Himalaya - ${tour.title}`,
       text: tour.description || `Check out this amazing journey: ${tour.title}`,
-      url: `${window.location.origin}${window.location.pathname}/${tour.id}&v=${Date.now()}`
+      url: `${window.location.origin}${window.location.pathname}/${tour.id}?v=${Date.now()}`
     };
 
     try {
