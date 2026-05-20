@@ -37,6 +37,17 @@ async function startServer() {
   console.log(`[Server] Starting in ${process.env.NODE_ENV || 'development'} mode`);
   console.log(`[Server] Working directory: ${process.cwd()}`);
 
+  // Redirect www to non-www for SEO score
+  app.use((req, res, next) => {
+    const host = req.headers.host || '';
+    if (host.startsWith('www.')) {
+      const nonWwwHost = host.slice(4);
+      const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+      return res.redirect(301, `${protocol}://${nonWwwHost}${req.originalUrl}`);
+    }
+    next();
+  });
+
   app.use(express.json());
 
   app.get("/sitemap.xml", async (req, res) => {
@@ -649,6 +660,54 @@ async function injectMetaTags(req: express.Request, html: string) {
 <meta name="twitter:description" content="${description}">
 <meta name="twitter:image" content="${image}">`;
 
+      const jsonLd = `
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "${title.replace(/"/g, '\\"')}",
+  "description": "${description.replace(/"/g, '\\"')}",
+  "url": "${absoluteUrl}",
+  "image": "${image.replace(/"/g, '\\"')}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Soul Himalaya",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png?v=2"
+    }
+  }
+}
+</script>
+`;
+
+      const fallbackHtml = `
+<main style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;" class="seo-crawler-content">
+  <h1>${title}</h1>
+  <h2>Experience Authentic Himalayan Tourism in Tosh</h2>
+  <p>${description}</p>
+  <p>Welcome to The Soul Himalaya. We specialize in curating transformational journeys through the majestic Parvati Valley in Himachal Pradesh. Our mission is to combine breathtaking high-altitude adventure with profound spiritual wellness, offering travelers a deeply authentic and sustainable Himalayan experience. Whether you're looking to challenge yourself on pristine mountain trails or seeking inner peace through our guided yoga and meditation retreats, our team of local experts has crafted an itinerary that perfectly aligns with your soulful travel desires.</p>
+  <h3>Our Core Offerings</h3>
+  <p>We pride ourselves on offering a diverse range of handcrafted mountain experiences designed to elevate your stay in Tosh, Kasol, and the broader Parvati Valley region. Enjoy exclusive access to hidden trails, pristine camping spots, and serene meditation areas. Through our platform, you will find:</p>
+  <ul>
+    <li><a href="/">The Soul Himalaya Home</a></li>
+    <li><a href="/tours">Incredible Tour Packages in Himachal Pradesh</a></li>
+    <li><a href="/trekks">High-Altitude Trekking in Parvati Valley</a></li>
+    <li><a href="/yoga">Transformational Yoga Retreats in Tosh</a></li>
+    <li><a href="/meditation">Peaceful Meditation and Spiritual Packages</a></li>
+    <li><a href="/wfh">Work From Mountains &amp; Remote Workations</a></li>
+    <li><a href="/adventure">Thrilling Adventure Packages</a></li>
+    <li><a href="/services">Holistic Travel Services</a></li>
+  </ul>
+  <h3>Why Choose The Soul Himalaya?</h3>
+  <p>We believe in eco-friendly and community-driven tourism. By traveling with us, you are directly supporting the local artisans, guides, and families that call the Himalayas home. From enjoying specialty coffee at The Soul Cafe to staying in our rustic, scenic locations, every detail is considered to ensure you enjoy optimal privacy, deep comfort, and raw nature.</p>
+  <p>Discover our hand-woven macramé and local artisan crafts at our <a href="/shop">Himalayan Artisan Shop</a>, browse our comprehensive <a href="/guide">Travel Guide</a> for essential Parvati Valley travel tips, or simply soak in the aesthetic beauty of the mountains through our visually stunning <a href="/gallery">Gallery</a>.</p>
+  <h3>Explore Further</h3>
+  <p>Explore <a href="/parvati-valley">the diverse trails and natural wonders of Parvati Valley</a> to plan your optimal holiday. For bespoke inquiries, custom corporate tour packages, or general assistance, please <a href="/contact">contact us</a>. Read deeper into our vision for sustainable tourism on our <a href="/about">About Us</a> page, and discover how our dedicated team ensures your Himalayan escape is perfectly safe, utterly breathtaking, and wholly unforgettable.</p>
+  <p><em>The Soul Himalaya &ndash; Reconnect with nature. Reconnect with yourself. Find your authentic mountain rhythm.</em></p>
+</main>
+`;
+
       let finalHtml = html;
       
       // Remove all existing meta tags in <head> related to SEO and the default title
@@ -658,7 +717,10 @@ async function injectMetaTags(req: express.Request, html: string) {
         .replace(/<meta\s+property=["'](og:[a-z]+)["']\s+content=["'].*?["']\s*\/?>/gims, '');
 
       // Inject the dynamic tags just before </head>
-      finalHtml = finalHtml.replace('</head>', `\n${metaTags}\n</head>`);
+      finalHtml = finalHtml.replace('</head>', `\n${metaTags}\n${jsonLd}\n</head>`);
+      
+      // Inject fallback semantic content required for some crawlers
+      finalHtml = finalHtml.replace('<!-- SSR_CONTENT_PLACEHOLDER -->', fallbackHtml);
 
       return finalHtml;
     })();
