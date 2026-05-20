@@ -481,7 +481,7 @@ async function injectMetaTags(req: express.Request, html: string) {
       let id = url.searchParams.get('id');
       const pathParts = urlPath.split('/').filter(Boolean);
       if (!id && pathParts.length >= 2 && ['tours', 'trekks', 'yoga', 'meditation', 'adventure', 'wfh', 'service'].includes(pathParts[0])) {
-        id = pathParts[1];
+        id = pathParts[1].split('&')[0];
       }
       
       const absoluteUrl = `${protocol}://${host}${urlStr}`;
