@@ -135,7 +135,8 @@ async function generateStaticHTML() {
   ];
 
   for (const category of allPackages) {
-    for (const pkg of category.items) {
+    for (const item of category.items) {
+      const pkg = item as any;
       if (!pkg.id) continue;
       
       const title = `${pkg.title || pkg.name} | The Soul Himalaya`;

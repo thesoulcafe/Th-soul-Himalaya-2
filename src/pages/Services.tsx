@@ -116,74 +116,62 @@ export default function Services() {
           <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Our Experiences</h1>
           <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Soulful Himalayan Journeys</p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {finalServices.map((service, index) => (
             <motion.div
               key={`${service.title}-${index}`}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ delay: index * 0.03, type: 'spring', stiffness: 300 }}
-              className="group"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              className="group relative h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer"
             >
-              <Link to={service.link || '#'}>
-                <Card className={cn(
-                  "relative overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl h-full border-0 p-0",
-                  index % 4 === 0 ? "bg-forest text-cream" : 
-                  index % 4 === 1 ? "bg-terracotta text-white" : 
-                  index % 4 === 2 ? "bg-cream text-forest border border-forest/10" : 
-                  "bg-black text-white"
-                )}>
-                  {/* Vibrant Gradient Overlay */}
-                  <div className={cn(
-                    "absolute inset-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500",
-                    index % 4 === 0 ? "bg-gradient-to-br from-white to-transparent" : 
-                    index % 4 === 1 ? "bg-gradient-to-br from-white to-transparent" : 
-                    index % 4 === 2 ? "bg-gradient-to-br from-terracotta to-transparent" : 
-                    "bg-gradient-to-br from-gold to-transparent"
-                  )} />
-                  
-                  <CardContent className="p-5 flex flex-col items-center text-center h-full relative z-10">
-                    {service.isAvailable === false && (
-                      <div className="absolute inset-0 bg-forest/40 backdrop-blur-[1px] flex items-center justify-center z-20">
-                        <Badge className="bg-rose-500 text-white border-none px-3 py-1 text-[9px] font-bold shadow-xl">
-                          Unavailable
-                        </Badge>
-                      </div>
-                    )}
-                    {profile?.role === 'admin' && (
-                      <Link 
-                        to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                        className="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-xl px-2.5 py-1.5 rounded-full flex items-center gap-1.5 border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 z-20 group/edit"
-                        title={service.id ? "Edit Service" : "Sync defaults to edit"}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Edit2 className="h-3 w-3" />
-                        <span className="text-[8px] font-bold uppercase tracking-widest leading-none">Edit</span>
-                      </Link>
-                    )}
-                    <div className={cn(
-                      "mb-3 p-2.5 rounded-xl transition-all duration-500 shadow-sm",
-                      index % 4 === 2 ? "bg-forest/5" : "bg-white/10 group-hover:bg-white/20"
-                    )}>
-                      {React.createElement(getIcon(service.title), { className: "h-5 w-5" })}
-                    </div>
-                    
-                    <h3 className="text-sm font-heading font-bold mb-1 tracking-tight">
-                      {service.title}
-                    </h3>
-                    
-                    <p className="text-[10px] leading-tight opacity-60 mb-4 line-clamp-2">
-                      {service.description}
-                    </p>
-                    
-                    <div className="mt-auto flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                      <span>Explore</span>
-                      <ArrowRight className="h-2 w-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <Link to={service.link || `/services/${service.id}`} className="absolute inset-0 z-30" />
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+              <img 
+                src={service.image || service.coverImage || 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=800'} 
+                alt={service.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                referrerPolicy="no-referrer"
+              />
+              
+              {service.isAvailable === false && (
+                <div className="absolute top-4 left-4 z-20">
+                  <Badge className="bg-rose-500 text-white border-none px-3 py-1 text-[9px] font-bold shadow-xl uppercase tracking-widest">
+                    Unavailable
+                  </Badge>
+                </div>
+              )}
+              {profile?.role === 'admin' && (
+                <Link 
+                  to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                  className="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-xl px-2 p-1.5 rounded-full flex items-center justify-center border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 z-40 group/edit"
+                  title={service.id ? "Edit Service" : "Sync defaults to edit"}
+                  onClick={(e) => { e.stopPropagation(); }}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Link>
+              )}
+
+              <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="bg-white/10 backdrop-blur-xl w-10 h-10 rounded-xl flex items-center justify-center border border-white/20">
+                    <Star className="text-terracotta h-5 w-5" />
+                  </div>
+                  <span className="text-white/80 font-bold uppercase tracking-widest text-[9px] bg-forest/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">{service.type || 'Service'}</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-heading font-extrabold text-white mb-3 line-clamp-2 leading-tight tracking-tight">
+                  {service.title}
+                </h3>
+                <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed font-medium">
+                  {service.description || 'Experience our unique Himalayan service.'}
+                </p>
+                <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
+                  <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />
+                  Explore Details
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

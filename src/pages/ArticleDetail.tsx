@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
-  ArrowLeft, 
+  ArrowLeft,
   Clock, 
   MapPin, 
   Calendar, 
@@ -17,11 +17,91 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
+import { cn } from '@/lib/utils';
 import { SEO } from '@/components/SEO';
+import { 
+  DEFAULT_TOURS, DEFAULT_TREKKS, DEFAULT_SHOP, 
+  DEFAULT_YOGA, DEFAULT_MEDITATION, DEFAULT_ADVENTURE, 
+  DEFAULT_WFH, DEFAULT_SERVICES 
+} from '@/constants';
 
 // Enhanced Intelligence Database for 2026
 const ARTICLE_CONTENT: Record<string, any> = {
+  "tosh-treks-guide": {
+    title: "Treks from Tosh: Ultimate Guide to High-Altitude Trails",
+    category: "Trekking Guide",
+    readTime: "8 min read",
+    date: "May 2026",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80",
+    author: "Soul Expeditions",
+    authorRole: "Trekking Coordinators",
+    content: [
+      {
+        type: "paragraph",
+        text: "Tosh isn't just a place to relax; it is the ultimate basecamp for some of the most spectacular treks in the Parvati Valley. Whether you are seeking a short day hike to high-altitude meadows or a multi-day expedition into the deep Himalayas, Tosh is your starting point."
+      },
+      {
+        type: "heading",
+        text: "1. Kutla Glacier Point Trek"
+      },
+      {
+        type: "paragraph",
+        text: "Just a few hours hike above Tosh lies the pristine meadow of Kutla. Surrounded by pine forests and offering uninterrupted views of the Tosh Glacier ice tongues, Kutla is perfect for those who want to escape the growing crowds of Tosh."
+      },
+      {
+        type: "paragraph",
+        text: "The trail is steep but incredibly rewarding. It begins at the waterfall above Tosh and winds through apple orchards before entering the dense alpine forest. You can explore our dedicated Kutla expedition below."
+      },
+      {
+        type: "tour-link",
+        tourId: "trekk-1",
+        tourTitle: "Kutla Glacier Expedition",
+        url: "/trekks/trekk-1"
+      },
+      {
+        type: "heading",
+        text: "2. The Kheerganga Trek (Via Nakthan / Tosh)"
+      },
+      {
+        type: "paragraph",
+        text: "While the traditional route to Kheerganga starts at Barshaini, many trekkers prefer to stay in Tosh and start their journey from here. The trail converges near the Nakthan village and leads you through breathtaking gorges, ancient Shiva temples, and dense canopies until you reach the divine hot springs at the summit."
+      },
+      {
+        type: "paragraph",
+        text: "Kheerganga is a moderate 12km trek. Soaking your tired muscles in the natural hot springs while watching the snow-capped peaks is an experience you won't easily forget. We offer comprehensive guided packages with camping included."
+      },
+      {
+        type: "tour-link",
+        tourId: "tour-18",
+        tourTitle: "Kheerganga & Tosh Special",
+        url: "/tours/tour-18"
+      },
+      {
+        type: "heading",
+        text: "3. Animal Pass (For Experienced Trekkers)"
+      },
+      {
+        type: "paragraph",
+        text: "For the highly experienced and physically fit, the trail continues past Kutla towards the challenging Animal Pass. Reaching heights over 4,500 meters, this is a technical trek that requires proper acclimatization, guides, and camping gear. The views of the deep Himalayan divides are unparalleled, but it is not recommended for beginners."
+      },
+      {
+        type: "quote",
+        text: "Tosh is where the road ends, but for the true explorer, it is where the real journey begins.",
+        author: "Himalayan Proverb"
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
+      }
+    ]
+  },
   "tosh-guide-2026": {
     title: "The Ultimate Guide to Tosh Village (2026 Edition)",
     category: "Strategic Guide",
@@ -68,6 +148,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "As you walk through the narrow lanes, you'll see a mix of traditional wooden carvings and new-age mural art. It's a village in transition, where the ancient and the digital coexist in a delicate dance. Remember to greet the locals with a 'Namaste'—it opens more doors than any amount of money ever could."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -113,6 +204,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "The lore of Alexander the Great's soldiers settling here is pervasive. While genetic studies provide a nuanced view, the presence of distinct facial features and a unique governing structure keep the legend alive. Whether Greek or autochthonous, the Malanese are a people fiercely protective of their heritage."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -150,6 +252,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
           "Flora Protection: Plucking wildflowers or collecting rare fungi is prohibited by village edict.",
           "Mindful Media: If filming, use minimal gear and respect the silence of those meditating nearby."
         ]
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -182,6 +295,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
           "Temple Boundaries: The temples are for the initiated only. Crossing the threshold without permission is a serious violation.",
           "Sacred Flora: Do not pluck any flowers or plants within the village boundaries. They are considered property of the Devta."
         ]
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -205,6 +329,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "The language of Malana, 'Kanashi', is an isolate. It has no clear connection to the surrounding Indo-Aryan or Tibeto-Burman languages. This linguistic anomaly is one of the strongest arguments for a distinct, and perhaps foreign, origin story."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -229,6 +364,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
           "Taxi Coordination: Shared taxis from Barshaini operate on a 'full-load' basis. For private transit, booking 24 hours in advance is now required.",
           "Monsoon Readiness: During July-August, check the status of the Jari bridge hourly for potential closures."
         ]
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -253,6 +399,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
           "Pink Floyd: Still the undisputed king of sunset vistas.",
           "Woodside Inn: A quiet retreat for those who need silence between meetings."
         ]
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -268,6 +425,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "The trek from Tosh to Kheerganga via Nakthan is the most iconic route in the valley. In 2026, the trail has been streamlined with new ecological markers and designated rest zones to manage the increasing visitor throughput."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -283,6 +451,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "Packing for the Himalayas in May is an exercise in versatility. You must plan for both the biting alpine cold of the night and the intense UV radiation of the midday sun."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -298,6 +477,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "Pulga's architecture is a testament to Himalayan ingenuity. The 'Kath-Kuni' style—alternating layers of stone and deodar wood—allows structures to breathe and withstand seismic activity. These houses aren't just buildings; they are living thermal regulators."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -313,6 +503,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "Pulga has emerged as the forest capital for digital nomads. With the arrival of high-speed satellite internet in 2026, the 'Fairy Forest Cafes' now offer a level of connectivity previously unthinkable in such remote terrain."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -328,6 +529,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "Trekking in the Parvati Valley requires respect for the topography. At 2,960 meters, Kheerganga is where many trekkers first experience altitude-related fatigue. Proper hydration and a rhythmic pace are critical for a safe ascent."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -343,6 +555,17 @@ const ARTICLE_CONTENT: Record<string, any> = {
       {
         type: "paragraph",
         text: "The natural hot springs of Kheerganga are a geological marvel. Rich in sulfur and other minerals, these waters have been used for centuries to cure skin ailments and muscle exhaustion. The science of their heat is connected to deep subterranean tectonic shifts."
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "internal-links"
       }
     ]
   },
@@ -408,24 +631,14 @@ export default function ArticleDetail() {
         image={article.image}
         type="article"
       />
-      {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)}
-          className="rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-forest hover:bg-white/40 h-10 px-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to {hamletId}
-        </Button>
-        <div className="flex gap-2">
-          <Button variant="ghost" className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center p-0">
+      
+      {/* Hero Section */}
+      <header className="relative h-[80vh] w-full overflow-hidden">
+        <div className="absolute top-[80px] right-6 z-10 flex gap-2">
+          <Button variant="ghost" className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center p-0 text-white shadow-lg shadow-black/10 hover:bg-white/40">
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
-      </nav>
-
-      {/* Hero Section */}
-      <header className="relative h-[80vh] w-full overflow-hidden">
         <motion.img 
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
@@ -484,16 +697,22 @@ export default function ArticleDetail() {
 
       {/* Content Section */}
       <article className="max-w-3xl mx-auto px-8 py-24 md:py-32">
-        <div className="space-y-16">
+        <div className="space-y-12">
           {article.content.map((block: any, index: number) => {
             if (block.type === 'paragraph') {
+              // Apply drop cap only to the very first paragraph in the article
+              const isFirstParagraph = index === 0 || (index > 0 && article.content.findIndex((b: any) => b.type === 'paragraph') === index);
+              
               return (
                 <motion.p 
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
-                  className="text-xl md:text-2xl text-forest/80 leading-[1.6] font-serif italic first-letter:text-5xl first-letter:float-left first-letter:mr-3 first-letter:font-black first-letter:text-terracotta"
+                  className={cn(
+                    "text-lg md:text-xl text-forest/80 leading-relaxed font-sans font-medium",
+                    isFirstParagraph && "first-letter:text-6xl first-letter:float-left first-letter:mr-4 first-letter:mt-2 first-letter:font-serif first-letter:font-black text-forest first-letter:text-terracotta"
+                  )}
                 >
                   {block.text}
                 </motion.p>
@@ -506,15 +725,16 @@ export default function ArticleDetail() {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="relative py-12 px-12 md:px-20 border-l-4 border-terracotta bg-forest/[0.02] rounded-r-[3rem]"
+                  className="relative my-16 py-12 px-10 md:px-16 border-l-4 border-terracotta bg-white shadow-2xl shadow-forest/5 rounded-r-3xl"
                 >
-                  <Sparkles className="absolute top-8 right-8 h-8 w-8 text-terracotta/10" />
-                  <p className="text-2xl md:text-4xl font-heading font-black text-forest leading-tight italic tracking-tight mb-6">
+                  <Sparkles className="absolute top-8 right-8 h-8 w-8 text-terracotta/20" />
+                  <p className="text-2xl md:text-3xl lg:text-4xl font-serif font-black text-forest leading-snug italic tracking-tight mb-6">
                     "{block.text}"
                   </p>
                   {block.author && (
-                    <cite className="not-italic text-[10px] font-black uppercase tracking-[0.4em] text-forest/30">
-                      — {block.author}
+                    <cite className="not-italic flex items-center gap-4 text-xs font-bold uppercase tracking-[0.2em] text-forest/50">
+                      <div className="w-8 h-[2px] bg-terracotta rounded-full"></div>
+                      {block.author}
                     </cite>
                   )}
                 </motion.div>
@@ -527,7 +747,7 @@ export default function ArticleDetail() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="text-4xl md:text-6xl font-heading font-black text-forest uppercase tracking-tighter leading-[0.9]"
+                  className="text-3xl md:text-5xl font-heading font-black text-forest tracking-tight mt-20 mb-8"
                 >
                   {block.text}
                 </motion.h2>
@@ -540,7 +760,7 @@ export default function ArticleDetail() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="bg-white p-12 md:p-16 rounded-[4rem] shadow-2xl shadow-forest/5 border border-forest/5 space-y-8"
+                  className="bg-white p-10 md:p-14 rounded-3xl shadow-xl shadow-forest/5 border border-forest/5 space-y-8 my-16"
                 >
                   <div className="flex items-center gap-4">
                     <Zap className="h-6 w-6 text-terracotta" />
@@ -570,6 +790,107 @@ export default function ArticleDetail() {
                   </ul>
                 </motion.div>
               );
+            }
+            if (block.type === 'tour-link') {
+              const allPackages = [
+                ...DEFAULT_TOURS.map(p => ({ ...p, type: 'tour' })),
+                ...DEFAULT_TREKKS.map(p => ({ ...p, type: 'trekk' })),
+                ...DEFAULT_SHOP.map(p => ({ ...p, type: 'shop' })),
+                ...DEFAULT_YOGA.map(p => ({ ...p, type: 'yoga' })),
+                ...DEFAULT_MEDITATION.map(p => ({ ...p, type: 'meditation' })),
+                ...DEFAULT_ADVENTURE.map(p => ({ ...p, type: 'adventure' })),
+                ...DEFAULT_WFH.map(p => ({ ...p, type: 'wfh' })),
+                ...DEFAULT_SERVICES.map(p => ({ ...p, type: 'service' }))
+              ];
+              const pkg: any = allPackages.find((p: any) => p.id === block.tourId);
+              
+              if (!pkg) {
+                return (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="flex justify-center my-12"
+                  >
+                    <Link to={block.url}>
+                      <Button className="bg-forest text-cream hover:bg-terracotta font-black uppercase tracking-widest px-8 py-6 rounded-full shadow-xl transition-all hover:scale-105">
+                        Explore {block.tourTitle} <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </motion.div>
+                );
+              }
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5 }}
+                  className="group relative h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer max-w-lg mx-auto my-16"
+                >
+                  <Link to={block.url} className="absolute inset-0 z-30" />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  <img 
+                    src={pkg.image || pkg.coverImage || 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=800'} 
+                    alt={pkg.name || pkg.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="bg-white/10 backdrop-blur-xl w-10 h-10 rounded-xl flex items-center justify-center border border-white/20">
+                        <Star className="text-terracotta h-5 w-5" />
+                      </div>
+                      <span className="text-white/80 font-bold uppercase tracking-widest text-[9px] bg-forest/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">{pkg.type}</span>
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-montserrat font-extrabold text-white mb-3 line-clamp-2 leading-tight">{pkg.name || pkg.title}</h3>
+                    <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed">
+                      {pkg.description || pkg.shortDescription || 'Experience the magic of the Himalayas with this specially curated package.'}
+                    </p>
+                    <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
+                      <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />
+                      Explore Details
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            }
+            if (block.type === 'internal-links') {
+              return (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="my-16 p-8 md:p-12 bg-white rounded-3xl shadow-xl shadow-forest/5 border border-forest/10"
+                >
+                  <h3 className="text-2xl font-serif font-black text-forest mb-6 italic">Essential Resources & Explorations</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Link to="/tours" className="flex items-center gap-3 p-4 rounded-xl hover:bg-forest/5 transition-colors group">
+                      <Compass className="h-5 w-5 text-terracotta group-hover:rotate-45 transition-transform" />
+                      <span className="font-bold text-forest">Explore All Packages</span>
+                    </Link>
+                    <Link to="/gallery" className="flex items-center gap-3 p-4 rounded-xl hover:bg-forest/5 transition-colors group">
+                      <Sparkles className="h-5 w-5 text-terracotta group-hover:rotate-12 transition-transform" />
+                      <span className="font-bold text-forest">Visual Journey (Gallery)</span>
+                    </Link>
+                    <Link to="/about" className="flex items-center gap-3 p-4 rounded-xl hover:bg-forest/5 transition-colors group">
+                      <History className="h-5 w-5 text-terracotta group-hover:-rotate-12 transition-transform" />
+                      <span className="font-bold text-forest">Our Philosophy</span>
+                    </Link>
+                    <Link to="/contact" className="flex items-center gap-3 p-4 rounded-xl hover:bg-forest/5 transition-colors group">
+                      <MapPin className="h-5 w-5 text-terracotta group-hover:animate-bounce transition-transform" />
+                      <span className="font-bold text-forest">Connect With Us</span>
+                    </Link>
+                  </div>
+                </motion.div>
+              );
+            }
+            if (block.type === 'image') {
+              return null;
             }
             return null;
           })}

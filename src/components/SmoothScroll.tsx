@@ -34,9 +34,13 @@ export default function SmoothScroll() {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest('a');
+      
+      // If it's a hash link on the *same* page, handle it with Lenis
       if (anchor && anchor.hash && anchor.origin === window.location.origin) {
-        e.preventDefault();
-        lenis.scrollTo(anchor.hash);
+        if (anchor.pathname === window.location.pathname) {
+          e.preventDefault();
+          lenis.scrollTo(anchor.hash);
+        }
       }
     };
 

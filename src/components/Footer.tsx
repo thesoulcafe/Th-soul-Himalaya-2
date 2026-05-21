@@ -70,11 +70,18 @@ export default function Footer() {
           <div className="space-y-6">
             <h4 className="text-lg font-bold">Quick Links</h4>
             <ul className="space-y-3 text-sm text-cream/70">
-              {['Home', 'About', 'Gallery', 'Contact', 'Blueberry'].map((item) => (
-                <motion.li key={item} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300 }}>
-                  <Link to={item === 'Home' ? '/' : item === 'Gallery' ? '/#follow-our-journey' : `/${item.toLowerCase()}`} className="hover:text-terracotta transition-colors flex items-center gap-2">
+              {[
+                { name: 'Home', href: '/' },
+                { name: 'Our Story', href: '/about' },
+                { name: 'Our Journey', href: '/#follow-our-journey' },
+                { name: 'Gallery', href: '/gallery' },
+                { name: 'Contact Us', href: '/contact' },
+                { name: 'Blueberry Farm', href: '/blueberry' }
+              ].map((item) => (
+                <motion.li key={item.name} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300 }}>
+                  <Link to={item.href} className="hover:text-terracotta transition-colors flex items-center gap-2">
                     <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {item === 'Blueberry' ? 'Blueberry Farm' : item === 'Contact' ? 'Contact Us' : item === 'About' ? 'Our Story' : item}
+                    {item.name}
                   </Link>
                 </motion.li>
               ))}

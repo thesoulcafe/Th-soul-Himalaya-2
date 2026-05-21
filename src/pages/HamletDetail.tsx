@@ -129,6 +129,11 @@ const HAMLET_DETAILS: Record<string, any> = {
         title: "What to Pack for Tosh in May: Temperature & Gear Guide",
         excerpt: "Don't get caught in the mountain chill. Our curated list for the variable May climate.",
         link: "tosh-packing"
+      },
+      {
+        title: "Treks from Tosh: Ultimate Guide to High-Altitude Trails",
+        excerpt: "Detailed breakdown of all major treks starting from Tosh, including Kutla Glacier Point and the Kheerganga route.",
+        link: "tosh-treks-guide"
       }
     ]
   },

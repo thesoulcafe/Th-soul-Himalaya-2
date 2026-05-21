@@ -560,7 +560,7 @@ async function injectMetaTags(req: express.Request, html: string) {
               ...DEFAULT_MEDITATION, ...DEFAULT_ADVENTURE, ...DEFAULT_WFH,
               ...DEFAULT_SERVICES
             ];
-            const pkg = allPackages.find(p => p.id === id);
+            const pkg: any = allPackages.find(p => p.id === id);
             if (pkg) {
               title = `${pkg.title || pkg.name || 'Tour'} | The Soul Himalaya`;
               description = pkg.shortDescription || pkg.description || description;
