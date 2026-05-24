@@ -1,0 +1,4 @@
+customRules:
+  - source: 'https://main.d1yswrq8t3vfwp.amplifyapp.com/<*>'
+    target: 'https://thesoulhimalaya.com/<*>'
+    status: '301'

@@ -38,6 +38,7 @@ const BookingPage = lazy(() => import('./pages/BookingPage'));
 const ArticleDetail = lazy(() => import('./pages/ArticleDetail'));
 const SoulCafe = lazy(() => import('./pages/SoulCafe'));
 const Success = lazy(() => import('./pages/Success'));
+const HelmetsOfGodsArticle = lazy(() => import('./pages/HelmetsOfGodsArticle'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-cream">
@@ -98,6 +99,7 @@ export default function App() {
                   <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
                   <Route path="soul-cafe" element={<SoulCafe />} />
                   <Route path="enquiry-success" element={<Success />} />
+                  <Route path="helmets-of-gods/:slug" element={<HelmetsOfGodsArticle />} />
                   <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
                 </Route>
               </Routes>

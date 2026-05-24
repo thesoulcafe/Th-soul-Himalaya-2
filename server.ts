@@ -574,6 +574,24 @@ async function injectMetaTags(req: express.Request, html: string) {
         }
       }
 
+      // --- STEP 1.5: Helmets of Gods Dynamic Articles ---
+      if (!metaOverridden && urlPath.startsWith('/helmets-of-gods/')) {
+        try {
+          const articleSlug = urlPath.replace('/helmets-of-gods/', '');
+          const q = query(collection(db, "helmets_of_gods"), where("slug", "==", articleSlug));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            const articleData = snap.docs[0].data();
+            title = `${articleData.title} | Helmets of Gods`;
+            description = articleData.metaDescription || description;
+            metaOverridden = true;
+            console.log(`[Meta] Helmets of Gods article found for ${articleSlug}`);
+          }
+        } catch (error) {
+          console.warn("[Meta] Helmets of Gods lookup failed:", error);
+        }
+      }
+
       // --- STEP 2: Check seo_settings collection (Programmatic SEO) - SECOND PRIORITY ---
       if (!metaOverridden) {
         try {

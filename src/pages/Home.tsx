@@ -696,47 +696,44 @@ export default function Home() {
         </div>
 
         {/* Parvati Valley Spotlight - Redesigned to be more beautiful with text below image */}
-        <div className="max-w-7xl mx-auto mt-32 px-4 sm:px-6">
-          <div className="flex flex-col items-center p-8 md:p-16 rounded-[4rem] bg-forest/5 border border-forest/10 overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-[100px] -mr-64 -mt-64" />
-            
-            <div className="w-full flex flex-col lg:flex-row items-center gap-12 relative z-10">
-              <div className="flex-1 space-y-8 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/5 text-forest text-[10px] font-black uppercase tracking-widest">
+        <div className="max-w-7xl mx-auto mt-24 md:mt-32 px-4 sm:px-6">
+          <Link to="/parvati-valley" className="block cursor-pointer group">
+            <div className="relative w-full rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-2xl h-[550px] md:h-[650px] flex items-end md:items-center">
+              {/* Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-1000"
+                style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=2000&q=80)' }}
+              />
+              
+              {/* Gradients for readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-forest/90 via-forest/60 to-transparent w-full md:w-3/4 opacity-90 hidden md:block" />
+              <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent w-full md:hidden opacity-90" />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
+              
+              {/* Content */}
+              <div className="relative z-10 p-8 pt-24 md:p-16 w-full max-w-2xl text-center md:text-left flex flex-col items-center md:items-start mt-auto md:mt-0">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest mb-6 border border-white/30 drop-shadow-md">
                   <Zap className="h-4 w-4 text-terracotta" /> Regional Spotlight
                 </div>
-                <h2 className="text-4xl md:text-5xl lg:text-7xl font-montserrat font-extrabold text-forest tracking-tighter leading-[1.1]">The Valley of <br />Shadows & Light</h2>
-                <p className="text-forest/60 text-lg md:text-xl leading-relaxed max-w-xl font-medium">
+                
+                <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-montserrat font-extrabold text-white tracking-tighter leading-[1.1] mb-4 sm:mb-6 drop-shadow-lg">
+                  Parvati <br className="hidden md:block"/>Valley
+                </h3>
+                
+                <p className="text-white/90 text-sm sm:text-base md:text-xl leading-relaxed font-medium mb-6 sm:mb-8 drop-shadow-md hidden sm:block">
                   Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists. Explore our new destination suite.
                 </p>
-              </div>
 
-              <div className="flex-1 w-full max-w-lg">
-                <Link to="/parvati-valley" className="block cursor-pointer">
-                  <motion.div 
-                    whileHover={{ scale: 1.02 }}
-                    className="relative rounded-[3rem] overflow-hidden shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] bg-white group/pv"
-                  >
-                    <div className="relative h-[400px] md:h-[500px] overflow-hidden">
-                      <div 
-                        className="absolute inset-0 bg-cover bg-center group-hover/pv:scale-110 transition-transform duration-1000"
-                        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=1200&q=80)' }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                    </div>
-                    
-                    <div className="p-8 md:p-12 bg-forest text-white text-center">
-                      <h3 className="text-2xl md:text-4xl font-heading font-bold text-white tracking-tighter mb-2">Parvati Deep Dive</h3>
-                      <p className="text-terracotta text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] mb-8">A Spiritual Odyssey</p>
-                      <div className="w-full py-4 md:py-6 bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl font-black text-xs md:text-sm shadow-xl shadow-terracotta/20 flex items-center justify-center transition-all uppercase tracking-widest">
-                          Explore the Valley
-                      </div>
-                    </div>
-                  </motion.div>
-                </Link>
+                <p className="text-white/90 text-sm leading-relaxed font-medium mb-6 drop-shadow-md sm:hidden max-w-[280px]">
+                  Where ancient democracies and sacred mists meet. Explore our new destination suite in the Parvati Valley.
+                </p>
+
+                <div className="inline-flex py-4 cursor-pointer md:py-5 px-8 md:px-10 bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl font-black text-xs md:text-sm shadow-xl shadow-terracotta/20 items-center justify-center transition-all uppercase tracking-widest duration-500 group-hover:-translate-y-1 w-full sm:w-auto">
+                  Explore The Valley
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
