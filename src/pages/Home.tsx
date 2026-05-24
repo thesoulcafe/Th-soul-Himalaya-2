@@ -726,7 +726,7 @@ export default function Home() {
                     </div>
                     
                     <div className="p-8 md:p-12 bg-forest text-white text-center">
-                      <h4 className="text-2xl md:text-4xl font-heading font-bold text-white tracking-tighter mb-2">Parvati Deep Dive</h4>
+                      <h3 className="text-2xl md:text-4xl font-heading font-bold text-white tracking-tighter mb-2">Parvati Deep Dive</h3>
                       <p className="text-terracotta text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] mb-8">A Spiritual Odyssey</p>
                       <div className="w-full py-4 md:py-6 bg-terracotta hover:bg-terracotta/90 text-white rounded-2xl font-black text-xs md:text-sm shadow-xl shadow-terracotta/20 flex items-center justify-center transition-all uppercase tracking-widest">
                           Explore the Valley
