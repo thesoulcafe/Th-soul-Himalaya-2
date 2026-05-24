@@ -3351,7 +3351,7 @@ export default function Admin() {
                   {[
                     { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
                     { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
-                    { label: 'Keyword Focus', value: seoSettings.filter(s => s.keyword).length, icon: Target, color: 'text-orange-500' },
+                    { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (s.keyword ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
                     { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
                   ].map((stat, i) => (
                     <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
@@ -3735,7 +3735,24 @@ export default function Admin() {
                             };
                         });
 
-                        const seedData = [...staticSeedData, ...dynamicSeedData];
+                        let helmetsData: any[] = [];
+                        try {
+                          const snap = await getDocs(collection(db, 'helmets_of_gods'));
+                          helmetsData = snap.docs.map(doc => {
+                            const data = doc.data();
+                            return {
+                                path: `/helmets-of-gods/${data.slug}`,
+                                title: data.title ? `${data.title} | Helmets of Gods`.substring(0, 60) : "Helmets of Gods Article",
+                                keyword: Array.isArray(data.keywords) ? data.keywords.join(', ').substring(0, 100) : "Parvati Valley, spiritual retreats",
+                                description: data.metaDescription ? data.metaDescription.substring(0, 160) : "Read about this sacred place in the Himalayas.",
+                                ogImage: defaultImage
+                            };
+                          });
+                        } catch (e) {
+                          console.warn("Failed to fetch helmets of gods for SEO opt", e);
+                        }
+
+                        const seedData = [...staticSeedData, ...dynamicSeedData, ...helmetsData];
 
                         try {
                           let count = 0;

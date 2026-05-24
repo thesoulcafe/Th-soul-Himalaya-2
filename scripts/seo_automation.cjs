@@ -40,15 +40,15 @@ async function generateAndPublishArticles() {
             "Himalayan spiritual retreats"
         ];
         
-        console.log(\`[SEO Pipeline] Generating article for keywords: \${targetKeywords.join(', ')}\`);
+        console.log(`[SEO Pipeline] Generating article for keywords: ${targetKeywords.join(', ')}`);
 
-        const prompt = \`
+        const prompt = `
 You are an expert travel writer and SEO specialist for "The Soul Himalaya" (a spiritual travel company in Parvati Valley).
 Write a beautifully crafted, deeply spiritual, and informative 800-word article about the Parvati Valley.
 
 CRITICAL SEO INSTRUCTIONS:
 You MUST naturally weave the following exact keywords into the article. Do NOT keyword stuff. Use each exactly 1-2 times:
-\${targetKeywords.map(kw => \`- "\${kw}"\`).join('\\n')}
+${targetKeywords.map(kw => `- "${kw}"`).join('\n')}
 
 Output JSON format exactly like this:
 {
@@ -56,17 +56,17 @@ Output JSON format exactly like this:
   "slug": "url-friendly-slug-with-keywords",
   "metaDescription": "A compelling meta description under 160 chars containing at least one keyword",
   "content": "The full article in HTML format, using proper semantic <h2> and <h3> tags for hierarchy. No markdown blocks outside the HTML.",
-  "keywords": \${JSON.stringify(targetKeywords)}
+  "keywords": ${JSON.stringify(targetKeywords)}
 }
-\`;
+`;
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(prompt);
         let rawText = result.response.text();
         
         // Clean JSON formatting if Gemini wrapped it in markdown
-        if(rawText.startsWith('\`\`\`json')) {
-            rawText = rawText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        if(rawText.startsWith('```json')) {
+            rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
         }
 
         const articleData = JSON.parse(rawText);
@@ -75,8 +75,8 @@ Output JSON format exactly like this:
         // Note: For a real production app, use firebase-admin with service-account.json
         // Or inject into the "seo_articles" collection using the client db initialized natively.
         
-        console.log(\`[SEO Pipeline] Successfully generated article: \${articleData.title}\`);
-        console.log(\`[SEO Pipeline] Slug: \${articleData.slug}\`);
+        console.log(`[SEO Pipeline] Successfully generated article: ${articleData.title}`);
+        console.log(`[SEO Pipeline] Slug: ${articleData.slug}`);
         
         // Mock save logic (would write to firestore)
         // await db.collection('helmets_of_gods').doc(articleData.slug).set({
