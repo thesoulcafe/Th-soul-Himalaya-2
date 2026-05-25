@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DEFAULT_SERVICES } from '@/constants';
 import Leaderboard from '@/components/Leaderboard';
 import { SEO } from '@/components/SEO';
+import { LatestArticlesSection } from '@/components/LatestArticlesSection';
 
 const HorizontalServiceRow = ({ services, hasLoadedServices }: { services: any[], hasLoadedServices: boolean }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -792,6 +793,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest SEO Articles Section */}
+      <LatestArticlesSection />
 
       {/* Instagram Section */}
       <section id="follow-our-journey" className="py-24 bg-cream overflow-hidden">

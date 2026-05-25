@@ -19,6 +19,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Link } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { LatestArticlesSection } from '@/components/LatestArticlesSection';
 
 // Content JSON Structure
 const PARVATI_DATA = {
@@ -347,6 +348,9 @@ const ParvatiValley = () => {
           </div>
         </div>
       </section>
+
+      {/* SEO Articles Section */}
+      <LatestArticlesSection />
 
       {/* 4. Footer-like Funnel */}
       <section className="py-24 px-6 text-center max-w-4xl mx-auto">

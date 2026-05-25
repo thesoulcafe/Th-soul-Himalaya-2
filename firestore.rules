@@ -220,5 +220,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    match /helmets_of_gods/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }
