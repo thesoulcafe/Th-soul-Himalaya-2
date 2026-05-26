@@ -117,7 +117,21 @@ export default function Services() {
           <p className="text-terracotta font-medium tracking-widest uppercase text-xs">Soulful Himalayan Journeys</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {finalServices.map((service, index) => (
+          {finalServices.map((service, index) => {
+            const themes = ['forest', 'terracotta', 'cream', 'luxury', 'white'];
+            const theme = service.theme || themes[index % themes.length];
+            const isDark = theme === 'forest' || theme === 'terracotta' || theme === 'luxury';
+            const cardClass = getCardStyle(theme);
+            const headingColor = isDark ? 'text-white' : 'text-forest';
+            const descColor = isDark ? 'text-white/80' : 'text-forest/70';
+            const starBg = isDark ? 'bg-white/10' : 'bg-forest/5';
+            const badgeBg = isDark ? 'bg-forest/40' : 'bg-forest/10';
+            const badgeBorder = isDark ? 'border-white/10' : 'border-forest/20';
+            const badgeText = isDark ? 'text-white/80' : 'text-forest/80';
+            const exploreLine = isDark ? 'bg-terracotta' : (theme === 'terracotta' ? 'bg-white' : 'bg-terracotta');
+            const exploreText = isDark ? 'text-white' : 'text-forest';
+
+            return (
             <motion.div
               key={`${service.title}-${index}`}
               initial={{ opacity: 0, y: 30 }}
@@ -125,16 +139,9 @@ export default function Services() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className="group relative h-[400px] md:h-[450px] rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer"
+              className={cn("group relative p-8 md:p-10 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-300 flex flex-col justify-between h-full", cardClass)}
             >
               <Link to={service.link || `/services/${service.id}`} className="absolute inset-0 z-30" />
-              <div className="absolute inset-0 z-10 bg-gradient-to-t from-forest/90 via-forest/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
-              <img 
-                src={service.image || service.coverImage || 'https://images.unsplash.com/photo-1621425444159-5f17426db33e?q=80&w=800'} 
-                alt={service.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
               
               {service.isAvailable === false && (
                 <div className="absolute top-4 left-4 z-20">
@@ -150,30 +157,32 @@ export default function Services() {
                   title={service.id ? "Edit Service" : "Sync defaults to edit"}
                   onClick={(e) => { e.stopPropagation(); }}
                 >
-                  <Edit2 className="h-4 w-4" />
+                  <Edit2 className="h-4 w-4 text-forest" />
                 </Link>
               )}
 
-              <div className="absolute inset-0 z-20 p-8 flex flex-col justify-end">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="bg-white/10 backdrop-blur-xl w-10 h-10 rounded-xl flex items-center justify-center border border-white/20">
+              <div className="flex flex-col flex-grow z-20 relative pt-4 sm:pt-0">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className={cn("backdrop-blur-sm w-10 h-10 rounded-xl flex items-center justify-center border border-transparent shrink-0", starBg)}>
                     <Star className="text-terracotta h-5 w-5" />
                   </div>
-                  <span className="text-white/80 font-bold uppercase tracking-widest text-[9px] bg-forest/40 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">{service.type || 'Service'}</span>
+                  <span className={cn("font-bold uppercase tracking-widest text-[9px] px-3 py-1 rounded-full backdrop-blur-sm border", badgeBg, badgeBorder, badgeText)}>
+                    {service.type || 'Service'}
+                  </span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-heading font-extrabold text-white mb-3 line-clamp-2 leading-tight tracking-tight">
+                <h3 className={cn("text-2xl md:text-3xl font-heading font-extrabold mb-4 line-clamp-2 leading-tight tracking-tight", headingColor)}>
                   {service.title}
                 </h3>
-                <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed font-medium">
+                <p className={cn("text-xs md:text-sm mb-8 line-clamp-3 leading-relaxed font-medium flex-grow", descColor)}>
                   {service.description || 'Experience our unique Himalayan service.'}
                 </p>
-                <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
-                  <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />
+                <div className={cn("group/btn flex items-center gap-3 font-bold uppercase text-[10px] tracking-widest mt-auto", exploreText)}>
+                  <span className={cn("w-8 h-[1px] group-hover/btn:w-16 transition-all duration-500", exploreLine)} />
                   Explore Details
                 </div>
               </div>
             </motion.div>
-          ))}
+          )})}
         </div>
 
         {/* Customize Card */}
