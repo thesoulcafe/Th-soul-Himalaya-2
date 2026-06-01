@@ -619,10 +619,12 @@ const ARTICLE_CONTENT: Record<string, any> = {
 import { HAMLET_DETAILS } from './HamletDetail';
 
 // Auto-generates a rich 500-word SEO article structure for undefined articles
-const generateContent = (hamletId: string, articleMeta: any) => {
+const generateContent = (hamletId: string, articleMeta: any, articleId: string) => {
   const hId = hamletId ? hamletId.charAt(0).toUpperCase() + hamletId.slice(1) : "The Himalayas";
-  const title = articleMeta?.title || "Himalayan Lore";
-  const excerpt = articleMeta?.excerpt || "A deep dive into the spiritual ecology of the region.";
+  const slugToTitle = (slug: string) => slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const generatedTitle = articleId ? slugToTitle(articleId) : "Himalayan Lore";
+  const title = articleMeta?.title || generatedTitle;
+  const excerpt = articleMeta?.excerpt || `A complete guide and deep dive into the spiritual ecology and unique features of ${hId}.`;
   
   return {
     title: title,
@@ -696,7 +698,7 @@ export default function ArticleDetail() {
   if (!article) {
     const hamletMeta = hamletId ? HAMLET_DETAILS[hamletId.toLowerCase()] : null;
     const articleMeta = hamletMeta?.articles?.find((a: any) => a.link === articleId);
-    article = generateContent(hamletId || 'unknown', articleMeta);
+    article = generateContent(hamletId || 'unknown', articleMeta, articleId || '');
   }
 
   return (

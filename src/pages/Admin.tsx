@@ -159,6 +159,8 @@ export default function Admin() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [seoSettings, setSeoSettings] = useState<any[]>([]);
   const [seoProposals, setSeoProposals] = useState<any[] | null>(null);
+  const [pseoLocations, setPseoLocations] = useState("Tosh, Malana, Kasol, Kheerganga, Kalga, Pulga");
+  const [pseoTopics, setPseoTopics] = useState("Best Cafes in {Loc}, How to reach {Loc}, Budget Stays in {Loc}");
   const [siteSettings, setSiteSettings] = useState<any>({ googleSiteVerification: '' });
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   
@@ -3804,6 +3806,73 @@ export default function Admin() {
                       {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin text-white" /> : <Target className="h-4 w-4 text-white" />}
                       Generate Auto-SEO Proposals
                     </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Programmatic SEO Generator */}
+                <Card className="border border-indigo-500/20 shadow-sm rounded-[2rem] p-8 mt-12 bg-indigo-50/10">
+                  <CardHeader className="p-0 mb-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="h-10 w-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                           <Zap className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        <div>
+                           <CardTitle className="text-xl font-bold text-forest">Programmatic Generator</CardTitle>
+                           <p className="text-xs text-forest/50 font-medium">Generate hundreds of intent locations using permutations.</p>
+                        </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0 space-y-6">
+                     <div className="space-y-4">
+                        <div className="space-y-1.5">
+                           <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Locations (Comma separated)</label>
+                           <Input 
+                               value={pseoLocations}
+                               onChange={(e) => setPseoLocations(e.target.value)}
+                               className="h-12 rounded-xl bg-forest/[0.02] border-forest/10 font-medium text-xs"
+                           />
+                        </div>
+                        <div className="space-y-1.5">
+                           <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Topics ({`{Loc}`} as variable)</label>
+                           <Input 
+                               value={pseoTopics}
+                               onChange={(e) => setPseoTopics(e.target.value)}
+                               className="h-12 rounded-xl bg-forest/[0.02] border-forest/10 font-medium text-xs"
+                           />
+                        </div>
+                     </div>
+                     <Button 
+                         disabled={isProcessing}
+                         onClick={() => {
+                            const locations = pseoLocations.split(',').map(s => s.trim()).filter(Boolean);
+                            const topics = pseoTopics.split(',').map(s => s.trim()).filter(Boolean);
+                            if (!locations.length || !topics.length) return setNotification({ message: "Fields cannot be empty", type: "error"});
+
+                            const generated: any[] = [];
+                            for (const loc of locations) {
+                                for(const topic of topics) {
+                                   const title = topic.replace(/{Loc}/g, loc);
+                                   const linkSlug = topic.toLowerCase().replace(/\{loc\}/g, loc).replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                                   const path = `/hamlet/${loc.toLowerCase().replace(/\s+/g,'-')}/article/${linkSlug}`;
+                                   const keyword = `${topic.replace(/{Loc}/g, loc)}, travel ${loc}, Parvati valley ${loc}`;
+                                   const description = `Read our ultimate guide on ${title}. Discover the best places, itineraries, and spiritual pathways in ${loc}, Parvati Valley.`;
+                                   generated.push({ path, title, keyword, description, ogImage: siteSettings?.globalOgImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" });
+                                }
+                            }
+                            // Append to proposals
+                            setSeoProposals(prev => {
+                                const base = prev || [];
+                                // Filter out exact path duplicates from the new proposals
+                                const existingPaths = new Set(base.map(b => b.path));
+                                const uniqueNew = generated.filter(g => !existingPaths.has(g.path));
+                                return [...base, ...uniqueNew];
+                            });
+                            setNotification({ message: `Generated ${generated.length} programmatic SEO entries! Review in pending proposals.`, type: 'success' });
+                         }}
+                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 rounded-xl flex justify-center items-center gap-2"
+                     >
+                         <Zap className="h-4 w-4" /> Build {pseoLocations.split(',').filter(Boolean).length * pseoTopics.split(',').filter(Boolean).length} Pages Matrix
+                     </Button>
                   </CardContent>
                 </Card>
               </div>
