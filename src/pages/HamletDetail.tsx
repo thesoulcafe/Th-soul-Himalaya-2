@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
-const HAMLET_DETAILS: Record<string, any> = {
+export const HAMLET_DETAILS: Record<string, any> = {
   malana: {
     name: "Malana",
     tagline: "The Oldest Democracy in the World",
@@ -50,21 +50,16 @@ const HAMLET_DETAILS: Record<string, any> = {
     isHub: true,
     hubTitle: "The Malana Intelligence Hub",
     articles: [
-      {
-        title: "Malana: Decoding the World's Oldest Democracy",
-        excerpt: "An in-depth look at the unique social governance and the edicts of Jamlu Devta.",
-        link: "malana-democracy"
-      },
-      {
-        title: "Social Taboos: A Guide for Respectful Exploration",
-        excerpt: "Crucial intelligence on Malana's 'No-Touch' policy and how to navigate the village boundaries.",
-        link: "social-taboos"
-      },
-      {
-        title: "The Legend of Alexander: Greek DNA in the Himalayas?",
-        excerpt: "Analyzing the historical and genetic theories connecting Malana to the Macedonian army.",
-        link: "malana-heritage"
-      }
+      { title: "Malana: Decoding the World's Oldest Democracy", excerpt: "An in-depth look at the unique social governance and the edicts of Jamlu Devta.", link: "malana-democracy" },
+      { title: "Social Taboos: A Guide for Respectful Exploration", excerpt: "Crucial intelligence on Malana's 'No-Touch' policy and how to navigate the village boundaries.", link: "social-taboos" },
+      { title: "The Legend of Alexander: Greek DNA in the Himalayas?", excerpt: "Analyzing the historical and genetic theories connecting Malana to the Macedonian army.", link: "malana-heritage" },
+      { title: "Jamlu Devta: The Spiritual Sovereign of Malana", excerpt: "Understanding the deity whose word is law, and how his power governs the daily lives of the villagers.", link: "jamlu-devta-sovereign" },
+      { title: "The Architecture of Isolation: Malana's Wood and Stone", excerpt: "How the Kath-Kuni style and specific village layout preserves Malana's strict social hierarchies.", link: "malana-architecture-isolation" },
+      { title: "Kanashi: The Isolated Language of the Mountains", excerpt: "A linguistic deep-dive into the sacred tongue of Malana that no outsider is allowed to speak.", link: "kanashi-language" },
+      { title: "The Shift in Economy: Beyond the Green Gold", excerpt: "How modern eco-tourism and guided treks are reshaping the traditional economic structure of Malana.", link: "malana-economy-shift" },
+      { title: "Trekking the Magic Valley Route to Malana", excerpt: "The complete guide to the spellbinding ascent through Chanderkhani Pass and the Magic Valley.", link: "magic-valley-trek" },
+      { title: "The Sacred Courtyard: Understanding Malana's Parliament", excerpt: "The intricate workings of the upper and lower houses that have kept this democracy alive for millennia.", link: "sacred-courtyard-parliament" },
+      { title: "Festivals of Malana: Fagli and Shaun Celebrations", excerpt: "A rare glimpse into the masked dances, rhythmic drums, and profound rituals of Malana's festivals.", link: "malana-festivals" }
     ]
   },
   tosh: {
@@ -105,36 +100,16 @@ const HAMLET_DETAILS: Record<string, any> = {
     isHub: true,
     hubTitle: "The Tosh Content Hub",
     articles: [
-      {
-        title: "The Ultimate Guide to Tosh Village (2026 Edition)",
-        excerpt: "Everything you need to know about the sentinel of the Pin Parvati Pass, updated for the current season.",
-        link: "tosh-guide-2026"
-      },
-      {
-        title: "How to Reach Tosh: Road Conditions from Barshaini (April 2026 Update)",
-        excerpt: "Critical travel intelligence on road safety, landslide zones, and taxi rates for the 2026 spring season.",
-        link: "tosh-roads-2026"
-      },
-      {
-        title: "Best Cafes in Tosh for Workations & Views",
-        excerpt: "Where to find the best Wi-Fi and even better views for your remote Himalayan office.",
-        link: "tosh-cafes"
-      },
-      {
-        title: "Tosh to Kheerganga Trek: Latest Rules and Camping Updates",
-        excerpt: "Forest department guidelines, campsite availability, and vital trek safety tips for 2026.",
-        link: "tosh-kheerganga-trek"
-      },
-      {
-        title: "What to Pack for Tosh in May: Temperature & Gear Guide",
-        excerpt: "Don't get caught in the mountain chill. Our curated list for the variable May climate.",
-        link: "tosh-packing"
-      },
-      {
-        title: "Treks from Tosh: Ultimate Guide to High-Altitude Trails",
-        excerpt: "Detailed breakdown of all major treks starting from Tosh, including Kutla Glacier Point and the Kheerganga route.",
-        link: "tosh-treks-guide"
-      }
+      { title: "The Ultimate Guide to Tosh Village (2026 Edition)", excerpt: "Everything you need to know about the sentinel of the Pin Parvati Pass, updated for the current season.", link: "tosh-guide-2026" },
+      { title: "How to Reach Tosh: Road Conditions from Barshaini (April 2026 Update)", excerpt: "Critical travel intelligence on road safety, landslide zones, and taxi rates for the 2026 spring season.", link: "tosh-roads-2026" },
+      { title: "Best Cafes in Tosh for Workations & Views", excerpt: "Where to find the best Wi-Fi and even better views for your remote Himalayan office.", link: "tosh-cafes" },
+      { title: "Tosh to Kheerganga Trek: Latest Rules and Camping Updates", excerpt: "Forest department guidelines, campsite availability, and vital trek safety tips for 2026.", link: "tosh-kheerganga-trek" },
+      { title: "What to Pack for Tosh in May: Temperature & Gear Guide", excerpt: "Don't get caught in the mountain chill. Our curated list for the variable May climate.", link: "tosh-packing" },
+      { title: "Treks from Tosh: Ultimate Guide to High-Altitude Trails", excerpt: "Detailed breakdown of all major treks starting from Tosh, including Kutla Glacier Point and the Kheerganga route.", link: "tosh-treks-guide" },
+      { title: "Tosh Waterfall: A Hidden Gem in the High Himalayas", excerpt: "Locating and safely navigating to the secluded Tosh waterfall, the perfect spot for deep meditation.", link: "tosh-waterfall-hidden" },
+      { title: "Experiencing the Pink Floyd Cafe at Sunset", excerpt: "Why this legendary cafe remains the spiritual center for music and dusk views in the Parvati Valley.", link: "pink-floyd-sunset" },
+      { title: "Glacial Proximity: The Changing Ice of Tosh Glacier", excerpt: "An ecological perspective on Tosh's namesake glacier and the shifting landscape of the high passes.", link: "tosh-glacier-ecology" },
+      { title: "Authentic Himachali Homestays in Upper Tosh", excerpt: "Ditch the commercial hotels and discover the warmth of a traditional wooden homestay with local families.", link: "authentic-homestays-tosh" }
     ]
   },
   pulga: {
@@ -169,21 +144,16 @@ const HAMLET_DETAILS: Record<string, any> = {
     isHub: true,
     hubTitle: "The Pulga Wisdom Hub",
     articles: [
-      {
-        title: "The Fairy Forest: A Botanical & Spiritual Study",
-        excerpt: "Exploring the ancient deodar groves where the sunlight meets the spirit of the woods.",
-        link: "fairy-forest-pulga"
-      },
-      {
-        title: "Slow Living: The Pulga Architecture Manual",
-        excerpt: "A deep dive into Kath-Kuni wooden houses and the philosophy of Himalayan timber construction.",
-        link: "pulga-architecture"
-      },
-      {
-        title: "Digital Nomads in the Woods: Internet & Power Guide",
-        excerpt: "Practical logistics for remote workers seeking the solitude of Pulga's forest cafes.",
-        link: "pulga-nomads"
-      }
+      { title: "The Fairy Forest: A Botanical & Spiritual Study", excerpt: "Exploring the ancient deodar groves where the sunlight meets the spirit of the woods.", link: "fairy-forest-pulga" },
+      { title: "Slow Living: The Pulga Architecture Manual", excerpt: "A deep dive into Kath-Kuni wooden houses and the philosophy of Himalayan timber construction.", link: "pulga-architecture" },
+      { title: "Digital Nomads in the Woods: Internet & Power Guide", excerpt: "Practical logistics for remote workers seeking the solitude of Pulga's forest cafes.", link: "pulga-nomads" },
+      { title: "The Mystic Vibe: Why Pulga is the Valley's Best Kept Secret", excerpt: "Unpacking the unique, uncommercialized energetic signature that draws artists and yogis to Pulga.", link: "mystic-vibe-pulga" },
+      { title: "Exploring the Tea Gardens of Pulga", excerpt: "Wandering through the lush terraced clearings that offer a stark contrast to the dense pine forests.", link: "pulga-tea-gardens" },
+      { title: "The Great Pine Reserve: Trekking Past Pulga Village", excerpt: "Lesser-known trails offering absolute solitude for the experienced and respectful hiker.", link: "great-pine-reserve" },
+      { title: "Healing Retreats: Forest Bathing in Parvati Valley", excerpt: "The science and spirit behind 'Shinrin-yoku' and why Pulga's air is considered naturally therapeutic.", link: "forest-bathing-pulga" },
+      { title: "Finding the Right Homestay in Pulga's Wooden Maze", excerpt: "Navigate the confusing but charming labyrinth of Pulga to find the perfect quiet room.", link: "pulga-homestay-maze" },
+      { title: "Sunset Point at Pulga: A Photographer's Dream", excerpt: "Timing and locations for capturing the iconic golden light filtering over the Parvati River.", link: "sunset-point-pulga" },
+      { title: "Respecting the Forest: Eco-Tourism in Pulga", excerpt: "How to minimize your footprint and support the local community's efforts to keep Pulga pristine.", link: "eco-tourism-pulga" }
     ]
   },
   kheerganga: {
@@ -218,21 +188,16 @@ const HAMLET_DETAILS: Record<string, any> = {
     isHub: true,
     hubTitle: "The Kheerganga Portal",
     articles: [
-      {
-        title: "The Legend of Kartikeya: Sacred Peaks & Silence",
-        excerpt: "Tracing the spiritual path of the Son of Shiva to the high plateau of Kheerganga.",
-        link: "kheerganga-legend"
-      },
-      {
-        title: "Thermal Sanctity: The Science & Myth of the Springs",
-        excerpt: "Understanding the healing properties and the milky-white waters of the natural baths.",
-        link: "hot-springs"
-      },
-      {
-        title: "High Altitude Survival: The 12km Spiritual Trek",
-        excerpt: "A comprehensive guide to the trekking route, safety zones, and weather windows.",
-        link: "trekking-guide"
-      }
+      { title: "The Legend of Kartikeya: Sacred Peaks & Silence", excerpt: "Tracing the spiritual path of the Son of Shiva to the high plateau of Kheerganga.", link: "kheerganga-legend" },
+      { title: "Thermal Sanctity: The Science & Myth of the Springs", excerpt: "Understanding the healing properties and the milky-white waters of the natural baths.", link: "hot-springs" },
+      { title: "High Altitude Survival: The 12km Spiritual Trek", excerpt: "A comprehensive guide to the trekking route, safety zones, and weather windows.", link: "trekking-guide" },
+      { title: "Camping at Kheerganga: Star Gazing and Night Survival", excerpt: "What to expect when sleeping at 3000m, from Milky Way photography to staying warm.", link: "kheerganga-camping-night" },
+      { title: "The Route from Nakthan: The Most Scenic Path", excerpt: "Breaking down the trail from Barshaini through Nakthan village and the Rudranag waterfall.", link: "nakthan-scenic-route" },
+      { title: "Exploring the Kartikeya Meditation Cave", excerpt: "The etiquette and spiritual significance of visiting the sacred cave above the hot springs.", link: "kartikeya-cave-meditation" },
+      { title: "Kheerganga in Winter: A Daring Snow Expedition", excerpt: "A stark look at the extreme conditions, dangers, and solitary beauty of a winter ascent.", link: "kheerganga-winter-expedition" },
+      { title: "Mountain Flora: Rare Herbs Found Near Kheerganga", excerpt: "A field guide to the high-alpine medicinal plants and wildflowers along the trekking route.", link: "mountain-flora-kheerganga" },
+      { title: "The Shiva Temple of Kheerganga: Rituals at 3000m", excerpt: "Understanding the daily worship patterns and significance of the plateau's primary shrine.", link: "shiva-temple-kheerganga" },
+      { title: "Essential Fitness Required for the Kheerganga Climb", excerpt: "A training guide and fitness checklist to ensure your ascent is joyful rather than grueling.", link: "fitness-kheerganga-climb" }
     ]
   }
 };

@@ -1,25 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, limit, getDocs } from 'firebase/firestore';
+import { collection, query, limit, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Link } from 'react-router-dom';
 import { BookOpen, ArrowRight } from 'lucide-react';
+import { SEED_ARTICLES } from '../lib/seedData';
+import { useAuth } from '../lib/AuthContext';
 
 export const LatestArticlesSection = () => {
   const [articles, setArticles] = useState<any[]>([]);
+  const { profile } = useAuth();
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const q = query(collection(db, 'helmets_of_gods'), limit(4));
+        const q = query(collection(db, 'helmets_of_gods'), limit(10));
         const snap = await getDocs(q);
-        const fetched = snap.docs.map(doc => doc.data());
+        let fetched = snap.docs.map(doc => doc.data());
+        
+        if (fetched.length === 0) {
+          fetched = [...SEED_ARTICLES];
+          
+          if (profile?.role === 'admin') {
+            // Only attempt to seed if the user is an admin to prevent permission errors
+            for (const item of SEED_ARTICLES) {
+              try {
+                const articleData = { ...item, createdAt: new Date().toISOString() };
+                await setDoc(doc(db, 'helmets_of_gods', item.slug), articleData);
+              } catch (seedErr) {
+                // Ignore seed error quietly 
+              }
+            }
+          }
+        }
+        
         setArticles(fetched);
       } catch (error) {
-        console.error("Failed to fetch articles:", error);
+        setArticles([...SEED_ARTICLES]);
       }
     };
     fetchArticles();
-  }, []);
+  }, [profile?.role]);
 
   if (articles.length === 0) return null;
 

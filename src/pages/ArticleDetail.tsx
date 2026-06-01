@@ -616,12 +616,88 @@ const ARTICLE_CONTENT: Record<string, any> = {
   }
 };
 
+import { HAMLET_DETAILS } from './HamletDetail';
+
+// Auto-generates a rich 500-word SEO article structure for undefined articles
+const generateContent = (hamletId: string, articleMeta: any) => {
+  const hId = hamletId ? hamletId.charAt(0).toUpperCase() + hamletId.slice(1) : "The Himalayas";
+  const title = articleMeta?.title || "Himalayan Lore";
+  const excerpt = articleMeta?.excerpt || "A deep dive into the spiritual ecology of the region.";
+  
+  return {
+    title: title,
+    category: "Geo-Spiritual Intelligence",
+    readTime: "5 min read",
+    date: "June 2026",
+    image: "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    author: "Soul Expeditions Auto-Intelligence",
+    authorRole: "Himalayan Archivist",
+    content: [
+      {
+        type: "paragraph",
+        text: `${excerpt} The journey into ${hId} is more than a physical transit; it is a deep immersion into an ecosystem where myth, ecology, and human endurance intertwine. Through the lens of '${title}', we see precisely how the Parvati Valley has preserved its ancient rhythm despite the accelerating modern world.`
+      },
+      {
+        type: "heading",
+        text: `The Spiritual Ecosystem of ${hId}`
+      },
+      {
+        type: "paragraph",
+        text: `Nestled deep within the vastness of the Great Himalayan National Park's buffer zone, ${hId} acts as a geographic focal point for transformation. For centuries, wandering ascetics, shepherds, and now modern digital nomads have all found themselves converging on these very slopes. The architecture here tells a story of survival: thick stone foundations topped with intricate Kath-Kuni woodwork, designed to breathe through the summer and lock in warmth during the relentless winter snows. When analyzing '${title}', one is essentially unpacking a layer of this complex survival strategy.`
+      },
+      {
+        type: "paragraph",
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+      },
+      {
+        type: "quote",
+        text: `The true essence of ${hId} is not found on a map, but in the silence between the falling cedar needles.`,
+        author: "Himalayan Proverb"
+      },
+      {
+        type: "heading",
+        text: "Sustainable Exploration Dynamics"
+      },
+      {
+        type: "paragraph",
+        text: `Understanding '${title}' also requires a deep commitment to sustainable interaction. The delicate balance of ${hId} is under unprecedented pressure. Water sources that flow pure from the glacial melt must remain untainted. Local traditions, which may seem obscure to the urban eye, serve as vital social glue. As visitors, our presence alters the micro-economy, pushing it away from subsistence agriculture toward service orientation.`
+      },
+      {
+        type: "paragraph",
+        text: "Beyond the physical beauty, engaging with the local culture and ecosystem demands a respectful, sustainable approach. The remote hamlets of this region are fragile sanctuaries, preserving centuries-old traditions, unique architectural forms, and deep-rooted spiritual beliefs. As you traverse these paths, practicing 'leave no trace' principles and opting for guided experiences ensures that your journey contributes positively to the community. Whether you are seeking a rigorous physical challenge on the high passes, or a quiet corner to meditate and practice yoga, the valley holds endless transformative potential for those who arrive with an open heart and a respectful stride."
+      },
+      {
+        type: "list",
+        title: "Ethical Integration Protocols",
+        items: [
+          "Zero-Trace Policy: Carry back out everything that comes into the valley with you. The alpine soil takes centuries to process synthetic waste.",
+          "Cultural Humility: Observe before acting. Request permission before photographing people or sacred shrines.",
+          "Local Economy: Support native artisans, cafes, and homestays to ensure the financial benefits of your visit remain within the community."
+        ]
+      },
+      {
+        type: "paragraph",
+        text: `As we conclude this briefing on '${title}', remember that ${hId} will test you, physically and mentally. The steep ascents, the unpredictable weather, and the sheer scale of the mountains demand respect. But it is precisely this challenge that makes the profound sense of peace upon reaching your destination so transformative. Let this intelligence guide you not just in navigation, but in cultivation of extreme presence.`
+      },
+      {
+        type: "internal-links"
+      }
+    ]
+  };
+};
+
 export default function ArticleDetail() {
   const { hamletId, articleId } = useParams();
   const navigate = useNavigate();
   
   // Find article content
-  const article = ARTICLE_CONTENT[articleId || ''] || ARTICLE_CONTENT["tosh-guide-2026"];
+  let article = ARTICLE_CONTENT[articleId || ''];
+  
+  if (!article) {
+    const hamletMeta = hamletId ? HAMLET_DETAILS[hamletId.toLowerCase()] : null;
+    const articleMeta = hamletMeta?.articles?.find((a: any) => a.link === articleId);
+    article = generateContent(hamletId || 'unknown', articleMeta);
+  }
 
   return (
     <div className="min-h-screen bg-cream selection:bg-terracotta selection:text-white">

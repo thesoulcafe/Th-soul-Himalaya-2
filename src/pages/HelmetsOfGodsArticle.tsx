@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { SEO } from '@/components/SEO';
 import { Loader2, ArrowLeft } from 'lucide-react';
+import { SEED_ARTICLES } from '@/lib/seedData';
 
 interface ArticleData {
   title: string;
@@ -31,14 +32,26 @@ export default function HelmetsOfGodsArticle() {
         const q = query(collection(db, 'helmets_of_gods'), where('slug', '==', slug));
         const snap = await getDocs(q);
         
+        let foundArticle = null;
         if (!snap.empty) {
-          setArticle(snap.docs[0].data() as ArticleData);
+          foundArticle = snap.docs[0].data() as ArticleData;
         } else {
-          // If not found in DB, fallback gracefully or show 404
-          setArticle(null);
+          // If not found in DB, fallback to seed data
+          const fallback = SEED_ARTICLES.find(a => a.slug === slug);
+          if (fallback) {
+            foundArticle = { ...fallback, createdAt: new Date().toISOString() };
+          }
         }
+        setArticle(foundArticle);
       } catch (error) {
         console.error("Failed to fetch article:", error);
+        // On permission error, fallback to seed data
+        const fallback = SEED_ARTICLES.find(a => a.slug === slug);
+        if (fallback) {
+          setArticle({ ...fallback, createdAt: new Date().toISOString() });
+        } else {
+          setArticle(null);
+        }
       } finally {
         setLoading(false);
       }

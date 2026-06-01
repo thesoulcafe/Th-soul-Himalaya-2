@@ -158,6 +158,7 @@ export default function Admin() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [seoSettings, setSeoSettings] = useState<any[]>([]);
+  const [seoProposals, setSeoProposals] = useState<any[] | null>(null);
   const [siteSettings, setSiteSettings] = useState<any>({ googleSiteVerification: '' });
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   
@@ -3703,26 +3704,59 @@ export default function Admin() {
                                   ? cleanDesc
                                   : cleanDesc.length > 160 ? cleanDesc.substring(0, 155) + '...' : "";
 
-                            if (item.type === 'tour') {
-                                newTitle = `${originName} | Tour Package Himachal`;
-                                newKeyword = `${originName}, Tour Package Himachal Pardesh, Himalaya tours, Parvati travel`;
-                                if (newDesc.length < 50) newDesc = `Experience ${originName} with The Soul Himalaya. Our exclusive tour package ensures a seamless and breathtaking adventure across the pristine Parvati Valley.`;
-                            } else if (item.type === 'trekk') {
-                                newTitle = `${originName} | Trekking in Parvati Valley`;
-                                newKeyword = `${originName}, trekking in Parvati valley, trekking in Tosh, high-altitude mountain trekking`;
-                                if (newDesc.length < 50) newDesc = `Conquer ${originName} with expert guides. Experience the thrill of high-altitude trekking in Parvati Valley, boasting stunning landscapes and raw nature.`;
-                            } else if (item.type === 'yoga') {
-                                newTitle = `${originName} | Yoga Retreat in Tosh`;
-                                newKeyword = `${originName}, yoga packages, yoga retreats Parvati Valley, spiritual wellness Tosh`;
-                                if (newDesc.length < 50) newDesc = `Join the ${originName} yoga retreat in Tosh. Disconnect from daily chaos, practice profound mindfulness, and rejuvenate your soul in mighty Himalayas.`;
-                            } else if (item.type === 'meditation') {
-                                newTitle = `${originName} | Peaceful Meditation Package`;
-                                newKeyword = `${originName}, meditation packages, wellness retreats Tosh, spiritual guidance`;
-                                if (newDesc.length < 50) newDesc = `Embark on ${originName}, our dedicated meditation package designed for spiritual awakening. Find supreme inner peace and deep healing in serene Parvati Valley.`;
-                            } else {
-                                newTitle = `${originName} | Authentic Service`;
-                                newKeyword = `${originName}, services Soul Himalaya, Parvati Valley activities, custom mountain packages`;
-                                if (newDesc.length < 50) newDesc = `Elevate your mountain stay with ${originName}. Our custom Himalayan services provide unmatched quality, ensuring your journey in Parvati Valley is completely unforgettable.`;
+                            newTitle = item.data?.title || newTitle;
+                            newKeyword = item.data?.keyword || newKeyword;
+                            newDesc = item.data?.description || newDesc;
+                            
+                            // Improved auto-generation logic
+                            if (!newTitle || newTitle.length < 30) {
+                              if (item.type === 'tour') {
+                                newTitle = `${originName} | Exclusive Tour Package Himachal | Soul Himalaya`;
+                              } else if (item.type === 'trekk') {
+                                newTitle = `${originName} | High-Altitude Trekking in Parvati Valley`;
+                              } else if (item.type === 'yoga') {
+                                newTitle = `${originName} | Transformational Yoga Retreat in Tosh`;
+                              } else if (item.type === 'meditation') {
+                                newTitle = `${originName} | Spiritual Meditation & Wellness in Tosh`;
+                              } else if (item.type === 'wfh') {
+                                newTitle = `${originName} | Best Workation & Remote Work Stay in Parvati Valley`;
+                              } else {
+                                newTitle = `${originName} | Authentic Himalayan Experience | Soul Himalaya`;
+                              }
+                            }
+
+                            if (!newKeyword || newKeyword.length < 20) {
+                              const baseKws = `${originName}, Parvati Valley, Tosh, Himalayan retreat`;
+                              if (item.type === 'tour') {
+                                newKeyword = `${baseKws}, Tour Package Himachal Pardesh, customized tours Tosh${item.data?.location ? ', ' + item.data.location : ''}`;
+                              } else if (item.type === 'trekk') {
+                                newKeyword = `${baseKws}, trekking in Parvati valley, trekking in Tosh, Kheerganga alternative${item.data?.difficulty ? ', ' + item.data.difficulty + ' trek' : ''}`;
+                              } else if (item.type === 'yoga') {
+                                newKeyword = `${baseKws}, yoga packages, yoga retreats Parvati Valley, mindfulness retreats Himachal`;
+                              } else if (item.type === 'meditation') {
+                                newKeyword = `${baseKws}, meditation packages, spiritual awakening Tosh, vipassana style retreat`;
+                              } else if (item.type === 'wfh') {
+                                newKeyword = `${baseKws}, wfh in Parvati valley, workation Tosh, remote work Himalayan cafes`;
+                              } else {
+                                newKeyword = `${baseKws}, Soul Himalaya services`;
+                              }
+                            }
+
+                            if (!newDesc || newDesc.length < 70) {
+                              const durationDesc = item.data?.duration ? ` A ${item.data.duration} journey.` : '';
+                              if (item.type === 'tour') {
+                                newDesc = `Book the ${originName} tour package. Experience the raw beauty of Himachal Pradesh with The Soul Himalaya's exclusive itineraries.${durationDesc}`;
+                              } else if (item.type === 'trekk') {
+                                newDesc = `Join our expert guides on the ${originName} trek. Experience high-altitude trekking in Parvati Valley, offering stunning glacier views and rustic trails.${durationDesc}`;
+                              } else if (item.type === 'yoga') {
+                                newDesc = `Rejuvenate with the ${originName} yoga retreat in Tosh. Practice profound mindfulness and align your chakras amidst the majestic Himalayan mountains.${durationDesc}`;
+                              } else if (item.type === 'meditation') {
+                                newDesc = `Find deep inner peace with the ${originName} meditation package. A dedicated spiritual getaway designed for maximum healing in serene Parvati Valley.${durationDesc}`;
+                              } else if (item.type === 'wfh') {
+                                newDesc = `Elevate your productivity with the ${originName} workation package. Enjoy high-speed internet and breathtaking valley views from the best cafes in Tosh.${durationDesc}`;
+                              } else {
+                                newDesc = `Immerse yourself in ${originName}. Our custom Himalayan services provide unmatched quality to make your Parvati Valley adventure completely unforgettable.${durationDesc}`;
+                              }
                             }
 
                             return {
@@ -3754,40 +3788,12 @@ export default function Admin() {
                         const seedData = [...staticSeedData, ...dynamicSeedData, ...helmetsData];
 
                         try {
-                          let count = 0;
-                          
-                          // First, Add or Update all seed data
-                          for (const item of seedData) {
-                            const existing = seoSettings.find(s => s.path === item.path);
-                            if (existing) {
-                              await updateDoc(doc(db, 'seo_settings', existing.id), {
-                                ...item,
-                                updatedAt: serverTimestamp()
-                              });
-                            } else {
-                              await addDoc(collection(db, 'seo_settings'), {
-                                ...item,
-                                createdAt: serverTimestamp(),
-                                updatedAt: serverTimestamp()
-                              });
-                            }
-                            count++;
-                          }
-
-                          // Then, Remove unwanted paths
-                          const seedPaths = seedData.map(s => s.path);
-                          let removedCount = 0;
-                          for (const s of seoSettings) {
-                            if (s.path && !seedPaths.includes(s.path)) {
-                                await deleteDoc(doc(db, 'seo_settings', s.id));
-                                removedCount++;
-                            }
-                          }
-
-                          setNotification({ message: `Optimized ${count} pages. Cleaned ${removedCount} unused paths.`, type: 'success' });
+                          // Change: Show proposals instead of saving them automatically
+                          setSeoProposals(seedData);
+                          setNotification({ message: `Successfully generated ${seedData.length} SEO proposals! Please review and apply them below.`, type: 'success' });
                         } catch (err) {
                           console.error(err);
-                          setNotification({ message: 'Failed to auto-optimize all pages', type: 'error' });
+                          setNotification({ message: 'Failed to generate SEO proposals', type: 'error' });
                         } finally {
                           setIsProcessing(false);
                         }
@@ -3796,7 +3802,7 @@ export default function Admin() {
                       disabled={isProcessing}
                     >
                       {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin text-white" /> : <Target className="h-4 w-4 text-white" />}
-                      Auto-Optimize All Pages (100% SEO)
+                      Generate Auto-SEO Proposals
                     </Button>
                   </CardContent>
                 </Card>
@@ -3804,6 +3810,92 @@ export default function Admin() {
 
               {/* Status List Column */}
               <div className="lg:col-span-7 space-y-6">
+
+                {seoProposals && (
+                  <Card className="border border-emerald-500/30 shadow-emerald-500/5 shadow-2xl rounded-[2rem] overflow-hidden mb-8 bg-emerald-50/50">
+                    <div className="bg-emerald-600 p-6 text-white flex justify-between items-center">
+                      <div>
+                        <h3 className="font-bold text-xl uppercase tracking-widest flex items-center gap-2"><Sparkles className="h-5 w-5" /> Pending Approvals</h3>
+                        <p className="text-white/80 text-sm mt-1">Review your generated SEO configurations before pushing to the edge configuration.</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" onClick={() => setSeoProposals(null)} className="text-white hover:bg-white/20">Cancel All</Button>
+                        <Button 
+                          className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold"
+                          onClick={async () => {
+                            setIsProcessing(true);
+                            try {
+                              let count = 0;
+                              // Add/Update proposals
+                              for (const item of seoProposals) {
+                                const existing = seoSettings.find(s => s.path === item.path);
+                                if (existing) {
+                                  await updateDoc(doc(db, 'seo_settings', existing.id), {
+                                    ...item,
+                                    updatedAt: serverTimestamp()
+                                  });
+                                } else {
+                                  await addDoc(collection(db, 'seo_settings'), {
+                                    ...item,
+                                    createdAt: serverTimestamp(),
+                                    updatedAt: serverTimestamp()
+                                  });
+                                }
+                                count++;
+                              }
+                              // Clean up old non-matching paths
+                              const newPaths = seoProposals.map(s => s.path);
+                              for (const s of seoSettings) {
+                                if (s.path && !newPaths.includes(s.path)) {
+                                  await deleteDoc(doc(db, 'seo_settings', s.id));
+                                }
+                              }
+                              setSeoProposals(null);
+                              setNotification({ message: `Successfully applied ${count} SEO configurations!`, type: 'success' });
+                            } catch (e) {
+                              setNotification({ message: 'Error applying configurations.', type: 'error' });
+                            } finally {
+                              setIsProcessing(false);
+                            }
+                          }}
+                        >
+                           Apply All {seoProposals.length} Proposals
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+                      {["Core Pages", "Hamlets", "Articles", "Tours"].map(category => {
+                        const items = seoProposals.filter(p => {
+                          if (category === "Core Pages") return p.path.split('/').length === 2 && !p.path.includes('?');
+                          if (category === "Hamlets" || category === "Articles") return p.path.includes('hamlet') || p.path.includes('helmets');
+                          return p.path.includes('?'); // Tours/Services
+                        });
+                        
+                        if (items.length === 0) return null;
+                        
+                        return (
+                          <div key={category} className="mb-8">
+                            <h4 className="text-sm font-black uppercase text-emerald-700 tracking-widest mb-4 border-b border-emerald-900/10 pb-2">{category} ({items.length})</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {items.map((prop, idx) => (
+                                <div key={idx} className="bg-white rounded-xl border border-emerald-900/10 p-4 shadow-sm relative group overflow-hidden">
+                                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                                  <div className="text-xs text-emerald-600 font-mono mb-2">{prop.path}</div>
+                                  <h5 className="font-bold text-forest leading-tight mb-1 text-sm">{prop.title}</h5>
+                                  <p className="text-xs text-forest/60 mb-2 truncate">{prop.description}</p>
+                                  <div className="text-[10px] bg-stone-100 text-stone-500 px-2 py-1 rounded inline-block">
+                                    {prop.keyword}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </Card>
+                )}
+
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                   <h3 className="text-xl font-extrabold text-forest uppercase tracking-tight">Indexed Links Masterlist</h3>
                   <div className="flex flex-wrap items-center gap-2">
@@ -3920,17 +4012,58 @@ export default function Admin() {
                   </motion.div>
                 )}
 
-                <div className="relative grid gap-4 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {seoSettings
-                    .filter(item => {
+                <div className="relative flex flex-col gap-8 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {(() => {
+                    const filteredSeo = seoSettings.filter(item => {
                       if (!seoSearchTerm) return true;
                       const term = seoSearchTerm.toLowerCase();
                       return item.path.toLowerCase().includes(term) || 
                              item.keyword?.toLowerCase().includes(term) ||
                              item.title.toLowerCase().includes(term);
-                    })
-                    .map((item) => {
-                      const titleLen = item.title?.length || 0;
+                    });
+
+                    if (filteredSeo.length === 0) {
+                      return (
+                        <div className="text-center py-20 bg-forest/[0.01] rounded-[2rem] border border-dashed border-forest/10">
+                          <Search className="h-12 w-12 text-forest/10 mx-auto mb-4" />
+                          <h4 className="text-lg font-bold text-forest/40 mb-2">No Organic Footprint Yet</h4>
+                          <p className="text-xs text-forest/30 font-medium max-w-xs mx-auto">Try a different search or run the auto-optimizer.</p>
+                        </div>
+                      );
+                    }
+
+                    const corePaths = ['/', '/about', '/contact', '/services', '/tours', '/trekks', '/yoga', '/meditation', '/adventure', '/wfh', '/tour-packages', '/parvati-valley'];
+                    
+                    const groupedSeoSettings = {
+                      "Core Landing Pages": filteredSeo.filter(s => corePaths.includes(s.path)),
+                      "Dynamic Packages & Services": filteredSeo.filter(s => s.path.match(/^\/(tours|trekks|yoga|meditation|adventure|wfh|services)\/.+/)),
+                      "Articles & Blog Content": filteredSeo.filter(s => s.path.includes('/article/') || s.path.includes('/helmets-of-gods/'))
+                    };
+                    
+                    const matchedPaths = [
+                      ...groupedSeoSettings["Core Landing Pages"],
+                      ...groupedSeoSettings["Dynamic Packages & Services"],
+                      ...groupedSeoSettings["Articles & Blog Content"]
+                    ].map(s => s.path);
+                    
+                    const otherPages = filteredSeo.filter(s => !matchedPaths.includes(s.path));
+
+                    const sections = [
+                      { title: "Core Landing Pages", items: groupedSeoSettings["Core Landing Pages"] },
+                      { title: "Dynamic Packages & Services", items: groupedSeoSettings["Dynamic Packages & Services"] },
+                      { title: "Articles & Blog content", items: groupedSeoSettings["Articles & Blog Content"] },
+                      { title: "Other Pages", items: otherPages }
+                    ].filter(sec => sec.items.length > 0);
+
+                    return sections.map((section, secIdx) => (
+                      <div key={secIdx} className="mb-4">
+                        <div className="flex items-center gap-3 border-b border-forest/10 pb-3 mb-4">
+                          <h4 className="text-xs font-black text-forest uppercase tracking-[0.2em]">{section.title}</h4>
+                          <Badge className="bg-forest/5 text-forest/70 hover:bg-forest/10">{section.items.length}</Badge>
+                        </div>
+                        <div className="grid gap-4">
+                          {section.items.map((item) => {
+                            const titleLen = item.title?.length || 0;
                       const descLen = item.description?.length || 0;
                       
                       // Audit flags
@@ -4041,15 +4174,11 @@ export default function Admin() {
                       </motion.div>
                     );
                   })}
-                  
-                  {seoSettings.length === 0 && (
-                    <div className="text-center py-20 bg-forest/[0.01] rounded-[2rem] border border-dashed border-forest/10">
-                      <Search className="h-12 w-12 text-forest/10 mx-auto mb-4" />
-                      <h4 className="text-lg font-bold text-forest/40 mb-2">No Organic Footprint Yet</h4>
-                      <p className="text-xs text-forest/30 font-medium max-w-xs mx-auto">Start by optimizing your primary routes and high-intent landing pages.</p>
-                    </div>
-                  )}
                 </div>
+              </div>
+            ));
+          })()}
+        </div>
 
                 {/* Global Configuration Card */}
                 <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
