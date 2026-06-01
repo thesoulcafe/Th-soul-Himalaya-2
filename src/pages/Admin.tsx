@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -150,6 +150,24 @@ export default function Admin() {
   const galleryInputRef = React.useRef<HTMLInputElement>(null);
   const [activeMainTab, setActiveMainTab] = useState<AdminTab>((searchParams.get('tab') as AdminTab) || 'overview');
   const [activeContentTab, setActiveContentTab] = useState<ContentType>((searchParams.get('type') as ContentType) || 'tour');
+  const [activeSeoNav, setActiveSeoNav] = useState('SEO Strategy Roadmap');
+  const [activeSeoStatusTab, setActiveSeoStatusTab] = useState('All');
+
+  const SEONavItems = [
+    { id: 'SEO Strategy Roadmap', icon: Map },
+    { id: 'Goals Tracker', icon: Target },
+    { id: 'Topical Mapper', icon: Layers },
+    { id: 'Keyword Planner', icon: Search },
+    { id: 'Content Gap Analysis', icon: Database },
+    { id: 'Influencer Outreach Planner', icon: Users },
+    { id: 'Email Marketing Planner', icon: Mail },
+    { id: 'Schema Markup Planner', icon: Code },
+    { id: 'Programmatic Generator', icon: Zap },
+    { id: 'Checklists', icon: ListTodo },
+    { id: 'Notes & Ideas', icon: PenTool },
+    { id: 'Tips', icon: Lightbulb },
+    { id: 'FAQ', icon: HelpCircle },
+  ];
   
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [tourCategories, setTourCategories] = useState<string[]>(['Romantic', 'Wellness', 'Corporate', 'Backpacker', 'Adventure', 'Mix-up']);
@@ -161,6 +179,12 @@ export default function Admin() {
   const [seoProposals, setSeoProposals] = useState<any[] | null>(null);
   const [pseoLocations, setPseoLocations] = useState("Tosh, Malana, Kasol, Kheerganga, Kalga, Pulga");
   const [pseoTopics, setPseoTopics] = useState("Best Cafes in {Loc}, How to reach {Loc}, Budget Stays in {Loc}");
+  const [newGapTitle, setNewGapTitle] = useState('');
+  const [newInfluencer, setNewInfluencer] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newChecklistTask, setNewChecklistTask] = useState('');
+  const [newTopicCluster, setNewTopicCluster] = useState('');
+  const [localNotes, setLocalNotes] = useState('');
   const [siteSettings, setSiteSettings] = useState<any>({ googleSiteVerification: '' });
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   
@@ -383,9 +407,10 @@ export default function Admin() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [seoFormData, setSeoFormData] = useState<any>({ path: '', keyword: '', title: '', description: '', ogImage: '' });
   const [editingSeoId, setEditingSeoId] = useState<string | null>(null);
+  const [isSeoQuickEditModalOpen, setIsSeoQuickEditModalOpen] = useState(false);
   const [seoSearchTerm, setSeoSearchTerm] = useState('');
   const [isSeoFilterVisible, setIsSeoFilterVisible] = useState(false);
-  const [isSeoAuditActive, setIsSeoAuditActive] = useState(false);
+  const [auditSeoItem, setAuditSeoItem] = useState<any | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void | Promise<void> } | null>(null);
 
@@ -419,6 +444,12 @@ export default function Admin() {
       return () => clearTimeout(timer);
     }
   }, [notification]);
+
+  useEffect(() => {
+    if (siteSettings?.seoNotes !== undefined && localNotes === '') {
+      setLocalNotes(siteSettings.seoNotes);
+    }
+  }, [siteSettings?.seoNotes]);
 
   // Real-time listeners
   useEffect(() => {
@@ -3272,23 +3303,75 @@ export default function Admin() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="p-4 md:p-10"
+            className="bg-[#faf9f6]"
           >
-            {/* SEO Dashboard Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="h-10 w-10 rounded-xl bg-terracotta/10 flex items-center justify-center">
-                    <Zap className="h-5 w-5 text-terracotta" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-forest tracking-tight">SEO Command Center</h2>
-                    <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest leading-none">Organic Growth & Index Optimization</p>
-                  </div>
-                </div>
-              </div>
+            {/* Header Banner */}
+            <div className="h-48 w-full bg-gradient-to-b from-[#fcead0] to-[#faf9f6]/90 border-b border-[#f3e4d0]/50" />
+            
+            {/* Main Container */}
+            <div className="relative z-10 px-6 md:px-10 w-full pb-20">
               
-              <div className="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
+              {/* Header Info */}
+              <div className="mb-10">
+                  <div className="h-20 w-20 bg-[#e7805e] rounded-xl flex items-center justify-center -mt-10 mb-4 shadow-sm border-4 border-[#faf9f6] relative overflow-hidden group">
+                     {/* Magnifying box illustration */}
+                     <div className="absolute inset-0 border-[6px] border-black/20 m-2 rounded-lg" />
+                     <Search className="h-10 w-10 text-white z-10 relative drop-shadow-md" strokeWidth={3} />
+                  </div>
+                  <h1 className="text-3xl md:text-5xl font-extrabold text-[#3a352f] mb-3 tracking-tight">Complete SEO Manager</h1>
+                  <p className="flex items-center text-sm font-semibold text-[#8b857d] hover:text-[#5c5448] cursor-pointer w-fit transition-colors">
+                     <Info className="h-4 w-4 mr-1.5" /> Step By Step Guide (Getting Started)
+                  </p>
+              </div>
+
+              <div className="flex flex-col lg:flex-row gap-10">
+                 {/* Sidebar */}
+                 <div className="w-full lg:w-[280px] flex-shrink-0">
+                    <div className="bg-[#f2eadc] rounded-lg p-5 sticky top-10 border border-[#e5d4bc]/30 shadow-inner">
+                       <h3 className="flex items-center font-bold text-[#5c5448] mb-5 px-1.5 uppercase tracking-wider text-xs"><Send className="h-3.5 w-3.5 mr-2" /> Navigate</h3>
+                       <div className="space-y-0.5">
+                          {SEONavItems.map(item => (
+                             <button
+                                key={item.id}
+                                onClick={() => setActiveSeoNav(item.id)}
+                                className={cn(
+                                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-bold transition-all text-left",
+                                   activeSeoNav === item.id ? "bg-[#e2d5c2] text-[#3a352f] shadow-sm" : "text-[#796f61] hover:bg-[#e8decb]/50 hover:text-[#3a352f]"
+                                )}
+                             >
+                                <div className={cn("p-1.5 rounded-full flex items-center justify-center", activeSeoNav === item.id ? "bg-[#3a352f] text-[#f2eadc]" : "bg-[#dfccb4] text-[#796f61]")}>
+                                  <item.icon className="h-3 w-3" />
+                                </div>
+                                {item.id}
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Content Area */}
+                 <div className="flex-1 min-w-0">
+                   
+                   {/* Notion like status tabs (always on top of content area) */}
+                   <div className="flex flex-wrap items-center gap-6 border-b border-[#e5d4bc] pb-3 mb-6 overflow-x-auto scroller-hide">
+                     {['In Progress', 'Not Started', 'All', 'Achieved', 'Paused', 'Not Achieved'].map((tab, idx) => (
+                       <div key={tab} 
+                            onClick={() => setActiveSeoStatusTab(tab)}
+                            className={cn("flex items-center gap-2 text-sm font-bold whitespace-nowrap cursor-pointer transition-colors", activeSeoStatusTab === tab ? "text-[#3a352f]" : "text-[#9e9488] hover:text-[#5c5448]")}>
+                         {tab === 'In Progress' && <Clock className="h-4 w-4" />}
+                         {tab === 'Not Started' && <div className="h-3.5 w-3.5 rounded-full border-2 border-current opacity-70" />}
+                         {tab === 'All' && <Target className="h-4 w-4" />}
+                         {tab === 'Achieved' && <CheckCircle2 className="h-4 w-4" />}
+                         {tab === 'Paused' && <><div className="h-3.5 w-[3px] bg-current opacity-70 rounded-full" /><div className="h-3.5 w-[3px] bg-current opacity-70 rounded-full -ml-[6px]" /></>}
+                         {tab === 'Not Achieved' && <X className="h-4 w-4" />}
+                         {tab}
+                       </div>
+                     ))}
+                   </div>
+                   
+                   {activeSeoNav === 'SEO Strategy Roadmap' && (
+                     <div className="space-y-10">
+                       <div className="flex flex-col sm:flex-row flex-wrap gap-4">
                 <Button 
                   onClick={async () => {
                     setIsSyncing(true);
@@ -3368,10 +3451,14 @@ export default function Admin() {
                 </div>
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-10">
               {/* Editor Column */}
-              <div className="lg:col-span-5 space-y-6">
+              <div className={cn("space-y-6", activeSeoNav === 'SEO Strategy Roadmap' ? "lg:col-span-12 hidden" : "lg:col-span-12")}>
+                
+                {activeSeoNav === 'Keyword Planner' && (
+                  <>
                 <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden">
                   <CardHeader className="bg-forest/[0.02] border-b border-forest/5 p-8">
                     <CardTitle className="text-xl font-bold text-forest">Optimization Studio</CardTitle>
@@ -3558,10 +3645,26 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-full bg-forest hover:bg-forest/90 text-white font-bold h-14 rounded-2xl shadow-lg shadow-forest/10 group transition-all" disabled={isProcessing}>
-                        {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Deploy Meta Configuration"}
-                        {!isProcessing && <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
-                      </Button>
+                      <div className="flex gap-4">
+                        {editingSeoId && (
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-1/3 border-rose-200 text-rose-500 hover:bg-rose-50 font-bold h-14 rounded-2xl transition-all" 
+                            onClick={() => {
+                              setEditingSeoId(null);
+                              setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+                            }}
+                            disabled={isProcessing}
+                          >
+                            Cancel Edit
+                          </Button>
+                        )}
+                        <Button type="submit" className={cn("bg-forest hover:bg-forest/90 text-white font-bold h-14 rounded-2xl shadow-lg shadow-forest/10 group transition-all w-full")} disabled={isProcessing}>
+                          {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : editingSeoId ? "Update SEO Configuration" : "Save Selected SEO Configuration"}
+                          {!isProcessing && <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+                        </Button>
+                      </div>
                     </form>
                   </CardContent>
                 </Card>
@@ -3586,9 +3689,357 @@ export default function Admin() {
                     </p>
                   </div>
                 </div>
+                </>
+                )}
 
-                {/* Global SEO Settings */}
+                {activeSeoNav === 'Content Gap Analysis' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Content Gap Analysis</h3>
+                    <p className="text-sm text-forest/60 mb-6">Compare our content coverage against competitors and identify missing topics.</p>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. Winter Trekking Gear List" 
+                        value={newGapTitle}
+                        onChange={(e) => setNewGapTitle(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newGapTitle.trim()) {
+                            e.preventDefault();
+                            const currentGaps = siteSettings.contentGaps || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                contentGaps: [...currentGaps, newGapTitle.trim()]
+                              });
+                              setNewGapTitle('');
+                              setNotification({ message: 'Added content gap topic', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newGapTitle.trim()) return;
+                          const currentGaps = siteSettings.contentGaps || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              contentGaps: [...currentGaps, newGapTitle.trim()]
+                            });
+                            setNewGapTitle('');
+                            setNotification({ message: 'Added content gap topic', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="space-y-4">
+                      {(siteSettings.contentGaps || []).map((gap: string, i: number) => (
+                        <div key={i} className="flex justify-between items-center p-4 border border-forest/5 rounded-xl bg-forest/[0.01]">
+                          <span className="font-bold text-forest/80 text-sm">{gap}</span>
+                          <Button size="sm" variant="ghost" className="text-rose-500 hover:bg-rose-50" onClick={async () => {
+                            const updatedGaps = siteSettings.contentGaps.filter((_: any, index: number) => index !== i);
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                contentGaps: updatedGaps
+                              });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Influencer Outreach Planner' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Influencer Outreach Planner</h3>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. @himalayan_yogi (Yoga focused)" 
+                        value={newInfluencer}
+                        onChange={(e) => setNewInfluencer(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newInfluencer.trim()) {
+                            e.preventDefault();
+                            const currentList = siteSettings.influencers || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                influencers: [...currentList, newInfluencer.trim()]
+                              });
+                              setNewInfluencer('');
+                              setNotification({ message: 'Added influencer to list', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newInfluencer.trim()) return;
+                          const currentList = siteSettings.influencers || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              influencers: [...currentList, newInfluencer.trim()]
+                            });
+                            setNewInfluencer('');
+                            setNotification({ message: 'Added influencer to list', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {(siteSettings.influencers || []).map((influencer: string, i: number) => (
+                        <div key={i} className="p-5 border border-forest/5 rounded-xl bg-forest/[0.01] flex justify-between items-center group relative">
+                          <div>
+                            <h4 className="font-bold text-forest">{influencer}</h4>
+                            <span className="text-xs text-forest/50 uppercase font-mono tracking-wider mt-2 block">Status: Outreach Candidate</span>
+                          </div>
+                          <Button size="icon" variant="ghost" className="text-rose-500 hover:bg-rose-50 absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={async () => {
+                            const updatedList = siteSettings.influencers.filter((_: any, index: number) => index !== i);
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                influencers: updatedList
+                              });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Email Marketing Planner' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Email Marketing Planner</h3>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. Summer Retreat Early Bird" 
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newEmail.trim()) {
+                            e.preventDefault();
+                            const currentList = siteSettings.emails || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                emails: [...currentList, newEmail.trim()]
+                              });
+                              setNewEmail('');
+                              setNotification({ message: 'Added email campaign', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newEmail.trim()) return;
+                          const currentList = siteSettings.emails || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              emails: [...currentList, newEmail.trim()]
+                            });
+                            setNewEmail('');
+                            setNotification({ message: 'Added email campaign', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="space-y-4">
+                      {(siteSettings.emails || []).map((email: string, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-4 border border-forest/5 rounded-xl bg-forest/[0.01]">
+                          <span className="font-bold text-forest text-sm">{email}</span>
+                          <div className="flex items-center gap-2">
+                             <Badge variant="outline">Scheduled</Badge>
+                             <Button size="sm" variant="ghost" className="text-rose-500 hover:bg-rose-50" onClick={async () => {
+                               const updatedList = siteSettings.emails.filter((_: any, index: number) => index !== i);
+                               try {
+                                 await setDoc(doc(db, 'site_settings', 'global'), {
+                                   ...siteSettings,
+                                   emails: updatedList
+                                 });
+                               } catch (err) {
+                                 console.error(err);
+                               }
+                             }}>
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Checklists' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">On-Page SEO Checklist</h3>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. Add Alt Text to Images" 
+                        value={newChecklistTask}
+                        onChange={(e) => setNewChecklistTask(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newChecklistTask.trim()) {
+                            e.preventDefault();
+                            const currentList = siteSettings.checklist || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                checklist: [...currentList, { task: newChecklistTask.trim(), done: false }]
+                              });
+                              setNewChecklistTask('');
+                              setNotification({ message: 'Added checklist task', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newChecklistTask.trim()) return;
+                          const currentList = siteSettings.checklist || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              checklist: [...currentList, { task: newChecklistTask.trim(), done: false }]
+                            });
+                            setNewChecklistTask('');
+                            setNotification({ message: 'Added checklist task', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="space-y-2">
+                      {(siteSettings.checklist || []).map((item: any, i: number) => (
+                        <label key={i} className="flex items-center justify-between gap-3 p-3 hover:bg-forest/5 rounded-lg cursor-pointer group">
+                          <div className="flex items-center gap-3">
+                            <input 
+                              type="checkbox" 
+                              className="w-4 h-4 rounded text-forest" 
+                              checked={item.done}
+                              onChange={async (e) => {
+                                const currentList = [...siteSettings.checklist];
+                                currentList[i].done = e.target.checked;
+                                try {
+                                  await setDoc(doc(db, 'site_settings', 'global'), {
+                                    ...siteSettings,
+                                    checklist: currentList
+                                  });
+                                } catch (err) {
+                                  console.error(err);
+                                }
+                              }}
+                            />
+                            <span className={cn("text-sm font-medium", item.done ? "text-forest/40 line-through" : "text-forest/80")}>{item.task}</span>
+                          </div>
+                          <Button size="icon" variant="ghost" className="text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity" onClick={async (e) => {
+                            e.preventDefault();
+                            const updatedList = siteSettings.checklist.filter((_: any, index: number) => index !== i);
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                checklist: updatedList
+                              });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </label>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Notes & Ideas' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Notes & Ideas</h3>
+                    <textarea 
+                      className="w-full h-48 p-4 border border-forest/10 rounded-xl bg-forest/[0.01] resize-none focus:outline-none focus:ring-2 focus:ring-forest/20" 
+                      placeholder="Jot down content ideas, keywords, or strategy notes here..."
+                      value={localNotes}
+                      onChange={(e) => setLocalNotes(e.target.value)}
+                    ></textarea>
+                    <div className="flex justify-end mt-4">
+                      <Button onClick={async () => {
+                        try {
+                          await setDoc(doc(db, 'site_settings', 'global'), {
+                            ...siteSettings,
+                            seoNotes: localNotes
+                          });
+                          setNotification({ message: 'Notes saved', type: 'success' });
+                        } catch (err) {
+                          console.error(err);
+                        }
+                      }}>Save Notes</Button>
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Tips' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">SEO Best Practices</h3>
+                    <ul className="list-disc list-inside space-y-3 text-sm text-forest/80 marker:text-terracotta">
+                      <li>Always include your primary keyword in the first 100 words.</li>
+                      <li>Use short, memorable URLs.</li>
+                      <li>Optimize for search intent, not just string matching.</li>
+                      <li>Regularly update old content to keep it fresh.</li>
+                    </ul>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'FAQ' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Common Questions</h3>
+                    <div className="space-y-4">
+                      {[
+                        { q: 'How long does SEO take?', a: 'Typically 3-6 months to start seeing significant results.' },
+                        { q: 'What is programmatic SEO?', a: 'Generating multiple landing pages based on data templates to capture long-tail keywords.' }
+                      ].map((faq, i) => (
+                        <div key={i}>
+                          <h4 className="font-bold text-sm text-forest">{faq.q}</h4>
+                          <p className="text-xs text-forest/60 mt-1">{faq.a}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Schema Markup Planner' && (
                 <Card className="border border-terracotta/20 shadow-xl rounded-[2rem] bg-white overflow-hidden">
+                  {/* Global SEO Settings */}
                   <CardHeader className="bg-terracotta/[0.02] border-b border-terracotta/10 p-8">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-lg bg-terracotta/10 flex items-center justify-center">
@@ -3787,12 +4238,123 @@ export default function Admin() {
                           console.warn("Failed to fetch helmets of gods for SEO opt", e);
                         }
 
-                        const seedData = [...staticSeedData, ...dynamicSeedData, ...helmetsData];
+                        const seedData = [...staticSeedData, ...dynamicSeedData, ...helmetsData].map(item => {
+                          let cleanPath = item.path.replace(/^\//, '').replace(/-/g, ' ');
+                          const prefixesToStrip = ['article ', 'tours ', 'trekks ', 'services ', 'yoga ', 'meditation ', 'adventure ', 'wfh '];
+                          let displayPath = cleanPath;
+                          for (const prefix of prefixesToStrip) {
+                             if (displayPath.toLowerCase().startsWith(prefix)) {
+                                displayPath = displayPath.substring(prefix.length);
+                                break;
+                             }
+                          }
+                          const capitalizedPath = displayPath.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'The Soul Himalaya';
+                          
+                          const isArticle = item.path.includes('/article/') || item.path.includes('/helmets-of-gods/');
+                          const isService = item.path.includes('/services/');
+                          const isTrek = item.path.includes('/trekks') || item.path.includes('/adventure');
+                          const isYoga = item.path.includes('/yoga') || item.path.includes('/meditation') || item.path.includes('/wfh');
+                          const isAbout = item.path.includes('/about');
+                          const isContact = item.path.includes('/contact');
+
+                          let suffix = 'Tour Packages';
+                          if (isArticle) suffix = 'Guide & Insights';
+                          else if (isService) suffix = 'Services Parvati Valley';
+                          else if (isTrek) suffix = 'Trekking Parvati Valley';
+                          else if (isYoga) suffix = 'Retreats & Wellness';
+                          else if (isAbout) suffix = 'About Us';
+                          else if (isContact) suffix = 'Contact & Booking';
+
+                          let newKeyword = item.keyword;
+                          if (!newKeyword) {
+                            if (capitalizedPath === 'The Soul Himalaya') {
+                               newKeyword = 'Himalayan Tour Packages';
+                            } else {
+                               newKeyword = `${capitalizedPath} ${suffix}`;
+                            }
+                          }
+
+                          let primaryKeyword = newKeyword.split(',')[0].trim();
+                          let formattedPrimary = primaryKeyword.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+                          let newTitle = item.title;
+                          if (!newTitle || newTitle.length < 30 || newTitle.length > 60 || !newTitle.toLowerCase().includes(primaryKeyword.toLowerCase())) {
+                            let generatedTitle = `${formattedPrimary} | The Soul Himalaya`;
+                            if (generatedTitle.length > 60) {
+                              generatedTitle = `${formattedPrimary} | Soul Himalaya`;
+                            }
+                            if (generatedTitle.length > 60) {
+                              generatedTitle = formattedPrimary;
+                            }
+                            if (generatedTitle.length < 30) {
+                              generatedTitle = `Explore ${generatedTitle}`;
+                              if (generatedTitle.length < 30) {
+                                 generatedTitle = `${generatedTitle} in Parvati Valley`;
+                              }
+                            }
+                            if (generatedTitle.length > 60) {
+                              generatedTitle = generatedTitle.substring(0, 60);
+                              const lastSpace = generatedTitle.lastIndexOf(' ');
+                              if (lastSpace > 40) {
+                                generatedTitle = generatedTitle.substring(0, lastSpace);
+                              }
+                            }
+                            newTitle = generatedTitle;
+                          }
+
+                          let newDesc = item.description;
+                          if (!newDesc || newDesc.length < 70 || newDesc.length > 160 || !newDesc.toLowerCase().includes(primaryKeyword.toLowerCase())) {
+                            newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalayas with our premium packages and sustainable tourism in Parvati Valley.`;
+                            if (newDesc.length > 160) {
+                              newDesc = `Experience the best ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty and sustainable tourism in Parvati Valley.`;
+                            }
+                            if (newDesc.length > 160) {
+                              newDesc = `Experience ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty in Parvati Valley.`;
+                              if (newDesc.length > 160) {
+                                newDesc = newDesc.substring(0, 159);
+                              }
+                            }
+                            if (newDesc.length < 70) {
+                              newDesc = `${newDesc} Book your unforgettable Himalayan adventure with us today!`;
+                            }
+                          }
+
+                          return {
+                            ...item, 
+                            selected: true,
+                            keyword: newKeyword,
+                            title: newTitle,
+                            description: newDesc,
+                            ogImage: item.ogImage || siteSettings?.globalOgImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"
+                          };
+                        });
+
+                        // Filter to include only missing SEO configurations or badly optimized ones
+                        const filteredSeedData = seedData.filter(item => {
+                          const existing = seoSettings.find(s => s.path === item.path);
+                          if (!existing) return true;
+                          
+                          const tLen = existing.title?.length || 0;
+                          const dLen = existing.description?.length || 0;
+                          const hasKeyword = !!existing.keyword && existing.keyword.trim().length > 0;
+                          
+                          const keywordLower = existing.keyword?.toLowerCase() || '';
+                          const titleHasKeyword = hasKeyword && existing.title?.toLowerCase().includes(keywordLower);
+                          const descHasKeyword = hasKeyword && existing.description?.toLowerCase().includes(keywordLower);
+                          const hasOgImage = !!existing.ogImage && existing.ogImage.trim().length > 0;
+                          
+                          if (tLen < 30 || tLen > 60) return true;
+                          if (dLen < 70 || dLen > 160) return true;
+                          if (!hasKeyword || !titleHasKeyword || !descHasKeyword) return true;
+                          if (!hasOgImage) return true;
+                          
+                          return false; // Already optimized perfectly
+                        });
 
                         try {
                           // Change: Show proposals instead of saving them automatically
-                          setSeoProposals(seedData);
-                          setNotification({ message: `Successfully generated ${seedData.length} SEO proposals! Please review and apply them below.`, type: 'success' });
+                          setSeoProposals(filteredSeedData);
+                          setNotification({ message: `Successfully generated ${filteredSeedData.length} SEO proposals! Please review and apply them below.`, type: 'success' });
                         } catch (err) {
                           console.error(err);
                           setNotification({ message: 'Failed to generate SEO proposals', type: 'error' });
@@ -3808,9 +4370,11 @@ export default function Admin() {
                     </Button>
                   </CardContent>
                 </Card>
+                )}
 
-                {/* Programmatic SEO Generator */}
+                {activeSeoNav === 'Programmatic Generator' && (
                 <Card className="border border-indigo-500/20 shadow-sm rounded-[2rem] p-8 mt-12 bg-indigo-50/10">
+                  {/* Programmatic SEO Generator */}
                   <CardHeader className="p-0 mb-6">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="h-10 w-10 bg-indigo-100 rounded-xl flex items-center justify-center">
@@ -3864,7 +4428,7 @@ export default function Admin() {
                                 const base = prev || [];
                                 // Filter out exact path duplicates from the new proposals
                                 const existingPaths = new Set(base.map(b => b.path));
-                                const uniqueNew = generated.filter(g => !existingPaths.has(g.path));
+                                const uniqueNew = generated.filter(g => !existingPaths.has(g.path)).map(g => ({ ...g, selected: true }));
                                 return [...base, ...uniqueNew];
                             });
                             setNotification({ message: `Generated ${generated.length} programmatic SEO entries! Review in pending proposals.`, type: 'success' });
@@ -3875,10 +4439,11 @@ export default function Admin() {
                      </Button>
                   </CardContent>
                 </Card>
+                )}
               </div>
 
               {/* Status List Column */}
-              <div className="lg:col-span-7 space-y-6">
+              <div className={cn("space-y-6", ['SEO Strategy Roadmap', 'Keyword Planner', 'Schema Markup Planner', 'Programmatic Generator'].includes(activeSeoNav) ? "lg:col-span-12" : "hidden")}>
 
                 {seoProposals && (
                   <Card className="border border-emerald-500/30 shadow-emerald-500/5 shadow-2xl rounded-[2rem] overflow-hidden mb-8 bg-emerald-50/50">
@@ -3887,7 +4452,13 @@ export default function Admin() {
                         <h3 className="font-bold text-xl uppercase tracking-widest flex items-center gap-2"><Sparkles className="h-5 w-5" /> Pending Approvals</h3>
                         <p className="text-white/80 text-sm mt-1">Review your generated SEO configurations before pushing to the edge configuration.</p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
+                        <label className="flex items-center gap-2 text-sm mr-4 shrink-0 cursor-pointer">
+                          <input type="checkbox" className="rounded" onChange={(e) => {
+                            const checked = e.target.checked;
+                            setSeoProposals(prev => prev ? prev.map(p => ({ ...p, selected: checked })) : null);
+                          }} checked={seoProposals.every(p => p.selected)} /> Select All
+                        </label>
                         <Button variant="ghost" onClick={() => setSeoProposals(null)} className="text-white hover:bg-white/20">Cancel All</Button>
                         <Button 
                           className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold"
@@ -3895,31 +4466,28 @@ export default function Admin() {
                             setIsProcessing(true);
                             try {
                               let count = 0;
+                              const selectedProposals = seoProposals.filter(p => p.selected);
                               // Add/Update proposals
-                              for (const item of seoProposals) {
+                              for (const item of selectedProposals) {
                                 const existing = seoSettings.find(s => s.path === item.path);
+                                const { selected, ...rest } = item;
+                                
                                 if (existing) {
                                   await updateDoc(doc(db, 'seo_settings', existing.id), {
-                                    ...item,
+                                    ...rest,
                                     updatedAt: serverTimestamp()
                                   });
                                 } else {
                                   await addDoc(collection(db, 'seo_settings'), {
-                                    ...item,
+                                    ...rest,
                                     createdAt: serverTimestamp(),
                                     updatedAt: serverTimestamp()
                                   });
                                 }
                                 count++;
                               }
-                              // Clean up old non-matching paths
-                              const newPaths = seoProposals.map(s => s.path);
-                              for (const s of seoSettings) {
-                                if (s.path && !newPaths.includes(s.path)) {
-                                  await deleteDoc(doc(db, 'seo_settings', s.id));
-                                }
-                              }
-                              setSeoProposals(null);
+                              // Clear only what was selected
+                              setSeoProposals(prev => prev ? prev.filter(p => !p.selected).length > 0 ? prev.filter(p => !p.selected) : null : null);
                               setNotification({ message: `Successfully applied ${count} SEO configurations!`, type: 'success' });
                             } catch (e) {
                               setNotification({ message: 'Error applying configurations.', type: 'error' });
@@ -3928,7 +4496,7 @@ export default function Admin() {
                             }
                           }}
                         >
-                           Apply All {seoProposals.length} Proposals
+                           Apply Selected ({seoProposals.filter(p => p.selected).length})
                         </Button>
                       </div>
                     </div>
@@ -3944,12 +4512,32 @@ export default function Admin() {
                         
                         return (
                           <div key={category} className="mb-8">
-                            <h4 className="text-sm font-black uppercase text-emerald-700 tracking-widest mb-4 border-b border-emerald-900/10 pb-2">{category} ({items.length})</h4>
+                            <div className="flex items-center gap-2 mb-4 border-b border-emerald-900/10 pb-2">
+                               <input type="checkbox" className="rounded border-emerald-500" 
+                                  checked={items.every(p => p.selected)}
+                                  onChange={(e) => {
+                                      const checked = e.target.checked;
+                                      setSeoProposals(prev => prev ? prev.map(p => {
+                                          if (items.find(i => i.path === p.path)) return { ...p, selected: checked };
+                                          return p;
+                                      }) : null);
+                                  }}
+                               />
+                               <h4 className="text-sm font-black uppercase text-emerald-700 tracking-widest">{category} ({items.length})</h4>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {items.map((prop, idx) => (
-                                <div key={idx} className="bg-white rounded-xl border border-emerald-900/10 p-4 shadow-sm relative group overflow-hidden">
-                                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                                  <div className="text-xs text-emerald-600 font-mono mb-2">{prop.path}</div>
+                                <div key={idx} 
+                                    className={`bg-white rounded-xl border p-4 shadow-sm relative group overflow-hidden cursor-pointer transition-colors ${prop.selected ? 'border-emerald-500 bg-emerald-50/10' : 'border-emerald-900/10 opacity-70 hover:opacity-100'}`}
+                                    onClick={() => {
+                                        setSeoProposals(prev => prev ? prev.map(p => p.path === prop.path ? { ...p, selected: !p.selected } : p) : null);
+                                    }}
+                                >
+                                  <div className={`absolute top-0 left-0 w-1 h-full ${prop.selected ? 'bg-emerald-500' : 'bg-stone-300'}`}></div>
+                                  <div className="absolute top-3 right-3 text-emerald-600">
+                                    <input type="checkbox" className="rounded w-4 h-4" checked={prop.selected} readOnly />
+                                  </div>
+                                  <div className="text-xs text-emerald-600 font-mono mb-2 pr-6 truncate">{prop.path}</div>
                                   <h5 className="font-bold text-forest leading-tight mb-1 text-sm">{prop.title}</h5>
                                   <p className="text-xs text-forest/60 mb-2 truncate">{prop.description}</p>
                                   <div className="text-[10px] bg-stone-100 text-stone-500 px-2 py-1 rounded inline-block">
@@ -4044,22 +4632,6 @@ export default function Admin() {
                     >
                       <Filter className="h-3 w-3 mr-2" /> Filter
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className={cn(
-                        "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest",
-                        isSeoAuditActive ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "bg-forest/5 text-forest/70 hover:bg-forest/10"
-                      )}
-                      onClick={() => {
-                        setIsSeoAuditActive(!isSeoAuditActive);
-                        if (!isSeoAuditActive) {
-                          setNotification({ message: 'SEO Health Audit Active: Highlighting issues', type: 'success' });
-                        }
-                      }}
-                    >
-                      <Activity className="h-3 w-3 mr-2" /> Audit
-                    </Button>
                   </div>
                 </div>
 
@@ -4084,11 +4656,40 @@ export default function Admin() {
                 <div className="relative flex flex-col gap-8 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
                   {(() => {
                     const filteredSeo = seoSettings.filter(item => {
-                      if (!seoSearchTerm) return true;
-                      const term = seoSearchTerm.toLowerCase();
-                      return item.path.toLowerCase().includes(term) || 
-                             item.keyword?.toLowerCase().includes(term) ||
-                             item.title.toLowerCase().includes(term);
+                      if (!seoSearchTerm && activeSeoStatusTab === 'All') return true;
+                      
+                      let matchesSearch = true;
+                      if (seoSearchTerm) {
+                         const term = seoSearchTerm.toLowerCase();
+                         matchesSearch = item.path.toLowerCase().includes(term) || 
+                                         item.keyword?.toLowerCase().includes(term) ||
+                                         item.title?.toLowerCase().includes(term);
+                      }
+
+                      if (!matchesSearch) return false;
+
+                      if (activeSeoStatusTab !== 'All') {
+                         const titleLen = item.title?.length || 0;
+                         const descLen = item.description?.length || 0;
+                         const score = (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
+                                      (descLen > 120 && descLen <= 160 ? 40 : 20) + 
+                                      (item.keyword ? 20 : 0);
+                         
+                         let status = 'Not Achieved';
+                         if (titleLen === 0 && descLen === 0 && !item.keyword) {
+                           status = 'Not Started';
+                         } else if (score >= 80) {
+                           status = 'Achieved';
+                         } else if (score >= 50) {
+                           status = 'In Progress';
+                         }
+
+                         // Treat Paused the same as In Progress or however it should map, or just match exact
+                         if (activeSeoStatusTab === 'Paused') return status === 'In Progress'; 
+                         if (activeSeoStatusTab !== status) return false;
+                      }
+
+                      return true;
                     });
 
                     if (filteredSeo.length === 0) {
@@ -4133,18 +4734,50 @@ export default function Admin() {
                         <div className="grid gap-4">
                           {section.items.map((item) => {
                             const titleLen = item.title?.length || 0;
-                      const descLen = item.description?.length || 0;
-                      
-                      // Audit flags
-                      const hasTitleIssue = titleLen < 30 || titleLen > 60;
-                      const hasDescIssue = descLen < 70 || descLen > 160;
-                      const isHighPriority = isSeoAuditActive && (hasTitleIssue || hasDescIssue);
+                            const descLen = item.description?.length || 0;
+                            const hasKeyword = !!item.keyword && item.keyword.trim().length > 0;
+                            
+                            const keywordLower = item.keyword?.toLowerCase() || '';
+                            const titleHasKeyword = hasKeyword && item.title?.toLowerCase().includes(keywordLower);
+                            const descHasKeyword = hasKeyword && item.description?.toLowerCase().includes(keywordLower);
+                            
+                            // Audit flags
+                            const isMissingTitle = titleLen === 0;
+                            const isMissingDesc = descLen === 0;
+                            const isTitleTooShort = titleLen > 0 && titleLen < 30;
+                            const isTitleTooLong = titleLen > 60;
+                            const isDescTooShort = descLen > 0 && descLen < 70;
+                            const isDescTooLong = descLen > 160;
+                            const isMissingKeyword = !hasKeyword;
+                            const isMissingOgImage = !item.ogImage || item.ogImage.trim().length === 0;
+                            
+                            const auditIssues = [];
+                            if (isMissingKeyword) auditIssues.push('Missing Target Keyword');
+                            if (isMissingTitle) auditIssues.push('Missing Title');
+                            if (isTitleTooShort) auditIssues.push('Title Too Short (< 30)');
+                            if (isTitleTooLong) auditIssues.push('Title Too Long (> 60)');
+                            if (!isMissingTitle && hasKeyword && !titleHasKeyword) auditIssues.push('Keyword Not In Title');
+                            
+                            if (isMissingDesc) auditIssues.push('Missing Meta Description');
+                            if (isDescTooShort) auditIssues.push('Description Too Short (< 70)');
+                            if (isDescTooLong) auditIssues.push('Description Too Long (> 160)');
+                            if (!isMissingDesc && hasKeyword && !descHasKeyword) auditIssues.push('Keyword Not In Description');
+                            
+                            if (isMissingOgImage) auditIssues.push('Missing OG Preview Image');
 
-                      const score = (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
-                                   (descLen > 120 && descLen <= 160 ? 40 : 20) + 
-                                   (item.keyword ? 20 : 0);
-                      
-                      return (
+                            const hasAuditFlags = auditIssues.length > 0;
+
+                            const initialScore = 
+                                  (titleLen > 40 && titleLen <= 60 ? 20 : (titleLen > 0 ? 10 : 0)) + 
+                                  (descLen > 120 && descLen <= 160 ? 20 : (descLen > 0 ? 10 : 0)) + 
+                                  (hasKeyword ? 15 : 0) +
+                                  (titleHasKeyword ? 15 : 0) +
+                                  (descHasKeyword ? 15 : 0) +
+                                  (!isMissingOgImage ? 15 : 0);
+                                  
+                            const score = Math.min(100, initialScore);
+                            
+                            return (
                         <motion.div 
                           key={item.id}
                           layout
@@ -4152,11 +4785,11 @@ export default function Admin() {
                           animate={{ opacity: 1, x: 0 }}
                         >
                           <Card className={cn(
-                            "group border shadow-sm hover:shadow-xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden relative",
-                            isHighPriority ? "border-rose-500/50 bg-rose-50/10" : "border-forest/5 hover:border-forest/20"
+                            "group border shadow-md hover:shadow-2xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden relative",
+                            isHighPriority ? "border-rose-500/50 bg-rose-50/10" : "border-forest/10 hover:border-forest/30"
                           )}>
                             {/* Score indicator bar on top */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gray-100">
+                            <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-100">
                               <div 
                                 className={cn(
                                   "h-full transition-all",
@@ -4165,78 +4798,96 @@ export default function Admin() {
                                 style={{ width: `${score}%` }} 
                               />
                             </div>
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-5 md:p-6 mt-1">
-                              <div className="flex-grow space-y-3">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <Badge className="bg-forest/[0.03] hover:bg-forest/[0.05] text-forest border-none px-3 py-1 text-[10px] font-mono lowercase break-all">
-                                    {item.path}
-                                  </Badge>
-                                  {item.keyword && (
-                                    <Badge className="bg-terracotta border-none text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest break-all">
-                                      {item.keyword}
-                                    </Badge>
-                                  )}
-                                  <div className="h-1 w-1 rounded-full bg-forest/20 hidden md:block" />
-                                  <span className={cn(
-                                    "text-[10px] font-black uppercase tracking-widest",
-                                    score >= 80 ? "text-emerald-600" : score >= 50 ? "text-amber-500" : "text-rose-500"
-                                  )}>
-                                    Score: {score}%
-                                  </span>
-                                  {isSeoAuditActive && (
-                                    <div className="flex gap-2">
-                                      {hasTitleIssue && <Badge variant="outline" className="text-[8px] border-rose-200 text-rose-500 bg-rose-50">Title Len</Badge>}
-                                      {hasDescIssue && <Badge variant="outline" className="text-[8px] border-rose-200 text-rose-500 bg-rose-50">Desc Len</Badge>}
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                <div>
-                                  <h4 className="font-bold text-forest text-base mb-1 group-hover:text-terracotta transition-colors">{item.title}</h4>
-                                  <p className="text-xs text-forest/50 font-medium leading-relaxed line-clamp-2 md:max-w-[500px]">
-                                    {item.description}
-                                  </p>
-                                </div>
+                            
+                            <div className="flex flex-col lg:flex-row gap-6 p-6 mt-1.5">
+                              {/* Display OG Image Thumbnail */}
+                              <div className="w-full lg:w-48 h-32 lg:h-auto rounded-xl overflow-hidden shrink-0 border border-forest/10 relative bg-forest/5 flex items-center justify-center">
+                                {item.ogImage ? (
+                                  <img src={item.ogImage} alt="OG" className="w-full h-full object-cover" loading="lazy" />
+                                ) : (
+                                  <div className="text-center text-forest/30">
+                                    <Globe className="h-8 w-8 mx-auto mb-1 opacity-50" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">No Meta Image</span>
+                                  </div>
+                                )}
                               </div>
+                              
+                              <div className="flex-grow min-w-0 flex flex-col justify-between">
+                                <div className="space-y-3 mb-4">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <Badge className="bg-forest/[0.05] hover:bg-forest/[0.08] text-forest border-none px-3 py-1.5 text-[10px] font-mono lowercase break-all">
+                                      {item.path}
+                                    </Badge>
+                                    {item.keyword && (
+                                      <Badge className="bg-terracotta border-none text-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest break-all">
+                                        {item.keyword}
+                                      </Badge>
+                                    )}
+                                    <div className="h-1.5 w-1.5 rounded-full bg-forest/20 hidden md:block" />
+                                    <span className={cn(
+                                      "text-[11px] font-black uppercase tracking-widest whitespace-nowrap bg-stone-100 px-2 py-1 rounded-md",
+                                      score >= 80 ? "text-emerald-700" : score >= 50 ? "text-amber-600" : "text-rose-600"
+                                    )}>
+                                      Score: {score}%
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="w-full">
+                                    <h4 className="font-extrabold text-forest text-lg mb-2 group-hover:text-terracotta transition-colors break-words">{item.title || "No Meta Title Provided"}</h4>
+                                    <p className="text-sm text-forest/60 font-medium leading-relaxed line-clamp-2 md:max-w-2xl bg-forest/[0.02] p-3 rounded-xl border border-forest/5">
+                                      {item.description || "No meta description provided."}
+                                    </p>
+                                  </div>
+                                </div>
 
-                              <div className="flex flex-row md:flex-col items-center justify-end gap-2 w-full md:w-auto shrink-0 border-t border-forest/5 md:border-none pt-4 md:pt-0">
-                              <Button 
-                                variant="ghost" 
-                                className="h-10 flex-1 md:flex-none w-full rounded-xl bg-forest/5 text-forest/80 hover:bg-forest hover:text-white transition-colors"
-                                onClick={() => {
-                                  setEditingSeoId(item.id);
-                                  setSeoFormData({
-                                    path: item.path,
-                                    keyword: item.keyword || '',
-                                    title: item.title,
-                                    description: item.description,
-                                    ogImage: item.ogImage || ''
-                                  });
-                                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }}
-                              >
-                                <Edit2 className="h-4 w-4 md:mr-2" /> <span className="md:inline">Edit</span>
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                className="h-10 flex-1 md:flex-none w-full rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"
-                                onClick={async () => {
-                                  setConfirmModal({
-                                    message: `Permanently delete SEO configuration for ${item.path}? This will revert to site-wide defaults.`,
-                                    onConfirm: async () => {
-                                      try {
-                                        await deleteDoc(doc(db, 'seo_settings', item.id));
-                                        setNotification({ message: 'SEO dynamics purged', type: 'success' });
-                                      } catch (error) {
-                                        handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
+                                <div className="flex flex-row flex-wrap items-center justify-end gap-3 w-full shrink-0 border-t border-forest/10 pt-4">
+                                <Button 
+                                  variant="outline" 
+                                  className="h-12 flex-1 md:flex-none md:w-32 rounded-xl border-forest/10 text-forest/70 hover:bg-forest/5 transition-all font-bold tracking-wide"
+                                  onClick={() => {
+                                    setAuditSeoItem(item);
+                                  }}
+                                >
+                                  <Activity className="h-4 w-4 mr-2" /> <span>Audit</span>
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  className="h-12 flex-1 md:flex-none md:w-32 rounded-xl bg-forest border border-forest text-white hover:bg-forest/90 transition-all font-bold tracking-wide shadow-md"
+                                  onClick={() => {
+                                    setEditingSeoId(item.id);
+                                    setSeoFormData({
+                                      path: item.path,
+                                      keyword: item.keyword || '',
+                                      title: item.title,
+                                      description: item.description,
+                                      ogImage: item.ogImage || ''
+                                    });
+                                    setIsSeoQuickEditModalOpen(true);
+                                  }}
+                                >
+                                  <Edit2 className="h-4 w-4 mr-2" /> <span>Edit</span>
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  className="h-12 flex-1 md:flex-none md:w-32 rounded-xl bg-white border border-rose-200 text-rose-500 hover:bg-rose-500 hover:text-white transition-all font-bold tracking-wide shadow-sm"
+                                  onClick={async () => {
+                                    setConfirmModal({
+                                      message: `Permanently delete SEO configuration for ${item.path}? This will revert to site-wide defaults.`,
+                                      onConfirm: async () => {
+                                        try {
+                                          await deleteDoc(doc(db, 'seo_settings', item.id));
+                                          setNotification({ message: 'SEO dynamics purged', type: 'success' });
+                                        } catch (error) {
+                                          handleFirestoreError(error, OperationType.DELETE, `seo_settings/${item.id}`);
+                                        }
+                                        setConfirmModal(null);
                                       }
-                                      setConfirmModal(null);
-                                    }
-                                  });
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 md:mr-2" /> <span className="md:inline">Delete</span>
-                              </Button>
+                                    });
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" /> <span>Delete</span>
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </Card>
@@ -4249,8 +4900,9 @@ export default function Admin() {
           })()}
         </div>
 
-                {/* Global Configuration Card */}
+                {activeSeoNav === 'Schema Markup Planner' && (
                 <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
+                  {/* Global Configuration Card */}
                   <div className="flex items-center gap-4 mb-6">
                     <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center">
                       <Settings className="h-6 w-6 text-white" />
@@ -4288,8 +4940,176 @@ export default function Admin() {
                     <Button type="submit" className="w-full bg-forest text-white font-bold h-12 rounded-xl transition-all">Synchronize Verification</Button>
                   </form>
                 </Card>
+                )}
+
+                {activeSeoNav === 'Goals Tracker' && (
+                  <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-amber-500">
+                    <h3 className="text-2xl font-bold text-forest mb-4">SEO Goals Tracker</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <Target className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Organic Traffic Goal</h4>
+                        <Input 
+                          type="number"
+                          className="text-3xl font-black text-amber-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalTraffic || 15000}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalTraffic: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="timeframe..."
+                          value={siteSettings.seoGoalTrafficTimeframe || "monthly users by Q4"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalTrafficTimeframe: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <TrendingUp className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Top 10 Rankings</h4>
+                        <Input 
+                          type="number"
+                          className="text-3xl font-black text-emerald-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalRankings || 42}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalRankings: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="description..."
+                          value={siteSettings.seoGoalRankingsDesc || "target keywords in page 1"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalRankingsDesc: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <CheckCircle2 className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Site Health Status</h4>
+                        <Input 
+                          type="number"
+                          className="text-3xl font-black text-blue-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalHealth || 98}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalHealth: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="description..."
+                          value={siteSettings.seoGoalHealthDesc || "Crawlability score"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalHealthDesc: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Topical Mapper' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-purple-500">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Topical Mapping Matrix</h3>
+                    <p className="text-sm text-forest/60 mb-6">Visualizing your semantic content clusters and entity associations for high-altitude trekking and wellness tourism in Parvati Valley.</p>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. Tosh Valley Trails" 
+                        value={newTopicCluster}
+                        onChange={(e) => setNewTopicCluster(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newTopicCluster.trim()) {
+                            e.preventDefault();
+                            const currentList = siteSettings.topicalClusters || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                topicalClusters: [...currentList, newTopicCluster.trim()]
+                              });
+                              setNewTopicCluster('');
+                              setNotification({ message: 'Added topic cluster', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newTopicCluster.trim()) return;
+                          const currentList = siteSettings.topicalClusters || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              topicalClusters: [...currentList, newTopicCluster.trim()]
+                            });
+                            setNewTopicCluster('');
+                            setNotification({ message: 'Added topic cluster', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {(siteSettings.topicalClusters || []).map((cluster: string, i: number) => (
+                        <div key={i} className="flex-1 min-w-[200px] border border-forest/10 p-5 rounded-xl bg-forest/[0.02] relative group">
+                          <h4 className="font-extrabold text-forest text-base">{cluster}</h4>
+                          <ul className="mt-4 space-y-3 text-xs font-medium text-forest/60">
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-emerald-400"/> Core Pillar Defined</li>
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-amber-400"/> Needs content expansion</li>
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-rose-400"/> Needs internal links</li>
+                          </ul>
+                          <Button size="icon" variant="ghost" className="text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2" onClick={async () => {
+                            const updatedList = siteSettings.topicalClusters.filter((_: any, index: number) => index !== i);
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                topicalClusters: updatedList
+                              });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
               </div>
             </div>
+          </div>
+          </div>
+          </div>
           </motion.div>
         )}
         {activeMainTab === 'messages' && (
@@ -4457,6 +5277,486 @@ export default function Admin() {
         )}
       </AnimatePresence>
     </div>
+
+      <AnimatePresence>
+        {auditSeoItem && (
+          <div className="fixed inset-0 z-[95] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-forest/40 backdrop-blur-sm"
+              onClick={() => setAuditSeoItem(null)}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white rounded-[2xl] w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-8 py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.01]">
+                 <div>
+                   <h3 className="text-2xl font-black text-forest">Performance SEO Audit</h3>
+                   <p className="text-xs text-forest/50 font-bold uppercase tracking-widest mt-1">Google Search Console Analyser — {auditSeoItem.path}</p>
+                 </div>
+                 <Button 
+                   variant="ghost" 
+                   size="icon" 
+                   onClick={() => setAuditSeoItem(null)} 
+                   className="rounded-full hover:bg-forest/5 text-forest/40"
+                 >
+                   <X className="h-5 w-5" />
+                 </Button>
+              </div>
+
+              <div className="p-8 overflow-y-auto space-y-8">
+                {/* Structural Analysis */}
+                <div>
+                  <h4 className="text-sm font-black text-forest uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-terracotta" /> Structural Analysis
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl border border-forest/10 bg-forest/[0.02]">
+                       <div className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2">Meta Title Quality</div>
+                       <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-bold text-forest line-clamp-1">{auditSeoItem.title || "Missing"}</span>
+                          <span className={cn(
+                            "text-xs font-bold px-2 py-0.5 rounded",
+                            (auditSeoItem.title?.length >= 30 && auditSeoItem.title?.length <= 60) ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                          )}>{auditSeoItem.title?.length || 0} chars</span>
+                       </div>
+                       <p className="text-xs text-forest/60">
+                         {(!auditSeoItem.title) ? "Title is missing. Search engines will not rank this page properly." : 
+                          (auditSeoItem.title.length < 30) ? "Title is too short. Try to include primary keywords and brand." : 
+                          (auditSeoItem.title.length > 60) ? "Title is too long. It will be truncated in search results." : 
+                          "Optimal length. Well structured."}
+                       </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-forest/10 bg-forest/[0.02]">
+                       <div className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2">Meta Description Readability</div>
+                       <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-forest/5 text-forest/70">{auditSeoItem.description?.length || 0} chars</span>
+                       </div>
+                       <p className="text-xs text-forest/60 mt-2">
+                         {(!auditSeoItem.description) ? "Description is missing. Search engines will auto-generate one." : 
+                          (auditSeoItem.description.length < 70) ? "Description too short. Missed opportunity for call to action (CTA)." : 
+                          (auditSeoItem.description.length > 160) ? "Description too long. It will be truncated." : 
+                          "Optimal length. Ensure it has a clear Call To Action."}
+                       </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-forest/10 bg-forest/[0.02]">
+                       <div className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2">Primary Keyword Inclusion</div>
+                       <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline" className="text-xs font-bold text-forest border-forest/20">{auditSeoItem.keyword || "Not set"}</Badge>
+                       </div>
+                       <p className="text-xs flex gap-4">
+                         <span className={cn("font-bold", (auditSeoItem.keyword && auditSeoItem.title?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
+                           Title: {(auditSeoItem.keyword && auditSeoItem.title?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
+                         </span>
+                         <span className={cn("font-bold", (auditSeoItem.keyword && auditSeoItem.description?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
+                           Desc: {(auditSeoItem.keyword && auditSeoItem.description?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
+                         </span>
+                       </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-forest/10 bg-forest/[0.02]">
+                       <div className="text-[10px] font-bold text-forest/40 uppercase tracking-widest mb-2">Open Graph Image (Social Sharing)</div>
+                       <div className="flex items-center gap-3">
+                         {auditSeoItem.ogImage ? (
+                            <div className="w-16 h-10 bg-forest/10 rounded overflow-hidden">
+                              <img src={auditSeoItem.ogImage} alt="OG" className="w-full h-full object-cover" />
+                            </div>
+                         ) : (
+                            <div className="w-16 h-10 bg-rose-100 rounded flex items-center justify-center">
+                              <Image className="h-4 w-4 text-rose-500" />
+                            </div>
+                         )}
+                         <p className={cn("text-xs font-bold", auditSeoItem.ogImage ? "text-emerald-600" : "text-rose-500")}>
+                           {auditSeoItem.ogImage ? "Preview available. Ready for WhatsApp/Twitter." : "No OG Image set. Social shares will look broken."}
+                         </p>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SERP Simulator */}
+                <div>
+                  <h4 className="text-sm font-black text-forest uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-terracotta" /> SERP Simulator (Desktop)
+                  </h4>
+                  <div className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm max-w-2xl font-sans">
+                     <div className="flex items-center gap-3 mb-1">
+                       <div className="h-7 w-7 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
+                         {siteSettings?.logoUrl ? <img src={siteSettings.logoUrl} className="h-4 w-4" /> : <div className="h-3 w-3 bg-gray-300 rounded-full" />}
+                       </div>
+                       <div>
+                         <div className="text-[13px] text-gray-800 leading-tight">The Soul Himalaya</div>
+                         <div className="text-[12px] text-gray-500 leading-tight">https://thesoulhimalaya.com {auditSeoItem.path.replace(/\//g, ' > ')}</div>
+                       </div>
+                     </div>
+                     <div className="text-[#1a0dab] text-xl cursor-pointer hover:underline truncate py-1">
+                       {auditSeoItem.title || "Meta Title Missing"}
+                     </div>
+                     <div className="text-[14px] text-[#4d5156] leading-snug line-clamp-2">
+                        {auditSeoItem.description || "No meta description has been set for this page. Google will try to find relevant text from the page content to show here."}
+                     </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end border-t border-forest/10 pt-6">
+                  <Button 
+                    className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg px-8"
+                    onClick={() => {
+                        let cleanPath = auditSeoItem.path.replace(/^\//, '').replace(/-/g, ' ');
+                        const prefixesToStrip = ['article ', 'tours ', 'trekks ', 'services ', 'yoga ', 'meditation ', 'adventure ', 'wfh '];
+                        let displayPath = cleanPath;
+                        for (const prefix of prefixesToStrip) {
+                           if (displayPath.toLowerCase().startsWith(prefix)) {
+                              displayPath = displayPath.substring(prefix.length);
+                              break;
+                           }
+                        }
+                        const capitalizedPath = displayPath.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'The Soul Himalaya';
+                        
+                        let newTitle = auditSeoItem.title;
+                        let newDesc = auditSeoItem.description;
+                        let newKeyword = auditSeoItem.keyword;
+
+                        const isArticle = auditSeoItem.path.includes('/article/') || auditSeoItem.path.includes('/helmets-of-gods/');
+                        const isService = auditSeoItem.path.includes('/services/');
+                        const isTrek = auditSeoItem.path.includes('/trekks') || auditSeoItem.path.includes('/adventure');
+                        const isYoga = auditSeoItem.path.includes('/yoga') || auditSeoItem.path.includes('/meditation') || auditSeoItem.path.includes('/wfh');
+                        const isAbout = auditSeoItem.path.includes('/about');
+                        const isContact = auditSeoItem.path.includes('/contact');
+
+                        let suffix = 'Tour Packages';
+                        if (isArticle) suffix = 'Guide & Insights';
+                        else if (isService) suffix = 'Services Parvati Valley';
+                        else if (isTrek) suffix = 'Trekking Parvati Valley';
+                        else if (isYoga) suffix = 'Retreats & Wellness';
+                        else if (isAbout) suffix = 'About Us';
+                        else if (isContact) suffix = 'Contact & Booking';
+
+                        if (!newKeyword) {
+                          if (capitalizedPath === 'The Soul Himalaya') {
+                             newKeyword = 'Himalayan Tour Packages';
+                          } else {
+                             newKeyword = `${capitalizedPath} ${suffix}`;
+                          }
+                        }
+
+                        let primaryKeyword = newKeyword.split(',')[0].trim();
+                        let formattedPrimary = primaryKeyword.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+                        if (!newTitle || newTitle.length < 30 || newTitle.length > 60 || !newTitle.toLowerCase().includes(primaryKeyword.toLowerCase())) {
+                           let generatedTitle = `${formattedPrimary} | The Soul Himalaya`;
+                           
+                           if (generatedTitle.length > 60) {
+                             generatedTitle = `${formattedPrimary} | Soul Himalaya`;
+                           }
+                           
+                           if (generatedTitle.length > 60) {
+                             generatedTitle = formattedPrimary;
+                           }
+                           
+                           if (generatedTitle.length < 30) {
+                             generatedTitle = `Explore ${generatedTitle}`;
+                             if (generatedTitle.length < 30) {
+                                generatedTitle = `${generatedTitle} in Parvati Valley`;
+                             }
+                           }
+                           
+                           if (generatedTitle.length > 60) {
+                             generatedTitle = generatedTitle.substring(0, 60);
+                             const lastSpace = generatedTitle.lastIndexOf(' ');
+                             if (lastSpace > 40) {
+                               generatedTitle = generatedTitle.substring(0, lastSpace);
+                             }
+                           }
+                           
+                           newTitle = generatedTitle;
+                        }
+
+                        if (!newDesc || newDesc.length < 70 || newDesc.length > 160 || !newDesc.toLowerCase().includes(primaryKeyword.toLowerCase())) {
+                          newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalayas with our premium packages and sustainable tourism in Parvati Valley.`;
+                          if (newDesc.length > 160) {
+                            newDesc = `Experience the best ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty and sustainable tourism in Parvati Valley.`;
+                          }
+                          if (newDesc.length > 160) {
+                            newDesc = `Experience ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty in Parvati Valley.`;
+                            if (newDesc.length > 160) {
+                              newDesc = newDesc.substring(0, 159);
+                            }
+                          }
+                          if (newDesc.length < 70) {
+                            newDesc = `${newDesc} Book your unforgettable Himalayan adventure with us today!`;
+                          }
+                        }
+
+                        let newOgImage = auditSeoItem.ogImage;
+                        if (!newOgImage || newOgImage.trim().length === 0) {
+                          newOgImage = siteSettings?.globalOgImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
+                        }
+
+                        setEditingSeoId(auditSeoItem.id);
+                        setSeoFormData({
+                          path: auditSeoItem.path,
+                          keyword: newKeyword,
+                          title: newTitle,
+                          description: newDesc,
+                          ogImage: newOgImage
+                        });
+                        setAuditSeoItem(null);
+                        setIsSeoQuickEditModalOpen(true);
+                        setNotification({ message: 'Audit applied fixes. Ready for review.', type: 'success' });
+                    }}
+                  >
+                    Auto-Fix & Review
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isSeoQuickEditModalOpen && (
+          <div className="fixed inset-0 z-[90] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-forest/40 backdrop-blur-sm"
+              onClick={() => {
+                setIsSeoQuickEditModalOpen(false);
+                setEditingSeoId(null);
+                setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+              }}
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-8 py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.02]">
+                 <div>
+                   <h3 className="text-xl font-bold text-forest">Quick Edit SEO Configuration</h3>
+                   <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Adjust meta details before applying</p>
+                 </div>
+                 <Button 
+                   variant="ghost" 
+                   size="icon" 
+                   onClick={() => {
+                     setIsSeoQuickEditModalOpen(false);
+                     setEditingSeoId(null);
+                     setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+                   }} 
+                   className="rounded-full hover:bg-forest/5 text-forest/40"
+                 >
+                   <X className="h-5 w-5" />
+                 </Button>
+              </div>
+              
+              <div className="p-8 overflow-y-auto">
+                <form 
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setIsProcessing(true);
+                    try {
+                      if (editingSeoId) {
+                        await updateDoc(doc(db, 'seo_settings', editingSeoId), {
+                          ...seoFormData,
+                          updatedAt: serverTimestamp()
+                        });
+                        setNotification({ message: 'SEO dynamics updated successfully', type: 'success' });
+                      } else {
+                        const existing = seoSettings.find(s => s.path === seoFormData.path);
+                        if (existing) {
+                          await updateDoc(doc(db, 'seo_settings', existing.id), {
+                            ...seoFormData,
+                            updatedAt: serverTimestamp()
+                          });
+                          setNotification({ message: 'SEO configuration merged', type: 'success' });
+                        } else {
+                          await addDoc(collection(db, 'seo_settings'), {
+                            ...seoFormData,
+                            updatedAt: serverTimestamp()
+                          });
+                          setNotification({ message: 'SEO configuration deployed', type: 'success' });
+                        }
+                      }
+                      setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+                      setEditingSeoId(null);
+                      setIsSeoQuickEditModalOpen(false);
+                    } catch (error) {
+                      handleFirestoreError(error, OperationType.WRITE, 'seo_settings');
+                    } finally {
+                      setIsProcessing(false);
+                    }
+                  }}
+                  className="space-y-6"
+                >
+                  <div className="grid gap-6">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Page Path / Slug</label>
+                      <div className="relative">
+                        <Compass className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                        <Input 
+                          value={seoFormData.path} 
+                          readOnly
+                          className="h-12 pl-12 rounded-xl bg-forest/[0.05] border-transparent text-sm font-medium text-forest/50"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Target Keyword</label>
+                      <div className="relative">
+                        <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                        <Input 
+                          value={seoFormData.keyword} 
+                          onChange={e => setSeoFormData({...seoFormData, keyword: e.target.value})} 
+                          className="h-12 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white text-sm font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-end">
+                        <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Title</label>
+                        <span className={cn(
+                          "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                          seoFormData.title?.length >= 30 && seoFormData.title?.length <= 60 
+                            ? "bg-emerald-50 text-emerald-600" 
+                            : "bg-rose-50 text-rose-600"
+                        )}>{seoFormData.title?.length || 0}/60 chars</span>
+                      </div>
+                      <Input 
+                        value={seoFormData.title} 
+                        onChange={e => setSeoFormData({...seoFormData, title: e.target.value})} 
+                        className="h-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white text-sm font-medium"
+                        required
+                        maxLength={100}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-end">
+                        <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1">Meta Description</label>
+                        <span className={cn(
+                          "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                          seoFormData.description?.length >= 70 && seoFormData.description?.length <= 160 
+                            ? "bg-emerald-50 text-emerald-600" 
+                            : "bg-rose-50 text-rose-600"
+                        )}>{seoFormData.description?.length || 0}/160 chars</span>
+                      </div>
+                      <Textarea 
+                        value={seoFormData.description} 
+                        onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} 
+                        className="min-h-[100px] resize-none rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white text-sm p-4 font-medium"
+                        required
+                        maxLength={300}
+                      />
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-forest/40 uppercase tracking-widest ml-1 text-terracotta flex items-center gap-2">
+                        <Share2 className="h-3 w-3" /> OG Preview Image
+                      </label>
+                      <div className="flex gap-3">
+                        <div className="relative flex-1">
+                          <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/20" />
+                          <Input 
+                            placeholder="https://i.postimg.cc/..." 
+                            value={seoFormData.ogImage} 
+                            onChange={e => setSeoFormData({...seoFormData, ogImage: e.target.value})} 
+                            className="h-12 pl-12 rounded-xl bg-forest/[0.02] border-forest/10 focus:bg-white text-sm font-medium"
+                          />
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            id="seo-og-upload-quick"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setIsUploading(true);
+                                try {
+                                  const safeName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                                  const storagePath = `seo/${Date.now()}_${safeName}`;
+                                  const storageRef = ref(storage, storagePath);
+                                  const uploadTask = uploadBytesResumable(storageRef, file);
+                                  
+                                  const downloadURL = await new Promise<string>((resolve, reject) => {
+                                    uploadTask.on('state_changed', 
+                                      (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
+                                      (error) => reject(error),
+                                      async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
+                                    );
+                                  });
+                                  
+                                  setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
+                                  setNotification({ message: 'OG Image uploaded!', type: 'success' });
+                                } catch (err) {
+                                  console.error(err);
+                                  setNotification({ message: 'Upload failed', type: 'error' });
+                                } finally {
+                                  setIsUploading(false);
+                                  setUploadProgress(0);
+                                }
+                              }
+                            }}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="h-12 w-12 rounded-xl border-forest/10 hover:bg-forest/5 p-0"
+                            onClick={() => document.getElementById('seo-og-upload-quick')?.click()}
+                            disabled={isUploading}
+                          >
+                            {isUploading ? <RefreshCw className="h-4 w-4 animate-spin text-terracotta" /> : <Upload className="h-4 w-4 text-forest/40" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4 border-t border-forest/5">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      className="flex-1 font-bold h-12 rounded-xl text-forest hover:bg-forest/5" 
+                      onClick={() => {
+                        setIsSeoQuickEditModalOpen(false);
+                        setEditingSeoId(null);
+                        setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
+                      }}
+                      disabled={isProcessing}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-600/20" 
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Confirm & Save"}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Custom Confirmation Modal */}
       <AnimatePresence>

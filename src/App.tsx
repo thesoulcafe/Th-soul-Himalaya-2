@@ -56,14 +56,15 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <CartProvider>
-          <SmoothScroll />
-          <Toaster position="top-center" richColors />
-          <Router>
-            <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+      <HelmetProvider>
+        <AuthProvider>
+          <CartProvider>
+            <SmoothScroll />
+            <Toaster position="top-center" richColors />
+            <Router>
+              <ScrollToTop />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
                   <Route path="tours" element={<Tours />} />
@@ -107,6 +108,7 @@ export default function App() {
           </Router>
         </CartProvider>
       </AuthProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }
