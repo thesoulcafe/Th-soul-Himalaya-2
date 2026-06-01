@@ -533,6 +533,7 @@ export default function Tours() {
                   <Card 
                     className="overflow-hidden border border-forest/5 shadow-lg hover:shadow-xl transition-all duration-500 rounded-[2rem] bg-white group h-full flex flex-col p-0 relative"
                   >
+                    <Link to={`/tours/${tour.id}`} className="absolute inset-0 z-0" aria-label={`View Details for ${tour.title}`} />
                     <div 
                       className="relative aspect-[4/3] overflow-hidden cursor-pointer"
                       onClick={() => navigate(`/tours/${tour.id}`)}

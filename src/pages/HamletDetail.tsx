@@ -116,7 +116,7 @@ const HAMLET_DETAILS: Record<string, any> = {
         link: "tosh-roads-2026"
       },
       {
-        title: "7 Best Cafes in Tosh for Workations & Views",
+        title: "Best Cafes in Tosh for Workations & Views",
         excerpt: "Where to find the best Wi-Fi and even better views for your remote Himalayan office.",
         link: "tosh-cafes"
       },

@@ -315,8 +315,9 @@ export default function Meditation() {
                 <Card 
                   className="overflow-hidden border-none shadow-xl rounded-[2.5rem] bg-white h-full flex flex-col group relative"
                 >
+                  <Link to={`/meditation/${pkg.id}`} className="absolute inset-0 z-0" aria-label={`View Details for ${pkg.title}`} />
                   <div 
-                    className="relative h-64 overflow-hidden cursor-pointer"
+                    className="relative h-64 overflow-hidden cursor-pointer z-10"
                     onClick={() => navigate(`/meditation/${pkg.id}`)}
                   >
                     <ImageSlider 

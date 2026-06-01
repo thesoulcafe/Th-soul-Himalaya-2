@@ -300,9 +300,10 @@ export default function Adventure() {
               >
                 <Card 
                   onClick={() => navigate(`/adventure/${activity.id}`)}
-                  className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer"
+                  className="overflow-hidden border-none shadow-2xl rounded-[2.5rem] bg-white h-full flex flex-col group cursor-pointer relative"
                 >
-                    <div className="relative h-80 overflow-hidden">
+                  <Link to={`/adventure/${activity.id}`} className="absolute inset-0 z-0" aria-label={`View Details for ${activity.title}`} />
+                    <div className="relative h-80 overflow-hidden z-10">
                       <ImageSlider 
                         images={((activity.title || '').toLowerCase().includes('valley of shadows') 
                           ? ["https://i.postimg.cc/wMSWmFKB/IMG-1095.webp"] 

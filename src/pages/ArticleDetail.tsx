@@ -379,7 +379,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
     ]
   },
   "tosh-cafes": {
-    title: "7 Best Cafes in Tosh for Workations & Views",
+    title: "Best Cafes in Tosh for Workations & Views",
     category: "Lifestyle",
     readTime: "8 min read",
     date: "April 2026",

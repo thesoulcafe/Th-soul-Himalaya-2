@@ -323,6 +323,7 @@ export default function WFH() {
                   onClick={() => navigate(`/wfh/${pkg.id}`)}
                   className={`relative h-full border-none shadow-xl rounded-[2.5rem] overflow-hidden cursor-pointer group ${pkg.popular ? 'bg-forest text-white ring-4 ring-terracotta/20' : 'bg-white text-forest'}`}
                 >
+                  <Link to={`/wfh/${pkg.id}`} className="absolute inset-0 z-0" aria-label={`View Details for ${pkg.title}`} />
                   {pkg.popular && (
                     <div className="absolute top-6 right-6 z-10">
                       <Badge className="bg-terracotta text-white border-none px-4 py-1">Most Popular</Badge>

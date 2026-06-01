@@ -295,6 +295,7 @@ export default function Trekks() {
                 <Card 
                   className="overflow-hidden border border-forest/5 shadow-lg group h-full flex flex-col md:flex-row p-0 rounded-[2rem] bg-white transition-all duration-500 hover:shadow-2xl relative"
                 >
+                  <Link to={`/trekks/${trekk.id}`} className="absolute inset-0 z-0" aria-label={`View Details for ${trekk.title}`} />
                   {/* Left Side: Image */}
                   <div 
                     className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden cursor-pointer"
