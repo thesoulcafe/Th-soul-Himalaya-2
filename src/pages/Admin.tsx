@@ -3437,7 +3437,7 @@ export default function Admin() {
                   {[
                     { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
                     { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
-                    { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (s.keyword ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
+                    { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (typeof s.keyword === 'string' ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
                     { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
                   ].map((stat, i) => (
                     <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
@@ -4239,6 +4239,7 @@ export default function Admin() {
                         }
 
                         const seedData = [...staticSeedData, ...dynamicSeedData, ...helmetsData].map(item => {
+                          if (typeof item.path !== 'string') return item;
                           let cleanPath = item.path.replace(/^\//, '').replace(/-/g, ' ');
                           const prefixesToStrip = ['article ', 'tours ', 'trekks ', 'services ', 'yoga ', 'meditation ', 'adventure ', 'wfh '];
                           let displayPath = cleanPath;
@@ -4503,6 +4504,7 @@ export default function Admin() {
                     <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
                       {["Core Pages", "Hamlets", "Articles", "Tours"].map(category => {
                         const items = seoProposals.filter(p => {
+                          if (typeof p.path !== 'string') return false;
                           if (category === "Core Pages") return p.path.split('/').length === 2 && !p.path.includes('?');
                           if (category === "Hamlets" || category === "Articles") return p.path.includes('hamlet') || p.path.includes('helmets');
                           return p.path.includes('?'); // Tours/Services
@@ -4661,9 +4663,9 @@ export default function Admin() {
                       let matchesSearch = true;
                       if (seoSearchTerm) {
                          const term = seoSearchTerm.toLowerCase();
-                         matchesSearch = item.path.toLowerCase().includes(term) || 
-                                         item.keyword?.toLowerCase().includes(term) ||
-                                         item.title?.toLowerCase().includes(term);
+                         matchesSearch = (typeof item.path === 'string' && item.path.toLowerCase().includes(term)) || 
+                                         (typeof item.keyword === 'string' && item.keyword.toLowerCase().includes(term)) ||
+                                         (typeof item.title === 'string' && item.title.toLowerCase().includes(term));
                       }
 
                       if (!matchesSearch) return false;
@@ -4705,9 +4707,9 @@ export default function Admin() {
                     const corePaths = ['/', '/about', '/contact', '/services', '/tours', '/trekks', '/yoga', '/meditation', '/adventure', '/wfh', '/tour-packages', '/parvati-valley'];
                     
                     const groupedSeoSettings = {
-                      "Core Landing Pages": filteredSeo.filter(s => corePaths.includes(s.path)),
-                      "Dynamic Packages & Services": filteredSeo.filter(s => s.path.match(/^\/(tours|trekks|yoga|meditation|adventure|wfh|services)\/.+/)),
-                      "Articles & Blog Content": filteredSeo.filter(s => s.path.includes('/article/') || s.path.includes('/helmets-of-gods/'))
+                      "Core Landing Pages": filteredSeo.filter(s => typeof s.path === 'string' && corePaths.includes(s.path)),
+                      "Dynamic Packages & Services": filteredSeo.filter(s => typeof s.path === 'string' && s.path.match(/^\/(tours|trekks|yoga|meditation|adventure|wfh|services)\/.+/)),
+                      "Articles & Blog Content": filteredSeo.filter(s => typeof s.path === 'string' && (s.path.includes('/article/') || s.path.includes('/helmets-of-gods/')))
                     };
                     
                     const matchedPaths = [
@@ -4735,11 +4737,11 @@ export default function Admin() {
                           {section.items.map((item) => {
                             const titleLen = item.title?.length || 0;
                             const descLen = item.description?.length || 0;
-                            const hasKeyword = !!item.keyword && item.keyword.trim().length > 0;
+                            const hasKeyword = !!item.keyword && typeof item.keyword === 'string' && item.keyword.trim().length > 0;
                             
-                            const keywordLower = item.keyword?.toLowerCase() || '';
-                            const titleHasKeyword = hasKeyword && item.title?.toLowerCase().includes(keywordLower);
-                            const descHasKeyword = hasKeyword && item.description?.toLowerCase().includes(keywordLower);
+                            const keywordLower = typeof item.keyword === 'string' ? item.keyword.toLowerCase() : '';
+                            const titleHasKeyword = hasKeyword && typeof item.title === 'string' && item.title.toLowerCase().includes(keywordLower);
+                            const descHasKeyword = hasKeyword && typeof item.description === 'string' && item.description.toLowerCase().includes(keywordLower);
                             
                             // Audit flags
                             const isMissingTitle = titleLen === 0;
@@ -4749,7 +4751,7 @@ export default function Admin() {
                             const isDescTooShort = descLen > 0 && descLen < 70;
                             const isDescTooLong = descLen > 160;
                             const isMissingKeyword = !hasKeyword;
-                            const isMissingOgImage = !item.ogImage || item.ogImage.trim().length === 0;
+                            const isMissingOgImage = !item.ogImage || (typeof item.ogImage === 'string' && item.ogImage.trim().length === 0);
                             
                             const auditIssues = [];
                             if (isMissingKeyword) auditIssues.push('Missing Target Keyword');
@@ -4776,6 +4778,7 @@ export default function Admin() {
                                   (!isMissingOgImage ? 15 : 0);
                                   
                             const score = Math.min(100, initialScore);
+                            const isHighPriority = hasAuditFlags && score < 60;
                             
                             return (
                         <motion.div 
@@ -5353,11 +5356,11 @@ export default function Admin() {
                           <Badge variant="outline" className="text-xs font-bold text-forest border-forest/20">{auditSeoItem.keyword || "Not set"}</Badge>
                        </div>
                        <p className="text-xs flex gap-4">
-                         <span className={cn("font-bold", (auditSeoItem.keyword && auditSeoItem.title?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
-                           Title: {(auditSeoItem.keyword && auditSeoItem.title?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
+                         <span className={cn("font-bold", (typeof auditSeoItem.keyword === 'string' && typeof auditSeoItem.title === 'string' && auditSeoItem.title.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
+                           Title: {(typeof auditSeoItem.keyword === 'string' && typeof auditSeoItem.title === 'string' && auditSeoItem.title.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
                          </span>
-                         <span className={cn("font-bold", (auditSeoItem.keyword && auditSeoItem.description?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
-                           Desc: {(auditSeoItem.keyword && auditSeoItem.description?.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
+                         <span className={cn("font-bold", (typeof auditSeoItem.keyword === 'string' && typeof auditSeoItem.description === 'string' && auditSeoItem.description.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "text-emerald-600" : "text-rose-500" )}>
+                           Desc: {(typeof auditSeoItem.keyword === 'string' && typeof auditSeoItem.description === 'string' && auditSeoItem.description.toLowerCase().includes(auditSeoItem.keyword.split(',')[0].trim().toLowerCase())) ? "Yes" : "No"}
                          </span>
                        </p>
                     </div>
