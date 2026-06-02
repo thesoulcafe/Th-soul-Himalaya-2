@@ -4339,7 +4339,7 @@ export default function Admin() {
                           const dLen = existing.description?.length || 0;
                           const hasKeyword = !!existing.keyword && existing.keyword.trim().length > 0;
                           
-                          const keywordLower = existing.keyword?.toLowerCase() || '';
+                          const keywordLower = existing.keyword?.split(',')[0].trim().toLowerCase() || '';
                           const titleHasKeyword = hasKeyword && existing.title?.toLowerCase().includes(keywordLower);
                           const descHasKeyword = hasKeyword && existing.description?.toLowerCase().includes(keywordLower);
                           const hasOgImage = !!existing.ogImage && existing.ogImage.trim().length > 0;
@@ -4739,7 +4739,7 @@ export default function Admin() {
                             const descLen = item.description?.length || 0;
                             const hasKeyword = !!item.keyword && typeof item.keyword === 'string' && item.keyword.trim().length > 0;
                             
-                            const keywordLower = typeof item.keyword === 'string' ? item.keyword.toLowerCase() : '';
+                            const keywordLower = typeof item.keyword === 'string' ? item.keyword.split(',')[0].trim().toLowerCase() : '';
                             const titleHasKeyword = hasKeyword && typeof item.title === 'string' && item.title.toLowerCase().includes(keywordLower);
                             const descHasKeyword = hasKeyword && typeof item.description === 'string' && item.description.toLowerCase().includes(keywordLower);
                             
