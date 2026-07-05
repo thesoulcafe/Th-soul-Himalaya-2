@@ -68,7 +68,7 @@ export default function Shop() {
           transition={{ delay: 0.3 }}
           className="text-base md:text-lg text-forest/60 mb-12 max-w-2xl mx-auto font-medium leading-relaxed"
         >
-          Our artisans in Tosh are busy weaving the spirit of the Himalayas into every knot. 
+          Our artisans in Tosh are busy weaving the spirit of the Himalaya's into every knot. 
           The Macramé collection featuring wall hangings, plant holders, and more will be available soon.
         </motion.p>
 

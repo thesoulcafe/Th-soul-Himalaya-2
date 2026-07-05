@@ -52,7 +52,7 @@ export const HAMLET_DETAILS: Record<string, any> = {
     articles: [
       { title: "Malana: Decoding the World's Oldest Democracy", excerpt: "An in-depth look at the unique social governance and the edicts of Jamlu Devta.", link: "malana-democracy" },
       { title: "Social Taboos: A Guide for Respectful Exploration", excerpt: "Crucial intelligence on Malana's 'No-Touch' policy and how to navigate the village boundaries.", link: "social-taboos" },
-      { title: "The Legend of Alexander: Greek DNA in the Himalayas?", excerpt: "Analyzing the historical and genetic theories connecting Malana to the Macedonian army.", link: "malana-heritage" },
+      { title: "The Legend of Alexander: Greek DNA in the Himalaya's?", excerpt: "Analyzing the historical and genetic theories connecting Malana to the Macedonian army.", link: "malana-heritage" },
       { title: "Jamlu Devta: The Spiritual Sovereign of Malana", excerpt: "Understanding the deity whose word is law, and how his power governs the daily lives of the villagers.", link: "jamlu-devta-sovereign" },
       { title: "The Architecture of Isolation: Malana's Wood and Stone", excerpt: "How the Kath-Kuni style and specific village layout preserves Malana's strict social hierarchies.", link: "malana-architecture-isolation" },
       { title: "Kanashi: The Isolated Language of the Mountains", excerpt: "A linguistic deep-dive into the sacred tongue of Malana that no outsider is allowed to speak.", link: "kanashi-language" },
@@ -71,7 +71,7 @@ export const HAMLET_DETAILS: Record<string, any> = {
     experience: [
       { 
         title: "Glacier Views", 
-        desc: "Panoramic vistas of the Tosh Glacier and the snow-clad peaks of the Great Himalayas.",
+        desc: "Panoramic vistas of the Tosh Glacier and the snow-clad peaks of the Great Himalaya's.",
         icon: <Mountain />
       },
       { 
@@ -106,7 +106,7 @@ export const HAMLET_DETAILS: Record<string, any> = {
       { title: "Tosh to Kheerganga Trek: Latest Rules and Camping Updates", excerpt: "Forest department guidelines, campsite availability, and vital trek safety tips for 2026.", link: "tosh-kheerganga-trek" },
       { title: "What to Pack for Tosh in May: Temperature & Gear Guide", excerpt: "Don't get caught in the mountain chill. Our curated list for the variable May climate.", link: "tosh-packing" },
       { title: "Treks from Tosh: Ultimate Guide to High-Altitude Trails", excerpt: "Detailed breakdown of all major treks starting from Tosh, including Kutla Glacier Point and the Kheerganga route.", link: "tosh-treks-guide" },
-      { title: "Tosh Waterfall: A Hidden Gem in the High Himalayas", excerpt: "Locating and safely navigating to the secluded Tosh waterfall, the perfect spot for deep meditation.", link: "tosh-waterfall-hidden" },
+      { title: "Tosh Waterfall: A Hidden Gem in the High Himalaya's", excerpt: "Locating and safely navigating to the secluded Tosh waterfall, the perfect spot for deep meditation.", link: "tosh-waterfall-hidden" },
       { title: "Experiencing the Pink Floyd Cafe at Sunset", excerpt: "Why this legendary cafe remains the spiritual center for music and dusk views in the Parvati Valley.", link: "pink-floyd-sunset" },
       { title: "Glacial Proximity: The Changing Ice of Tosh Glacier", excerpt: "An ecological perspective on Tosh's namesake glacier and the shifting landscape of the high passes.", link: "tosh-glacier-ecology" },
       { title: "Authentic Himachali Homestays in Upper Tosh", excerpt: "Ditch the commercial hotels and discover the warmth of a traditional wooden homestay with local families.", link: "authentic-homestays-tosh" }

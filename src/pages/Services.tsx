@@ -198,7 +198,7 @@ export default function Services() {
               <div className="text-center md:text-left">
                 <h2 className="text-2xl md:text-4xl font-heading font-bold text-cream mb-4">Also Customize Your trip</h2>
                 <p className="text-cream/70 text-xs md:text-sm max-w-xl font-medium">
-                  Don't see exactly what you're looking for? Let us create a unique itinerary tailored specifically to your soul's journey in the Himalayas. From private trekks to exclusive wellness retreats.
+                  Don't see exactly what you're looking for? Let us create a unique itinerary tailored specifically to your soul's journey in the Himalaya's. From private trekks to exclusive wellness retreats.
                 </p>
               </div>
               <Link 

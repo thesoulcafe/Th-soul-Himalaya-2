@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb, Image as ImageIcon
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -145,6 +145,7 @@ interface UserProfile {
 
 export default function Admin() {
   const { profile, loading, login, logout, user } = useAuth();
+  
   const [searchParams, setSearchParams] = useSearchParams();
   const coverInputRef = React.useRef<HTMLInputElement>(null);
   const galleryInputRef = React.useRef<HTMLInputElement>(null);
@@ -1148,12 +1149,22 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row overflow-hidden font-sans selection:bg-terracotta/20">
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col lg:flex-row overflow-hidden font-sans selection:bg-terracotta/20 relative">
       {/* Mobile Header */}
-      <div className="lg:hidden h-16 bg-forest flex items-center justify-between px-6 sticky top-0 z-[60]">
+      <div className="lg:hidden h-16 bg-forest flex items-center justify-between px-6 shrink-0 z-[60]">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-terracotta" />
-          <span className="font-heading font-bold text-white">Soul Admin</span>
+          <div className="flex flex-col -space-y-1">
+            <span className="font-heading font-bold text-white text-sm">Soul Admin</span>
+            <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
+              {activeMainTab === 'seo_manager' ? 'SEO Manager' : 
+               activeMainTab === 'overview' ? 'Dashboard' :
+               activeMainTab === 'content' ? 'Content' :
+               activeMainTab === 'bookings' ? 'Reservations' :
+               activeMainTab === 'users' ? 'Directory' :
+               activeMainTab === 'messages' ? 'Messages' : 'Admin'}
+            </span>
+          </div>
         </div>
         <Button 
           variant="ghost" 
@@ -1260,9 +1271,9 @@ export default function Admin() {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col h-screen overflow-y-auto">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-forest/5 flex items-center justify-between px-10 sticky top-0 z-40">
+        <header className="hidden lg:flex h-20 bg-white/80 backdrop-blur-md border-b border-forest/5 items-center justify-between px-6 md:px-10 shrink-0 z-40">
           <div className="flex items-center gap-4 flex-grow max-w-xl">
             <div className="relative w-full group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-forest/30 group-focus-within:text-terracotta transition-colors" />
@@ -1288,7 +1299,10 @@ export default function Admin() {
           </div>
         </header>
 
-        <div className="p-10">
+        <div className={cn(
+          "flex-1 overflow-y-auto scroll-smooth",
+          activeMainTab === 'seo_manager' ? "p-0" : "p-4 md:p-10"
+        )}>
           <AnimatePresence mode="wait">
             {activeMainTab === 'overview' && (
               <motion.div 
@@ -3300,49 +3314,56 @@ export default function Admin() {
         {activeMainTab === 'seo_manager' && (
           <motion.div
             key="seo_manager"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-[#faf9f6]"
+            exit={{ opacity: 0, y: -10 }}
+            className="w-full bg-[#F8F9FA] min-h-full"
           >
             {/* Header Banner */}
-            <div className="h-48 w-full bg-gradient-to-b from-[#fcead0] to-[#faf9f6]/90 border-b border-[#f3e4d0]/50" />
+            <div className="h-32 md:h-48 w-full bg-gradient-to-b from-[#fcead0] to-[#faf9f6]/90 border-b border-[#f3e4d0]/50" />
             
             {/* Main Container */}
-            <div className="relative z-10 px-6 md:px-10 w-full pb-20">
+            <div className="relative z-10 px-4 md:px-10 w-full pb-32">
               
               {/* Header Info */}
-              <div className="mb-10">
-                  <div className="h-20 w-20 bg-[#e7805e] rounded-xl flex items-center justify-center -mt-10 mb-4 shadow-sm border-4 border-[#faf9f6] relative overflow-hidden group">
+              <div className="mb-6 md:mb-10">
+                  <div className="h-16 w-16 md:h-20 md:w-20 bg-[#e7805e] rounded-xl flex items-center justify-center -mt-8 md:-mt-10 mb-4 shadow-sm border-4 border-[#faf9f6] relative overflow-hidden group">
                      {/* Magnifying box illustration */}
-                     <div className="absolute inset-0 border-[6px] border-black/20 m-2 rounded-lg" />
-                     <Search className="h-10 w-10 text-white z-10 relative drop-shadow-md" strokeWidth={3} />
+                     <div className="absolute inset-0 border-[4px] md:border-[6px] border-black/20 m-1.5 md:m-2 rounded-lg" />
+                     <Search className="h-8 w-8 md:h-10 md:w-10 text-white z-10 relative drop-shadow-md" strokeWidth={3} />
                   </div>
-                  <h1 className="text-3xl md:text-5xl font-extrabold text-[#3a352f] mb-3 tracking-tight">Complete SEO Manager</h1>
-                  <p className="flex items-center text-sm font-semibold text-[#8b857d] hover:text-[#5c5448] cursor-pointer w-fit transition-colors">
+                  <h1 className="text-2xl md:text-5xl font-extrabold text-[#3a352f] mb-2 md:mb-3 tracking-tight">Complete SEO Manager</h1>
+                  <p className="flex items-center text-[10px] md:text-sm font-semibold text-[#8b857d] hover:text-[#5c5448] cursor-pointer w-fit transition-colors">
                      <Info className="h-4 w-4 mr-1.5" /> Step By Step Guide (Getting Started)
                   </p>
               </div>
 
-              <div className="flex flex-col lg:flex-row gap-10">
-                 {/* Sidebar */}
-                 <div className="w-full lg:w-[280px] flex-shrink-0">
-                    <div className="bg-[#f2eadc] rounded-lg p-5 sticky top-10 border border-[#e5d4bc]/30 shadow-inner">
-                       <h3 className="flex items-center font-bold text-[#5c5448] mb-5 px-1.5 uppercase tracking-wider text-xs"><Send className="h-3.5 w-3.5 mr-2" /> Navigate</h3>
-                       <div className="space-y-0.5">
+              <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
+                 {/* Sidebar Navigation */}
+                 <div className="w-full lg:w-[280px] flex-shrink-0 lg:h-fit">
+                    <div className="bg-[#f2eadc] rounded-2xl p-4 lg:p-5 sticky top-24 lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto border border-[#e5d4bc]/30 shadow-inner scrollbar-hide">
+                       <h3 className="hidden lg:flex items-center font-bold text-[#5c5448] mb-5 px-1.5 uppercase tracking-wider text-[10px]"><Send className="h-3 w-3 mr-2 text-terracotta" /> SEO Management Terminal</h3>
+                       
+                       {/* Mobile Nav: Horizontal Scroll */}
+                       <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 lg:space-y-0.5 pb-2 lg:pb-0 scrollbar-hide -mx-2 px-2 lg:mx-0 lg:px-0">
                           {SEONavItems.map(item => (
                              <button
                                 key={item.id}
                                 onClick={() => setActiveSeoNav(item.id)}
                                 className={cn(
-                                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-bold transition-all text-left",
-                                   activeSeoNav === item.id ? "bg-[#e2d5c2] text-[#3a352f] shadow-sm" : "text-[#796f61] hover:bg-[#e8decb]/50 hover:text-[#3a352f]"
+                                   "flex-shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left whitespace-nowrap lg:whitespace-normal lg:w-full",
+                                   activeSeoNav === item.id 
+                                     ? "bg-[#3a352f] text-[#f2eadc] shadow-lg shadow-black/10 scale-[1.02]" 
+                                     : "text-[#796f61] hover:bg-[#e8decb]/50 hover:text-[#3a352f]"
                                 )}
                              >
-                                <div className={cn("p-1.5 rounded-full flex items-center justify-center", activeSeoNav === item.id ? "bg-[#3a352f] text-[#f2eadc]" : "bg-[#dfccb4] text-[#796f61]")}>
-                                  <item.icon className="h-3 w-3" />
+                                <div className={cn(
+                                  "p-1.5 rounded-lg flex items-center justify-center transition-colors", 
+                                  activeSeoNav === item.id ? "bg-white/10 text-white" : "bg-[#dfccb4] text-[#796f61]"
+                                )}>
+                                  <item.icon className="h-3.5 w-3.5" />
                                 </div>
-                                {item.id}
+                                <span className="tracking-tight">{item.id}</span>
                              </button>
                           ))}
                        </div>
@@ -3353,17 +3374,20 @@ export default function Admin() {
                  <div className="flex-1 min-w-0">
                    
                    {/* Notion like status tabs (always on top of content area) */}
-                   <div className="flex flex-wrap items-center gap-6 border-b border-[#e5d4bc] pb-3 mb-6 overflow-x-auto scroller-hide">
+                   <div className="flex items-center gap-4 lg:gap-6 border-b border-[#e5d4bc] pb-3 mb-6 overflow-x-auto scroller-hide scrollbar-hide px-1">
                      {['In Progress', 'Not Started', 'All', 'Achieved', 'Paused', 'Not Achieved'].map((tab, idx) => (
                        <div key={tab} 
                             onClick={() => setActiveSeoStatusTab(tab)}
-                            className={cn("flex items-center gap-2 text-sm font-bold whitespace-nowrap cursor-pointer transition-colors", activeSeoStatusTab === tab ? "text-[#3a352f]" : "text-[#9e9488] hover:text-[#5c5448]")}>
-                         {tab === 'In Progress' && <Clock className="h-4 w-4" />}
-                         {tab === 'Not Started' && <div className="h-3.5 w-3.5 rounded-full border-2 border-current opacity-70" />}
-                         {tab === 'All' && <Target className="h-4 w-4" />}
-                         {tab === 'Achieved' && <CheckCircle2 className="h-4 w-4" />}
-                         {tab === 'Paused' && <><div className="h-3.5 w-[3px] bg-current opacity-70 rounded-full" /><div className="h-3.5 w-[3px] bg-current opacity-70 rounded-full -ml-[6px]" /></>}
-                         {tab === 'Not Achieved' && <X className="h-4 w-4" />}
+                            className={cn(
+                              "flex items-center gap-2 text-[11px] lg:text-sm font-bold whitespace-nowrap cursor-pointer transition-colors px-1", 
+                              activeSeoStatusTab === tab ? "text-[#3a352f]" : "text-[#9e9488] hover:text-[#5c5448]"
+                            )}>
+                         {tab === 'In Progress' && <Clock className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
+                         {tab === 'Not Started' && <div className="h-3 w-3 lg:h-3.5 lg:w-3.5 rounded-full border-2 border-current opacity-70" />}
+                         {tab === 'All' && <Target className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
+                         {tab === 'Achieved' && <CheckCircle2 className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
+                         {tab === 'Paused' && <div className="flex gap-[2px] items-center"><div className="h-3 w-[2px] bg-current opacity-70 rounded-full" /><div className="h-3 w-[2px] bg-current opacity-70 rounded-full" /></div>}
+                         {tab === 'Not Achieved' && <X className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
                          {tab}
                        </div>
                      ))}
@@ -3433,19 +3457,19 @@ export default function Admin() {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
                   {[
                     { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
                     { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
                     { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (typeof s.keyword === 'string' ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
                     { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm">
+                    <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-2 mb-1">
                         <stat.icon className={cn("h-3 w-3", stat.color)} />
                         <span className="text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
                       </div>
-                      <div className="text-lg font-bold text-forest">{stat.value}</div>
+                      <div className="text-base lg:text-lg font-bold text-forest">{stat.value}</div>
                     </div>
                   ))}
                 </div>
@@ -3453,9 +3477,9 @@ export default function Admin() {
             </div>
           )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mt-6 lg:mt-10">
               {/* Editor Column */}
-              <div className={cn("space-y-6", activeSeoNav === 'SEO Strategy Roadmap' ? "lg:col-span-12 hidden" : "lg:col-span-12")}>
+              <div className={cn("space-y-6 lg:col-span-12")}>
                 
                 {activeSeoNav === 'Keyword Planner' && (
                   <>
@@ -3568,7 +3592,7 @@ export default function Admin() {
                               {seoFormData.description?.length || 0}/160
                             </div>
                             <Textarea 
-                              placeholder="Discover the mystic beauty of the Himalayas..." 
+                              placeholder="Discover the mystic beauty of the Himalaya's..." 
                               value={seoFormData.description} 
                               onChange={e => setSeoFormData({...seoFormData, description: e.target.value})} 
                               className="min-h-[120px] rounded-2xl bg-forest/[0.02] border-forest/10 focus:bg-white transition-all text-sm font-medium leading-relaxed resize-none p-5"
@@ -4120,7 +4144,7 @@ export default function Admin() {
                         const defaultImage = "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
                         const staticSeedData = [
                           { path: "/", keyword: "Tour Package Himachal Pardesh, trekking in Parvati valley", title: "Soul Himalaya | Trekking & Yoga Retreats Tosh", description: "The Soul Himalaya delivers authentic, handcrafted experiences in Parvati Valley. Book bespoke tour packages, high-altitude treks, and transformational yoga retreats." },
-                          { path: "/tours", keyword: "Tour Package Himachal Pardesh, corporate Tour packages, Parvati valley tours", title: "Exclusive Tour Packages in Himachal | The Soul Himalaya", description: "Discover enchanting tour packages across Himachal Pradesh. From romantic getaways to corporate team-building retreats, experience the Himalayas in rustic luxury." },
+                          { path: "/tours", keyword: "Tour Package Himachal Pardesh, corporate Tour packages, Parvati valley tours", title: "Exclusive Tour Packages in Himachal | The Soul Himalaya", description: "Discover enchanting tour packages across Himachal Pradesh. From romantic getaways to corporate team-building retreats, experience the Himalaya's in rustic luxury." },
                           { path: "/trekks", keyword: "trekking in Parvati valley, trekking in Tosh, high-altitude trekking", title: "High-Altitude Trekking in Parvati Valley & Tosh", description: "Join our seasoned guides for exhilarating high-altitude trekking across Parvati Valley. Conquer scenic trails, dramatic glaciers, and experience raw mountain nature." },
                           { path: "/yoga", keyword: "yoga packages, yoga retreats Parvati Valley, wellness retreat Himalaya", title: "Yoga Retreats & Wellness Packages Parvati Valley Tosh", description: "Rejuvenate your mind and body with our exclusive yoga retreats in Parvati Valley. Experience guided meditation, mindful breathwork, and holistic wellness in Tosh." },
                           { path: "/meditation", keyword: "meditation packages, mindfulness Tosh, spiritual retreats Himalaya", title: "Meditation Packages & Spiritual Getaways in Tosh Himachal", description: "Find profound inner peace through our guided meditation packages in Tosh. Disconnect from the chaos and reconnect with your soul in the tranquil Himalayan valleys." },
@@ -4230,7 +4254,7 @@ export default function Admin() {
                                 path: `/helmets-of-gods/${data.slug}`,
                                 title: data.title ? `${data.title} | Helmets of Gods`.substring(0, 60) : "Helmets of Gods Article",
                                 keyword: Array.isArray(data.keywords) ? data.keywords.join(', ').substring(0, 100) : "Parvati Valley, spiritual retreats",
-                                description: data.metaDescription ? data.metaDescription.substring(0, 160) : "Read about this sacred place in the Himalayas.",
+                                description: data.metaDescription ? data.metaDescription.substring(0, 160) : "Read about this sacred place in the Himalaya's.",
                                 ogImage: defaultImage
                             };
                           });
@@ -4305,7 +4329,7 @@ export default function Admin() {
 
                           let newDesc = item.description;
                           if (!newDesc || newDesc.length < 70 || newDesc.length > 160 || !newDesc.toLowerCase().includes(primaryKeyword.toLowerCase())) {
-                            newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalayas with our premium packages and sustainable tourism in Parvati Valley.`;
+                            newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalaya's with our premium packages and sustainable tourism in Parvati Valley.`;
                             if (newDesc.length > 160) {
                               newDesc = `Experience the best ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty and sustainable tourism in Parvati Valley.`;
                             }
@@ -4440,6 +4464,212 @@ export default function Admin() {
                      </Button>
                   </CardContent>
                 </Card>
+                )}
+                
+                {activeSeoNav === 'Schema Markup Planner' && (
+                <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
+                  {/* Global Configuration Card */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center">
+                      <Settings className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-forest">Global Index Verification</h3>
+                      <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Master site verification engine</p>
+                    </div>
+                  </div>
+                  
+                  <form 
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await setDoc(doc(db, 'site_settings', 'global'), {
+                          googleSiteVerification: siteSettings.googleSiteVerification,
+                          updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        setNotification({ message: 'Global index keys updated', type: 'success' });
+                      } catch (error) {
+                        handleFirestoreError(error, OperationType.WRITE, 'site_settings/global');
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] text-forest/40 font-bold uppercase tracking-widest ml-1">Google Console Token</label>
+                      <Input 
+                        placeholder="google-site-verification=..." 
+                        value={siteSettings.googleSiteVerification || ''} 
+                        onChange={e => setSiteSettings({...siteSettings, googleSiteVerification: e.target.value})} 
+                        className="h-14 rounded-2xl bg-white border-forest/10 font-mono text-xs" 
+                      />
+                    </div>
+                    <Button type="submit" className="w-full bg-forest text-white font-bold h-12 rounded-xl transition-all">Synchronize Verification</Button>
+                  </form>
+                </Card>
+                )}
+
+                {activeSeoNav === 'Goals Tracker' && (
+                  <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-amber-500">
+                    <h3 className="text-2xl font-bold text-forest mb-4">SEO Goals Tracker</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <Target className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-forest/60">Organic Traffic Goal</h4>
+                        <Input 
+                          type="number"
+                          className="text-2xl sm:text-3xl font-black text-amber-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[120px] sm:max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalTraffic || 15000}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalTraffic: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="timeframe..."
+                          value={siteSettings.seoGoalTrafficTimeframe || "monthly users by Q4"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalTrafficTimeframe: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <TrendingUp className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-forest/60">Top 10 Rankings</h4>
+                        <Input 
+                          type="number"
+                          className="text-2xl sm:text-3xl font-black text-emerald-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[120px] sm:max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalRankings || 42}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalRankings: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="description..."
+                          value={siteSettings.seoGoalRankingsDesc || "target keywords in page 1"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalRankingsDesc: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
+                        <CheckCircle2 className="h-8 w-8 text-forest/40 mb-3" />
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-forest/60">Site Health Status</h4>
+                        <Input 
+                          type="number"
+                          className="text-2xl sm:text-3xl font-black text-blue-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[120px] sm:max-w-[150px]" 
+                          placeholder="0"
+                          value={siteSettings.seoGoalHealth || 98}
+                          onChange={async (e) => {
+                            const val = e.target.value;
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalHealth: Number(val)
+                            });
+                          }}
+                        />
+                        <Input 
+                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
+                          placeholder="description..."
+                          value={siteSettings.seoGoalHealthDesc || "Crawlability score"}
+                          onChange={async (e) => {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              seoGoalHealthDesc: e.target.value
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                {activeSeoNav === 'Topical Mapper' && (
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-purple-500">
+                    <h3 className="text-2xl font-bold text-forest mb-4">Topical Mapping Matrix</h3>
+                    <p className="text-sm text-forest/60 mb-6">Visualizing your semantic content clusters and entity associations for high-altitude trekking and wellness tourism in Parvati Valley.</p>
+                    <div className="flex gap-2 mb-6">
+                      <Input 
+                        placeholder="E.g. Tosh Valley Trails" 
+                        value={newTopicCluster}
+                        onChange={(e) => setNewTopicCluster(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={async (e) => {
+                          if (e.key === 'Enter' && newTopicCluster.trim()) {
+                            e.preventDefault();
+                            const currentList = siteSettings.topicalClusters || [];
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                topicalClusters: [...currentList, newTopicCluster.trim()]
+                              });
+                              setNewTopicCluster('');
+                              setNotification({ message: 'Added topic cluster', type: 'success' });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={async () => {
+                          if (!newTopicCluster.trim()) return;
+                          const currentList = siteSettings.topicalClusters || [];
+                          try {
+                            await setDoc(doc(db, 'site_settings', 'global'), {
+                              ...siteSettings,
+                              topicalClusters: [...currentList, newTopicCluster.trim()]
+                            });
+                            setNewTopicCluster('');
+                            setNotification({ message: 'Added topic cluster', type: 'success' });
+                          } catch (err) {
+                            console.error(err);
+                          }
+                        }}
+                      >Add</Button>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {(siteSettings.topicalClusters || []).map((cluster: string, i: number) => (
+                        <div key={i} className="flex-1 min-w-[200px] border border-forest/10 p-5 rounded-xl bg-forest/[0.02] relative group">
+                          <h4 className="font-extrabold text-forest text-base">{cluster}</h4>
+                          <ul className="mt-4 space-y-3 text-xs font-medium text-forest/60">
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-emerald-400"/> Core Pillar Defined</li>
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-amber-400"/> Needs content expansion</li>
+                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-rose-400"/> Needs internal links</li>
+                          </ul>
+                          <Button size="icon" variant="ghost" className="text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2" onClick={async () => {
+                            const updatedList = siteSettings.topicalClusters.filter((_: any, index: number) => index !== i);
+                            try {
+                              await setDoc(doc(db, 'site_settings', 'global'), {
+                                ...siteSettings,
+                                topicalClusters: updatedList
+                              });
+                            } catch (err) {
+                              console.error(err);
+                            }
+                          }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
                 )}
               </div>
 
@@ -4784,8 +5014,8 @@ export default function Admin() {
                         <motion.div 
                           key={item.id}
                           layout
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
                         >
                           <Card className={cn(
                             "group border shadow-md hover:shadow-2xl transition-all duration-300 rounded-[1.5rem] bg-white overflow-hidden relative",
@@ -4903,211 +5133,7 @@ export default function Admin() {
           })()}
         </div>
 
-                {activeSeoNav === 'Schema Markup Planner' && (
-                <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
-                  {/* Global Configuration Card */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center">
-                      <Settings className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-forest">Global Index Verification</h3>
-                      <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Master site verification engine</p>
-                    </div>
-                  </div>
-                  
-                  <form 
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      try {
-                        await setDoc(doc(db, 'site_settings', 'global'), {
-                          googleSiteVerification: siteSettings.googleSiteVerification,
-                          updatedAt: serverTimestamp()
-                        }, { merge: true });
-                        setNotification({ message: 'Global index keys updated', type: 'success' });
-                      } catch (error) {
-                        handleFirestoreError(error, OperationType.WRITE, 'site_settings/global');
-                      }
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] text-forest/40 font-bold uppercase tracking-widest ml-1">Google Console Token</label>
-                      <Input 
-                        placeholder="google-site-verification=..." 
-                        value={siteSettings.googleSiteVerification || ''} 
-                        onChange={e => setSiteSettings({...siteSettings, googleSiteVerification: e.target.value})} 
-                        className="h-14 rounded-2xl bg-white border-forest/10 font-mono text-xs" 
-                      />
-                    </div>
-                    <Button type="submit" className="w-full bg-forest text-white font-bold h-12 rounded-xl transition-all">Synchronize Verification</Button>
-                  </form>
-                </Card>
-                )}
 
-                {activeSeoNav === 'Goals Tracker' && (
-                  <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-amber-500">
-                    <h3 className="text-2xl font-bold text-forest mb-4">SEO Goals Tracker</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
-                        <Target className="h-8 w-8 text-forest/40 mb-3" />
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Organic Traffic Goal</h4>
-                        <Input 
-                          type="number"
-                          className="text-3xl font-black text-amber-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
-                          placeholder="0"
-                          value={siteSettings.seoGoalTraffic || 15000}
-                          onChange={async (e) => {
-                            const val = e.target.value;
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalTraffic: Number(val)
-                            });
-                          }}
-                        />
-                        <Input 
-                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
-                          placeholder="timeframe..."
-                          value={siteSettings.seoGoalTrafficTimeframe || "monthly users by Q4"}
-                          onChange={async (e) => {
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalTrafficTimeframe: e.target.value
-                            });
-                          }}
-                        />
-                      </div>
-                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
-                        <TrendingUp className="h-8 w-8 text-forest/40 mb-3" />
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Top 10 Rankings</h4>
-                        <Input 
-                          type="number"
-                          className="text-3xl font-black text-emerald-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
-                          placeholder="0"
-                          value={siteSettings.seoGoalRankings || 42}
-                          onChange={async (e) => {
-                            const val = e.target.value;
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalRankings: Number(val)
-                            });
-                          }}
-                        />
-                        <Input 
-                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
-                          placeholder="description..."
-                          value={siteSettings.seoGoalRankingsDesc || "target keywords in page 1"}
-                          onChange={async (e) => {
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalRankingsDesc: e.target.value
-                            });
-                          }}
-                        />
-                      </div>
-                      <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
-                        <CheckCircle2 className="h-8 w-8 text-forest/40 mb-3" />
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-forest">Site Health Status</h4>
-                        <Input 
-                          type="number"
-                          className="text-3xl font-black text-blue-600 mt-2 text-center bg-transparent border-none outline-none focus:ring-0 max-w-[150px]" 
-                          placeholder="0"
-                          value={siteSettings.seoGoalHealth || 98}
-                          onChange={async (e) => {
-                            const val = e.target.value;
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalHealth: Number(val)
-                            });
-                          }}
-                        />
-                        <Input 
-                          className="text-xs text-forest/50 font-medium text-center bg-transparent border-none focus:ring-0 max-w-[200px]" 
-                          placeholder="description..."
-                          value={siteSettings.seoGoalHealthDesc || "Crawlability score"}
-                          onChange={async (e) => {
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              seoGoalHealthDesc: e.target.value
-                            });
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </Card>
-                )}
-
-                {activeSeoNav === 'Topical Mapper' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-purple-500">
-                    <h3 className="text-2xl font-bold text-forest mb-4">Topical Mapping Matrix</h3>
-                    <p className="text-sm text-forest/60 mb-6">Visualizing your semantic content clusters and entity associations for high-altitude trekking and wellness tourism in Parvati Valley.</p>
-                    <div className="flex gap-2 mb-6">
-                      <Input 
-                        placeholder="E.g. Tosh Valley Trails" 
-                        value={newTopicCluster}
-                        onChange={(e) => setNewTopicCluster(e.target.value)}
-                        className="flex-1"
-                        onKeyDown={async (e) => {
-                          if (e.key === 'Enter' && newTopicCluster.trim()) {
-                            e.preventDefault();
-                            const currentList = siteSettings.topicalClusters || [];
-                            try {
-                              await setDoc(doc(db, 'site_settings', 'global'), {
-                                ...siteSettings,
-                                topicalClusters: [...currentList, newTopicCluster.trim()]
-                              });
-                              setNewTopicCluster('');
-                              setNotification({ message: 'Added topic cluster', type: 'success' });
-                            } catch (err) {
-                              console.error(err);
-                            }
-                          }
-                        }}
-                      />
-                      <Button 
-                        onClick={async () => {
-                          if (!newTopicCluster.trim()) return;
-                          const currentList = siteSettings.topicalClusters || [];
-                          try {
-                            await setDoc(doc(db, 'site_settings', 'global'), {
-                              ...siteSettings,
-                              topicalClusters: [...currentList, newTopicCluster.trim()]
-                            });
-                            setNewTopicCluster('');
-                            setNotification({ message: 'Added topic cluster', type: 'success' });
-                          } catch (err) {
-                            console.error(err);
-                          }
-                        }}
-                      >Add</Button>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                      {(siteSettings.topicalClusters || []).map((cluster: string, i: number) => (
-                        <div key={i} className="flex-1 min-w-[200px] border border-forest/10 p-5 rounded-xl bg-forest/[0.02] relative group">
-                          <h4 className="font-extrabold text-forest text-base">{cluster}</h4>
-                          <ul className="mt-4 space-y-3 text-xs font-medium text-forest/60">
-                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-emerald-400"/> Core Pillar Defined</li>
-                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-amber-400"/> Needs content expansion</li>
-                            <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-rose-400"/> Needs internal links</li>
-                          </ul>
-                          <Button size="icon" variant="ghost" className="text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2" onClick={async () => {
-                            const updatedList = siteSettings.topicalClusters.filter((_: any, index: number) => index !== i);
-                            try {
-                              await setDoc(doc(db, 'site_settings', 'global'), {
-                                ...siteSettings,
-                                topicalClusters: updatedList
-                              });
-                            } catch (err) {
-                              console.error(err);
-                            }
-                          }}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                )}
               </div>
             </div>
           </div>
@@ -5374,7 +5400,7 @@ export default function Admin() {
                             </div>
                          ) : (
                             <div className="w-16 h-10 bg-rose-100 rounded flex items-center justify-center">
-                              <Image className="h-4 w-4 text-rose-500" />
+                              <ImageIcon className="h-4 w-4 text-rose-500" />
                             </div>
                          )}
                          <p className={cn("text-xs font-bold", auditSeoItem.ogImage ? "text-emerald-600" : "text-rose-500")}>
@@ -5484,7 +5510,7 @@ export default function Admin() {
                         }
 
                         if (!newDesc || newDesc.length < 70 || newDesc.length > 160 || !newDesc.toLowerCase().includes(primaryKeyword.toLowerCase())) {
-                          newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalayas with our premium packages and sustainable tourism in Parvati Valley.`;
+                          newDesc = `Experience the best ${primaryKeyword.toLowerCase()}. Discover the mystic beauty of the Himalaya's with our premium packages and sustainable tourism in Parvati Valley.`;
                           if (newDesc.length > 160) {
                             newDesc = `Experience the best ${primaryKeyword.toLowerCase()} with The Soul Himalaya. Discover mystic beauty and sustainable tourism in Parvati Valley.`;
                           }
@@ -5528,7 +5554,7 @@ export default function Admin() {
 
       <AnimatePresence>
         {isSeoQuickEditModalOpen && (
-          <div className="fixed inset-0 z-[90] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center sm:p-6">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
@@ -5541,10 +5567,10 @@ export default function Admin() {
               }}
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative bg-white rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+              initial={{ opacity: 0, y: 100 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              exit={{ opacity: 0, y: 100 }}
+              className="relative bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="px-8 py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.02]">

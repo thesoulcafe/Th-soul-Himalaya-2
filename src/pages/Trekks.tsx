@@ -427,7 +427,7 @@ export default function Trekks() {
             </div>
             <h3 className="text-2xl font-heading font-bold">Preparation</h3>
             <p className="text-cream/70 text-sm leading-relaxed">
-              Trekking in the Himalayas requires physical fitness and mental preparation. 
+              Trekking in the Himalaya's requires physical fitness and mental preparation. 
               We recommend starting a cardio routine at least 4 weeks before your trekk.
             </p>
           </div>

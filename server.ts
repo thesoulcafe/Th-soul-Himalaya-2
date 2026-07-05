@@ -718,7 +718,7 @@ async function injectMetaTags(req: express.Request, html: string) {
     <li><a href="/services">Holistic Travel Services</a></li>
   </ul>
   <h3>Why Choose The Soul Himalaya?</h3>
-  <p>We believe in eco-friendly and community-driven tourism. By traveling with us, you are directly supporting the local artisans, guides, and families that call the Himalayas home. From enjoying specialty coffee at The Soul Cafe to staying in our rustic, scenic locations, every detail is considered to ensure you enjoy optimal privacy, deep comfort, and raw nature.</p>
+  <p>We believe in eco-friendly and community-driven tourism. By traveling with us, you are directly supporting the local artisans, guides, and families that call the Himalaya's home. From enjoying specialty coffee at The Soul Cafe to staying in our rustic, scenic locations, every detail is considered to ensure you enjoy optimal privacy, deep comfort, and raw nature.</p>
   <p>Discover our hand-woven macramé and local artisan crafts at our <a href="/shop">Himalayan Artisan Shop</a>, browse our comprehensive <a href="/guide">Travel Guide</a> for essential Parvati Valley travel tips, or simply soak in the aesthetic beauty of the mountains through our visually stunning <a href="/gallery">Gallery</a>.</p>
   <h3>Explore Further</h3>
   <p>Explore <a href="/parvati-valley">the diverse trails and natural wonders of Parvati Valley</a> to plan your optimal holiday. For bespoke inquiries, custom corporate tour packages, or general assistance, please <a href="/contact">contact us</a>. Read deeper into our vision for sustainable tourism on our <a href="/about">About Us</a> page, and discover how our dedicated team ensures your Himalayan escape is perfectly safe, utterly breathtaking, and wholly unforgettable.</p>

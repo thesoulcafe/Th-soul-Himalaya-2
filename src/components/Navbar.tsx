@@ -46,7 +46,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-forest text-cream border-b border-white/10 shadow-lg h-[64px] md:h-[72px] px-4 sm:px-6 flex items-center"
+      className="fixed top-0 left-0 right-0 z-50 bg-forest/95 backdrop-blur-md text-cream border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] h-[64px] md:h-[76px] px-4 sm:px-6 flex items-center transition-all duration-300"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function Navbar() {
             whileTap={{ scale: 0.9 }}
           >
             <Link to="/" className="flex items-center group gap-2 xs:gap-3">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner border border-white/20 group-hover:border-terracotta/50 transition-colors shrink-0">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-2xl border border-white/20 group-hover:border-terracotta/50 transition-all duration-500 shrink-0">
                 <img 
                   src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
                   alt="The Soul Himalaya Logo" 
@@ -63,14 +63,14 @@ export default function Navbar() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <span className="flex items-baseline gap-1 xs:gap-1.5 leading-none transition-all duration-500 group-hover:gap-2 pt-1 md:hidden">
-                <span className="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[22px] font-playfair italic font-medium text-white/90">
+              <span className="flex items-baseline gap-1 leading-none transition-all duration-500 pt-1">
+                <span className="text-[12px] xs:text-[14px] lg:text-[16px] xl:text-[18px] font-playfair italic font-medium text-white/90">
                   The
                 </span>
-                <span className="text-[18px] xs:text-[22px] sm:text-[24px] md:text-[28px] lg:text-[30px] xl:text-[34px] font-fluid text-terracotta drop-shadow-sm px-0.5 sm:px-1">
+                <span className="text-[12px] xs:text-[14px] lg:text-[16px] xl:text-[18px] font-playfair italic font-bold text-terracotta drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] px-0.5">
                   Soul
                 </span>
-                <span className="text-[12px] xs:text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] xl:text-[22px] font-playfair italic font-medium text-white/90">
+                <span className="text-[12px] xs:text-[14px] lg:text-[16px] xl:text-[18px] font-playfair italic font-medium text-white/90 hidden xs:inline">
                   Himalaya
                 </span>
               </span>
@@ -79,7 +79,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center space-x-6 xl:space-x-10">
+        <div className="hidden lg:flex items-center ml-8 xl:ml-12 2xl:ml-16 space-x-3 xl:space-x-5 2xl:space-x-8">
           {navLinks.map((link) => (
             <motion.div
               key={link.name}
@@ -90,7 +90,7 @@ export default function Navbar() {
                 <a
                   href={link.href}
                   className={cn(
-                    'text-[12px] xl:text-[13px] font-montserrat font-bold uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    'text-[9px] xl:text-[10px] 2xl:text-[11px] font-montserrat font-black uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/60 relative group pb-1 block whitespace-nowrap',
                     location.pathname === link.href && 'text-white border-b-2 border-terracotta'
                   )}
                 >
@@ -104,7 +104,7 @@ export default function Navbar() {
                 <Link
                   to={link.href}
                   className={cn(
-                    'text-[12px] xl:text-[13px] font-montserrat font-bold uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/70 relative group pb-1',
+                    'text-[9px] xl:text-[10px] 2xl:text-[11px] font-montserrat font-black uppercase tracking-[0.1em] xl:tracking-[0.15em] transition-all duration-300 hover:text-terracotta text-white/60 relative group pb-1 block whitespace-nowrap',
                     location.pathname === link.href && 'text-white border-b-2 border-terracotta'
                   )}
                 >
@@ -118,11 +118,11 @@ export default function Navbar() {
             </motion.div>
           ))}
           {user && (
-            <div className="flex items-center gap-4 xl:gap-6 border-l border-white/10 pl-4 xl:pl-6">
+            <div className="flex items-center gap-3 xl:gap-5 border-l border-white/10 pl-3 xl:pl-5">
               <Link
                 to="/dashboard"
                 className={cn(
-                  'text-[10px] xl:text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-1.5 xl:gap-2',
+                  'text-[9px] xl:text-[10px] font-black uppercase tracking-widest transition-colors hover:text-terracotta text-white/60 flex items-center gap-1.5',
                   location.pathname === '/dashboard' && 'text-white'
                 )}
               >
@@ -133,7 +133,7 @@ export default function Navbar() {
                 <Link
                   to="/admin"
                   className={cn(
-                    'text-[10px] xl:text-[11px] font-bold uppercase tracking-widest transition-colors hover:text-terracotta text-white/70 flex items-center gap-1.5 xl:gap-2',
+                    'text-[9px] xl:text-[10px] font-black uppercase tracking-widest transition-colors hover:text-terracotta text-white/60 flex items-center gap-1.5',
                     location.pathname === '/admin' && 'text-white'
                   )}
                 >
@@ -163,10 +163,27 @@ export default function Navbar() {
                 </button>
               }
             />
-            <SheetContent side="right" className="w-[280px] xs:w-[320px] sm:w-[400px] bg-forest border-white/10 text-cream p-0">
+            <SheetContent side="right" className="w-[280px] xs:w-[320px] sm:w-[400px] bg-forest border-white/10 text-cream p-0 overflow-hidden">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <div className="p-5 pt-16 h-full flex flex-col">
-                <div className="flex flex-col space-y-1">
+              <div className="p-6 pt-12 h-full flex flex-col relative">
+                {/* Decorative Background for Mobile Menu */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-terracotta/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                
+                <div className="mb-8 flex items-center gap-3 px-2">
+                  <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center overflow-hidden border border-white/20">
+                    <img 
+                      src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
+                      alt="Logo" 
+                      className="h-9 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-terracotta font-playfair italic font-bold text-2xl leading-none">Soul</span>
+                    <span className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">Himalaya</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-1.5">
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -275,28 +292,28 @@ export default function Navbar() {
                         <a
                           href={link.href}
                           className={cn(
-                            'flex items-center w-full px-5 py-2.5 rounded-lg transition-all duration-200 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/5'
+                            'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-300 group border border-white/5 text-cream/70 hover:text-white hover:bg-white/10 hover:border-terracotta/20'
                           )}
                         >
-                          <ArrowRight className="h-3.5 w-3.5 mr-3 text-terracotta opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <span className="text-xs font-bold tracking-widest uppercase">{link.name}</span>
+                          <ArrowRight className="h-4 w-4 mr-3 text-terracotta opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
+                          <span className="text-[13px] font-black tracking-[0.1em] uppercase">{link.name}</span>
                         </a>
                       ) : (
                         <Link
                           to={link.href}
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            'flex items-center w-full px-5 py-2.5 rounded-lg transition-all duration-200 group border border-white/5',
+                            'flex items-center w-full px-5 py-3 rounded-xl transition-all duration-300 group border border-white/5',
                             location.pathname === link.href 
-                              ? 'text-terracotta font-bold border-terracotta/20 bg-white/5' 
-                              : 'text-cream/70 hover:text-white hover:bg-white/5'
+                              ? 'text-terracotta font-black border-terracotta/30 bg-terracotta/5' 
+                              : 'text-cream/70 hover:text-white hover:bg-white/10 hover:border-terracotta/20'
                           )}
                         >
                           <ArrowRight className={cn(
-                            "h-3.5 w-3.5 mr-3 text-terracotta transition-opacity",
-                            location.pathname === link.href ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            "h-4 w-4 mr-3 text-terracotta transition-all duration-300 transform",
+                            location.pathname === link.href ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-1"
                           )} />
-                          <span className="text-xs font-bold tracking-widest uppercase">{link.name}</span>
+                          <span className="text-[13px] font-black tracking-[0.1em] uppercase">{link.name}</span>
                         </Link>
                       )}
                     </motion.div>

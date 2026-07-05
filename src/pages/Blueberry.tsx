@@ -12,9 +12,9 @@ export default function Blueberry() {
   return (
     <div className="pt-20 min-h-screen flex flex-col bg-cream">
       <SEO 
-        title="The Soul Blueberry Farm | Tosh Village, Himalayas"
+        title="The Soul Blueberry Farm | Tosh Village, Himalaya's"
         description="Visit our high-altitude organic blueberry farm in Tosh, Parvati Valley. Experience sustainable farming, pick-your-own berries, and farm-to-table freshness."
-        keywords="blueberry farm Tosh, organic farm Parvati Valley, sustainable farming Himalayas, pick your own blueberries India, things to do in Tosh"
+        keywords="blueberry farm Tosh, organic farm Parvati Valley, sustainable farming Himalaya's, pick your own blueberries India, things to do in Tosh"
         type="website"
       />
       
@@ -52,7 +52,7 @@ export default function Blueberry() {
 
             <div className="flex items-center justify-center gap-4 text-white/80 font-bold uppercase tracking-widest text-xs mb-12">
               <MapPin className="h-4 w-4 text-terracotta" />
-              <span>Upper Tosh Village, Himalayas</span>
+              <span>Upper Tosh Village, Himalaya's</span>
             </div>
 
             <div className="bg-white/20 backdrop-blur-xl p-3 md:p-4 rounded-[2rem] shadow-2xl max-w-lg mx-auto flex items-center border border-white/20">

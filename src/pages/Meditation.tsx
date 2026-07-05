@@ -269,7 +269,7 @@ export default function Meditation() {
               <Sun className="h-8 w-8 text-terracotta" />
             </div>
             <h3 className="text-2xl font-heading font-bold text-forest">Silence</h3>
-            <p className="text-forest/60 text-sm">Embrace the power of silence in the heart of the Himalayas.</p>
+            <p className="text-forest/60 text-sm">Embrace the power of silence in the heart of the Himalaya's.</p>
           </div>
           <div className="space-y-4">
             <div className="bg-cream p-6 rounded-full w-fit mx-auto">

@@ -214,7 +214,7 @@ export default function Adventure() {
     <div className="pt-24">
       {seo && <SEO 
         title={seo.title || "Adventure Sports"} 
-        description={seo.description || "Feel the adrenaline in the Himalayas."} 
+        description={seo.description || "Feel the adrenaline in the Himalaya's."} 
         image={seo.image}
         seoData={seo.seoData}
       />}

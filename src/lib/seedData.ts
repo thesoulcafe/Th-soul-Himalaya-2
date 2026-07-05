@@ -30,7 +30,7 @@ export const SEED_ARTICLES = [
   {
     title: "Vashisht & The Hot Springs",
     slug: "vashisht-hot-springs",
-    metaDescription: "Learn about Sage Vashisht, the guru of Lord Rama, and the miraculous hot springs named after him that provide healing and spiritual cleansing in the Himalayas.",
+    metaDescription: "Learn about Sage Vashisht, the guru of Lord Rama, and the miraculous hot springs named after him that provide healing and spiritual cleansing in the Himalaya's.",
     content: "<h2>The Legend of Sage Vashisht</h2><p>According to legend, Sage Vashisht, heartbroken by the death of his sons, tried to end his life in the river Vipasha (Beas). The river refused to drown him, instead breaking his bonds.</p><h2>The Healing Helmet</h2><p>The village of Vashisht stands where he meditated. The sulfur hot springs here are considered therapeutic, a healing helmet provided by the sage's enduring spiritual energy. Travelers seek these waters for physical and spiritual rejuvenation.</p>",
     keywords: ["Vashisht", "hot springs", "sage Vashisht", "healing waters"],
   },

@@ -109,7 +109,7 @@ export const SEO = ({ title, description, keywords, canonicalUrl, image, type = 
       "image": finalImage,
       "location": {
         "@type": "Place",
-        "name": "Parvati Valley, Himalayas",
+        "name": "Parvati Valley, Himalaya's",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Kasol",

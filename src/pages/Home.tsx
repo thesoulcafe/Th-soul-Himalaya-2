@@ -478,19 +478,79 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-terracotta font-montserrat font-bold uppercase text-[10px] md:text-xs mt-0 mb-4 tracking-[0.2em] drop-shadow-sm"
+              className="text-white font-montserrat font-black uppercase text-[16px] xs:text-[18px] sm:text-2xl md:text-5xl mt-0 mb-8 tracking-[0.2em] drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] whitespace-nowrap"
             >
               Parvati Valley & Beyond
             </motion.p>
             
-            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-montserrat font-extrabold text-white mb-4 leading-[0.95] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-2 italic">
+            <motion.h1 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-montserrat font-extrabold text-white mb-6 leading-[0.85] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-3 italic relative group cursor-default"
+            >
               <span className="sr-only">Tour Package Himachal Pradesh, Trekking in Parvati Valley & Yoga Retreats in Tosh</span>
-              <span className="opacity-90 uppercase tracking-tight pr-4">FIND YOUR</span>
-              <span className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_10px_10px_rgba(193,90,62,0.3)] pl-1">SOUL</span>
-            </h1>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 0.95, y: 0 }}
+                transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="uppercase tracking-tight pr-4 transition-all duration-1000 group-hover:tracking-[0.05em] group-hover:text-white/100"
+              >
+                FIND YOUR
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 60 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative"
+              >
+                <motion.span 
+                  animate={{ 
+                    y: [0, -15, 0],
+                    rotate: [0, 1.5, 0, -1.5, 0]
+                  }}
+                  transition={{ 
+                    duration: 6, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                  className="text-terracotta font-playfair italic normal-case tracking-normal drop-shadow-[0_15px_20px_rgba(193,90,62,0.5)] pl-1 block transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_30px_rgba(193,90,62,0.6)]"
+                >
+                  SOUL
+                </motion.span>
+                
+                {/* Subtle Glow Effect */}
+                <div className="absolute inset-0 bg-terracotta/20 blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
+                
+                {/* Floating Decorative Sparkles */}
+                <motion.div
+                  animate={{ 
+                    scale: [0.8, 1.2, 0.8],
+                    opacity: [0.2, 0.5, 0.2],
+                    rotate: [0, 45, 0]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-8 -right-8 text-white/30 hidden md:block pointer-events-none"
+                >
+                  <Sparkles className="h-10 w-10" />
+                </motion.div>
+                <motion.div
+                  animate={{ 
+                    scale: [1.2, 0.8, 1.2],
+                    opacity: [0.1, 0.4, 0.1],
+                    rotate: [0, -45, 0]
+                  }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute -bottom-4 -left-12 text-white/20 hidden md:block pointer-events-none"
+                >
+                  <Sparkles className="h-6 w-6" />
+                </motion.div>
+              </motion.div>
+            </motion.h1>
 
-            <p className="text-xs xs:text-sm md:text-base text-cream/80 mb-8 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px] px-4">
-              A multi-experience travel and lifestyle brand based in the mystical heart of the Himalayas. Discover curated retreats, adventures, and artisan crafts.
+            <p className="text-xs xs:text-sm md:text-base text-cream/90 mb-10 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px] px-4">
+              A multi-experience travel and lifestyle brand based in the mystical heart of the Himalaya's. Discover curated retreats, adventures, and artisan crafts.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-0">
@@ -523,8 +583,8 @@ export default function Home() {
                 <Link 
                   to="/about"
                   className={cn(
-                    buttonVariants({ variant: "ghost", size: "lg" }),
-                    "px-8 sm:px-10 py-6 sm:py-8 text-white/70 hover:text-white rounded-full transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto"
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "px-8 sm:px-10 py-6 sm:py-8 text-terracotta border-terracotta/60 hover:border-terracotta hover:bg-terracotta/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto shadow-[0_0_20px_rgba(193,90,62,0.2)]"
                   )}
                 >
                   Our Philosophy
@@ -590,7 +650,7 @@ export default function Home() {
                     </div>
                     <h3 className="text-2xl md:text-3xl font-montserrat font-extrabold text-white mb-3 line-clamp-2 leading-tight">{pkg.name || pkg.title}</h3>
                     <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed">
-                      {pkg.description || pkg.shortDescription || 'Experience the magic of the Himalayas with this specially curated package.'}
+                      {pkg.description || pkg.shortDescription || "Experience the magic of the Himalaya's with this specially curated package."}
                     </p>
                     <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
                       <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />
@@ -649,7 +709,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-4xl md:text-5xl font-montserrat font-extrabold text-white mb-4 leading-tight">Corporate <br />Tour Package</h3>
                 <p className="text-white/70 text-sm md:text-base mb-8 max-w-sm leading-relaxed">
-                  Elevate your team's spirit in the lap of the Himalayas. Tailor-made retreats for visionary companies looking to reset and reconnect.
+                  Elevate your team's spirit in the lap of the Himalaya's. Tailor-made retreats for visionary companies looking to reset and reconnect.
                 </p>
                 <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[11px] tracking-widest">
                   <span className="w-12 h-[1px] bg-white/30 group-hover/btn:w-20 transition-all duration-500" />

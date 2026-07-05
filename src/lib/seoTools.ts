@@ -127,7 +127,7 @@ export function generateSchema(type: 'adventure' | 'cafe' | 'org', data: any) {
       "image": toAbsoluteUrl(data.image),
       "location": {
         "@type": "Place",
-        "name": "Parvati Valley, Himalayas",
+        "name": "Parvati Valley, Himalaya's",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Kasol",

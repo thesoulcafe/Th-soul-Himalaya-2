@@ -38,7 +38,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
     content: [
       {
         type: "paragraph",
-        text: "Tosh isn't just a place to relax; it is the ultimate basecamp for some of the most spectacular treks in the Parvati Valley. Whether you are seeking a short day hike to high-altitude meadows or a multi-day expedition into the deep Himalayas, Tosh is your starting point."
+        text: "Tosh isn't just a place to relax; it is the ultimate basecamp for some of the most spectacular treks in the Parvati Valley. Whether you are seeking a short day hike to high-altitude meadows or a multi-day expedition into the deep Himalaya's, Tosh is your starting point."
       },
       {
         type: "heading",
@@ -91,7 +91,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -151,7 +151,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -207,7 +207,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -255,7 +255,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -298,7 +298,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -310,7 +310,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
     ]
   },
   "malana-heritage": {
-    title: "The Legend of Alexander: Greek DNA in the Himalayas?",
+    title: "The Legend of Alexander: Greek DNA in the Himalaya's?",
     category: "Genetic History",
     readTime: "14 min read",
     date: "March 2026",
@@ -332,7 +332,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -367,7 +367,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -402,7 +402,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -428,7 +428,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -450,11 +450,11 @@ const ARTICLE_CONTENT: Record<string, any> = {
     content: [
       {
         type: "paragraph",
-        text: "Packing for the Himalayas in May is an exercise in versatility. You must plan for both the biting alpine cold of the night and the intense UV radiation of the midday sun."
+        text: "Packing for the Himalaya's in May is an exercise in versatility. You must plan for both the biting alpine cold of the night and the intense UV radiation of the midday sun."
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -480,7 +480,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -506,7 +506,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -532,7 +532,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -558,7 +558,7 @@ const ARTICLE_CONTENT: Record<string, any> = {
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "paragraph",
@@ -620,7 +620,7 @@ import { HAMLET_DETAILS } from './HamletDetail';
 
 // Auto-generates a rich 500-word SEO article structure for undefined articles
 const generateContent = (hamletId: string, articleMeta: any, articleId: string) => {
-  const hId = hamletId ? hamletId.charAt(0).toUpperCase() + hamletId.slice(1) : "The Himalayas";
+  const hId = hamletId ? hamletId.charAt(0).toUpperCase() + hamletId.slice(1) : "The Himalaya's";
   const slugToTitle = (slug: string) => slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const generatedTitle = articleId ? slugToTitle(articleId) : "Himalayan Lore";
   const title = articleMeta?.title || generatedTitle;
@@ -649,7 +649,7 @@ const generateContent = (hamletId: string, articleMeta: any, articleId: string) 
       },
       {
         type: "paragraph",
-        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalayas. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
+        text: "Immersing yourself in the high-altitude tranquility of the Parvati Valley is an experience that transcends typical tourism. The whispering pines, the majestic snow-capped peaks, and the ancient trails carved by local shepherds offer a profound reset for the wandering soul. Here, time loses its urgency, replaced by the deep, rhythmic pulse of the Himalaya's. Every sunrise brings a fresh canvas of gold across the glaciers, while the crisp, unpolluted air cleanses the mind of urban clutter. Travelers who venture this far into the mountains often report a profound sense of clarity and connection to the earth, a testament to the raw, untamed energy of these ancient lands."
       },
       {
         type: "quote",
@@ -926,7 +926,7 @@ export default function ArticleDetail() {
                     </div>
                     <h3 className="text-2xl md:text-3xl font-montserrat font-extrabold text-white mb-3 line-clamp-2 leading-tight">{pkg.name || pkg.title}</h3>
                     <p className="text-white/70 text-xs md:text-sm mb-6 line-clamp-2 leading-relaxed">
-                      {pkg.description || pkg.shortDescription || 'Experience the magic of the Himalayas with this specially curated package.'}
+                      {pkg.description || pkg.shortDescription || "Experience the magic of the Himalaya's with this specially curated package."}
                     </p>
                     <div className="group/btn flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-widest">
                       <span className="w-8 h-[1px] bg-terracotta group-hover/btn:w-16 transition-all duration-500" />

@@ -44,7 +44,7 @@ export default function About() {
               <p>
                 THE SOUL HIMALAYA isn't just a business; it's a dream that took root in the high-altitude village of Tosh. 
                 Our founder, a local resident of the Parvati Valley, envisioned a brand that would showcase the authentic 
-                beauty of the Himalayas while preserving its sacred spirit and supporting the local community.
+                beauty of the Himalaya's while preserving its sacred spirit and supporting the local community.
               </p>
             </div>
 

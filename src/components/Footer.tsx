@@ -46,7 +46,7 @@ export default function Footer() {
               <span className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-playfair italic font-medium text-cream/90">
                 The
               </span>
-              <span className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-fluid text-terracotta px-1 md:px-2 drop-shadow-lg">
+              <span className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-playfair italic font-bold text-terracotta px-1 md:px-2 drop-shadow-lg">
                 Soul
               </span>
               <span className="text-lg xs:text-xl sm:text-2xl md:text-4xl font-playfair italic font-medium text-cream/90">
