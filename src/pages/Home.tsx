@@ -478,7 +478,7 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-white font-montserrat font-black uppercase text-[16px] xs:text-[18px] sm:text-2xl md:text-5xl mt-0 mb-8 tracking-[0.2em] drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] whitespace-nowrap"
+              className="text-[#FFD700] font-montserrat font-black uppercase text-[16px] xs:text-[18px] sm:text-2xl md:text-5xl mt-0 mb-8 tracking-[0.2em] drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] whitespace-nowrap"
             >
               Parvati Valley & Beyond
             </motion.p>
@@ -486,7 +486,7 @@ export default function Home() {
             <motion.h1 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-montserrat font-extrabold text-white mb-6 leading-[0.85] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-1 md:gap-3 italic relative group cursor-default"
+              className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-montserrat font-extrabold text-white mb-10 leading-[1.0] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-6 md:gap-12 italic relative group cursor-default"
             >
               <span className="sr-only">Tour Package Himachal Pradesh, Trekking in Parvati Valley & Yoga Retreats in Tosh</span>
               
