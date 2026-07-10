@@ -6,14 +6,30 @@ import './index.css';
 
 // Suppress potential MetaMask/Web3 injected errors that might be misreported in AI Studio environment
 if (typeof window !== 'undefined') {
+  const isWeb3Error = (msg: string) => {
+    const lowerMsg = msg.toLowerCase();
+    return lowerMsg.includes('metamask') || 
+           lowerMsg.includes('ethereum') || 
+           lowerMsg.includes('web3') || 
+           lowerMsg.includes('failed to connect') ||
+           lowerMsg.includes('wallet');
+  };
+
   const suppressInjectedErrors = (e: ErrorEvent | PromiseRejectionEvent) => {
-    const msg = ('message' in e ? e.message : String(e.reason))?.toLowerCase() || '';
-    if (msg.includes('metamask') || msg.includes('ethereum') || msg.includes('web3')) {
+    let msg = '';
+    if ('message' in e) {
+      msg = e.message || '';
+    } else if ('reason' in e && e.reason) {
+      msg = typeof e.reason === 'string' ? e.reason : (e.reason.message || String(e.reason));
+    }
+    
+    if (isWeb3Error(msg)) {
       e.stopImmediatePropagation();
       if ('preventDefault' in e) e.preventDefault();
       return true;
     }
   };
+  
   window.addEventListener('error', suppressInjectedErrors, true);
   window.addEventListener('unhandledrejection', suppressInjectedErrors, true);
 
@@ -22,11 +38,21 @@ if (typeof window !== 'undefined') {
   const originalWarn = console.warn;
   
   const isIgnorable = (args: any[]) => {
-    const msg = args.map(arg => String(arg)).join(' ').toLowerCase();
-    return msg.includes('metamask') || 
-           msg.includes('ethereum') || 
-           msg.includes('web3') || 
-           msg.includes('failed to connect to metamask');
+    try {
+      const msg = args.map(arg => {
+        if (!arg) return '';
+        if (typeof arg === 'string') return arg;
+        if (arg.message) return arg.message;
+        if (typeof arg === 'object') {
+          try { return JSON.stringify(arg); } catch { return String(arg); }
+        }
+        return String(arg);
+      }).join(' ');
+      
+      return isWeb3Error(msg);
+    } catch (err) {
+      return false;
+    }
   };
 
   console.error = (...args: any[]) => {
