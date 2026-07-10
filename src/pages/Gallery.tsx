@@ -24,7 +24,7 @@ export default function Gallery() {
           return { 
             id: doc.id, 
             url: data.data.image || data.data.img,
-            title: data.data.title || 'Soul Himalaya Artifact',
+            title: data.data.title || '',
             description: data.data.description || 'A timeless capture of spiritual resonance.'
           };
         });
@@ -57,9 +57,9 @@ export default function Gallery() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-6xl md:text-8xl font-serif text-neutral-900 tracking-tight"
+          className="text-4xl md:text-6xl lg:text-7xl font-serif text-neutral-900 tracking-tight"
         >
-          Review <span className="italic text-[#A0522D]">Gallery</span>
+          Successful Traveller <span className="italic text-[#A0522D]">Gallery</span>
         </motion.h1>
       </header>
 

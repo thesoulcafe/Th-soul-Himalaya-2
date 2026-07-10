@@ -331,8 +331,6 @@ export default function Yoga() {
                         : [pkg.image, ...(pkg.images || [])]).filter(Boolean)} 
                       alt={pkg.title}
                       className="h-full w-full"
-                      showThumbnails={true}
-                      thumbnailClassName="absolute bottom-2 left-0 right-0 z-20 pointer-events-auto"
                     />
                     <div className="absolute inset-0 bg-black/10 pointer-events-none" />
                     {pkg.isAvailable === false && (

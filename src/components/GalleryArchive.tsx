@@ -100,14 +100,10 @@ export default function GalleryArchive({
 
               {/* Text / Review */}
               <div className="space-y-2 px-2">
-                <h3 className="font-serif text-lg font-bold text-neutral-900">{img.title}</h3>
+                {img.title && <h3 className="font-serif text-lg font-bold text-neutral-900">{img.title}</h3>}
                 <p className="text-sm text-neutral-600 line-clamp-3 leading-relaxed">
                   "{img.description}"
                 </p>
-                <div className="pt-2 text-[10px] font-bold text-[#A0522D] uppercase tracking-widest flex items-center gap-2">
-                  <span className="h-1 w-4 bg-[#A0522D] rounded-full" />
-                  Successful Traveller Review
-                </div>
               </div>
             </motion.div>
           ))}

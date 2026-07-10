@@ -1,31 +1,33 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Map, Coffee, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2, Sparkles } from 'lucide-react';
+import { Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/lib/AuthContext';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { DEFAULT_SERVICES } from '@/constants';
+
+const getCardStyle = (theme: string) => {
+  switch (theme) {
+    case 'forest':
+      return 'bg-forest text-cream border-none';
+    case 'terracotta':
+      return 'bg-terracotta text-white border-none';
+    case 'cream':
+      return 'bg-cream text-forest border-forest/10';
+    case 'luxury':
+      return 'bg-black text-white border-gold/20 border-2';
+    default:
+      return 'bg-white text-forest border-none';
+  }
+};
 
 export default function Services() {
   const { profile } = useAuth();
   const [services, setServices] = useState<any[]>([]);
-
-  const getIcon = (title: string) => {
-    const t = title.toLowerCase();
-    if (t.includes('tour')) return Map;
-    if (t.includes('wfh') || t.includes('workation')) return HomeIcon;
-    if (t.includes('meditation')) return Sparkles;
-    if (t.includes('yoga')) return Flower2;
-    if (t.includes('trekk')) return Compass;
-    if (t.includes('shop')) return ShoppingBag;
-    if (t.includes('adventure')) return Wind;
-    return Compass;
-  };
 
   useEffect(() => {
     const q = query(collection(db, 'content'), where('type', '==', 'service'));
@@ -64,26 +66,6 @@ export default function Services() {
 
     return () => unsubscribe();
   }, []);
-
-  const getCardStyle = (theme: string) => {
-    switch (theme) {
-      case 'forest':
-        return 'bg-forest text-cream border-none';
-      case 'terracotta':
-        return 'bg-terracotta text-white border-none';
-      case 'cream':
-        return 'bg-cream text-forest border-forest/10';
-      case 'luxury':
-        return 'bg-black text-white border-gold/20 border-2';
-      default:
-        return 'bg-white text-forest border-none';
-    }
-  };
-
-  const getTextColor = (theme: string) => {
-    if (['forest', 'terracotta', 'luxury'].includes(theme)) return 'text-white/80';
-    return 'text-forest/70';
-  };
 
   const finalServices = useMemo(() => {
     // Robust deduplication
@@ -132,57 +114,58 @@ export default function Services() {
             const exploreText = isDark ? 'text-white' : 'text-forest';
 
             return (
-            <motion.div
-              key={`${service.title}-${index}`}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
-              className={cn("group relative p-8 md:p-10 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-300 flex flex-col justify-between h-full", cardClass)}
-            >
-              <Link to={service.link || `/services/${service.id}`} className="absolute inset-0 z-30" />
-              
-              {service.isAvailable === false && (
-                <div className="absolute top-4 left-4 z-20">
-                  <Badge className="bg-rose-500 text-white border-none px-3 py-1 text-[9px] font-bold shadow-xl uppercase tracking-widest">
-                    Unavailable
-                  </Badge>
-                </div>
-              )}
-              {profile?.role === 'admin' && (
-                <Link 
-                  to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
-                  className="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-xl px-2 p-1.5 rounded-full flex items-center justify-center border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 z-40 group/edit"
-                  title={service.id ? "Edit Service" : "Sync defaults to edit"}
-                  onClick={(e) => { e.stopPropagation(); }}
-                >
-                  <Edit2 className="h-4 w-4 text-forest" />
-                </Link>
-              )}
-
-              <div className="flex flex-col flex-grow z-20 relative pt-4 sm:pt-0">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className={cn("backdrop-blur-sm w-10 h-10 rounded-xl flex items-center justify-center border border-transparent shrink-0", starBg)}>
-                    <Star className="text-terracotta h-5 w-5" />
+              <motion.div
+                key={`${service.title}-${index}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className={cn("group relative p-8 md:p-10 rounded-[2rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.08)] cursor-pointer transition-all duration-300 flex flex-col justify-between h-full", cardClass)}
+              >
+                <Link to={service.link || `/services/${service.id}`} className="absolute inset-0 z-30" />
+                
+                {service.isAvailable === false && (
+                  <div className="absolute top-4 left-4 z-20">
+                    <Badge className="bg-rose-500 text-white border-none px-3 py-1 text-[9px] font-bold shadow-xl uppercase tracking-widest">
+                      Unavailable
+                    </Badge>
                   </div>
-                  <span className={cn("font-bold uppercase tracking-widest text-[9px] px-3 py-1 rounded-full backdrop-blur-sm border", badgeBg, badgeBorder, badgeText)}>
-                    {service.type || 'Service'}
-                  </span>
+                )}
+                {profile?.role === 'admin' && (
+                  <Link 
+                    to={service.id ? `/admin?tab=content&type=service&edit=${service.id}` : `/admin?tab=content&type=service`}
+                    className="absolute top-4 right-4 bg-white/95 backdrop-blur shadow-xl px-2 p-1.5 rounded-full flex items-center justify-center border border-forest/10 hover:bg-forest hover:text-white transition-all duration-300 z-40 group/edit"
+                    title={service.id ? "Edit Service" : "Sync defaults to edit"}
+                    onClick={(e) => { e.stopPropagation(); }}
+                  >
+                    <Edit2 className="h-4 w-4 text-forest" />
+                  </Link>
+                )}
+
+                <div className="flex flex-col flex-grow z-20 relative pt-4 sm:pt-0">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className={cn("backdrop-blur-sm w-10 h-10 rounded-xl flex items-center justify-center border border-transparent shrink-0", starBg)}>
+                      <Star className="text-terracotta h-5 w-5" />
+                    </div>
+                    <span className={cn("font-bold uppercase tracking-widest text-[9px] px-3 py-1 rounded-full backdrop-blur-sm border", badgeBg, badgeBorder, badgeText)}>
+                      {service.type || 'Service'}
+                    </span>
+                  </div>
+                  <h3 className={cn("text-2xl md:text-3xl font-heading font-extrabold mb-4 line-clamp-2 leading-tight tracking-tight", headingColor)}>
+                    {service.title}
+                  </h3>
+                  <p className={cn("text-xs md:text-sm mb-8 line-clamp-3 leading-relaxed font-medium flex-grow", descColor)}>
+                    {service.description || 'Experience our unique Himalayan service.'}
+                  </p>
+                  <div className={cn("group/btn flex items-center gap-3 font-bold uppercase text-[10px] tracking-widest mt-auto", exploreText)}>
+                    <span className={cn("w-8 h-[1px] group-hover/btn:w-16 transition-all duration-500", exploreLine)} />
+                    Explore Details
+                  </div>
                 </div>
-                <h3 className={cn("text-2xl md:text-3xl font-heading font-extrabold mb-4 line-clamp-2 leading-tight tracking-tight", headingColor)}>
-                  {service.title}
-                </h3>
-                <p className={cn("text-xs md:text-sm mb-8 line-clamp-3 leading-relaxed font-medium flex-grow", descColor)}>
-                  {service.description || 'Experience our unique Himalayan service.'}
-                </p>
-                <div className={cn("group/btn flex items-center gap-3 font-bold uppercase text-[10px] tracking-widest mt-auto", exploreText)}>
-                  <span className={cn("w-8 h-[1px] group-hover/btn:w-16 transition-all duration-500", exploreLine)} />
-                  Explore Details
-                </div>
-              </div>
-            </motion.div>
-          )})}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Customize Card */}

@@ -148,7 +148,7 @@ const ParvatiValley = () => {
                     <div className="h-px w-12 bg-white/40 self-center" />
                   </div>
 
-                  <h2 className="font-playfair text-5xl xs:text-6xl md:text-8xl text-white font-black italic tracking-tighter uppercase leading-none">
+                  <h2 className="font-playfair text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white font-black italic tracking-tighter uppercase leading-none">
                     Shiva Shakti
                   </h2>
 
@@ -298,7 +298,7 @@ const ParvatiValley = () => {
               <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-terracotta/10 text-terracotta text-[10px] font-black uppercase tracking-[0.3em]">
                 <Sparkles className="h-3 w-3" /> Technical Heritage
               </div>
-              <h2 className="text-4xl md:text-7xl font-playfair font-black italic text-forest tracking-tighter leading-none">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-playfair font-black italic text-forest tracking-tighter leading-none">
                 The Heritage <br />of Survival
               </h2>
               <p className="text-forest/60 text-lg font-medium leading-relaxed">

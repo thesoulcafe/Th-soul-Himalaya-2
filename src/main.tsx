@@ -7,12 +7,13 @@ import './index.css';
 // Suppress potential MetaMask/Web3 injected errors that might be misreported in AI Studio environment
 if (typeof window !== 'undefined') {
   const isWeb3Error = (msg: string) => {
-    const lowerMsg = msg.toLowerCase();
+    const lowerMsg = String(msg).toLowerCase();
     return lowerMsg.includes('metamask') || 
            lowerMsg.includes('ethereum') || 
            lowerMsg.includes('web3') || 
            lowerMsg.includes('failed to connect') ||
-           lowerMsg.includes('wallet');
+           lowerMsg.includes('wallet') ||
+           lowerMsg.includes('inpage.js');
   };
 
   const suppressInjectedErrors = (e: ErrorEvent | PromiseRejectionEvent) => {
@@ -30,40 +31,16 @@ if (typeof window !== 'undefined') {
     }
   };
   
+  // Also suppress console errors that might trigger UI notifications
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    const msg = args.join(' ');
+    if (isWeb3Error(msg)) return;
+    originalConsoleError.apply(console, args);
+  };
+
   window.addEventListener('error', suppressInjectedErrors, true);
   window.addEventListener('unhandledrejection', suppressInjectedErrors, true);
-
-  // Also monkey-patch console methods for specific strings
-  const originalError = console.error;
-  const originalWarn = console.warn;
-  
-  const isIgnorable = (args: any[]) => {
-    try {
-      const msg = args.map(arg => {
-        if (!arg) return '';
-        if (typeof arg === 'string') return arg;
-        if (arg.message) return arg.message;
-        if (typeof arg === 'object') {
-          try { return JSON.stringify(arg); } catch { return String(arg); }
-        }
-        return String(arg);
-      }).join(' ');
-      
-      return isWeb3Error(msg);
-    } catch (err) {
-      return false;
-    }
-  };
-
-  console.error = (...args: any[]) => {
-    if (isIgnorable(args)) return;
-    originalError.apply(console, args);
-  };
-
-  console.warn = (...args: any[]) => {
-    if (isIgnorable(args)) return;
-    originalWarn.apply(console, args);
-  };
 }
 
 createRoot(document.getElementById('root')!).render(

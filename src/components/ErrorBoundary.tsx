@@ -36,8 +36,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
       let errorMessage = "Something went wrong. Please try again later.";
       
       try {
+        const errorMsg = state.error?.message || "";
+        const lowerMsg = errorMsg.toLowerCase();
+        
+        // If it's a MetaMask or Web3 injected error, don't show the error screen, 
+        // just try to render children anyway or return null
+        if (lowerMsg.includes('metamask') || lowerMsg.includes('ethereum') || lowerMsg.includes('web3') || lowerMsg.includes('wallet')) {
+          return props.children;
+        }
+
         // Check if it's a JSON string from our Firestore error handler
-        const parsed = JSON.parse(state.error?.message || "");
+        const parsed = JSON.parse(errorMsg);
         if (parsed.error && parsed.error.includes("insufficient permissions")) {
           errorMessage = "You don't have permission to perform this action. Please check if you are logged in.";
         }

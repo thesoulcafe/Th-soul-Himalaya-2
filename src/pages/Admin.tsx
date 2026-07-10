@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb, Image as ImageIcon
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb, Image as ImageIcon, Link, FileCode
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -151,23 +151,27 @@ export default function Admin() {
   const galleryInputRef = React.useRef<HTMLInputElement>(null);
   const [activeMainTab, setActiveMainTab] = useState<AdminTab>((searchParams.get('tab') as AdminTab) || 'overview');
   const [activeContentTab, setActiveContentTab] = useState<ContentType>((searchParams.get('type') as ContentType) || 'tour');
-  const [activeSeoNav, setActiveSeoNav] = useState('SEO Strategy Roadmap');
+  const [activeSeoNav, setActiveSeoNav] = useState('Dashboard');
   const [activeSeoStatusTab, setActiveSeoStatusTab] = useState('All');
 
   const SEONavItems = [
+    { id: 'Dashboard', icon: LayoutDashboard },
+    { id: 'Site Auditor', icon: Activity },
+    { id: 'Rank Checker', icon: BarChart3 },
+    { id: 'Keyword Planner', icon: Search },
+    { id: 'Backlink Checker', icon: Link },
+    { id: 'Sitemap Generator', icon: FileCode },
+    { id: 'Directory Submitter', icon: Send },
+    { id: 'Search Engine Saturator', icon: Zap },
+    { id: 'Social Media Checker', icon: Share2 },
     { id: 'SEO Strategy Roadmap', icon: Map },
     { id: 'Goals Tracker', icon: Target },
     { id: 'Topical Mapper', icon: Layers },
-    { id: 'Keyword Planner', icon: Search },
     { id: 'Content Gap Analysis', icon: Database },
-    { id: 'Influencer Outreach Planner', icon: Users },
-    { id: 'Email Marketing Planner', icon: Mail },
     { id: 'Schema Markup Planner', icon: Code },
     { id: 'Programmatic Generator', icon: Zap },
     { id: 'Checklists', icon: ListTodo },
     { id: 'Notes & Ideas', icon: PenTool },
-    { id: 'Tips', icon: Lightbulb },
-    { id: 'FAQ', icon: HelpCircle },
   ];
   
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
@@ -3332,7 +3336,7 @@ export default function Admin() {
                      <div className="absolute inset-0 border-[4px] md:border-[6px] border-black/20 m-1.5 md:m-2 rounded-lg" />
                      <Search className="h-8 w-8 md:h-10 md:w-10 text-white z-10 relative drop-shadow-md" strokeWidth={3} />
                   </div>
-                  <h1 className="text-2xl md:text-5xl font-extrabold text-[#3a352f] mb-2 md:mb-3 tracking-tight">Complete SEO Manager</h1>
+                  <h1 className="text-2xl md:text-5xl font-extrabold text-[#3a352f] mb-2 md:mb-3 tracking-tight">SEO Panel</h1>
                   <p className="flex items-center text-[10px] md:text-sm font-semibold text-[#8b857d] hover:text-[#5c5448] cursor-pointer w-fit transition-colors">
                      <Info className="h-4 w-4 mr-1.5" /> Step By Step Guide (Getting Started)
                   </p>
@@ -3393,6 +3397,224 @@ export default function Admin() {
                      ))}
                    </div>
                    
+                    {activeSeoNav === 'Dashboard' && (
+                      <div className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                           <Card className="bg-white border-forest/10 rounded-2xl shadow-sm overflow-hidden">
+                              <CardHeader className="bg-blue-50/50 pb-2 border-b border-blue-100/50">
+                                 <CardTitle className="text-xs font-bold text-blue-600 flex items-center gap-2"><Globe className="h-3 w-3" /> TOTAL WEBSITES</CardTitle>
+                              </CardHeader>
+                              <CardContent className="pt-4">
+                                 <div className="text-3xl font-black text-forest">1</div>
+                                 <p className="text-[10px] text-forest/40 font-bold mt-1 uppercase tracking-tighter">Active Projects</p>
+                              </CardContent>
+                           </Card>
+                           <Card className="bg-white border-forest/10 rounded-2xl shadow-sm overflow-hidden">
+                              <CardHeader className="bg-emerald-50/50 pb-2 border-b border-emerald-100/50">
+                                 <CardTitle className="text-xs font-bold text-emerald-600 flex items-center gap-2"><Activity className="h-3 w-3" /> AUDIT SCORE</CardTitle>
+                              </CardHeader>
+                              <CardContent className="pt-4">
+                                 <div className="text-3xl font-black text-forest">94%</div>
+                                 <p className="text-[10px] text-forest/40 font-bold mt-1 uppercase tracking-tighter">Optimization Health</p>
+                              </CardContent>
+                           </Card>
+                           <Card className="bg-white border-forest/10 rounded-2xl shadow-sm overflow-hidden">
+                              <CardHeader className="bg-orange-50/50 pb-2 border-b border-orange-100/50">
+                                 <CardTitle className="text-xs font-bold text-orange-600 flex items-center gap-2"><Target className="h-3 w-3" /> KEYWORDS TRACKED</CardTitle>
+                              </CardHeader>
+                              <CardContent className="pt-4">
+                                 <div className="text-3xl font-black text-forest">{seoSettings.length}</div>
+                                 <p className="text-[10px] text-forest/40 font-bold mt-1 uppercase tracking-tighter">Target Terms</p>
+                              </CardContent>
+                           </Card>
+                           <Card className="bg-white border-forest/10 rounded-2xl shadow-sm overflow-hidden">
+                              <CardHeader className="bg-purple-50/50 pb-2 border-b border-purple-100/50">
+                                 <CardTitle className="text-xs font-bold text-purple-600 flex items-center gap-2"><CheckCircle2 className="h-3 w-3" /> INDEX STATUS</CardTitle>
+                              </CardHeader>
+                              <CardContent className="pt-4">
+                                 <div className="text-3xl font-black text-forest">Active</div>
+                                 <p className="text-[10px] text-forest/40 font-bold mt-1 uppercase tracking-tighter">Search visibility</p>
+                              </CardContent>
+                           </Card>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                           <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden">
+                              <CardHeader className="p-8 border-b border-forest/5">
+                                 <CardTitle className="text-lg font-bold text-forest">SEO Health Summary</CardTitle>
+                                 <CardDescription>Overview of your site's search engine performance</CardDescription>
+                              </CardHeader>
+                              <CardContent className="p-8">
+                                 <div className="space-y-6">
+                                    {[
+                                       { label: 'On-Page SEO', value: 88, color: 'bg-emerald-500' },
+                                       { label: 'Technical SEO', value: 92, color: 'bg-blue-500' },
+                                       { label: 'Mobile Optimization', value: 98, color: 'bg-purple-500' },
+                                       { label: 'Performance / Speed', value: 76, color: 'bg-amber-500' },
+                                    ].map(item => (
+                                       <div key={item.label} className="space-y-2">
+                                          <div className="flex justify-between text-xs font-bold text-forest/60">
+                                             <span>{item.label}</span>
+                                             <span>{item.value}%</span>
+                                          </div>
+                                          <div className="h-2 w-full bg-forest/5 rounded-full overflow-hidden">
+                                             <motion.div 
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${item.value}%` }}
+                                                className={cn("h-full rounded-full", item.color)} 
+                                             />
+                                          </div>
+                                       </div>
+                                    ))}
+                                 </div>
+                              </CardContent>
+                           </Card>
+
+                           <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden">
+                              <CardHeader className="p-8 border-b border-forest/5">
+                                 <CardTitle className="text-lg font-bold text-forest">Recent SEO Activity</CardTitle>
+                                 <CardDescription>Latest updates and changes to your search configuration</CardDescription>
+                              </CardHeader>
+                              <CardContent className="p-0">
+                                 <div className="divide-y divide-forest/5">
+                                    {seoSettings.slice(0, 5).map((setting, i) => (
+                                       <div key={i} className="p-4 hover:bg-forest/[0.02] transition-colors flex items-center justify-between">
+                                          <div className="flex items-center gap-3">
+                                             <div className="h-8 w-8 rounded-lg bg-forest/5 flex items-center justify-center">
+                                                <RefreshCw className="h-4 w-4 text-forest/40" />
+                                             </div>
+                                             <div>
+                                                <div className="text-xs font-bold text-forest truncate max-w-[200px]">{setting.path}</div>
+                                                <div className="text-[10px] text-forest/40">Updated meta details</div>
+                                             </div>
+                                          </div>
+                                          <Badge variant="outline" className="text-[8px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 border-emerald-100">Sync'd</Badge>
+                                       </div>
+                                    ))}
+                                 </div>
+                              </CardContent>
+                           </Card>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeSeoNav === 'Site Auditor' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-forest/5 flex items-center justify-center mb-6">
+                              <Activity className="h-10 w-10 text-forest/20" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Website Auditor</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Scan your entire website for technical SEO issues, broken links, and optimization opportunities.</p>
+                           <Button className="bg-forest text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">
+                              <RefreshCw className="h-4 w-4 mr-2" /> Start Full Audit
+                           </Button>
+                        </div>
+                      </Card>
+                    )}
+
+                    {activeSeoNav === 'Rank Checker' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
+                              <BarChart3 className="h-10 w-10 text-blue-200" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Search Engine Rank Checker</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Track your website's ranking across major search engines for your target keywords.</p>
+                           <div className="flex gap-4 w-full max-w-lg mx-auto">
+                              <Input placeholder="Enter keyword..." className="h-12 rounded-xl" />
+                              <Button className="bg-blue-600 text-white h-12 px-6 rounded-xl font-bold uppercase text-[10px] tracking-widest">Check Rank</Button>
+                           </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {activeSeoNav === 'Backlink Checker' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-purple-50 flex items-center justify-center mb-6">
+                              <Link className="h-10 w-10 text-purple-200" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Backlink Explorer</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Analyze your website's backlink profile and monitor referring domains.</p>
+                           <Button className="bg-purple-600 text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">
+                              <Search className="h-4 w-4 mr-2" /> Analyze Backlinks
+                           </Button>
+                        </div>
+                      </Card>
+                    )}
+
+                    {activeSeoNav === 'Sitemap Generator' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-amber-50 flex items-center justify-center mb-6">
+                              <FileCode className="h-10 w-10 text-amber-200" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">XML Sitemap Generator</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Generate search engine friendly XML sitemaps to help crawlers index your site better.</p>
+                           <div className="flex gap-4">
+                              <Button variant="outline" className="h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs border-amber-200 text-amber-700">Preview Sitemap</Button>
+                              <Button className="bg-amber-600 text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">Generate & Sync</Button>
+                           </div>
+                        </div>
+                      </Card>
+                    )}
+
+                    {activeSeoNav === 'Directory Submitter' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-forest/5 flex items-center justify-center mb-6">
+                              <Send className="h-10 w-10 text-forest/20" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Automatic Directory Submitter</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Submit your website to hundreds of web directories automatically to build high-quality backlinks.</p>
+                           <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+                              <div className="p-4 bg-forest/[0.02] rounded-xl border border-forest/5">
+                                 <div className="text-xl font-bold text-forest">500+</div>
+                                 <div className="text-[10px] text-forest/40 uppercase font-bold tracking-widest">Directories</div>
+                              </div>
+                              <div className="p-4 bg-forest/[0.02] rounded-xl border border-forest/5">
+                                 <div className="text-xl font-bold text-forest">100%</div>
+                                 <div className="text-[10px] text-forest/40 uppercase font-bold tracking-widest">Success Rate</div>
+                              </div>
+                           </div>
+                           <Button className="mt-8 bg-forest text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">
+                              <Plus className="h-4 w-4 mr-2" /> Start Submission
+                           </Button>
+                        </div>
+                      </Card>
+                    )}
+                    
+                    {activeSeoNav === 'Search Engine Saturator' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-orange-50 flex items-center justify-center mb-6">
+                              <Zap className="h-10 w-10 text-orange-200" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Search Engine Saturator</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Automatically submit your URLs to 50+ search engines to ensure maximum indexing coverage.</p>
+                           <Button className="bg-orange-600 text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">
+                              <RefreshCw className="h-4 w-4 mr-2" /> Saturate Search Engines
+                           </Button>
+                        </div>
+                      </Card>
+                    )}
+
+                    {activeSeoNav === 'Social Media Checker' && (
+                      <Card className="rounded-[2rem] border-forest/5 shadow-xl bg-white overflow-hidden p-8">
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                           <div className="h-20 w-20 rounded-full bg-pink-50 flex items-center justify-center mb-6">
+                              <Share2 className="h-10 w-10 text-pink-200" />
+                           </div>
+                           <h3 className="text-2xl font-bold text-forest mb-2">Social Media Checker</h3>
+                           <p className="text-sm text-forest/60 max-w-md mb-8">Analyze your website's presence and engagement across Facebook, Twitter, LinkedIn, and Pinterest.</p>
+                           <Button className="bg-pink-600 text-white h-12 px-8 rounded-xl font-bold tracking-widest uppercase text-xs">
+                              <Activity className="h-4 w-4 mr-2" /> Check Social Stats
+                           </Button>
+                        </div>
+                      </Card>
+                    )}
+
                    {activeSeoNav === 'SEO Strategy Roadmap' && (
                      <div className="space-y-10">
                        <div className="flex flex-col sm:flex-row flex-wrap gap-4">
@@ -3457,22 +3679,22 @@ export default function Admin() {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
-                  {[
-                    { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
-                    { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
-                    { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (typeof s.keyword === 'string' ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
-                    { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
-                  ].map((stat, i) => (
-                    <div key={i} className="bg-white border border-forest/5 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-center gap-2 mb-1">
-                        <stat.icon className={cn("h-3 w-3", stat.color)} />
-                        <span className="text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
+                    {[
+                      { label: 'Optimized Pages', value: seoSettings.length, icon: Globe, color: 'text-blue-500' },
+                      { label: 'Health Score', value: '94%', icon: Gauge, color: 'text-emerald-500' },
+                      { label: 'Keyword Focus', value: seoSettings.reduce((count, s) => count + (typeof s.keyword === 'string' ? s.keyword.split(',').length : 0), 0), icon: Target, color: 'text-orange-500' },
+                      { label: 'Index Status', value: 'Healthy', icon: CheckCircle2, color: 'text-forest' },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white border border-forest/5 rounded-2xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center gap-2 mb-1">
+                          <stat.icon className={cn("h-3 w-3", stat.color)} />
+                          <span className="text-[8px] sm:text-[9px] font-bold text-forest/40 uppercase tracking-wider">{stat.label}</span>
+                        </div>
+                        <div className="text-sm sm:text-base lg:text-lg font-bold text-forest">{stat.value}</div>
                       </div>
-                      <div className="text-base lg:text-lg font-bold text-forest">{stat.value}</div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
               </div>
             </div>
           )}
@@ -3484,11 +3706,11 @@ export default function Admin() {
                 {activeSeoNav === 'Keyword Planner' && (
                   <>
                 <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden">
-                  <CardHeader className="bg-forest/[0.02] border-b border-forest/5 p-8">
+                  <CardHeader className="bg-forest/[0.02] border-b border-forest/5 p-5 sm:p-8">
                     <CardTitle className="text-xl font-bold text-forest">Optimization Studio</CardTitle>
                     <CardDescription className="text-xs text-forest/40 font-medium">Fine-tune meta dynamics for search crawlers</CardDescription>
                   </CardHeader>
-                  <CardContent className="p-8">
+                  <CardContent className="p-5 sm:p-8">
                     <form 
                       onSubmit={async (e) => {
                         e.preventDefault();
@@ -3669,12 +3891,12 @@ export default function Admin() {
                         </div>
                       </div>
 
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         {editingSeoId && (
                           <Button 
                             type="button" 
                             variant="outline" 
-                            className="w-1/3 border-rose-200 text-rose-500 hover:bg-rose-50 font-bold h-14 rounded-2xl transition-all" 
+                            className="w-full sm:w-1/3 border-rose-200 text-rose-500 hover:bg-rose-50 font-bold h-14 rounded-2xl transition-all" 
                             onClick={() => {
                               setEditingSeoId(null);
                               setSeoFormData({ path: '', keyword: '', title: '', description: '', ogImage: '' });
@@ -3694,7 +3916,7 @@ export default function Admin() {
                 </Card>
 
                 {/* Google Preview */}
-                <div className="p-8 bg-[#f8f9fa] rounded-[2rem] border border-gray-200">
+                <div className="p-5 sm:p-8 bg-[#f8f9fa] rounded-[2rem] border border-gray-200">
                   <div className="flex items-center gap-2 mb-6">
                     <Search className="h-4 w-4 text-gray-400" />
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Engine Result Preview</span>
@@ -3717,7 +3939,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Content Gap Analysis' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">Content Gap Analysis</h3>
                     <p className="text-sm text-forest/60 mb-6">Compare our content coverage against competitors and identify missing topics.</p>
                     <div className="flex gap-2 mb-6">
@@ -3784,7 +4006,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Influencer Outreach Planner' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">Influencer Outreach Planner</h3>
                     <div className="flex gap-2 mb-6">
                       <Input 
@@ -3853,7 +4075,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Email Marketing Planner' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">Email Marketing Planner</h3>
                     <div className="flex gap-2 mb-6">
                       <Input 
@@ -3922,7 +4144,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Checklists' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">On-Page SEO Checklist</h3>
                     <div className="flex gap-2 mb-6">
                       <Input 
@@ -4008,7 +4230,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Notes & Ideas' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">Notes & Ideas</h3>
                     <textarea 
                       className="w-full h-48 p-4 border border-forest/10 rounded-xl bg-forest/[0.01] resize-none focus:outline-none focus:ring-2 focus:ring-forest/20" 
@@ -4033,7 +4255,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Tips' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">SEO Best Practices</h3>
                     <ul className="list-disc list-inside space-y-3 text-sm text-forest/80 marker:text-terracotta">
                       <li>Always include your primary keyword in the first 100 words.</li>
@@ -4045,7 +4267,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'FAQ' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10">
                     <h3 className="text-2xl font-bold text-forest mb-4">Common Questions</h3>
                     <div className="space-y-4">
                       {[
@@ -4398,7 +4620,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Programmatic Generator' && (
-                <Card className="border border-indigo-500/20 shadow-sm rounded-[2rem] p-8 mt-12 bg-indigo-50/10">
+                <Card className="border border-indigo-500/20 shadow-sm rounded-[2rem] p-5 sm:p-8 mt-12 bg-indigo-50/10">
                   {/* Programmatic SEO Generator */}
                   <CardHeader className="p-0 mb-6">
                     <div className="flex items-center gap-3 mb-2">
@@ -4467,7 +4689,7 @@ export default function Admin() {
                 )}
                 
                 {activeSeoNav === 'Schema Markup Planner' && (
-                <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-8 mt-12 bg-forest/5">
+                <Card className="border border-forest/5 shadow-sm rounded-[2rem] p-5 sm:p-8 mt-12 bg-forest/5">
                   {/* Global Configuration Card */}
                   <div className="flex items-center gap-4 mb-6">
                     <div className="h-12 w-12 rounded-2xl bg-forest flex items-center justify-center">
@@ -4509,7 +4731,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Goals Tracker' && (
-                  <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-amber-500">
+                  <Card className="border border-forest/5 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10 border-t-4 border-t-amber-500">
                     <h3 className="text-2xl font-bold text-forest mb-4">SEO Goals Tracker</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="p-6 bg-forest/5 rounded-2xl flex flex-col items-center text-center relative group">
@@ -4601,7 +4823,7 @@ export default function Admin() {
                 )}
 
                 {activeSeoNav === 'Topical Mapper' && (
-                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-8 mt-10 border-t-4 border-t-purple-500">
+                  <Card className="border border-forest/10 shadow-xl rounded-[2rem] bg-white overflow-hidden p-5 sm:p-8 mt-10 border-t-4 border-t-purple-500">
                     <h3 className="text-2xl font-bold text-forest mb-4">Topical Mapping Matrix</h3>
                     <p className="text-sm text-forest/60 mb-6">Visualizing your semantic content clusters and entity associations for high-altitude trekking and wellness tourism in Parvati Valley.</p>
                     <div className="flex gap-2 mb-6">
@@ -4678,21 +4900,22 @@ export default function Admin() {
 
                 {seoProposals && (
                   <Card className="border border-emerald-500/30 shadow-emerald-500/5 shadow-2xl rounded-[2rem] overflow-hidden mb-8 bg-emerald-50/50">
-                    <div className="bg-emerald-600 p-6 text-white flex justify-between items-center">
-                      <div>
-                        <h3 className="font-bold text-xl uppercase tracking-widest flex items-center gap-2"><Sparkles className="h-5 w-5" /> Pending Approvals</h3>
-                        <p className="text-white/80 text-sm mt-1">Review your generated SEO configurations before pushing to the edge configuration.</p>
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        <label className="flex items-center gap-2 text-sm mr-4 shrink-0 cursor-pointer">
-                          <input type="checkbox" className="rounded" onChange={(e) => {
-                            const checked = e.target.checked;
-                            setSeoProposals(prev => prev ? prev.map(p => ({ ...p, selected: checked })) : null);
-                          }} checked={seoProposals.every(p => p.selected)} /> Select All
-                        </label>
-                        <Button variant="ghost" onClick={() => setSeoProposals(null)} className="text-white hover:bg-white/20">Cancel All</Button>
+                  <div className="bg-emerald-600 p-4 sm:p-6 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg sm:text-xl uppercase tracking-widest flex items-center gap-2"><Sparkles className="h-5 w-5" /> Pending Approvals</h3>
+                      <p className="text-white/80 text-xs sm:text-sm mt-1">Review your generated SEO configurations.</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 items-center w-full sm:w-auto">
+                      <label className="flex items-center gap-2 text-xs sm:text-sm mr-4 shrink-0 cursor-pointer">
+                        <input type="checkbox" className="rounded" onChange={(e) => {
+                          const checked = e.target.checked;
+                          setSeoProposals(prev => prev ? prev.map(p => ({ ...p, selected: checked })) : null);
+                        }} checked={seoProposals.every(p => p.selected)} /> Select All
+                      </label>
+                      <div className="flex gap-2 w-full sm:w-auto">
+                        <Button variant="ghost" onClick={() => setSeoProposals(null)} className="flex-1 sm:flex-none text-white hover:bg-white/20 text-[10px] h-9">Cancel</Button>
                         <Button 
-                          className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold"
+                          className="flex-1 sm:flex-none bg-white text-emerald-700 hover:bg-emerald-50 font-bold text-[10px] h-9"
                           onClick={async () => {
                             setIsProcessing(true);
                             try {
@@ -4731,7 +4954,8 @@ export default function Admin() {
                         </Button>
                       </div>
                     </div>
-                    <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+                  </div>
+                  <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
                       {["Core Pages", "Hamlets", "Articles", "Tours"].map(category => {
                         const items = seoProposals.filter(p => {
                           if (typeof p.path !== 'string') return false;
@@ -4785,107 +5009,114 @@ export default function Admin() {
                   </Card>
                 )}
 
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                  <h3 className="text-xl font-extrabold text-forest uppercase tracking-tight">Indexed Links Masterlist</h3>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={async () => {
-                        setIsProcessing(true);
-                        try {
-                          const pathMap = new Map();
-                          const docsToDelete: string[] = [];
-                          
-                          seoSettings.forEach(s => {
-                            if (!pathMap.has(s.path)) {
-                              pathMap.set(s.path, s);
-                            } else {
-                              const existing = pathMap.get(s.path);
-                              
-                              const calcScore = (item: any) => {
-                                const titleLen = item.title?.length || 0;
-                                const descLen = item.description?.length || 0;
-                                return (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
-                                       (descLen > 120 && descLen <= 160 ? 40 : 20) + 
-                                       (item.keyword ? 20 : 0);
-                              };
-
-                              if (calcScore(s) > calcScore(existing)) {
-                                docsToDelete.push(existing.id);
-                                pathMap.set(s.path, s);
-                              } else if (calcScore(s) === calcScore(existing)) {
-                                docsToDelete.push(s.id);
-                              } else {
-                                docsToDelete.push(s.id);
-                              }
-                            }
-                          });
-                          
-                          if (docsToDelete.length === 0) {
-                            setNotification({ message: 'No duplicate entries found.', type: 'success' });
-                            return;
-                          }
-                          
-                          let successCount = 0;
-                          for (const id of docsToDelete) {
+                <Card className="border border-forest/10 shadow-2xl rounded-[2rem] bg-white overflow-hidden mt-12">
+                  <CardHeader className="bg-forest/[0.02] border-b border-forest/5 p-6 sm:p-8">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-xl font-extrabold text-forest uppercase tracking-tight">Indexed Links Masterlist</CardTitle>
+                        <CardDescription className="text-xs text-forest/40 font-medium">Full inventory of deployed SEO configurations</CardDescription>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={async () => {
+                            setIsProcessing(true);
                             try {
-                              if (id) {
-                                await deleteDoc(doc(db, 'seo_settings', id));
-                                successCount++;
+                              const pathMap = new Map();
+                              const docsToDelete: string[] = [];
+                              
+                              seoSettings.forEach(s => {
+                                if (!pathMap.has(s.path)) {
+                                  pathMap.set(s.path, s);
+                                } else {
+                                  const existing = pathMap.get(s.path);
+                                  
+                                  const calcScore = (item: any) => {
+                                    const titleLen = item.title?.length || 0;
+                                    const descLen = item.description?.length || 0;
+                                    return (titleLen > 40 && titleLen <= 60 ? 40 : 20) + 
+                                           (descLen > 120 && descLen <= 160 ? 40 : 20) + 
+                                           (item.keyword ? 20 : 0);
+                                  };
+
+                                  if (calcScore(s) > calcScore(existing)) {
+                                    docsToDelete.push(existing.id);
+                                    pathMap.set(s.path, s);
+                                  } else if (calcScore(s) === calcScore(existing)) {
+                                    docsToDelete.push(s.id);
+                                  } else {
+                                    docsToDelete.push(s.id);
+                                  }
+                                }
+                              });
+                              
+                              if (docsToDelete.length === 0) {
+                                setNotification({ message: 'No duplicate entries found.', type: 'success' });
+                                return;
                               }
-                            } catch (e: any) {
-                              console.warn("Failed to delete duplicate:", id, e);
+                              
+                              let successCount = 0;
+                              for (const id of docsToDelete) {
+                                try {
+                                  if (id) {
+                                    await deleteDoc(doc(db, 'seo_settings', id));
+                                    successCount++;
+                                  }
+                                } catch (e: any) {
+                                  console.warn("Failed to delete duplicate:", id, e);
+                                }
+                              }
+                              
+                              setSeoSettings(prev => prev.filter(s => !docsToDelete.includes(s.id)));
+                              setNotification({ message: `Purged ${successCount} duplicate entries!`, type: 'success' });
+                            } catch (err: any) {
+                              console.error("Deduplication error:", err);
+                              setNotification({ message: 'Error executing deduplication', type: 'error' });
+                            } finally {
+                              setIsProcessing(false);
                             }
-                          }
-                          
-                          setSeoSettings(prev => prev.filter(s => !docsToDelete.includes(s.id)));
-                          setNotification({ message: `Purged ${successCount} duplicate entries!`, type: 'success' });
-                        } catch (err: any) {
-                          console.error("Deduplication error:", err);
-                          setNotification({ message: 'Error executing deduplication', type: 'error' });
-                        } finally {
-                          setIsProcessing(false);
-                        }
-                      }}
-                      className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest border-terracotta/20 text-terracotta hover:bg-terracotta/5 hover:border-terracotta"
-                    >
-                      <RefreshCw className={cn("h-3 w-3 mr-2", isProcessing ? "animate-spin" : "")} /> 
-                      Clean Duplicates
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className={cn(
-                        "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest",
-                        isSeoFilterVisible ? "bg-forest text-white" : "bg-forest/5 text-forest/70 hover:bg-forest/10"
-                      )}
-                      onClick={() => setIsSeoFilterVisible(!isSeoFilterVisible)}
-                    >
-                      <Filter className="h-3 w-3 mr-2" /> Filter
-                    </Button>
-                  </div>
-                </div>
-
-                {isSeoFilterVisible && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-4"
-                  >
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-forest/20" />
-                      <Input 
-                        placeholder="Search by path or keyword..." 
-                        value={seoSearchTerm}
-                        onChange={(e) => setSeoSearchTerm(e.target.value)}
-                        className="h-10 pl-9 rounded-xl border-forest/10 focus:ring-0 focus:border-forest/30 text-xs"
-                      />
+                          }}
+                          className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest border-terracotta/20 text-terracotta hover:bg-terracotta/5 hover:border-terracotta"
+                        >
+                          <RefreshCw className={cn("h-3 w-3 mr-2", isProcessing ? "animate-spin" : "")} /> 
+                          Clean Duplicates
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={cn(
+                            "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest",
+                            isSeoFilterVisible ? "bg-forest text-white" : "bg-forest/5 text-forest/70 hover:bg-forest/10"
+                          )}
+                          onClick={() => setIsSeoFilterVisible(!isSeoFilterVisible)}
+                        >
+                          <Filter className="h-3 w-3 mr-2" /> Filter
+                        </Button>
+                      </div>
                     </div>
-                  </motion.div>
-                )}
 
-                <div className="relative flex flex-col gap-8 max-h-[1400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {isSeoFilterVisible && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-6"
+                      >
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-forest/20" />
+                          <Input 
+                            placeholder="Search by path or keyword..." 
+                            value={seoSearchTerm}
+                            onChange={(e) => setSeoSearchTerm(e.target.value)}
+                            className="h-10 pl-9 rounded-xl border-forest/10 focus:ring-0 focus:border-forest/30 text-xs bg-white"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </CardHeader>
+
+                  <CardContent className="p-0">
+                    <div className="relative flex flex-col gap-6 max-h-[800px] min-h-[400px] overflow-y-auto p-6 sm:p-8 custom-scrollbar scroll-smooth bg-forest/[0.01]">
                   {(() => {
                     const filteredSeo = seoSettings.filter(item => {
                       if (!seoSearchTerm && activeSeoStatusTab === 'All') return true;
@@ -5129,9 +5360,11 @@ export default function Admin() {
                   })}
                 </div>
               </div>
-            ));
-          })()}
-        </div>
+                    ));
+                  })()}
+                    </div>
+                  </CardContent>
+                </Card>
 
 
               </div>
@@ -5324,10 +5557,10 @@ export default function Admin() {
               className="relative bg-white rounded-[2xl] w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-8 py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.01]">
+              <div className="px-5 sm:px-8 py-4 sm:py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.01]">
                  <div>
-                   <h3 className="text-2xl font-black text-forest">Performance SEO Audit</h3>
-                   <p className="text-xs text-forest/50 font-bold uppercase tracking-widest mt-1">Google Search Console Analyser — {auditSeoItem.path}</p>
+                   <h3 className="text-xl sm:text-2xl font-black text-forest">SEO Audit</h3>
+                   <p className="text-[10px] text-forest/50 font-bold uppercase tracking-widest mt-1 truncate max-w-[200px] sm:max-w-none">{auditSeoItem.path}</p>
                  </div>
                  <Button 
                    variant="ghost" 
@@ -5339,7 +5572,7 @@ export default function Admin() {
                  </Button>
               </div>
 
-              <div className="p-8 overflow-y-auto space-y-8">
+              <div className="p-4 sm:p-8 overflow-y-auto space-y-6 sm:space-y-8">
                 {/* Structural Analysis */}
                 <div>
                   <h4 className="text-sm font-black text-forest uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -5573,10 +5806,10 @@ export default function Admin() {
               className="relative bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-2xl w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-8 py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.02]">
+              <div className="px-5 sm:px-8 py-4 sm:py-6 border-b border-forest/10 flex justify-between items-center bg-forest/[0.02]">
                  <div>
-                   <h3 className="text-xl font-bold text-forest">Quick Edit SEO Configuration</h3>
-                   <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Adjust meta details before applying</p>
+                   <h3 className="text-lg sm:text-xl font-bold text-forest">Quick Edit SEO</h3>
+                   <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Adjust meta details</p>
                  </div>
                  <Button 
                    variant="ghost" 
@@ -5592,7 +5825,7 @@ export default function Admin() {
                  </Button>
               </div>
               
-              <div className="p-8 overflow-y-auto">
+              <div className="p-5 sm:p-8 overflow-y-auto">
                 <form 
                   onSubmit={async (e) => {
                     e.preventDefault();

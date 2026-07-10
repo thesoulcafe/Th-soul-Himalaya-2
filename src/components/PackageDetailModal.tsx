@@ -156,21 +156,21 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
              </button>
           </div>
 
-          {/* Hero / Gallery */}
-          <div className="w-full h-[45dvh] lg:h-[55dvh] relative shrink-0">
-            <ImageSlider 
-              images={images} 
-              alt={title}
-              className="w-full h-full object-cover"
-              autoSwipe={true}
-              interval={5000}
-              showThumbnails={false}
-            />
-            {/* Subtle Gradient for top tags readability */}
-            <div className="absolute inset-0 bg-gradient-to-b from-forest/40 to-transparent h-32 pointer-events-none" />
+          {/* Hero / Gallery Area */}
+          <div className="w-full relative shrink-0 bg-white pt-10">
+            <div className="px-4 sm:px-6 lg:px-10">
+              <ImageSlider 
+                images={images} 
+                alt={title}
+                className="w-full h-[40dvh] sm:h-[45dvh] lg:h-[55dvh]"
+                autoSwipe={true}
+                interval={5000}
+                showThumbnails={true}
+              />
+            </div>
             
             {pkg.isAvailable === false && (
-              <div className="absolute inset-0 bg-forest/40 flex items-center justify-center z-10 backdrop-blur-sm">
+              <div className="absolute top-10 inset-x-4 sm:inset-x-6 lg:inset-x-10 h-[40dvh] sm:h-[45dvh] lg:h-[55dvh] bg-forest/40 flex items-center justify-center z-10 backdrop-blur-sm rounded-[2rem] overflow-hidden">
                 <Badge className="bg-white/90 text-forest border-none px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-lg">
                   Currently Unavailable
                 </Badge>
@@ -178,8 +178,8 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
             )}
             
             {/* Top Tags */}
-            <div className="absolute top-6 left-6 lg:top-8 lg:left-8 z-10">
-              <Badge className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-5 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-sm">
+            <div className="absolute top-16 left-10 sm:left-12 lg:top-20 lg:left-20 z-10">
+              <Badge className="bg-forest/60 backdrop-blur-md text-white border border-white/20 px-5 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-sm">
                 {typeLabel}
               </Badge>
             </div>

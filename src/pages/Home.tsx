@@ -478,7 +478,7 @@ export default function Home() {
               initial={{ opacity: 0, letterSpacing: "0.5em" }}
               animate={{ opacity: 1, letterSpacing: "0.2em" }}
               transition={{ delay: 0.2, duration: 1 }}
-              className="text-[#FFD700] font-montserrat font-black uppercase text-[16px] xs:text-[18px] sm:text-2xl md:text-5xl mt-0 mb-8 tracking-[0.2em] drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] whitespace-nowrap"
+              className="text-[#FFD700] font-montserrat font-black uppercase text-[10px] xs:text-[12px] sm:text-base md:text-xl lg:text-2xl mt-0 mb-6 sm:mb-8 tracking-[0.2em] drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
             >
               Parvati Valley & Beyond
             </motion.p>
@@ -486,7 +486,7 @@ export default function Home() {
             <motion.h1 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-montserrat font-extrabold text-white mb-10 leading-[1.0] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-6 md:gap-12 italic relative group cursor-default"
+              className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-montserrat font-extrabold text-white mb-10 leading-[1.0] tracking-tighter drop-shadow-2xl flex flex-col items-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 italic relative group cursor-default"
             >
               <span className="sr-only">Tour Package Himachal Pradesh, Trekking in Parvati Valley & Yoga Retreats in Tosh</span>
               
@@ -679,7 +679,7 @@ export default function Home() {
           >
             <div className="max-w-4xl mx-auto">
               <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.4em] mb-4">Curated Journeys</p>
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-montserrat font-extrabold text-forest leading-[1.1] tracking-tight">Signature Collections</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-montserrat font-extrabold text-forest leading-[1.1] tracking-tight">Signature Collections</h2>
             </div>
           </motion.div>
 
@@ -807,7 +807,7 @@ export default function Home() {
           
           <div className="relative z-10">
             <p className="text-terracotta font-bold uppercase text-[10px] md:text-xs tracking-[0.5em] mb-8">Your Journey Begins Here</p>
-            <h2 className="text-4xl md:text-7xl lg:text-8xl font-montserrat font-extrabold mb-10 leading-[1.05] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-montserrat font-extrabold mb-10 leading-[1.05] tracking-tight">
               Ready to <br />Start Your <br /><span className="text-terracotta italic font-playfair">Himalayan Story?</span>
             </h2>
             <p className="text-white/60 text-base md:text-lg mb-14 max-w-2xl mx-auto font-medium leading-relaxed">

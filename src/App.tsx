@@ -80,7 +80,7 @@ export default function App() {
                   <Route path="adventure" element={<Adventure />} />
                   <Route path="adventure/:id" element={<Adventure />} />
                   <Route path="services" element={<Services />} />
-                  <Route path="services/:id" element={<Services />} />
+                  <Route path="services/:id" element={<ServiceDetail />} />
                   <Route path=":category/:id/book" element={<BookingPage />} />
                   <Route path="shop" element={<Shop />} />
                   <Route path="cart" element={<Cart />} />
@@ -89,7 +89,6 @@ export default function App() {
                   <Route path="guide" element={<Guide />} />
                   <Route path="gallery" element={<Gallery />} />
                   <Route path="contact" element={<Contact />} />
-                  <Route path="services" element={<Services />} />
                   <Route path="tailor-made" element={<TailorMade />} />
                   <Route path="admin" element={<Admin />} />
                   <Route path="checkout" element={<Checkout />} />
