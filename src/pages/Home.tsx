@@ -580,15 +580,15 @@ export default function Home() {
               </motion.div>
               
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Link 
-                  to="/about"
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-trip-planner-quiz'))}
                   className={cn(
                     buttonVariants({ variant: "outline", size: "lg" }),
                     "px-8 sm:px-10 py-6 sm:py-8 text-terracotta border-terracotta/60 hover:border-terracotta hover:bg-terracotta/10 rounded-full backdrop-blur-md transition-all duration-500 font-bold text-base sm:text-lg w-full sm:w-auto shadow-[0_0_20px_rgba(193,90,62,0.2)]"
                   )}
                 >
-                  Our Philosophy
-                </Link>
+                  Find Your Perfect Retreat
+                </button>
               </motion.div>
             </div>
           </motion.div>

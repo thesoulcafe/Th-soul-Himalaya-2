@@ -303,10 +303,8 @@ export default function HamletDetail() {
 
               <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {data.experience.map((exp: any, i: number) => {
-                  const Wrapper = exp.link ? Link : 'div';
-                  const props = exp.link ? { to: exp.link, className: 'space-y-4 group block' } : { className: 'space-y-4 group' };
-                  return (
-                    <Wrapper key={i} {...props} className={exp.title === "Trek Glacier Point" ? "space-y-4 group block bg-white p-6 rounded-3xl border-2 border-terracotta/20 hover:border-terracotta hover:shadow-2xl hover:shadow-terracotta/10 transition-all duration-300 transform hover:-translate-y-2" : props.className}>
+                  const cardContent = (
+                    <>
                       <div className={`h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${exp.title === "Trek Glacier Point" ? "bg-terracotta text-white shadow-xl shadow-terracotta/20" : "bg-forest/5 text-forest group-hover:bg-terracotta group-hover:text-white"}`}>
                         {React.cloneElement(exp.icon, { className: "h-8 w-8" })}
                       </div>
@@ -319,7 +317,25 @@ export default function HamletDetail() {
                           Start Exploration <ArrowRight className="h-3 w-3" />
                         </div>
                       )}
-                    </Wrapper>
+                    </>
+                  );
+
+                  const commonClass = exp.title === "Trek Glacier Point" 
+                    ? "space-y-4 group block bg-white p-6 rounded-3xl border-2 border-terracotta/20 hover:border-terracotta hover:shadow-2xl hover:shadow-terracotta/10 transition-all duration-300 transform hover:-translate-y-2" 
+                    : (exp.link ? 'space-y-4 group block' : 'space-y-4 group');
+
+                  if (exp.link) {
+                    return (
+                      <Link key={i} to={exp.link} className={commonClass}>
+                        {cardContent}
+                      </Link>
+                    );
+                  }
+                  
+                  return (
+                    <div key={i} className={commonClass}>
+                      {cardContent}
+                    </div>
                   );
                 })}
               </div>

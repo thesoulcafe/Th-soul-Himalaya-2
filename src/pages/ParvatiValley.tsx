@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { LatestArticlesSection } from '@/components/LatestArticlesSection';
+import InteractiveMap from '@/components/InteractiveMap';
 
 // Content JSON Structure
 const PARVATI_DATA = {
@@ -314,6 +315,10 @@ const ParvatiValley = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="py-12 bg-cream">
+        <InteractiveMap />
       </section>
 
       {/* 3. Material Culture (Redesigned: The Blueprint of Life) */}

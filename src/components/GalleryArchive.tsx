@@ -2,14 +2,14 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
-interface GalleryImage {
+export interface GalleryImage {
   id: string;
   url: string;
   title: string;
   description: string;
 }
 
-const SAMPLE_IMAGES: GalleryImage[] = [
+export const SAMPLE_IMAGES: GalleryImage[] = [
   {
     id: '1',
     url: 'https://images.unsplash.com/photo-1544735230-c112df2146bc?q=80&w=1000&auto=format&fit=crop',

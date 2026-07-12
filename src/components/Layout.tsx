@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import AIAssistant from './AIAssistant';
+import WhatsAppButton from './WhatsAppButton';
+import NewsletterPopup from './NewsletterPopup';
+import TripPlannerQuiz from './TripPlannerQuiz';
 import { Button } from './ui/button';
 import { ArrowLeft, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -9,6 +12,30 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+
+  useEffect(() => {
+    // Listen to custom event to open quiz manually from anywhere
+    const handleOpenQuiz = () => setIsQuizOpen(true);
+    window.addEventListener('open-trip-planner-quiz', handleOpenQuiz);
+
+    // Auto-open after 20 seconds of opening the website, but only once
+    const hasSeenQuiz = localStorage.getItem('soulHimalayaQuizShown');
+    if (hasSeenQuiz !== 'true') {
+      const timer = setTimeout(() => {
+        setIsQuizOpen(true);
+        localStorage.setItem('soulHimalayaQuizShown', 'true');
+      }, 20000);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('open-trip-planner-quiz', handleOpenQuiz);
+      };
+    }
+
+    return () => {
+      window.removeEventListener('open-trip-planner-quiz', handleOpenQuiz);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-terracotta selection:text-white relative">
@@ -57,8 +84,9 @@ export default function Layout() {
         )}
       </AnimatePresence>
 
-      {/* 2026 Generative AI Assistant */}
-      <AIAssistant />
+      <WhatsAppButton />
+      <NewsletterPopup />
+      <TripPlannerQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
     </div>
   );
 }

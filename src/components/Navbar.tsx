@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 const navLinks = [
   { name: 'TOUR PACKAGES', href: '/tours' },
   { name: 'MOUNTAIN TREKKS', href: '/trekks' },
+  { name: 'SPECIAL OFFERS', href: '/offers' },
   { name: 'THE SOUL CAFE', href: '/soul-cafe' },
   { name: 'GALLERY', href: '/gallery' },
   { name: 'GUIDE', href: '/guide' },
@@ -57,7 +58,7 @@ export default function Navbar() {
             <Link to="/" className="flex items-center group gap-2 xs:gap-3">
               <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-2xl border border-white/20 group-hover:border-terracotta/50 transition-all duration-500 shrink-0">
                 <img 
-                  src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
+                  src="https://i.postimg.cc/V6CDy34v/IMG-8050.jpg" 
                   alt="The Soul Himalaya Logo" 
                   className="h-8 md:h-10 w-auto object-contain brightness-110 contrast-125 group-hover:scale-110 transition-transform duration-500"
                   referrerPolicy="no-referrer"
@@ -79,7 +80,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden lg:flex items-center ml-8 xl:ml-12 2xl:ml-16 space-x-3 xl:space-x-5 2xl:space-x-8">
+        <div className="hidden xl:flex items-center ml-8 xl:ml-12 2xl:ml-16 space-x-3 xl:space-x-5 2xl:space-x-8">
           {navLinks.map((link) => (
             <motion.div
               key={link.name}
@@ -147,7 +148,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile/Tablet Nav */}
-        <div className="lg:hidden flex items-center -mr-2 sm:-mr-4 gap-1 sm:gap-2">
+        <div className="xl:hidden flex items-center -mr-2 sm:-mr-4 gap-1 sm:gap-2">
           {/* Mobile Cart Link - Direct Page */}
           <Link to="/cart" className="relative h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center bg-white/10 rounded-full text-white">
             <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -172,9 +173,10 @@ export default function Navbar() {
                 <div className="mb-8 flex items-center gap-3 px-2">
                   <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center overflow-hidden border border-white/20">
                     <img 
-                      src="https://i.postimg.cc/LXFYQ7WK/Untitled-design-(1).png" 
+                      src="https://i.postimg.cc/V6CDy34v/IMG-8050.jpg" 
                       alt="Logo" 
                       className="h-9 w-auto object-contain"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
                   <div className="flex flex-col">
@@ -183,7 +185,7 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <div className="flex flex-col space-y-1.5">
+                <div className="flex-1 flex flex-col space-y-1.5 overflow-y-auto no-scrollbar pb-6">
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}

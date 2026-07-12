@@ -259,10 +259,11 @@ export default function Admin() {
     console.log("--- File Upload Sequence Started ---");
     console.log(`File: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB, Type: ${file.type}`);
 
-    // 1. Client-side Validation
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      const msg = `Invalid file type (${file.type}). Please upload a JPEG, PNG, or WebP image.`;
+    // 1. Client-side Validation (Permissive to allow iPad/iOS HEIC uploads)
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    const isAllowedImage = file.type.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].includes(fileExt || '');
+    if (!isAllowedImage) {
+      const msg = `Invalid file format (${file.type || 'unknown'}). Please upload an image file (JPEG, PNG, WebP, or HEIC).`;
       console.error(msg);
       setNotification({ message: msg, type: 'error' });
       if (targetElement) targetElement.value = '';
@@ -303,7 +304,7 @@ export default function Admin() {
           const timeout = setTimeout(() => {
             const corsError = new Error("Firebase Upload Timeout. \n\nACTION REQUIRED: Since you are using a custom domain (thesoulhimalaya.com), you MUST configure CORS in Firebase Storage for your domain. \n\n1. Install gsutil\n2. Run: gsutil cors set cors.json gs://gen-lang-client-0435454443.firebasestorage.app\n\nWhere cors.json contains: [{\"origin\": [\"https://thesoulhimalaya.com\"], \"method\": [\"GET\", \"POST\", \"PUT\", \"DELETE\", \"HEAD\"], \"maxAgeSeconds\": 3600}]");
             reject(corsError);
-          }, 45000); // 45 seconds to be safe
+          }, 4000); // 4 seconds to be fast and user friendly
 
           uploadTask.on('state_changed', 
             (snapshot) => {
@@ -326,20 +327,17 @@ export default function Admin() {
           );
         });
       } catch (firebaseErr: any) {
-        console.warn("Firebase upload failed:", firebaseErr);
-        
-        // Only attempt fallback if NOT on production domain
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('run.app')) {
-          console.log("Attempting local dev fallback...");
-          const formData = new FormData();
-          formData.append('file', file);
-          const response = await fetch('/api/upload', { method: 'POST', body: formData });
-          if (!response.ok) throw new Error("Dev fallback failed.");
+        console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+        try {
+          const fallbackFormData = new FormData();
+          fallbackFormData.append('file', file);
+          const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+          if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
           const data = await response.json();
           downloadURL = data.url;
-        } else {
-          // On thesoulhimalaya.com, we MUST use Firebase
-          throw new Error(`Production Upload Failed: ${firebaseErr.message}. Ensure CORS is configured in Firebase Console.`);
+        } catch (fallbackErr: any) {
+          console.error("Fallback upload failed:", fallbackErr);
+          throw new Error(`Upload Failed: ${firebaseErr.message || firebaseErr}. Backend fallback also failed: ${fallbackErr.message || fallbackErr}`);
         }
       }
 
@@ -3851,19 +3849,41 @@ export default function Admin() {
                                       const storageRef = ref(storage, storagePath);
                                       const uploadTask = uploadBytesResumable(storageRef, file);
                                       
-                                      const downloadURL = await new Promise<string>((resolve, reject) => {
-                                        uploadTask.on('state_changed', 
-                                          (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
-                                          (error) => reject(error),
-                                          async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
-                                        );
-                                      });
+                                      let downloadURL: string;
+                                      try {
+                                        downloadURL = await new Promise<string>((resolve, reject) => {
+                                          const timeout = setTimeout(() => reject(new Error("Firebase upload timeout")), 4000);
+                                          uploadTask.on('state_changed', 
+                                            (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
+                                            (error) => {
+                                              clearTimeout(timeout);
+                                              reject(error);
+                                            },
+                                            async () => {
+                                              clearTimeout(timeout);
+                                              try {
+                                                resolve(await getDownloadURL(uploadTask.snapshot.ref));
+                                              } catch (urlErr) {
+                                                reject(urlErr);
+                                              }
+                                            }
+                                          );
+                                        });
+                                      } catch (firebaseErr) {
+                                        console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+                                        const fallbackFormData = new FormData();
+                                        fallbackFormData.append('file', file);
+                                        const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                        if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
+                                        const data = await response.json();
+                                        downloadURL = data.url;
+                                      }
                                       
                                       setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
                                       setNotification({ message: 'OG Image uploaded!', type: 'success' });
-                                    } catch (err) {
+                                    } catch (err: any) {
                                       console.error(err);
-                                      setNotification({ message: 'Upload failed', type: 'error' });
+                                      setNotification({ message: err.message || 'Upload failed', type: 'error' });
                                     } finally {
                                       setIsUploading(false);
                                       setUploadProgress(0);
@@ -5953,19 +5973,41 @@ export default function Admin() {
                                   const storageRef = ref(storage, storagePath);
                                   const uploadTask = uploadBytesResumable(storageRef, file);
                                   
-                                  const downloadURL = await new Promise<string>((resolve, reject) => {
-                                    uploadTask.on('state_changed', 
-                                      (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
-                                      (error) => reject(error),
-                                      async () => resolve(await getDownloadURL(uploadTask.snapshot.ref))
-                                    );
-                                  });
+                                  let downloadURL: string;
+                                  try {
+                                    downloadURL = await new Promise<string>((resolve, reject) => {
+                                      const timeout = setTimeout(() => reject(new Error("Firebase upload timeout")), 4000);
+                                      uploadTask.on('state_changed', 
+                                        (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
+                                        (error) => {
+                                          clearTimeout(timeout);
+                                          reject(error);
+                                        },
+                                        async () => {
+                                          clearTimeout(timeout);
+                                          try {
+                                            resolve(await getDownloadURL(uploadTask.snapshot.ref));
+                                          } catch (urlErr) {
+                                            reject(urlErr);
+                                          }
+                                        }
+                                      );
+                                    });
+                                  } catch (firebaseErr) {
+                                    console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+                                    const fallbackFormData = new FormData();
+                                    fallbackFormData.append('file', file);
+                                    const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                    if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
+                                    const data = await response.json();
+                                    downloadURL = data.url;
+                                  }
                                   
                                   setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
                                   setNotification({ message: 'OG Image uploaded!', type: 'success' });
-                                } catch (err) {
+                                } catch (err: any) {
                                   console.error(err);
-                                  setNotification({ message: 'Upload failed', type: 'error' });
+                                  setNotification({ message: err.message || 'Upload failed', type: 'error' });
                                 } finally {
                                   setIsUploading(false);
                                   setUploadProgress(0);

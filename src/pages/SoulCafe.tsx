@@ -225,7 +225,7 @@ export default function SoulCafe() {
                       onSubmit={handleReservation}
                       className="space-y-6"
                     >
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                            <label className="text-[10px] font-black uppercase tracking-widest px-2">Date</label>
                            <input type="date" required className="w-full bg-[#faf9f6] border border-forest/10 rounded-2xl p-4 focus:ring-1 focus:ring-terracotta outline-none text-sm" />

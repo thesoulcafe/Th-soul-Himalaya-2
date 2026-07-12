@@ -50,6 +50,7 @@ interface Booking {
     quantity: number;
     type: string;
     dateRange: string;
+    image?: string;
   }[];
 }
 
@@ -166,12 +167,47 @@ export default function Dashboard() {
 
   const getBookingImage = (booking: Booking) => {
     if (booking.image) return booking.image;
+    if (booking.items?.[0]?.image) return booking.items[0].image;
+    
+    const name = getBookingName(booking).toLowerCase();
     const type = getBookingType(booking).toLowerCase();
-    if (type.includes('yoga')) return "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80";
-    if (type.includes('trek')) return "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=400&q=80";
-    if (type.includes('wfh') || type.includes('work')) return "https://images.unsplash.com/photo-1497215848145-42a176884638?auto=format&fit=crop&w=400&q=80";
-    if (type.includes('meditation')) return "https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?auto=format&fit=crop&w=400&q=80";
-    return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80";
+    
+    // Check specific name keywords for WFH / Workation
+    if (name.includes('work from home') || name.includes('wfh') || name.includes('workation') || name.includes('pulga') || type.includes('wfh') || type.includes('work')) {
+      return "https://images.unsplash.com/photo-1497215848145-42a176884638?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check specific name keywords for Kheerganga
+    if (name.includes('kheerganga')) {
+      return "https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check specific name keywords for Tosh or Kutla Glacier
+    if (name.includes('glacier') || name.includes('kutla') || name.includes('tosh')) {
+      return "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check general trekking
+    if (name.includes('trek') || name.includes('hike') || name.includes('climb') || type.includes('trek')) {
+      return "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check yoga
+    if (name.includes('yoga') || name.includes('hatha') || name.includes('vinyasa') || name.includes('asana') || type.includes('yoga')) {
+      return "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check meditation
+    if (name.includes('meditation') || name.includes('silent') || name.includes('silence') || name.includes('mindful') || name.includes('retreat') || type.includes('meditation')) {
+      return "https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // Check general tours/expeditions
+    if (name.includes('tour') || name.includes('package') || name.includes('exped') || type.includes('tour')) {
+      return "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80";
   };
 
   const getBookingPrice = (booking: Booking) => {
@@ -281,74 +317,63 @@ export default function Dashboard() {
                       className="border-none bg-white rounded-[2rem] shadow-xl shadow-forest/[0.03] hover:shadow-2xl hover:shadow-forest/[0.08] transition-all group overflow-hidden cursor-pointer"
                       onClick={() => navigate(`/dashboard/booking/${booking.id}`)}
                     >
-                      <CardContent className="p-0">
-                        <div className="flex flex-col md:flex-row md:items-center">
-                          <div className="w-full md:w-48 h-48 relative overflow-hidden shrink-0">
-                            <img 
-                              src={getBookingImage(booking)} 
-                              alt="" 
-                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                              referrerPolicy="no-referrer"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-forest/40 to-transparent" />
-                          </div>
-                          <div className="flex-1 p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-2">
-                                <Badge className="bg-forest/5 text-forest/40 border-none px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
-                                  {getBookingType(booking)}
-                                </Badge>
-                                <span className="h-1 w-1 rounded-full bg-forest/10" />
-                                <Badge className={cn(
-                                  "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest",
-                                  booking.status === 'confirmed' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                                )}>
-                                  {booking.status || 'Reserved'}
-                                </Badge>
-                              </div>
-                              <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-2 truncate">
-                                {getBookingName(booking)}
-                              </h3>
-                              {getBookingDate(booking) && (
-                                <p className="text-sm font-bold text-terracotta mb-4 uppercase tracking-widest">{getBookingDate(booking)}</p>
-                              )}
-                              <div className="flex flex-wrap items-center gap-6 text-[10px] text-forest/40 font-black uppercase tracking-widest">
-                                <span className="flex items-center gap-2">
-                                  <Calendar className="h-3 w-3 text-terracotta" />
-                                  {booking.createdAt?.toDate ? booking.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}
-                                </span>
-                                <span className="flex items-center gap-2">
-                                  <Hash className="h-3 w-3 text-terracotta" />
-                                  ID: {booking.id.slice(-8).toUpperCase()}
-                                </span>
-                              </div>
+                      <CardContent className="p-8 md:p-10">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Badge className="bg-forest/5 text-forest/40 border-none px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
+                                {getBookingType(booking)}
+                              </Badge>
+                              <span className="h-1 w-1 rounded-full bg-forest/10" />
+                              <Badge className={cn(
+                                "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest",
+                                booking.status === 'confirmed' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                              )}>
+                                {booking.status || 'Reserved'}
+                              </Badge>
                             </div>
-                            <div className="flex items-center gap-4 lg:gap-8 justify-between lg:justify-end border-t lg:border-none pt-8 lg:pt-0">
-                              <div className="flex items-center gap-2">
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-terracotta hover:text-white transition-all text-forest/20"
-                                  onClick={(e) => handleShare(e, booking)}
-                                >
-                                  <Share2 className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  size="icon" 
-                                  variant="ghost" 
-                                  className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-forest hover:text-white transition-all text-forest/20"
-                                  onClick={(e) => handleHelp(e, booking)}
-                                >
-                                  <HelpCircle className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-3xl font-black text-forest tracking-tighter mb-1">{getBookingPrice(booking)}</p>
-                                <p className="text-[8px] text-forest/20 uppercase tracking-[0.3em] font-black">Expedition Value</p>
-                              </div>
-                              <div className="h-14 w-14 rounded-2xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">
-                                 <ArrowRight className="h-5 w-5" />
-                              </div>
+                            <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-2 truncate">
+                              {getBookingName(booking)}
+                            </h3>
+                            {getBookingDate(booking) && (
+                              <p className="text-sm font-bold text-terracotta mb-4 uppercase tracking-widest">{getBookingDate(booking)}</p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-6 text-[10px] text-forest/40 font-black uppercase tracking-widest">
+                              <span className="flex items-center gap-2">
+                                <Calendar className="h-3 w-3 text-terracotta" />
+                                {booking.createdAt?.toDate ? booking.createdAt.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent'}
+                              </span>
+                              <span className="flex items-center gap-2">
+                                <Hash className="h-3 w-3 text-terracotta" />
+                                ID: {booking.id.slice(-8).toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 lg:gap-8 justify-between lg:justify-end border-t lg:border-none pt-8 lg:pt-0">
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-terracotta hover:text-white transition-all text-forest/20"
+                                onClick={(e) => handleShare(e, booking)}
+                              >
+                                <Share2 className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-10 w-10 rounded-xl bg-forest/5 hover:bg-forest hover:text-white transition-all text-forest/20"
+                                onClick={(e) => handleHelp(e, booking)}
+                              >
+                                <HelpCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-3xl font-black text-forest tracking-tighter mb-1">{getBookingPrice(booking)}</p>
+                              <p className="text-[8px] text-forest/20 uppercase tracking-[0.3em] font-black">Expedition Value</p>
+                            </div>
+                            <div className="h-14 w-14 rounded-2xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">
+                               <ArrowRight className="h-5 w-5" />
                             </div>
                           </div>
                         </div>

@@ -40,6 +40,7 @@ const SoulCafe = lazy(() => import('./pages/SoulCafe'));
 const Success = lazy(() => import('./pages/Success'));
 const HelmetsOfGodsArticle = lazy(() => import('./pages/HelmetsOfGodsArticle'));
 const SEOArticleDetail = lazy(() => import('./pages/SEOArticleDetail'));
+const Offers = lazy(() => import('./pages/Offers'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-cream">
@@ -84,6 +85,7 @@ export default function App() {
                   <Route path="services/:id" element={<ServiceDetail />} />
                   <Route path=":category/:id/book" element={<BookingPage />} />
                   <Route path="shop" element={<Shop />} />
+                  <Route path="offers" element={<Offers />} />
                   <Route path="cart" element={<Cart />} />
                   <Route path="blueberry" element={<Blueberry />} />
                   <Route path="about" element={<About />} />

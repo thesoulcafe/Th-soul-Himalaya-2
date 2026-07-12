@@ -22,7 +22,8 @@ import {
   MapPin,
   Home as HomeIcon,
   Info,
-  Map
+  Map,
+  Percent
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,9 +73,63 @@ export default function SoulCart() {
     }
   }, [profile, user]);
 
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; label: string; discountPercent?: number; discountFixed?: number } | null>(null);
+
   const subtotal = totalPrice;
-  const taxes = Math.round(subtotal * 0.05);
-  const finalTotal = subtotal + taxes;
+  
+  let discountAmount = 0;
+  if (appliedPromo) {
+    if (appliedPromo.discountPercent) {
+      discountAmount = Math.round(subtotal * (appliedPromo.discountPercent / 100));
+    } else if (appliedPromo.discountFixed) {
+      discountAmount = Math.min(appliedPromo.discountFixed, subtotal);
+    }
+  }
+
+  const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+  const taxes = Math.round(discountedSubtotal * 0.05);
+  const finalTotal = discountedSubtotal + taxes;
+
+  const handleApplyPromo = () => {
+    const cleanedCode = promoInput.trim().toUpperCase();
+    if (!cleanedCode) return;
+
+    if (cleanedCode === 'SOUL15') {
+      setAppliedPromo({
+        code: 'SOUL15',
+        label: '15% Early Bird Discount',
+        discountPercent: 15
+      });
+      toast.success("SOUL15 applied! 15% discount has been manifested.");
+      setPromoInput('');
+    } else if (cleanedCode === 'NOMAD25') {
+      setAppliedPromo({
+        code: 'NOMAD25',
+        label: '25% Extended Stay Discount',
+        discountPercent: 25
+      });
+      toast.success("NOMAD25 applied! 25% accommodation discount manifested.");
+      setPromoInput('');
+    } else if (cleanedCode === 'COUPLE2026') {
+      setAppliedPromo({
+        code: 'COUPLE2026',
+        label: '₹2000 Couple Romantic Escape Discount',
+        discountFixed: 2000
+      });
+      toast.success("COUPLE2026 applied! ₹2000 discount manifested.");
+      setPromoInput('');
+    } else {
+      toast.error("Code not recognized in this frequency", {
+        description: "Verify your voucher code is correct and align your intent."
+      });
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    toast.info("Promo code removed.");
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -137,8 +192,12 @@ export default function SoulCart() {
           price: item.price,
           quantity: item.quantity,
           type: item.type,
+          image: item.image || '',
           dateRange: item.dateRange || ''
         })),
+        subtotalPrice: subtotal,
+        appliedPromoCode: appliedPromo ? appliedPromo.code : null,
+        discountAmount: discountAmount,
         totalPrice: finalTotal,
         note: note || '',
         status: 'reserved', // Mark as reserved
@@ -502,11 +561,63 @@ export default function SoulCart() {
               </div>
               
               <CardContent className="p-10 space-y-8 bg-gradient-to-b from-white to-forest/[0.02]">
+                {/* Promo Code Input Section */}
+                <div className="bg-forest/5 rounded-2xl p-4 border border-forest/10 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Percent className="h-4 w-4 text-terracotta" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-forest">Voucher & Promo Code</span>
+                  </div>
+                  {!appliedPromo ? (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder="E.g. SOUL15"
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value)}
+                        className="h-10 rounded-xl bg-white border-forest/10 text-xs text-forest font-semibold uppercase tracking-wider placeholder:text-forest/30 placeholder:normal-case font-sans"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleApplyPromo();
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={handleApplyPromo}
+                        className="bg-forest hover:bg-forest/90 text-white rounded-xl text-xs h-10 px-4 font-black uppercase tracking-widest"
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-white border border-emerald-100 rounded-xl px-4 py-2 shadow-sm">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Active Discount</span>
+                        <span className="text-xs font-bold text-forest font-mono">{appliedPromo.code} Applied</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleRemovePromo}
+                        className="h-8 w-8 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-5">
                   <div className="flex justify-between items-center group/row">
                     <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest group-hover/row:text-forest transition-colors">Base Energy Exchange</span>
                     <span className="font-mono font-black text-forest">₹{subtotal.toLocaleString()}</span>
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between items-center text-emerald-600 font-semibold group/row">
+                      <span className="text-[10px] font-black uppercase tracking-widest">Discount ({appliedPromo?.code})</span>
+                      <span className="font-mono font-black">-₹{discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center group/row">
                     <span className="text-[10px] font-black text-forest/30 uppercase tracking-widest group-hover/row:text-forest transition-colors">Abundance Tax (5%)</span>
                     <span className="font-mono font-black text-forest">₹{taxes.toLocaleString()}</span>

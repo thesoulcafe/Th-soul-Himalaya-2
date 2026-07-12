@@ -170,7 +170,9 @@ async function startServer() {
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith("image/")) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      const isImgExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif'].includes(ext);
+      if (file.mimetype.startsWith("image/") || isImgExt) {
         cb(null, true);
       } else {
         cb(new Error("Only images are allowed"));
@@ -634,7 +636,7 @@ async function injectMetaTags(req: express.Request, html: string) {
 
       // --- STEP 3: Path-based Hardcoded Fallbacks - THIRD PRIORITY ---
       if (!metaOverridden) {
-        if (urlPath.includes('/parvati-valley')) {
+        if (urlPath === '/parvati-valley') {
           title = "The Valley of Shadows & Light | Parvati Valley Spotlight";
           description = "Deep dive into the Parvati Valley—a place of ancient democracies, divine legends, and the ethereal glow of sacred mists.";
           image = "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
