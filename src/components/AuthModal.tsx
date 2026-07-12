@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Mail, Lock, User, Chrome, Phone } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface AuthModalProps {
@@ -84,7 +84,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         role: 'user',
         loyaltyPoints: 0,
         isBlocked: false,
-        createdAt: new Date().toISOString()
+        createdAt: serverTimestamp()
       }, { merge: true });
       
       onClose();
@@ -118,7 +118,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           role: 'user',
           loyaltyPoints: 0,
           isBlocked: false,
-          createdAt: new Date().toISOString()
+          createdAt: serverTimestamp()
         });
       }
       onClose();
@@ -185,6 +185,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   />
                 </div>
               </div>
+              {error && <p className="text-xs text-red-400 text-center">{error}</p>}
               <Button type="submit" className="w-full bg-terracotta text-white" disabled={loading}>
                 {loading ? 'Saving...' : 'Complete Signup'}
               </Button>

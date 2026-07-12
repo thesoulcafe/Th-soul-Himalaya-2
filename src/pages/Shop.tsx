@@ -43,8 +43,8 @@ export default function Shop() {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, tracking: "0.2em" }}
-          animate={{ opacity: 1, tracking: "0.4em" }}
+          initial={{ opacity: 0, letterSpacing: "0.2em" }}
+          animate={{ opacity: 1, letterSpacing: "0.4em" }}
           transition={{ delay: 0.1 }}
           className="text-terracotta font-bold uppercase text-xs mb-6"
         >

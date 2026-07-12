@@ -32,13 +32,25 @@ import { toast } from 'sonner';
 
 interface Booking {
   id: string;
-  item: string;
-  price: string;
-  type: string;
+  item?: string;
+  serviceName?: string;
+  price?: string;
+  totalPrice?: number;
+  type?: string;
+  serviceType?: string;
   createdAt: any;
   status: string;
   image?: string;
   slot?: string;
+  date?: string;
+  items?: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    type: string;
+    dateRange: string;
+  }[];
 }
 
 export default function Dashboard() {
@@ -124,7 +136,7 @@ export default function Dashboard() {
     e.stopPropagation();
     const shareData = {
       title: 'My Soul Journey Booking',
-      text: `Excited about my upcoming journey: ${booking.item}!`,
+      text: `Excited about my upcoming journey: ${getBookingName(booking)}!`,
       url: `${window.location.origin}/dashboard/booking/${booking.id}`,
     };
     if (navigator.share) {
@@ -137,7 +149,35 @@ export default function Dashboard() {
 
   const handleHelp = (e: React.MouseEvent, booking: Booking) => {
     e.stopPropagation();
-    navigate(`/guide?q=${encodeURIComponent(booking.item)}`);
+    navigate(`/guide?q=${encodeURIComponent(getBookingName(booking))}`);
+  };
+
+  const getBookingName = (booking: Booking) => {
+    return booking.item || booking.serviceName || booking.items?.[0]?.name || 'Unknown Journey';
+  };
+
+  const getBookingType = (booking: Booking) => {
+    return booking.type || booking.serviceType || booking.items?.[0]?.type || 'Journey';
+  };
+
+  const getBookingDate = (booking: Booking) => {
+    return booking.slot || booking.date || booking.items?.[0]?.dateRange || '';
+  };
+
+  const getBookingImage = (booking: Booking) => {
+    if (booking.image) return booking.image;
+    const type = getBookingType(booking).toLowerCase();
+    if (type.includes('yoga')) return "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80";
+    if (type.includes('trek')) return "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=400&q=80";
+    if (type.includes('wfh') || type.includes('work')) return "https://images.unsplash.com/photo-1497215848145-42a176884638?auto=format&fit=crop&w=400&q=80";
+    if (type.includes('meditation')) return "https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?auto=format&fit=crop&w=400&q=80";
+    return "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80";
+  };
+
+  const getBookingPrice = (booking: Booking) => {
+    if (booking.price) return booking.price;
+    if (booking.totalPrice) return `₹${booking.totalPrice.toLocaleString()}`;
+    return '₹0';
   };
 
   if (!user) return null;
@@ -245,7 +285,7 @@ export default function Dashboard() {
                         <div className="flex flex-col md:flex-row md:items-center">
                           <div className="w-full md:w-48 h-48 relative overflow-hidden shrink-0">
                             <img 
-                              src={booking.image || "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80"} 
+                              src={getBookingImage(booking)} 
                               alt="" 
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                               referrerPolicy="no-referrer"
@@ -256,7 +296,7 @@ export default function Dashboard() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-3 mb-2">
                                 <Badge className="bg-forest/5 text-forest/40 border-none px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
-                                  {booking.type || 'Journey'}
+                                  {getBookingType(booking)}
                                 </Badge>
                                 <span className="h-1 w-1 rounded-full bg-forest/10" />
                                 <Badge className={cn(
@@ -267,10 +307,10 @@ export default function Dashboard() {
                                 </Badge>
                               </div>
                               <h3 className="font-heading font-bold text-2xl md:text-3xl text-forest tracking-tight mb-2 truncate">
-                                {booking.item}
+                                {getBookingName(booking)}
                               </h3>
-                              {booking.slot && (
-                                <p className="text-sm font-bold text-terracotta mb-4 uppercase tracking-widest">{booking.slot}</p>
+                              {getBookingDate(booking) && (
+                                <p className="text-sm font-bold text-terracotta mb-4 uppercase tracking-widest">{getBookingDate(booking)}</p>
                               )}
                               <div className="flex flex-wrap items-center gap-6 text-[10px] text-forest/40 font-black uppercase tracking-widest">
                                 <span className="flex items-center gap-2">
@@ -303,7 +343,7 @@ export default function Dashboard() {
                                 </Button>
                               </div>
                               <div className="text-right">
-                                <p className="text-3xl font-black text-forest tracking-tighter mb-1">{booking.price}</p>
+                                <p className="text-3xl font-black text-forest tracking-tighter mb-1">{getBookingPrice(booking)}</p>
                                 <p className="text-[8px] text-forest/20 uppercase tracking-[0.3em] font-black">Expedition Value</p>
                               </div>
                               <div className="h-14 w-14 rounded-2xl bg-forest/5 flex items-center justify-center text-forest/20 group-hover:bg-forest group-hover:text-white transition-all">

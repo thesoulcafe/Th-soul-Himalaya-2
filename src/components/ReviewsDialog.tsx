@@ -109,15 +109,12 @@ export default function ReviewsDialog({ serviceId, serviceType, serviceName, tri
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger 
-        nativeButton={true}
-        render={
-          trigger || (
-            <button className={cn(buttonVariants({ variant: "outline" }), "rounded-full border-forest/20 text-forest hover:bg-forest hover:text-white transition-all px-4 py-2 flex items-center")}>
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Reviews ({reviews.length})
-            </button>
-          )
-        }
+        render={<>{trigger || (
+          <button className={cn(buttonVariants({ variant: "outline" }), "rounded-full border-forest/20 text-forest hover:bg-forest hover:text-white transition-all px-4 py-2 flex items-center")}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Reviews ({reviews.length})
+          </button>
+        )}</>}
       />
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-hidden flex flex-col p-0 rounded-[2rem] border-none shadow-2xl bg-cream">
         <DialogHeader className="p-8 bg-forest text-white">

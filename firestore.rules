@@ -65,6 +65,9 @@ service cloud.firestore {
              data.role in ['user', 'admin'] &&
              (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
              (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 600)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 20)) &&
+             (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
+             (!('pincode' in data) || (data.pincode is string && data.pincode.size() <= 10)) &&
              (!('loyaltyPoints' in data) || (data.loyaltyPoints is number && data.loyaltyPoints >= 0)) &&
              (!('soulPoints' in data) || (data.soulPoints is number && data.soulPoints >= 0)) &&
              (!('isBlocked' in data) || data.isBlocked is bool) &&
@@ -84,17 +87,17 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       // Secure List Query: Only admins can list users, or queries must filter by ID
-      allow list: if isAdmin(); 
+      allow list: if isAdmin();
       
-      allow create: if isVerified() && isOwner(userId) && 
+      allow create: if isSignedIn() && isOwner(userId) && 
                       isValidUserProfile(incoming()) && 
                       incoming().role == 'user' && // User cannot promote self to admin during create
-                      incoming().keys().size() <= 15; // Strict size check
+                      incoming().keys().size() <= 20; // Strict size check
       
-      allow update: if (isVerified() && isOwner(userId) && isValidUserProfile(incoming())) && (
+      allow update: if (isSignedIn() && isOwner(userId) && isValidUserProfile(incoming())) && (
                       // Action: Standard Profile Update
-                      (incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'trekPreferences', 'wishlist', 'lastActive']) && 
-                       incoming().role == existing().role &&
+                      (incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'phone', 'city', 'pincode', 'createdAt', 'trekPreferences', 'wishlist', 'lastActive']) && 
+                       incoming().role == existing().role && 
                        incoming().soulPoints == existing().soulPoints) ||
                       // Action: Admin Role/Points Update
                       isAdmin()

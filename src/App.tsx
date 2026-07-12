@@ -39,6 +39,7 @@ const ArticleDetail = lazy(() => import('./pages/ArticleDetail'));
 const SoulCafe = lazy(() => import('./pages/SoulCafe'));
 const Success = lazy(() => import('./pages/Success'));
 const HelmetsOfGodsArticle = lazy(() => import('./pages/HelmetsOfGodsArticle'));
+const SEOArticleDetail = lazy(() => import('./pages/SEOArticleDetail'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-cream">
@@ -95,6 +96,7 @@ export default function App() {
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="dashboard/booking/:id" element={<BookingDetails />} />
                   <Route path="parvati-valley" element={<ParvatiValley />} />
+                  <Route path="parvati-valley/guide/:slug" element={<SEOArticleDetail />} />
                   <Route path="parvati-valley/:hamletId" element={<HamletDetail />} />
                   <Route path="cosmic-manifestation" element={<CosmicManifestation />} />
                   <Route path="soul-cafe" element={<SoulCafe />} />

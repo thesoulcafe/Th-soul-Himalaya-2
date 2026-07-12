@@ -1709,7 +1709,7 @@ export default function Admin() {
                     <div className="flex-grow overflow-y-auto p-10 custom-scrollbar">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Common Fields */}
-                        {activeContentTab !== 'instagram' && activeContentTab !== 'faq' && (
+                        {activeContentTab !== 'instagram' && activeContentTab !== ('faq' as any) && (
                           <div className="space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">
                               {activeContentTab === 'shop_item' ? 'Item Name' : 'Title'}
@@ -1785,7 +1785,7 @@ export default function Admin() {
                               onChange={(e) => setFormData({...formData, price: e.target.value})}
                               className="h-14 rounded-2xl bg-forest/[0.03] border-none focus:ring-2 focus:ring-terracotta/20 font-medium"
                               placeholder="e.g. ₹14,999"
-                              required={activeContentTab !== 'service' && activeContentTab !== 'page_parvati'}
+                              required={activeContentTab !== 'service' && activeContentTab !== ('page_parvati' as any)}
                             />
                           </div>
                         )}
@@ -2260,7 +2260,7 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {activeContentTab === 'faq' && (
+                        {activeContentTab === ('faq' as any) && (
                           <>
                             <div className="space-y-3">
                               <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Question</label>
@@ -2349,7 +2349,7 @@ export default function Admin() {
                           </div>
                         )}
 
-                        {activeContentTab !== 'faq' && (
+                        {activeContentTab !== ('faq' as any) && (
                           <div className="md:col-span-2 space-y-3">
                             <label className="text-[10px] font-bold text-forest/40 uppercase tracking-widest ml-1">Description</label>
                             <textarea 
@@ -2620,7 +2620,6 @@ export default function Admin() {
                             variant="ghost" 
                             onClick={() => {
                               setConfirmModal({
-                                title: 'Delete Asset?',
                                 message: 'Are you sure you want to permanently delete this asset? This cannot be undone.',
                                 onConfirm: async () => {
                                   try {
@@ -2678,7 +2677,7 @@ export default function Admin() {
                   .filter(i => {
                     if (activeContentTab === 'all') return true;
                     if (activeContentTab === 'itinerary') return (i.data.itinerary && i.data.itinerary.length > 0) || i.data.theExperience;
-                    if (activeContentTab === 'trekk') return i.type === 'trekk' || i.type === 'trek';
+                    if (activeContentTab === 'trekk') return i.type === 'trekk' || i.type === ('trek' as any);
                     return i.type === activeContentTab;
                   })
                 .filter(i => {
@@ -2784,7 +2783,6 @@ export default function Admin() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setConfirmModal({
-                                title: 'Delete Asset?',
                                 message: 'Are you sure you want to delete this asset permanently?',
                                 onConfirm: async () => {
                                   try {
@@ -2871,7 +2869,6 @@ export default function Admin() {
                               onClick={(e: any) => {
                                 e.stopPropagation();
                                 setConfirmModal({
-                                  title: 'Delete Asset?',
                                   message: 'Delete this asset permanently?',
                                   onConfirm: async () => {
                                     try {
@@ -2970,7 +2967,7 @@ export default function Admin() {
                         </td>
                         <td className="px-6 py-4">
                            <p className="text-xs text-forest/50 font-medium">                            
-                             {booking.phone || userProfile?.phone || 'N/A'}
+                             {(booking as any).phone || userProfile?.phone || 'N/A'}
                            </p>
                         </td>
                         <td className="px-6 py-4">
@@ -2988,7 +2985,7 @@ export default function Admin() {
                         <td className="px-6 py-4 text-center">
                           <div className="flex flex-col items-center gap-2 text-forest/60">
                              <span className="text-xs font-mono font-medium">
-                               {booking.items?.[0]?.dateRange || booking.date || 'Pending'}
+                               {(booking.items?.[0] as any)?.dateRange || booking.date || 'Pending'}
                              </span>
                           </div>
                         </td>
@@ -3003,7 +3000,7 @@ export default function Admin() {
                           )}>
                             {booking.status}
                           </Badge>
-                          {booking.paymentMethod === 'reserve' && (
+                          {(booking as any).paymentMethod === 'reserve' && (
                             <p className="text-[8px] font-bold text-terracotta uppercase tracking-tighter mt-1">Reserve Option</p>
                           )}
                         </td>
@@ -3204,7 +3201,7 @@ export default function Admin() {
                         </div>
                         <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
                           <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Location Details</p>
-                          <p className="text-xs md:text-sm font-medium">{selectedUser.city || 'N/A'}{selectedUser.pincode ? `, ${selectedUser.pincode}` : ''}</p>
+                          <p className="text-xs md:text-sm font-medium">{(selectedUser as any).city || 'N/A'}{(selectedUser as any).pincode ? `, ${(selectedUser as any).pincode}` : ''}</p>
                         </div>
                         <div className="bg-white/5 rounded-2xl p-3 md:p-4 border border-white/10">
                           <p className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Loyalty Status</p>
@@ -3766,7 +3763,7 @@ export default function Admin() {
                                   if (existing) {
                                     setNotification({ 
                                       message: `Warning: ${newPath} already exists! Submitting will overwrite its settings.`, 
-                                      type: 'warning' 
+                                      type: 'error' 
                                     });
                                   }
                                 }
@@ -5023,7 +5020,7 @@ export default function Admin() {
                           onClick={async () => {
                             setIsProcessing(true);
                             try {
-                              const pathMap = new Map();
+                              const pathMap = new globalThis.Map<string, any>();
                               const docsToDelete: string[] = [];
                               
                               seoSettings.forEach(s => {
@@ -5442,7 +5439,7 @@ export default function Admin() {
                                   <span className="text-[10px] text-green-700 font-mono font-bold">{msg.userPhone}</span>
                                 </div>
                               )}
-                              {msg.metadata?.source === 'TailorMadePage' && (
+                              {(msg as any).metadata?.source === 'TailorMadePage' && (
                                 <Badge className="bg-terracotta/10 text-terracotta border-none px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shadow-sm">
                                   Tailor-Made 
                                 </Badge>
@@ -5510,7 +5507,6 @@ export default function Admin() {
                               variant="ghost"
                               onClick={() => {
                                 setConfirmModal({
-                                  title: 'Delete Signal?',
                                   message: 'Are you sure you want to permanently delete this communication? This cannot be undone.',
                                   onConfirm: async () => {
                                     try {

@@ -46,9 +46,9 @@ export const LatestArticlesSection = () => {
   return (
     <section className="py-24 px-4 bg-white/50 backdrop-blur-sm border-y border-forest/10 relative z-10 w-full overflow-hidden">
       <div className="max-w-7xl mx-auto relative">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 relative z-20">
+        <div className="flex flex-col items-center text-center mb-12 gap-6 relative z-20">
           <div>
-            <div className="flex items-center gap-2 text-terracotta font-black uppercase text-[10px] tracking-[0.3em] mb-4">
+            <div className="flex items-center justify-center gap-2 text-terracotta font-black uppercase text-[10px] tracking-[0.3em] mb-4">
               <BookOpen className="h-4 w-4" />
               <span>Travel Narratives</span>
             </div>
