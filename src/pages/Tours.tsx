@@ -159,7 +159,7 @@ export default function Tours() {
   }, [searchParams]);
 
   useEffect(() => {
-    const q = query(collection(db, 'content'), where('type', 'in', ['tour', 'yoga', 'meditation']));
+    const q = query(collection(db, 'content'), where('type', '==', 'tour'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const dbItems = snapshot.empty ? [] : snapshot.docs.map(doc => {
         const type = doc.data().type;
