@@ -198,12 +198,13 @@ export default function Yoga() {
 
   return (
     <div className="pt-24">
-      {seo && <SEO 
-        title={seo.title || "Yoga Retreats"} 
-        description={seo.description || "Heal your soul."} 
-        image={seo.image}
-        seoData={seo.seoData}
-      />}
+      <SEO 
+        title={seo?.title || "Yoga & Meditation Packages | Retreats in Parvati Valley"} 
+        description={seo?.description || "Heal your soul with transformative yoga and meditation packages in Parvati Valley. Experience guided retreats, mindful breathing, and inner peace in the Himalayas."} 
+        keywords={seo?.keyword || "yoga packages, meditation packages, Tour Package Himachal Pardesh, wellness retreat Parvati Valley"}
+        image={seo?.image}
+        seoData={seo?.seoData}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Yoga Retreats</h1>

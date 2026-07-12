@@ -206,12 +206,13 @@ export default function WFH() {
 
   return (
     <div className="pt-24">
-      {seo && <SEO 
-        title={seo.title || "Work from Himalaya"} 
-        description={seo.description || "Mountain offices for the soulful worker."} 
-        image={seo.image}
-        seoData={seo.seoData}
-      />}
+      <SEO 
+        title={seo?.title || "Work from Himalaya | Corporate Tour Packages & WFH Retreats"} 
+        description={seo?.description || "Work from the mountains with our exclusive WFH and corporate tour packages in Parvati Valley. Experience high-speed internet, inspiring views, and soulful retreats."} 
+        keywords={seo?.keyword || "corporate Tour packages, wfh in Parvati valley, workation in Himalayas, remote work Himachal Pradesh"}
+        image={seo?.image}
+        seoData={seo?.seoData}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Work From Himalaya</h1>

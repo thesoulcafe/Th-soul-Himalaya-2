@@ -288,13 +288,13 @@ export default function Tours() {
 
   return (
     <div className="pt-[64px] md:pt-[72px] px-4 sm:px-6">
-      {seo && <SEO 
-        title={seo.title || "Tour Packages"} 
-        description={seo.description || "Handpicked mountain journeys."} 
-        keywords={seo.keyword} 
-        image={seo.image}
-        seoData={seo.seoData}
-      />}
+      <SEO 
+        title={seo?.title || "Tour Packages in Himachal Pradesh | Parvati Valley Treks"} 
+        description={seo?.description || "Book your soulful tour package in Himachal Pradesh. Experience high-altitude trekking, curated corporate tours, and mindful adventures in the Parvati Valley."} 
+        keywords={seo?.keyword || "Tour Package Himachal Pardesh, trekking in Parvati valley, corporate Tour packages"} 
+        image={seo?.image}
+        seoData={seo?.seoData}
+      />
       
       {/* Search & Filter Header (Sticky) */}
       <div className="sticky top-[63px] md:top-[71px] z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 md:py-3 bg-cream/95 backdrop-blur-xl border-b border-forest/5 shadow-sm transition-all duration-500">

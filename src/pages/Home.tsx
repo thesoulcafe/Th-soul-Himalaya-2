@@ -432,9 +432,9 @@ export default function Home() {
   return (
     <div className="w-full overflow-hidden">
       <SEO 
-        title={seo?.title || "The Soul Himalaya | Spiritual Adventures & Wellness Treks"} 
-        description={seo?.description || "Experience curated spiritual adventures, wellness retreats, and eco-tours in Tosh and Parvati Valley."} 
-        keywords={seo?.keyword}
+        title={seo?.title || "The Soul Himalaya | Tour Package Himachal Pradesh & Yoga Retreats"} 
+        description={seo?.description || "Explore Parvati Valley with our exclusive tour packages. Experience high-altitude trekking in Tosh, soul-stirring yoga retreats, and sustainable tourism."} 
+        keywords={seo?.keyword || "Tour Package Himachal Pardesh, trekking in Parvati valley, trekking in Tosh, yoga packages, meditation packages, corporate Tour packages, wfh in Parvati valley"}
         type="website"
         cafeData={true}
       />
@@ -550,7 +550,7 @@ export default function Home() {
             </motion.h1>
 
             <p className="text-xs xs:text-sm md:text-base text-cream/90 mb-10 font-medium max-w-xl mx-auto leading-relaxed drop-shadow-md backdrop-blur-[2px] px-4">
-              A multi-experience travel and lifestyle brand based in the mystical heart of the Himalaya's. Discover curated retreats, adventures, and artisan crafts.
+              Embark on a soulful journey to the mystic heart of the Himalayas. Discover high-altitude trekking in Parvati Valley, transformative yoga retreats, and curated adventures designed to awaken your spirit.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-0">

@@ -203,14 +203,15 @@ export default function Trekks() {
 
   return (
     <div className="pt-24">
-      {seo && <SEO 
-        title={seo.title || "Mountain Trekks"} 
-        description={seo.description || "Discover wild paths."} 
-        image={seo.image}
+      <SEO 
+        title={seo?.title || "Trekking in Parvati Valley & Tosh | High-Altitude Expeditions"} 
+        description={seo?.description || "Embark on an adventurous trekking experience in Parvati Valley. Discover guided treks, remote trails in Tosh, and connect with the raw beauty of the Himalayas."} 
+        keywords={seo?.keyword || "trekking in Parvati valley, trekking in Tosh, Tour Package Himachal Pardesh, Himalayan trekking"}
+        image={seo?.image}
         type="adventure"
-        trekData={selectedTrekk || { title: seo.title, description: seo.description }}
-        seoData={seo.seoData}
-      />}
+        trekData={selectedTrekk || { title: seo?.title, description: seo?.description }}
+        seoData={seo?.seoData}
+      />
       {/* Tagline */}
       <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-forest mb-2">Mountain Trekks</h1>

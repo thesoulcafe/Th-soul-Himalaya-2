@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
@@ -222,6 +223,23 @@ export default function HamletDetail() {
 
   return (
     <div className="min-h-screen bg-stone-50 pt-24 pb-20">
+      <Helmet>
+        <title>{data.name} | Parvati Valley Trekking & Packages</title>
+        <meta name="description" content={`Explore ${data.name} in Parvati Valley. ${data.tagline}. Discover ancient culture, high-altitude trekking, and rustic stays.`} />
+        <meta name="keywords" content={`${data.name}, Parvati Valley, trekking in ${data.name}, ${data.name} stays, Tour Package Himachal Pardesh`} />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "TouristDestination",
+              "name": "${data.name}",
+              "description": "${data.history}",
+              "image": "${data.heroImage}"
+            }
+          `}
+        </script>
+      </Helmet>
+
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
         <motion.img 
@@ -288,7 +306,7 @@ export default function HamletDetail() {
                   const Wrapper = exp.link ? Link : 'div';
                   const props = exp.link ? { to: exp.link, className: 'space-y-4 group block' } : { className: 'space-y-4 group' };
                   return (
-                    <Wrapper key={i} {...(props as any)} className={exp.title === "Trek Glacier Point" ? "space-y-4 group block bg-white p-6 rounded-3xl border-2 border-terracotta/20 hover:border-terracotta hover:shadow-2xl hover:shadow-terracotta/10 transition-all duration-300 transform hover:-translate-y-2" : props.className}>
+                    <Wrapper key={i} {...props} className={exp.title === "Trek Glacier Point" ? "space-y-4 group block bg-white p-6 rounded-3xl border-2 border-terracotta/20 hover:border-terracotta hover:shadow-2xl hover:shadow-terracotta/10 transition-all duration-300 transform hover:-translate-y-2" : props.className}>
                       <div className={`h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${exp.title === "Trek Glacier Point" ? "bg-terracotta text-white shadow-xl shadow-terracotta/20" : "bg-forest/5 text-forest group-hover:bg-terracotta group-hover:text-white"}`}>
                         {React.cloneElement(exp.icon, { className: "h-8 w-8" })}
                       </div>

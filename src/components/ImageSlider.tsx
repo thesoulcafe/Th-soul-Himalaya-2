@@ -3,6 +3,60 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Clock, Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// --- Global Slider Manager ---
+const registeredSliders = new Set<HTMLElement>();
+const sliderCallbacks = new Map<HTMLElement, (isCenter: boolean) => void>();
+let centerSlider: HTMLElement | null = null;
+let scrollTimeout: NodeJS.Timeout | null = null;
+
+const updateCenterSlider = () => {
+  let closest: HTMLElement | null = null;
+  let minDistance = Infinity;
+  const centerY = window.innerHeight / 2;
+  const centerX = window.innerWidth / 2;
+
+  registeredSliders.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0) {
+      const elCenterY = rect.top + rect.height / 2;
+      const elCenterX = rect.left + rect.width / 2;
+      const distance = Math.sqrt(Math.pow(elCenterY - centerY, 2) + Math.pow(elCenterX - centerX, 2));
+      if (distance < minDistance) {
+        minDistance = distance;
+        closest = el;
+      }
+    }
+  });
+
+  if (centerSlider !== closest) {
+    if (centerSlider && sliderCallbacks.has(centerSlider)) {
+      sliderCallbacks.get(centerSlider)!(false);
+    }
+    centerSlider = closest;
+    if (centerSlider && sliderCallbacks.has(centerSlider)) {
+      sliderCallbacks.get(centerSlider)!(true);
+    }
+  }
+};
+
+const throttledUpdateCenterSlider = () => {
+  if (scrollTimeout) return;
+  scrollTimeout = setTimeout(() => {
+    updateCenterSlider();
+    scrollTimeout = null;
+  }, 100);
+};
+
+let isListening = false;
+const initGlobalListener = () => {
+  if (!isListening && typeof window !== 'undefined') {
+    window.addEventListener('scroll', throttledUpdateCenterSlider, { passive: true });
+    window.addEventListener('resize', throttledUpdateCenterSlider, { passive: true });
+    isListening = true;
+  }
+};
+// -----------------------------
+
 interface ImageSliderProps {
   images: string[];
   alt: string;
@@ -28,10 +82,30 @@ export default function ImageSlider({
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [direction, setDirection] = useState(0);
+  const [isCenterMost, setIsCenterMost] = useState(false);
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
   const previousOverflowRef = useRef<string>("");
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const el = containerRef.current;
+    registeredSliders.add(el);
+    sliderCallbacks.set(el, setIsCenterMost);
+    initGlobalListener();
+    throttledUpdateCenterSlider();
+
+    return () => {
+      registeredSliders.delete(el);
+      sliderCallbacks.delete(el);
+      if (centerSlider === el) {
+        centerSlider = null;
+        throttledUpdateCenterSlider();
+      }
+    };
+  }, []);
 
   const startHold = () => {
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
@@ -72,27 +146,17 @@ export default function ImageSlider({
 
   useEffect(() => {
     // If user has interacted, stop auto-swiping permanently for this component instance
-    if (!autoSwipeEnabled || isPaused || hasInteracted || images.length <= 1) return;
-
-    // Desynchronize by adding a random delay before the first transition
-    const desyncDelay = Math.random() * interval;
+    if (!autoSwipeEnabled || isPaused || hasInteracted || images.length <= 1 || !isCenterMost) return;
     
-    let timer: NodeJS.Timeout;
-    
-    const timeout = setTimeout(() => {
+    const timer = setInterval(() => {
       setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % images.length);
-      timer = setInterval(() => {
-        setDirection(1);
-        setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, interval);
-    }, desyncDelay);
+    }, interval);
 
     return () => {
-      clearTimeout(timeout);
-      if (timer) clearInterval(timer);
+      clearInterval(timer);
     };
-  }, [autoSwipeEnabled, isPaused, hasInteracted, images.length, interval]);
+  }, [autoSwipeEnabled, isPaused, hasInteracted, images.length, interval, isCenterMost]);
 
   // Scroll active thumbnail into view
   useEffect(() => {
