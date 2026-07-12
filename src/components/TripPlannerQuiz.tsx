@@ -10,6 +10,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const questions = [
@@ -55,7 +56,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mobile) return;
+    if (!mobile || !email) return;
     setIsSubmitting(true);
     
     try {
@@ -73,21 +74,30 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
 - **Planning Duration:** ${getOptionLabel(2, answers[2])}
 
 User has requested their personalized itinerary on Mobile / WhatsApp: ${mobile}
+Email: ${email}
       `.trim();
 
+      // 1. Save lead to messages
       await addDoc(collection(db, 'messages'), {
         userId: auth.currentUser?.uid || null,
         userName: "Himalayan Explorer",
         userPhone: mobile,
-        userEmail: "Quiz Submitter",
-        subject: "New Trip Planner Quiz Lead",
+        userEmail: email,
+        subject: "New Trip Planner Quiz & Guide Lead",
         message: formattedMessage,
         status: 'unread',
         createdAt: serverTimestamp()
       });
 
+      // 2. Save email to newsletter subscribers
+      await addDoc(collection(db, 'newsletter_subscribers'), {
+        email: email,
+        subscribedAt: serverTimestamp(),
+        source: 'combined_quiz'
+      });
+
       setIsSubmitting(false);
-      toast.success("Your personalized itinerary is on its way!");
+      toast.success("Your personalized itinerary and Himalayan travel guide are on their way!");
       setTimeout(() => {
         onClose();
         // Reset state
@@ -95,6 +105,7 @@ User has requested their personalized itinerary on Mobile / WhatsApp: ${mobile}
           setStep(0);
           setAnswers({});
           setMobile('');
+          setEmail('');
         }, 500);
       }, 1000);
     } catch (error: any) {
@@ -179,37 +190,55 @@ User has requested their personalized itinerary on Mobile / WhatsApp: ${mobile}
                   transition={{ duration: 0.3 }}
                   className="text-center max-w-md mx-auto"
                 >
-                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-forest/5 mb-6 text-terracotta">
-                    <Sparkles className="h-8 w-8" />
+                  <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-forest/5 mb-4 text-terracotta">
+                    <Sparkles className="h-7 w-7" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-playfair font-bold text-forest mb-4">
-                    Your Perfect Itinerary is Ready
+                  <h3 className="text-2xl md:text-3xl font-playfair font-bold text-forest mb-2">
+                    Your Personal Journey is Ready
                   </h3>
-                  <p className="text-forest/70 mb-8">
-                    Enter your Mobile or WhatsApp number below and we'll send you a beautifully crafted, personalized Himalayan journey over WhatsApp.
+                  <p className="text-forest/70 mb-6 text-sm">
+                    Enter your details below to receive your customized, hand-crafted itinerary on WhatsApp and our exclusive Himalayan PDF travel guide in your email inbox.
                   </p>
                   
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <input 
-                      type="tel"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      placeholder="Mobile / WhatsApp number with Country Code"
-                      required
-                      className="w-full bg-white border border-forest/10 rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
-                    />
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-left">
+                    <div>
+                      <label className="block text-[11px] font-bold text-forest/60 mb-1 uppercase tracking-wider">Email Address</label>
+                      <input 
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="yourname@example.com"
+                        required
+                        className="w-full bg-white border border-forest/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-forest/60 mb-1 uppercase tracking-wider">Mobile / WhatsApp Number</label>
+                      <input 
+                        type="tel"
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
+                        placeholder="WhatsApp number with Country Code"
+                        required
+                        className="w-full bg-white border border-forest/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
+                      />
+                    </div>
+                    
                     <Button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-forest hover:bg-forest/90 text-white rounded-xl py-6 h-auto text-lg font-medium shadow-lg hover:shadow-xl transition-all"
+                      className="w-full bg-forest hover:bg-forest/90 text-white rounded-xl py-5 h-auto text-base font-semibold shadow-md hover:shadow-lg transition-all mt-3"
                     >
                       {isSubmitting ? (
-                        <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
                       ) : (
-                        "Reveal My Journey"
+                        "Reveal My Journey & Get Guide"
                       )}
                     </Button>
                   </form>
+                  <p className="text-[10px] text-forest/40 mt-4 font-semibold uppercase tracking-wider">
+                    We respect your privacy. No spam, just pure adventure.
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>

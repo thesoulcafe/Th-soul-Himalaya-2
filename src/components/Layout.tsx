@@ -3,7 +3,6 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import WhatsAppButton from './WhatsAppButton';
-import NewsletterPopup from './NewsletterPopup';
 import TripPlannerQuiz from './TripPlannerQuiz';
 import { Button } from './ui/button';
 import { ArrowLeft, Home } from 'lucide-react';
@@ -85,7 +84,6 @@ export default function Layout() {
       </AnimatePresence>
 
       <WhatsAppButton />
-      <NewsletterPopup />
       <TripPlannerQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
     </div>
   );
