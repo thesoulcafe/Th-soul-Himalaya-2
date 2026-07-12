@@ -302,9 +302,9 @@ export default function Admin() {
       try {
         downloadURL = await new Promise<string>((resolve, reject) => {
           const timeout = setTimeout(() => {
-            const corsError = new Error("Firebase Upload Timeout. \n\nACTION REQUIRED: Since you are using a custom domain (thesoulhimalaya.com), you MUST configure CORS in Firebase Storage for your domain. \n\n1. Install gsutil\n2. Run: gsutil cors set cors.json gs://gen-lang-client-0435454443.firebasestorage.app\n\nWhere cors.json contains: [{\"origin\": [\"https://thesoulhimalaya.com\"], \"method\": [\"GET\", \"POST\", \"PUT\", \"DELETE\", \"HEAD\"], \"maxAgeSeconds\": 3600}]");
+            const corsError = new Error("Firebase Upload Timeout. \n\nACTION REQUIRED: Since you are using a custom domain (thesoulhimalaya.com), you MUST configure CORS in Firebase Storage for your domain. \n\n1. Install gsutil or open Cloud Shell\n2. Run: gsutil cors set cors.json gs://gen-lang-client-0435454443.firebasestorage.app\n\nWhere cors.json contains: [{\"origin\": [\"https://thesoulhimalaya.com\"], \"method\": [\"GET\", \"POST\", \"PUT\", \"DELETE\", \"HEAD\"], \"maxAgeSeconds\": 3600}]");
             reject(corsError);
-          }, 4000); // 4 seconds to be fast and user friendly
+          }, 90000); // 90 seconds for mountain internet resilience
 
           uploadTask.on('state_changed', 
             (snapshot) => {
@@ -328,6 +328,10 @@ export default function Admin() {
         });
       } catch (firebaseErr: any) {
         console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+        const isCustomDomain = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app');
+        if (isCustomDomain) {
+          throw new Error("Firebase Storage direct upload failed (Likely due to CORS). Since you are on your live domain (thesoulhimalaya.com), the server-side fallback is not available. Please configure CORS in Firebase Storage to allow direct client-side uploads from thesoulhimalaya.com.");
+        }
         try {
           const fallbackFormData = new FormData();
           fallbackFormData.append('file', file);
@@ -3852,7 +3856,7 @@ export default function Admin() {
                                       let downloadURL: string;
                                       try {
                                         downloadURL = await new Promise<string>((resolve, reject) => {
-                                          const timeout = setTimeout(() => reject(new Error("Firebase upload timeout")), 4000);
+                                          const timeout = setTimeout(() => reject(new Error("Firebase upload timeout (90s). Please check your internet connection or configure Firebase CORS.")), 90000);
                                           uploadTask.on('state_changed', 
                                             (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
                                             (error) => {
@@ -3869,8 +3873,12 @@ export default function Admin() {
                                             }
                                           );
                                         });
-                                      } catch (firebaseErr) {
+                                      } catch (firebaseErr: any) {
                                         console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+                                        const isCustomDomain = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app');
+                                        if (isCustomDomain) {
+                                          throw new Error("Firebase Storage direct upload failed (Likely due to CORS). Since you are on your live domain (thesoulhimalaya.com), the server-side fallback is not available. Please configure CORS in Firebase Storage to allow direct client-side uploads from thesoulhimalaya.com.");
+                                        }
                                         const fallbackFormData = new FormData();
                                         fallbackFormData.append('file', file);
                                         const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
@@ -5976,7 +5984,7 @@ export default function Admin() {
                                   let downloadURL: string;
                                   try {
                                     downloadURL = await new Promise<string>((resolve, reject) => {
-                                      const timeout = setTimeout(() => reject(new Error("Firebase upload timeout")), 4000);
+                                      const timeout = setTimeout(() => reject(new Error("Firebase upload timeout (90s). Please check your internet connection or configure Firebase CORS.")), 90000);
                                       uploadTask.on('state_changed', 
                                         (snapshot) => setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
                                         (error) => {
@@ -5993,8 +6001,12 @@ export default function Admin() {
                                         }
                                       );
                                     });
-                                  } catch (firebaseErr) {
+                                  } catch (firebaseErr: any) {
                                     console.warn("Firebase upload failed, attempting backend upload fallback...", firebaseErr);
+                                    const isCustomDomain = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('run.app');
+                                    if (isCustomDomain) {
+                                      throw new Error("Firebase Storage direct upload failed (Likely due to CORS). Since you are on your live domain (thesoulhimalaya.com), the server-side fallback is not available. Please configure CORS in Firebase Storage to allow direct client-side uploads from thesoulhimalaya.com.");
+                                    }
                                     const fallbackFormData = new FormData();
                                     fallbackFormData.append('file', file);
                                     const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
