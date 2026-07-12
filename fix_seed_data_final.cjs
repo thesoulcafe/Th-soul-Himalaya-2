@@ -1,4 +1,7 @@
+const fs = require('fs');
+const path = 'src/lib/seedData.ts';
 
+const content = `
 export const SEED_ARTICLES = [
   {
     title: "Jamlu Devta: The Enigma of Malana",
@@ -29,3 +32,5 @@ export const SEED_ARTICLES = [
     keywords: ["Hidimba Devi", "Manali temple", "Mahabharata", "Himachal mythology"],
   }
 ];
+`;
+fs.writeFileSync(path, content);

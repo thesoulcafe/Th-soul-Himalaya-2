@@ -36,6 +36,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Soul Expeditions",
     authorRole: "Trekking Coordinators",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Tosh isn't just a place to relax; it is the ultimate basecamp for some of the most spectacular treks in the Parvati Valley. Whether you are seeking a short day hike to high-altitude meadows or a multi-day expedition into the deep Himalaya's, Tosh is your starting point."
@@ -111,6 +143,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Arjun Sharma",
     authorRole: "Senior Soul Guide",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Tosh in 2026 is no longer the hidden secret it was a decade ago, but it has retained its position as the sentinel of the Pin Parvati Pass. As the village evolves into a hub for digital nomads and serious high-altitude trekkers, understanding the new logistics is critical for a smooth journey."
@@ -171,6 +235,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Elena Petrova",
     authorRole: "Anthropologist & Researcher",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Malana stands apart from the rest of the world, not just geographically but through a social contract that has survived thousands of years. Known as the 'Oldest Democracy', its judicial system is governed by the edicts of Jamlu Devta, delivered through a chosen oracle."
@@ -227,6 +323,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Rahul Varma",
     authorRole: "Eco-Guide & Naturalist",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "The Fairy Forest in Pulga is an ancient deodar grove where the light filters through needles like liquid gold. It is a place of profound silence, favored by those seeking meditation or a reset from the digital noise of the cities. During the magic hour, the emerald moss on the trees seems to glow with an inner luminescence."
@@ -275,6 +403,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Tenzing Norgay",
     authorRole: "Cultural Liaison",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Navigating the cultural landscape of Malana requires more than just a map; it requires an understanding of a social contract that has remained unchanged for thousands of years. The 'taboos' here are not mere suggestions—they are the survival mechanisms of an ancient lineage."
@@ -318,6 +478,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Dr. Sofia Katsaros",
     authorRole: "Historian",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "For centuries, the legend has persisted: that the people of Malana are the descendants of Alexander the Great's soldiers. These men, wounded or weary from the campaign, are said to have found refuge in this inaccessible valley, forging a new society based on their homeland's democratic principles."
@@ -352,6 +544,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Vikram Negi",
     authorRole: "Local Logistics Expert",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Reaching Tosh in 2026 is an exercise in mountain navigation. The road from Bhuntar has seen widening projects, but the final stretch from Barshaini remains a test of both vehicle and driver. Understanding the timing is key to avoiding the tourist bottlenecks."
@@ -387,6 +611,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Zoe Miller",
     authorRole: "Digital Nomad",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Tosh has evolved into the ultimate 'Office with a View'. The 2026 cafe scene is characterized by two things: high-speed satellite internet and world-class organic mountain produce."
@@ -422,6 +678,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Sunil Thapa",
     authorRole: "Lead Mountain Guide",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "The trek from Tosh to Kheerganga via Nakthan is the most iconic route in the valley. In 2026, the trail has been streamlined with new ecological markers and designated rest zones to manage the increasing visitor throughput."
@@ -448,6 +736,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Maya Singh",
     authorRole: "Outdoor Gear specialist",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Packing for the Himalaya's in May is an exercise in versatility. You must plan for both the biting alpine cold of the night and the intense UV radiation of the midday sun."
@@ -474,6 +794,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Kabir Das",
     authorRole: "Architect & Historian",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Pulga's architecture is a testament to Himalayan ingenuity. The 'Kath-Kuni' style—alternating layers of stone and deodar wood—allows structures to breathe and withstand seismic activity. These houses aren't just buildings; they are living thermal regulators."
@@ -500,6 +852,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Zoe Miller",
     authorRole: "Digital Nomad",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Pulga has emerged as the forest capital for digital nomads. With the arrival of high-speed satellite internet in 2026, the 'Fairy Forest Cafes' now offer a level of connectivity previously unthinkable in such remote terrain."
@@ -526,6 +910,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Sunil Thapa",
     authorRole: "Lead Mountain Guide",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Trekking in the Parvati Valley requires respect for the topography. At 2,960 meters, Kheerganga is where many trekkers first experience altitude-related fatigue. Proper hydration and a rhythmic pace are critical for a safe ascent."
@@ -552,6 +968,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Dr. Amit Roy",
     authorRole: "Geologist",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "The natural hot springs of Kheerganga are a geological marvel. Rich in sulfur and other minerals, these waters have been used for centuries to cure skin ailments and muscle exhaustion. The science of their heat is connected to deep subterranean tectonic shifts."
@@ -578,6 +1026,38 @@ const ARTICLE_CONTENT: Record<string, any> = {
     author: "Swami Vishwananda",
     authorRole: "Himalayan Scholar",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: "Kheerganga is more than just a destination; it is a pilgrimage site for the soul. Perched at nearly 3,000 meters, this meadow is where many seekers find their first true connection to the Himalayan void. The name itself—meaning 'Milky River'—hints at its divine origins."
@@ -635,6 +1115,38 @@ const generateContent = (hamletId: string, articleMeta: any, articleId: string) 
     author: "Soul Expeditions Auto-Intelligence",
     authorRole: "Himalayan Archivist",
     content: [
+  {
+    "type": "image-banner",
+    "url": "https://images.unsplash.com/photo-1544120190-275d3122c366?auto=format&fit=crop&w=2000&q=80",
+    "caption": "The majestic vistas of the Parvati Valley offer an uninterrupted connection with nature."
+  },
+  {
+    "type": "highlight-box",
+    "title": "A Tapestry of Culture and Wilderness",
+    "text": "As you traverse the rugged trails of Parvati Valley, the blending of ancient traditions and raw natural beauty is palpable. Every cedar tree and every stone pathway whispers centuries of stories. The sheer cliffs and sweeping meadows invite a deeper introspection, far removed from the relentless pace of urban existence."
+  },
+  {
+    "type": "paragraph",
+    "text": "The valley is characterized by its dramatic shifts in altitude, ranging from dense, subtropical forests in the lower reaches to stark, alpine tundra near the towering mountain passes. This ecological diversity creates a haven for a myriad of flora and fauna, many of which are endemic to this specific Himalayan microclimate. Bird watchers, botanists, and nature enthusiasts find endless fascination in the vibrant rhododendron blooms and the elusive Himalayan wildlife."
+  },
+  {
+    "type": "paragraph",
+    "text": "Local mythology permeates every aspect of daily life. The indigenous communities continue to revere the landscape, treating the rivers as living deities and the peaks as sacred sanctuaries. It's a place where the boundaries between the spiritual and the physical dissolve, inviting visitors to partake in a living, breathing heritage. Engaging with the villagers—listening to their folklore around a crackling fire—offers a glimpse into a worldview that places harmony with nature above all else."
+  },
+  {
+    "type": "quote",
+    "text": "In the heart of the Himalaya's, silence is not the absence of sound, but the presence of the profound.",
+    "author": "Soul Expeditions Team"
+  },
+  {
+    "type": "paragraph",
+    "text": "Travelers seeking transformation often describe their journey here as a pilgrimage of self-discovery. Whether you are navigating the steep inclines of Kheerganga, exploring the ancient wooden architecture of Pulga, or simply meditating by the rushing waters of the Parvati River, the environment forces a gentle surrender. The digital distractions fade, replaced by the immediate, visceral sensations of cold mountain air, the scent of pine, and the sound of distant bells."
+  },
+  {
+    "type": "paragraph",
+    "text": "For sustainable exploration, it is imperative to tread lightly. The pristine nature of this environment is fragile, dependent on the conscientious choices of every visitor. Embracing slow travel—staying longer in single locations, supporting local artisans, and minimizing ecological footprints—ensures that the magic of Parvati Valley remains vibrant for future generations. As you plan your itinerary, consider integrating moments of stillness and observation, allowing the true essence of the mountains to reveal itself."
+  }
+,
       {
         type: "paragraph",
         text: `${excerpt} The journey into ${hId} is more than a physical transit; it is a deep immersion into an ecosystem where myth, ecology, and human endurance intertwine. Through the lens of '${title}', we see precisely how the Parvati Valley has preserved its ancient rhythm despite the accelerating modern world.`
@@ -936,6 +1448,42 @@ export default function ArticleDetail() {
                 </motion.div>
               );
             }
+            
+            if (block.type === 'highlight-box') {
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="my-16 p-10 md:p-14 bg-gradient-to-br from-forest to-forest/90 text-white rounded-[2.5rem] shadow-2xl shadow-forest/20 relative overflow-hidden group"
+                >
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta/20 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000" />
+                  <div className="relative z-10 space-y-6">
+                    <h3 className="text-2xl md:text-3xl font-heading font-black italic tracking-tight">{block.title}</h3>
+                    <p className="text-lg text-white/80 leading-relaxed font-medium">{block.text}</p>
+                  </div>
+                </motion.div>
+              );
+            }
+
+            if (block.type === 'image-banner') {
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="my-16 relative aspect-[21/9] w-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/10 group"
+                >
+                  <img src={block.url} alt="Article imagery" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-10">
+                    <p className="text-white font-medium text-lg tracking-wide drop-shadow-md">{block.caption}</p>
+                  </div>
+                </motion.div>
+              );
+            }
+
             if (block.type === 'internal-links') {
               return (
                 <motion.div 
