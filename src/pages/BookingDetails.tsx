@@ -37,7 +37,7 @@ interface BookingItem {
   dateRange: string;
 }
 
-interface BookingDetails {
+interface BookingDetailsData {
   id: string;
   userId: string;
   userName: string;
@@ -54,7 +54,7 @@ interface BookingDetails {
 
 export default function BookingDetails() {
   const { id } = useParams();
-  const [booking, setBooking] = useState<BookingDetails | null>(null);
+  const [booking, setBooking] = useState<BookingDetailsData | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -74,7 +74,7 @@ export default function BookingDetails() {
             navigate('/dashboard');
             return;
           }
-          setBooking({ id: docSnap.id, ...data } as BookingDetails);
+          setBooking({ id: docSnap.id, ...data } as BookingDetailsData);
         } else {
           toast.error("Booking Not Found", { description: "The requested journey could not be located." });
           navigate('/dashboard');
