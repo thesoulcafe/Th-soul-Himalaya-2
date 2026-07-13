@@ -238,7 +238,8 @@ const handleOrder = async () => {
         });
 
         if (!orderResult.ok) {
-          throw new Error('Failed to create order');
+          const errorData = await orderResult.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to create order');
         }
 
         const orderData = await orderResult.json();

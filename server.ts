@@ -363,9 +363,9 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
       };
       const order = await razorpay.orders.create(options);
       res.json(order);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to create Razorpay order" });
+    } catch (error: any) {
+      console.error("Razorpay Order Error:", error);
+      res.status(500).json({ error: error.message || error.description || "Failed to create Razorpay order" });
     }
   });
 
