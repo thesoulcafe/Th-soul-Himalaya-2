@@ -377,7 +377,11 @@ export default function Home() {
         .filter(service => {
           const title = (service.title || '').toLowerCase();
           return !title.includes('cafe') && !title.includes('food') && !title.includes('photography & cafe narrative');
-        })
+        });
+
+      const itemsToUse = dbServices.length === 0 ? [...DEFAULT_SERVICES] : dbServices;
+
+      const sortedServices = itemsToUse
         .sort((a, b) => {
           // Force Macramé Shop to the end
           const aTitle = (a.title || '').toLowerCase();
@@ -396,7 +400,7 @@ export default function Home() {
           const bOrder = (b.order !== undefined && b.order !== null) ? Number(b.order) : 999;
           return aOrder - bOrder;
         });
-      setServices(dbServices);
+      setServices(sortedServices);
       setHasLoadedServices(true);
     }, (error) => {
       console.error("Services snapshot failed:", error);

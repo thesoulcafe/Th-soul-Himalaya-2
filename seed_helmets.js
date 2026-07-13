@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, query, where, setDoc, doc, addDoc } from 'firebase/firestore';
+import { initializeFirestore, collection, getDocs, query, where, setDoc, doc, addDoc } from 'firebase/firestore';
 
 const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf-8'));
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+const db = initializeFirestore(firebaseApp, { experimentalForceLongPolling: true }, firebaseConfig.firestoreDatabaseId);
 
 const articles = [
   {

@@ -111,7 +111,9 @@ export default function Meditation() {
         originalType: 'meditation'
       }));
 
-      const sortedPackages = dbPackages.sort((a, b) => {
+      const itemsToUse = dbPackages.length === 0 ? [...DEFAULT_MEDITATION] : dbPackages;
+
+      const sortedPackages = itemsToUse.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;

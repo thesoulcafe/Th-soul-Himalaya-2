@@ -176,7 +176,9 @@ export default function Tours() {
         return !title.includes('photography & cafe narrative');
       });
 
-      const sortedItems = dbItems.sort((a, b) => {
+      const itemsToUse = dbItems.length === 0 ? [...DEFAULT_TOURS] : dbItems;
+
+      const sortedItems = itemsToUse.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;

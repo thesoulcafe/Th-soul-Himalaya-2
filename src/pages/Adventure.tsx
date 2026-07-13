@@ -90,7 +90,9 @@ export default function Adventure() {
         originalType: 'adventure'
       }));
 
-      const sortedActivities = dbItems.sort((a, b) => {
+      const itemsToUse = dbItems.length === 0 ? [...DEFAULT_ADVENTURE] : dbItems;
+
+      const sortedActivities = itemsToUse.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;

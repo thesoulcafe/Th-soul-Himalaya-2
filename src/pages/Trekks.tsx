@@ -112,7 +112,9 @@ export default function Trekks() {
         originalType: doc.data().type
       }));
 
-      const sortedTrekks = dbTrekks.sort((a, b) => {
+      const itemsToUse = dbTrekks.length === 0 ? [...DEFAULT_TREKKS] : dbTrekks;
+
+      const sortedTrekks = itemsToUse.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;

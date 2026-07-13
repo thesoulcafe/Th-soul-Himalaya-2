@@ -71,13 +71,14 @@ export default function GalleryArchive({
   title = "Visual Manifest",
   propertyName = "The Soul Himalaya"
 }: GalleryArchiveProps) {
+  const displayImages = !images || images.length === 0 ? SAMPLE_IMAGES : images;
 
   return (
     <div className="w-full bg-white py-12 px-4 md:px-6">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {images.map((img, idx) => (
+          {displayImages.map((img, idx) => (
             <motion.div
               key={img.id}
               initial={{ opacity: 0, y: 20 }}

@@ -9,6 +9,7 @@ import { db, auth } from '@/lib/firebase';
 export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [countryCode, setCountryCode] = useState('+91');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +67,8 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
         return opt ? opt.label : optId;
       };
 
+      const fullMobile = `${countryCode} ${mobile.trim()}`;
+
       const formattedMessage = `
 **New Lead from Interactive Trip Planner Quiz!**
 
@@ -73,7 +76,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
 - **Traveling With:** ${getOptionLabel(1, answers[1])}
 - **Planning Duration:** ${getOptionLabel(2, answers[2])}
 
-User has requested their personalized itinerary on Mobile / WhatsApp: ${mobile}
+User has requested their personalized itinerary on Mobile / WhatsApp: ${fullMobile}
 Email: ${email}
       `.trim();
 
@@ -81,7 +84,7 @@ Email: ${email}
       await addDoc(collection(db, 'messages'), {
         userId: auth.currentUser?.uid || null,
         userName: "Himalayan Explorer",
-        userPhone: mobile,
+        userPhone: fullMobile,
         userEmail: email,
         subject: "New Trip Planner Quiz & Guide Lead",
         message: formattedMessage,
@@ -96,6 +99,9 @@ Email: ${email}
         source: 'combined_quiz'
       });
 
+      // Mark the quiz as submitted persistently so they are never prompted again
+      localStorage.setItem('soulHimalayaQuizSubmitted', 'true');
+
       setIsSubmitting(false);
       toast.success("Your personalized itinerary and Himalayan travel guide are on their way!");
       setTimeout(() => {
@@ -105,6 +111,7 @@ Email: ${email}
           setStep(0);
           setAnswers({});
           setMobile('');
+          setCountryCode('+91');
           setEmail('');
         }, 500);
       }, 1000);
@@ -214,14 +221,37 @@ Email: ${email}
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-forest/60 mb-1 uppercase tracking-wider">Mobile / WhatsApp Number</label>
-                      <input 
-                        type="tel"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value)}
-                        placeholder="WhatsApp number with Country Code"
-                        required
-                        className="w-full bg-white border border-forest/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
-                      />
+                      <div className="flex gap-2">
+                        <select
+                          value={countryCode}
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          className="bg-white border border-forest/10 rounded-xl pl-3 pr-8 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest font-medium text-sm w-28 appearance-none cursor-pointer"
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233F5E4D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right 0.5rem center',
+                            backgroundSize: '0.9rem'
+                          }}
+                        >
+                          <option value="+91">🇮🇳 +91</option>
+                          <option value="+972">🇮🇱 +972</option>
+                          <option value="+1">🇺🇸 +1</option>
+                          <option value="+44">🇬🇧 +44</option>
+                          <option value="+49">🇩🇪 +49</option>
+                          <option value="+33">🇫🇷 +33</option>
+                          <option value="+61">🇦🇺 +61</option>
+                          <option value="+7">🇷🇺 +7</option>
+                          <option value="+971">🇦🇪 +971</option>
+                        </select>
+                        <input 
+                          type="tel"
+                          value={mobile}
+                          onChange={(e) => setMobile(e.target.value)}
+                          placeholder="Phone number"
+                          required
+                          className="flex-1 bg-white border border-forest/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
+                        />
+                      </div>
                     </div>
                     
                     <Button 

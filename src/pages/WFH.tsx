@@ -119,7 +119,9 @@ export default function WFH() {
         originalType: 'wfh'
       }));
 
-      const sortedPackages = dbItems.sort((a, b) => {
+      const itemsToUse = dbItems.length === 0 ? [...DEFAULT_WFH] : dbItems;
+
+      const sortedPackages = itemsToUse.sort((a, b) => {
         const aAvail = a.isAvailable !== false;
         const bAvail = b.isAvailable !== false;
         if (aAvail && !bAvail) return -1;

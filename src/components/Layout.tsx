@@ -15,15 +15,22 @@ export default function Layout() {
 
   useEffect(() => {
     // Listen to custom event to open quiz manually from anywhere
-    const handleOpenQuiz = () => setIsQuizOpen(true);
+    const handleOpenQuiz = () => {
+      setIsQuizOpen(true);
+    };
     window.addEventListener('open-trip-planner-quiz', handleOpenQuiz);
 
-    // Auto-open after 20 seconds of opening the website, but only once
-    const hasSeenQuiz = localStorage.getItem('soulHimalayaQuizShown');
-    if (hasSeenQuiz !== 'true') {
+    // Auto-open after 20 seconds of opening the website, but only if they:
+    // 1. Haven't submitted the quiz in the past (localStorage persistent flag)
+    // 2. Haven't dismissed or seen it in the current session (sessionStorage flag)
+    const hasSubmittedQuiz = localStorage.getItem('soulHimalayaQuizSubmitted') === 'true';
+    const hasDismissedThisSession = sessionStorage.getItem('soulHimalayaQuizDismissed') === 'true';
+    const hasBeenShownThisSession = sessionStorage.getItem('soulHimalayaQuizShownThisSession') === 'true';
+
+    if (!hasSubmittedQuiz && !hasDismissedThisSession && !hasBeenShownThisSession) {
       const timer = setTimeout(() => {
         setIsQuizOpen(true);
-        localStorage.setItem('soulHimalayaQuizShown', 'true');
+        sessionStorage.setItem('soulHimalayaQuizShownThisSession', 'true');
       }, 20000);
       return () => {
         clearTimeout(timer);
@@ -84,7 +91,14 @@ export default function Layout() {
       </AnimatePresence>
 
       <WhatsAppButton />
-      <TripPlannerQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <TripPlannerQuiz 
+        isOpen={isQuizOpen} 
+        onClose={() => {
+          setIsQuizOpen(false);
+          // Set as dismissed in sessionStorage so they are not prompted again in the current session
+          sessionStorage.setItem('soulHimalayaQuizDismissed', 'true');
+        }} 
+      />
     </div>
   );
 }
