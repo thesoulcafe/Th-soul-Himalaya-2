@@ -155,6 +155,9 @@ async function generateStaticHTML() {
     { path: '/trekks', title: "Himalayan Trekking | The Soul Himalaya", desc: "High-altitude glacier treks.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/yoga', title: "Yoga Retreats | The Soul Himalaya", desc: "Himalayan yoga journeys.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/meditation', title: "Meditation in Parvati | The Soul Himalaya", desc: "Peaceful silence and mindfulness.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
+    { path: '/about', title: "About Soul Himalaya | Sustainable Tourism & Empowerment", desc: "Learn about The Soul Himalaya's dedication to sustainable tourism, environmental preservation, and uplifting local Parvati Valley communities through mindful travel.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
+    { path: '/tour-packages', title: "Tour Packages in Himachal Pradesh | Parvati Valley Treks", desc: "Book your soulful tour package in Himachal Pradesh. Experience high-altitude trekking, curated corporate tours, and mindful adventures in the Parvati Valley.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
+    { path: '/holistic-packages-trekking', title: "Curated Retreats, Treks & Wellness Services Soul Himalaya", desc: "Explore the full range of Soul Himalaya services. From high-altitude trekking and bespoke corporate tours to wellness sanctuaries and digital remote workations.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/parvati-valley', title: "Parvati Valley Explorer | The Soul Himalaya", desc: "Explore the magic of Tosh.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" }
   ];
   for (const g of generics) {

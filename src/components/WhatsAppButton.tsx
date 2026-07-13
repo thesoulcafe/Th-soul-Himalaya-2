@@ -19,7 +19,7 @@ export default function WhatsAppButton() {
             className="mb-4 bg-white/95 backdrop-blur-md border border-forest/10 p-5 rounded-3xl shadow-2xl w-72"
           >
             <div className="flex justify-between items-center mb-3">
-              <h4 className="font-playfair font-bold text-forest text-lg">Connect with us</h4>
+              <h4 className="font-playfair font-bold text-forest text-lg">Ask Assistant</h4>
               <button onClick={() => setIsOpen(false)} className="text-forest/50 hover:text-forest">
                 <X className="h-5 w-5" />
               </button>
@@ -34,7 +34,7 @@ export default function WhatsAppButton() {
               className="flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 px-4 rounded-xl font-medium hover:bg-[#128C7E] transition-colors shadow-lg hover:shadow-xl"
             >
               <MessageCircle className="h-5 w-5" />
-              Chat on WhatsApp
+              Ask Assistant
             </a>
           </motion.div>
         )}

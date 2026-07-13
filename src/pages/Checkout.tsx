@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShoppingBag, 
@@ -41,12 +41,13 @@ type CheckoutStep = 'cart' | 'details';
 
 export default function SoulCart() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
   const { user, profile } = useAuth();
   
   const [step, setStep] = useState<CheckoutStep>('details');
-  const [paymentMethod] = useState<'online' | 'reserve'>('reserve');
-  const [note, setNote] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'reserve'>('online');
+  const [note, setNote] = useState(location.state?.soulMessage || '');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -169,53 +170,158 @@ export default function SoulCart() {
     else setStep('details');
   };
 
-  const handleOrder = async () => {
+  
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+const handleOrder = async () => {
     if (!user) {
       setShowAuthModal(true);
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-      console.log("[Checkout] Processing 'Reserve Spot' booking...");
-      await addDoc(collection(db, 'bookings'), {
-        userId: user.uid,
-        userName: formData.fullName || user.displayName || 'Guest Explorer',
-        userEmail: formData.email || user.email,
-        phone: formData.phone,
-        city: formData.city,
-        pincode: formData.pincode,
-        items: cart.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          type: item.type,
-          image: item.image || '',
-          dateRange: item.dateRange || ''
-        })),
-        subtotalPrice: subtotal,
-        appliedPromoCode: appliedPromo ? appliedPromo.code : null,
-        discountAmount: discountAmount,
-        totalPrice: finalTotal,
-        note: note || '',
-        status: 'reserved', // Mark as reserved
-        paymentMethod: 'reserve',
-        createdAt: serverTimestamp(),
-      });
-      setIsSuccess(true);
-      clearCart();
+      if (paymentMethod === 'reserve') {
+        console.log("[Checkout] Processing 'Reserve Spot' booking...");
+        await addDoc(collection(db, 'bookings'), {
+          userId: user.uid,
+          userName: formData.fullName || user.displayName || 'Guest Explorer',
+          userEmail: formData.email || user.email,
+          phone: formData.phone,
+          city: formData.city,
+          pincode: formData.pincode,
+          items: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            type: item.type,
+            image: item.image || '',
+            dateRange: item.dateRange || ''
+          })),
+          subtotalPrice: subtotal,
+          appliedPromoCode: appliedPromo ? appliedPromo.code : null,
+          discountAmount: discountAmount,
+          totalPrice: finalTotal,
+          note: note || '',
+          status: 'reserved',
+          paymentMethod: 'reserve',
+          createdAt: serverTimestamp(),
+        });
+        setIsSuccess(true);
+        clearCart();
+        setIsSubmitting(false);
+      } else {
+        console.log("[Checkout] Processing Online Payment...");
+        const res = await loadRazorpayScript();
+        if (!res) {
+          toast.error("Payment Gateway Error", { description: "Failed to load Razorpay SDK" });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const orderResult = await fetch('/api/razorpay/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: finalTotal })
+        });
+
+        if (!orderResult.ok) {
+          throw new Error('Failed to create order');
+        }
+
+        const orderData = await orderResult.json();
+
+        const options = {
+          key: 'rzp_live_TD7OkloTGugSlw',
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "The Soul Himalaya",
+          description: "Trek and Retreat Booking",
+          image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+          order_id: orderData.id,
+          handler: async function (response: any) {
+            try {
+              const verifyRes = await fetch('/api/razorpay/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(response)
+              });
+              
+              if (verifyRes.ok) {
+                // Save to Firestore
+                await addDoc(collection(db, 'bookings'), {
+                  userId: user.uid,
+                  userName: formData.fullName || user.displayName || 'Guest Explorer',
+                  userEmail: formData.email || user.email,
+                  phone: formData.phone,
+                  city: formData.city,
+                  pincode: formData.pincode,
+                  items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    type: item.type,
+                    image: item.image || '',
+                    dateRange: item.dateRange || ''
+                  })),
+                  subtotalPrice: subtotal,
+                  appliedPromoCode: appliedPromo ? appliedPromo.code : null,
+                  discountAmount: discountAmount,
+                  totalPrice: finalTotal,
+                  note: note || '',
+                  status: 'confirmed',
+                  paymentMethod: 'online',
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  createdAt: serverTimestamp(),
+                });
+                setIsSuccess(true);
+                clearCart();
+              } else {
+                toast.error("Payment Verification Failed");
+              }
+            } catch (err: any) {
+              toast.error("Payment Failed", { description: err.message });
+            }
+          },
+          prefill: {
+            name: formData.fullName,
+            email: formData.email,
+            contact: formData.phone,
+          },
+          theme: {
+            color: "#1e3a2f"
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any){
+          toast.error("Payment Failed", { description: response.error.description });
+        });
+        rzp.open();
+        setIsSubmitting(false);
+      }
     } catch (err: any) {
       console.error('Reservation Error:', err);
       toast.error("Spirit Guide Blocked", {
-        description: `Reservation Failed: ${err.message}`,
+        description: 'Reservation Failed: ' + err.message,
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
-
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
@@ -400,14 +506,14 @@ export default function SoulCart() {
                     </div>
                   )}
 
-                  {/* Soulful Touch Section */}
+                  {/* Soul Message Section */}
                   <div className="bg-forest/5 rounded-[2.5rem] p-8 border border-forest/10 space-y-6">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-forest/10 flex items-center justify-center text-forest shadow-inner">
                         <PenTool className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-heading font-bold text-slate-900">Soulful Touch</h3>
+                        <h3 className="font-heading font-bold text-slate-900">Soul Message</h3>
                         <p className="text-xs text-slate-500 font-medium">Add a personal vibe to your journey</p>
                       </div>
                     </div>
@@ -472,40 +578,44 @@ export default function SoulCart() {
                       </div>
 
                       {/* Phone Field */}
-                      <div className="space-y-1.5 group">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Contact Number</label>
-                        <div className="relative">
-                          <Zap className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
-                          <Input 
-                            type="tel" 
-                            name="phone" 
-                            placeholder="+91 ---- ----"
-                            value={formData.phone} 
-                            onChange={handleInputChange} 
-                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
-                          />
+                      {!(profile?.phone) && (
+                        <div className="space-y-1.5 group">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Contact Number</label>
+                          <div className="relative">
+                            <Zap className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
+                            <Input 
+                              type="tel" 
+                              name="phone" 
+                              placeholder="+91 ---- ----"
+                              value={formData.phone} 
+                              onChange={handleInputChange} 
+                              className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Email Field */}
-                      <div className="space-y-1.5 group md:col-span-2">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Email Archive</label>
-                        <div className="relative">
-                          <Map className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
-                          <Input 
-                            type="email" 
-                            name="email" 
-                            placeholder="email@example.com"
-                            value={formData.email} 
-                            onChange={handleInputChange} 
-                            className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
-                          />
+                      {!(profile?.email || user?.email) && (
+                        <div className="space-y-1.5 group md:col-span-2">
+                          <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Email Archive</label>
+                          <div className="relative">
+                            <Map className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
+                            <Input 
+                              type="email" 
+                              name="email" 
+                              placeholder="email@example.com"
+                              value={formData.email} 
+                              onChange={handleInputChange} 
+                              className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* City Field */}
-                      <div className="space-y-1.5 group">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">Base (City)</label>
+                      <div className={cn("space-y-1.5 group", (profile?.phone && (profile?.email || user?.email)) ? "md:col-span-2" : "")}>
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">City Name</label>
                         <div className="relative">
                           <Mountain className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300 group-focus-within:text-forest transition-colors" />
                           <Input 
@@ -683,8 +793,8 @@ export default function SoulCart() {
                    variant="outline" 
                    className="w-full h-14 rounded-full border-white/10 text-white hover:bg-white hover:text-slate-900 font-black text-[10px] uppercase tracking-widest transition-all shadow-xl"
                    onClick={() => {
-                     const cartItemsText = cart.map(item => `${item.name} (${item.quantity})`).join(', ');
-                     const whatsappMessage = encodeURIComponent(`Namaste Soul Guide! I need wisdom for these paths in my cart: ${cartItemsText}.`);
+                     const cartItemsText = cart.map(item => `- ${item.name} (Qty: ${item.quantity})`).join("\n");
+                     const whatsappMessage = encodeURIComponent(`Namaste Soul Himalaya!\n\nI am currently customizing my journey and need some guidance.\n\n*My Cart Contains:*\n${cartItemsText}\n\nPlease help me orchestrate this path!`);
                      window.open(`https://wa.me/917878200632?text=${whatsappMessage}`, '_blank');
                    }}
                  >

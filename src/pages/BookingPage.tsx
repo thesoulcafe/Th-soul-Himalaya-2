@@ -176,58 +176,75 @@ export default function BookingPage() {
             {/* Slot Selection Column */}
             <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-1 gap-4">
-                {item.slots?.length > 0 ? (
-                  item.slots.map((slot: any, i: number) => {
-                    const isSelected = selectedSlotIndex === i;
-                    return (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        onClick={() => setSelectedSlotIndex(i)}
-                        className={`w-full p-6 rounded-[2.5rem] border-2 transition-all duration-500 flex items-center justify-between group relative overflow-hidden cursor-pointer ${
-                          isSelected 
-                            ? "border-terracotta bg-white shadow-2xl scale-[1.02]" 
-                            : "border-forest/5 bg-white/50 hover:border-terracotta/30 hover:bg-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-6 relative z-10">
-                          <div className={`h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-500 ${
-                            isSelected ? "bg-terracotta text-white shadow-lg rotate-6" : "bg-forest/5 text-forest/20 group-hover:bg-terracotta/10 group-hover:text-terracotta"
-                          }`}>
-                            <Calendar className="h-7 w-7" />
-                          </div>
-                          <div className="text-left">
-                            <div className="text-lg font-black text-forest tracking-tight">
-                              {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}
-                            </div>
-                            <div className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1 ${
-                              isSelected ? "text-terracotta" : "text-forest/30"
+                {(() => {
+                  const futureSlots = item.slots ? item.slots.filter((slot: any) => {
+                    const start = new Date(slot.startDate);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return start >= today;
+                  }) : [];
+                  
+                  return futureSlots.length > 0 ? (
+                    futureSlots.map((slot: any) => {
+                      const i = item.slots.indexOf(slot);
+                      const isSelected = selectedSlotIndex === i;
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          onClick={() => setSelectedSlotIndex(i)}
+                          className={`w-full p-6 rounded-[2.5rem] border-2 transition-all duration-500 flex items-center justify-between group relative overflow-hidden cursor-pointer ${
+                            isSelected 
+                              ? 'border-terracotta bg-white shadow-2xl scale-[1.02]' 
+                              : 'border-forest/5 bg-white hover:border-terracotta/30'
+                          }`}
+                        >
+                          {isSelected && (
+                            <motion.div 
+                              layoutId="active-bg"
+                              className="absolute inset-0 bg-terracotta/[0.03] pointer-events-none" 
+                            />
+                          )}
+                          
+                          <div className="flex items-center gap-6 relative z-10">
+                            <div className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+                              isSelected ? 'bg-terracotta text-white shadow-lg shadow-terracotta/20 rotate-6' : 'bg-forest/5 text-forest/20 group-hover:bg-terracotta/10 group-hover:text-terracotta'
                             }`}>
-                              {slot.available !== false ? 'Available Seat' : 'Last few spots'}
+                              <Calendar className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <div className="text-lg font-black text-forest tracking-tight">
+                                {new Date(slot.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} — {new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </div>
+                              <div className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1 ${
+                                isSelected ? 'text-terracotta' : 'text-forest/40'
+                              }`}>
+                                {slot.available !== false ? 'Available Seat' : 'Last few spots'}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        {isSelected ? (
-                          <div className="bg-terracotta p-2 rounded-full text-white shadow-lg">
-                            <CheckCircle2 className="h-5 w-5" />
-                          </div>
-                        ) : (
-                          <div className="bg-forest/5 p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all">
-                            <ArrowRight className="h-5 w-5 text-terracotta" />
-                          </div>
-                        )}
-                      </motion.div>
-                    );
-                  })
-                ) : (
-                  <div className="p-12 text-center bg-white/50 rounded-[3rem] border border-dashed border-forest/20">
-                    <Wind className="h-12 w-12 text-forest/10 mx-auto mb-4" />
-                    <p className="text-xs font-bold text-forest/40 uppercase tracking-widest">No scheduled departures found.</p>
-                    <Link to="/tailor-made" className="text-terracotta text-[10px] font-black uppercase tracking-widest underline underline-offset-4 mt-2 inline-block">Request custom dates</Link>
-                  </div>
-                )}
+                          {isSelected ? (
+                            <div className="bg-terracotta p-2 rounded-full text-white shadow-lg shadow-terracotta/20">
+                              <CheckCircle2 className="h-4 w-4" />
+                            </div>
+                          ) : (
+                            <div className="bg-forest/5 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                              <ArrowRight className="h-4 w-4 text-terracotta" />
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-12 text-center bg-white/50 rounded-[3rem] border border-dashed border-forest/20">
+                      <Wind className="h-12 w-12 text-forest/10 mx-auto mb-4" />
+                      <p className="text-xs font-bold text-forest/40 uppercase tracking-widest">No scheduled departures found.</p>
+                      <Link to="/tailor-made" className="text-terracotta text-[10px] font-black uppercase tracking-widest underline underline-offset-4 mt-2 inline-block">Request custom dates</Link>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Navigation Actions */}

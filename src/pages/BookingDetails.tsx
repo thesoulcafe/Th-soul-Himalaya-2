@@ -105,7 +105,7 @@ export default function BookingDetails() {
         toast.success("Link Copied", { description: "Journey URL copied to clipboard." });
       }
     } catch (err) {
-      console.error(err);
+      if (err.name !== 'AbortError') console.error(err);
     }
   };
 
@@ -162,7 +162,13 @@ export default function BookingDetails() {
                 <Share2 className="h-5 w-5" />
               </Button>
               <Button 
-                onClick={() => navigate(`/guide?q=${encodeURIComponent(booking.items[0]?.name || '')}`)}
+                onClick={() => {
+                  const phone = "917878200632";
+                  const packageDetails = booking.items.map(item => `- ${item.name} (Qty: ${item.quantity})`).join('\n');
+                  const message = `Namaste Soul Himalaya!\n\nI need assistance with my booking.\n\n*Booking ID:* ${booking.id}\n*Name:* ${booking.userName}\n*Package(s):*\n${packageDetails}\n\nPlease guide me!`;
+                  const encodedMessage = encodeURIComponent(message);
+                  window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+                }}
                 className="h-14 px-8 rounded-2xl bg-forest text-white hover:bg-forest/90 font-black text-[10px] uppercase tracking-widest shadow-xl shadow-forest/20 flex items-center justify-center gap-3 group"
               >
                 <HelpCircle className="h-4 w-4" /> Get Assistance <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -332,7 +338,13 @@ export default function BookingDetails() {
                  <h4 className="text-xl font-heading font-black italic mb-4">Seeking Wisdom?</h4>
                  <p className="text-[11px] text-white/70 font-medium leading-relaxed mb-8">Embark on the Soul Guide path for frequently asked revelations and manual search for this journey.</p>
                  <Button 
-                   onClick={() => navigate(`/guide?q=${encodeURIComponent(booking.items[0]?.name || '')}`)}
+                   onClick={() => {
+                     const phone = "917878200632";
+                     const packageDetails = booking.items.map(item => `- ${item.name} (Qty: ${item.quantity})`).join('\n');
+                     const message = `Namaste Soul Himalaya!\n\nI am seeking wisdom about my journey.\n\n*Booking ID:* ${booking.id}\n*Name:* ${booking.userName}\n*Package(s):*\n${packageDetails}\n\nPlease guide me!`;
+                     const encodedMessage = encodeURIComponent(message);
+                     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+                   }}
                    className="w-full bg-white text-terracotta hover:bg-forest hover:text-white rounded-full h-14 text-[9px] font-black uppercase tracking-widest transition-all"
                  >
                    Open Soul Guide

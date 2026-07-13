@@ -284,8 +284,9 @@ async function startServer() {
   let razorpayInstance: Razorpay | null = null;
   const getRazorpay = () => {
     if (!razorpayInstance) {
-      const key_id = process.env.VITE_RAZORPAY_KEY_ID;
-      const key_secret = process.env.RAZORPAY_KEY_SECRET;
+      // Using the live keys provided by the user
+      const key_id = 'rzp_live_TD7OkloTGugSlw';
+      const key_secret = 'iwt0CQTRvVYS0sAYVeX95qUJ';
       
       if (!key_id || !key_secret) {
         throw new Error("Razorpay API keys (VITE_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET) are missing from environment variables.");
@@ -352,12 +353,35 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
   });
 
   // Razorpay remains defined in dependencies for future use but endpoints are disabled for "Reserve Only" version.
-  app.post("/api/razorpay/order", (req, res) => {
-    res.status(403).json({ error: "Online payments are currently disabled. Please use the 'Reserve Spot' option." });
+  app.post("/api/razorpay/order", async (req, res) => {
+    try {
+      const razorpay = getRazorpay();
+      const options = {
+        amount: Math.round(req.body.amount * 100),
+        currency: "INR",
+        receipt: `receipt_order_${Date.now()}`
+      };
+      const order = await razorpay.orders.create(options);
+      res.json(order);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to create Razorpay order" });
+    }
   });
 
   app.post("/api/razorpay/verify", (req, res) => {
-    res.status(403).json({ error: "Online payments are currently disabled." });
+    const crypto = require("crypto");
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto
+      .createHmac("sha256", "iwt0CQTRvVYS0sAYVeX95qUJ")
+      .update(body.toString())
+      .digest("hex");
+    if (expectedSignature === razorpay_signature) {
+      res.json({ status: "success" });
+    } else {
+      res.status(400).json({ status: "failure", error: "Invalid signature" });
+    }
   });
 
   // Mock Bookings API

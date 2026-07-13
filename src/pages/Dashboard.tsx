@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -81,12 +81,12 @@ export default function Dashboard() {
     setIsSaving(true);
     try {
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         displayName: newName,
         phone: newPhone,
         city: newCity,
         pincode: newPincode
-      });
+      }, { merge: true });
       toast.success("Identity Manifested", {
         description: "Your soul profile has been updated successfully.",
       });
@@ -141,7 +141,7 @@ export default function Dashboard() {
       url: `${window.location.origin}/dashboard/booking/${booking.id}`,
     };
     if (navigator.share) {
-      navigator.share(shareData).catch(console.error);
+      navigator.share(shareData).catch(err => { if (err.name !== 'AbortError') console.error(err); });
     } else {
       navigator.clipboard.writeText(`${window.location.origin}/dashboard/booking/${booking.id}`);
       toast.success("Link Copied", { description: "Journey URL copied to clipboard." });
