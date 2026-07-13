@@ -7,6 +7,7 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
+import cors from "cors";
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import { 
@@ -32,6 +33,14 @@ const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 async function startServer() {
   const app = express();
+  
+  // Enable CORS
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+  
   const PORT = 3000;
 
   console.log(`[Server] Starting in ${process.env.NODE_ENV || 'development'} mode`);
@@ -370,7 +379,6 @@ Sitemap: https://thesoulhimalaya.com/sitemap.xml
   });
 
   app.post("/api/razorpay/verify", (req, res) => {
-    const crypto = require("crypto");
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto

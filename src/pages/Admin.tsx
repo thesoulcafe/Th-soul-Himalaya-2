@@ -336,7 +336,7 @@ export default function Admin() {
         try {
           const fallbackFormData = new FormData();
           fallbackFormData.append('file', file);
-          const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+          const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
           if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
           const data = await response.json();
           downloadURL = data.url;
@@ -3892,7 +3892,7 @@ export default function Admin() {
                                         }
                                         const fallbackFormData = new FormData();
                                         fallbackFormData.append('file', file);
-                                        const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                        const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
                                         if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
                                         const data = await response.json();
                                         downloadURL = data.url;
@@ -6020,7 +6020,7 @@ export default function Admin() {
                                     }
                                     const fallbackFormData = new FormData();
                                     fallbackFormData.append('file', file);
-                                    const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                    const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
                                     if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
                                     const data = await response.json();
                                     downloadURL = data.url;

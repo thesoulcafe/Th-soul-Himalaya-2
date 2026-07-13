@@ -231,7 +231,8 @@ const handleOrder = async () => {
           return;
         }
 
-        const orderResult = await fetch('/api/razorpay/order', {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+        const orderResult = await fetch(`${API_BASE}/api/razorpay/order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: finalTotal })
@@ -254,7 +255,7 @@ const handleOrder = async () => {
           order_id: orderData.id,
           handler: async function (response: any) {
             try {
-              const verifyRes = await fetch('/api/razorpay/verify', {
+              const verifyRes = await fetch(`${API_BASE}/api/razorpay/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(response)
