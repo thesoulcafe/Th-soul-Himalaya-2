@@ -306,7 +306,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 w-full">
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 w-full sm:w-auto">
                   {quantity > 0 ? (
                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
                        <div className="flex items-center justify-between bg-forest/[0.03] rounded-full border border-forest/10 p-1.5 w-full sm:w-auto shrink-0 shadow-inner">
@@ -338,7 +338,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                     <>
                       {(() => {
                         return futureSlots.length > 0 ? (
-                         <div className="relative w-full sm:flex-1 min-w-0 sm:max-w-[280px] group">
+                         <div className="relative w-full sm:w-60 shrink-0 group overflow-hidden rounded-full">
                             <select 
                              value={selectedSlotIndex}
                              onChange={(e) => setSelectedSlotIndex(e.target.value)}
@@ -368,7 +368,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/40 pointer-events-none group-hover:text-forest transition-colors" />
                          </div>
                        ) : (
-                        <div className="relative w-full sm:flex-1 min-w-0 sm:max-w-[280px] group">
+                        <div className="relative w-full sm:w-60 shrink-0 group overflow-hidden rounded-full">
                           <div className="absolute left-5 top-1/2 -translate-y-1/2 text-terracotta z-10 pointer-events-none">
                             <Calendar className="h-5 w-5" />
                           </div>
@@ -377,7 +377,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                             min={new Date().toISOString().split('T')[0]}
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-4 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white text-clip"
+                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-4 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white"
                           />
                         </div>
                       );
@@ -386,7 +386,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                       <Button 
                         onClick={handleBooking}
                         disabled={!canBook}
-                        className="w-full sm:w-auto flex-none h-14 px-8 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-xs uppercase transition-all flex items-center justify-center gap-3 shadow-xl shadow-forest/20 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
+                        className="w-full sm:w-60 shrink-0 h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-xs uppercase transition-all flex items-center justify-center gap-3 shadow-xl shadow-forest/20 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
                       >
                         Reserve Spot <ArrowRight className="h-4 w-4" />
                       </Button>
