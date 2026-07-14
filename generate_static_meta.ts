@@ -8,9 +8,19 @@ import {
   DEFAULT_SERVICES 
 } from './src/constants';
 
-const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf-8'));
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+let db = null;
+try {
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const firebaseApp = initializeApp(firebaseConfig);
+    db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+  } else {
+    console.warn("⚠️ firebase-applet-config.json not found. Dynamic static meta pages from Firestore will be skipped.");
+  }
+} catch (e) {
+  console.error("⚠️ Failed to initialize Firebase in generate_static_meta.ts:", e);
+}
 
 async function generateStaticHTML() {
   const distDir = path.join(process.cwd(), 'dist');
@@ -71,56 +81,60 @@ async function generateStaticHTML() {
   }
 
   // 1. Firebase SEO settings
-  try {
-    const seoSnap = await getDocs(collection(db, "seo_settings"));
-    seoSnap.forEach(doc => {
-      const data = doc.data();
-      const p = data.path;
-      if (!p) return;
-      // if p comes in as /tours?id=123 we must rewrite it to /tours/123 for static generation
-      let staticPath = p;
-      if (p.includes('?id=')) {
-        const [base_path, qs] = p.split('?id=');
-        staticPath = `${base_path}/${qs}`;
-      }
-      WriteTargetHTML(
-        staticPath,
-        data.title || 'The Soul Himalaya',
-        data.description || '',
-        data.ogImage || 'https://i.postimg.cc/wMSWmFKB/IMG-1095.webp'
-      );
-    });
-  } catch (e) {
-    console.error("Failed to build from seo_settings", e);
-  }
+  if (db) {
+    try {
+      const seoSnap = await getDocs(collection(db, "seo_settings"));
+      seoSnap.forEach(doc => {
+        const data = doc.data();
+        const p = data.path;
+        if (!p) return;
+        // if p comes in as /tours?id=123 we must rewrite it to /tours/123 for static generation
+        let staticPath = p;
+        if (p.includes('?id=')) {
+          const [base_path, qs] = p.split('?id=');
+          staticPath = `${base_path}/${qs}`;
+        }
+        WriteTargetHTML(
+          staticPath,
+          data.title || 'The Soul Himalaya',
+          data.description || '',
+          data.ogImage || 'https://i.postimg.cc/wMSWmFKB/IMG-1095.webp'
+        );
+      });
+    } catch (e) {
+      console.error("Failed to build from seo_settings", e);
+    }
 
-  // 2. Firebase Content
-  try {
-    const contentSnap = await getDocs(collection(db, "content"));
-    contentSnap.forEach(doc => {
-      const pkg = doc.data();
-      const type = pkg.type;
-      const id = doc.id;
-      let urlPath = null;
-      if (type === 'tour') urlPath = `/tours/${id}`;
-      else if (type === 'trekk' || type === 'trek') urlPath = `/trekks/${id}`;
-      else if (type === 'yoga') urlPath = `/yoga/${id}`;
-      else if (type === 'meditation') urlPath = `/meditation/${id}`;
-      else if (type === 'wfh') urlPath = `/wfh/${id}`;
-      else if (type === 'service') urlPath = `/services/${id}`;
+    // 2. Firebase Content
+    try {
+      const contentSnap = await getDocs(collection(db, "content"));
+      contentSnap.forEach(doc => {
+        const pkg = doc.data();
+        const type = pkg.type;
+        const id = doc.id;
+        let urlPath = null;
+        if (type === 'tour') urlPath = `/tours/${id}`;
+        else if (type === 'trekk' || type === 'trek') urlPath = `/trekks/${id}`;
+        else if (type === 'yoga') urlPath = `/yoga/${id}`;
+        else if (type === 'meditation') urlPath = `/meditation/${id}`;
+        else if (type === 'wfh') urlPath = `/wfh/${id}`;
+        else if (type === 'service') urlPath = `/services/${id}`;
 
-      if (!urlPath) return;
+        if (!urlPath) return;
 
-      const title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
-      const description = pkg.seoData?.metaDescription || pkg.shortDescription || pkg.description || "Experience curated retreats and adventures in Parvati Valley.";
-      let image = pkg.seoImage || pkg.seoData?.ogImageUrl;
-      if (!image && pkg.images && pkg.images.length > 0) image = pkg.images[0];
-      if (!image) image = pkg.image || pkg.coverImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
+        const title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
+        const description = pkg.seoData?.metaDescription || pkg.shortDescription || pkg.description || "Experience curated retreats and adventures in Parvati Valley.";
+        let image = pkg.seoImage || pkg.seoData?.ogImageUrl;
+        if (!image && pkg.images && pkg.images.length > 0) image = pkg.images[0];
+        if (!image) image = pkg.image || pkg.coverImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
 
-      WriteTargetHTML(urlPath, title, description, image);
-    });
-  } catch (e) {
-    console.error("Failed to build from content", e);
+        WriteTargetHTML(urlPath, title, description, image);
+      });
+    } catch (e) {
+      console.error("Failed to build from content", e);
+    }
+  } else {
+    console.log("Skipping Firebase fetch since database is not available.");
   }
 
   // 3. Fallback to constants
@@ -165,4 +179,10 @@ async function generateStaticHTML() {
   }
 }
 
-generateStaticHTML().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
+generateStaticHTML().then(() => {
+  console.log("✅ Static HTML generation complete!");
+  process.exit(0);
+}).catch((e) => {
+  console.error("⚠️ Static HTML generation completed with warnings/errors:", e);
+  process.exit(0);
+});
