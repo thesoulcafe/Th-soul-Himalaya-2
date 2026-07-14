@@ -46,7 +46,7 @@ export default function SoulCart() {
   const { user, profile } = useAuth();
   
   const [step, setStep] = useState<CheckoutStep>('details');
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'reserve'>('online');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'reserve'>('reserve');
   const [note, setNote] = useState(location.state?.soulMessage || '');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -642,6 +642,80 @@ const handleOrder = async () => {
                             onChange={handleInputChange} 
                             className="h-12 rounded-xl border-slate-100 bg-slate-50/50 pl-10 pr-4 text-xs text-forest font-semibold transition-all focus:bg-white focus:ring-4 focus:ring-forest/5 focus:border-forest/20 placeholder:text-slate-300 font-sans" 
                           />
+                        </div>
+                      </div>
+
+                      {/* Payment Method Selector */}
+                      <div className="space-y-4 md:col-span-2 pt-6 border-t border-slate-100">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1 block">
+                          Energy Exchange Method
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Option 1: Reserve Spot (Offline / UPI / Tosh Cash) */}
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('reserve')}
+                            className={cn(
+                              "flex flex-col items-start text-left p-6 rounded-3xl border-2 transition-all relative overflow-hidden",
+                              paymentMethod === 'reserve'
+                                ? "border-forest bg-forest/[0.02] shadow-lg shadow-forest/5"
+                                : "border-slate-100 hover:border-slate-200 bg-white"
+                            )}
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={cn(
+                                "h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",
+                                paymentMethod === 'reserve' ? "bg-forest text-white" : "bg-slate-50 text-slate-400"
+                              )}>
+                                <Compass className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-900 leading-tight">Offline Reservation</h4>
+                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Recommended for Amplify</span>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-1">
+                              Secure your spot with direct integration to our sacred mountain logs. Complete your exchange offline in Tosh or via UPI before the trek begins. (No external API server required)
+                            </p>
+                            {paymentMethod === 'reserve' && (
+                              <div className="absolute top-4 right-4 h-5 w-5 rounded-full bg-forest flex items-center justify-center text-white">
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                              </div>
+                            )}
+                          </button>
+
+                          {/* Option 2: Pay Online Instantly */}
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('online')}
+                            className={cn(
+                              "flex flex-col items-start text-left p-6 rounded-3xl border-2 transition-all relative overflow-hidden",
+                              paymentMethod === 'online'
+                                ? "border-forest bg-forest/[0.02] shadow-lg shadow-forest/5"
+                                : "border-slate-100 hover:border-slate-200 bg-white"
+                            )}
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={cn(
+                                "h-10 w-10 rounded-2xl flex items-center justify-center transition-colors",
+                                paymentMethod === 'online' ? "bg-forest text-white" : "bg-slate-50 text-slate-400"
+                              )}>
+                                <CreditCard className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-900 leading-tight">Instant Online Payment</h4>
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Requires API Server</span>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-slate-500 font-medium leading-relaxed mt-1">
+                              Initiate secure card/UPI payment with Razorpay. Requires an active API server.
+                            </p>
+                            {paymentMethod === 'online' && (
+                              <div className="absolute top-4 right-4 h-5 w-5 rounded-full bg-forest flex items-center justify-center text-white">
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                              </div>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
