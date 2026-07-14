@@ -1,11 +1,9 @@
 import { motion } from 'motion/react';
 import { Heart, MapPin, Users, Sparkles, Mountain } from 'lucide-react';
-import { SEO } from '../components/SEO';
 
 export default function About() {
   return (
     <div className="pt-20">
-      <SEO title="About Soul Himalaya | Sustainable Tourism & Empowerment" description="Learn about The Soul Himalaya's dedication to sustainable tourism, environmental preservation, and uplifting local Parvati Valley communities through mindful travel." keywords="sustainable tourism Parvati Valley, Soul Himalaya mission" />
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">

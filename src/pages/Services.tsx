@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
-import { SEO } from '../components/SEO';
 import { Map, Home as HomeIcon, Wind, Compass, Flower2, ShoppingBag, Star, Edit2, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';

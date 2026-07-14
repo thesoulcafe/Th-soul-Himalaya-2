@@ -68,72 +68,63 @@ export default function SlotSelectionPopup({
           {/* Body Content */}
           <div className="px-6 sm:px-10 py-6 space-y-4 bg-white/40">
             <div className="grid grid-cols-1 gap-4">
-              {(() => {
-                const futureSlots = slots ? slots.filter(slot => {
-                  const start = new Date(slot.startDate);
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  return start >= today;
-                }) : [];
-                return futureSlots.map((slot) => {
-                  const originalIndex = slots.indexOf(slot);
-                  const isSelected = localSelectedIndex === originalIndex.toString();
-                  const startDate = new Date(slot.startDate);
-                  const endDate = new Date(slot.endDate);
-                  
-                  return (
-                    <motion.div
-                      key={originalIndex}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: originalIndex * 0.05 }}
-                      onClick={() => setLocalSelectedIndex(originalIndex.toString())}
-                      className={cn(
-                        "w-full p-5 rounded-[1.5rem] border-2 transition-all duration-500 flex items-center justify-between group relative overflow-hidden cursor-pointer",
-                        isSelected 
-                          ? "border-terracotta bg-white shadow-xl scale-[1.02]" 
-                          : "border-forest/5 bg-white hover:border-terracotta/30"
-                      )}
-                    >
-                      {isSelected && (
-                        <motion.div 
-                          layoutId="active-bg"
-                          className="absolute inset-0 bg-terracotta/[0.03] pointer-events-none" 
-                        />
-                      )}
-                      
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className={cn(
-                          "h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-500",
-                          isSelected ? "bg-terracotta text-white shadow-lg shadow-terracotta/20 rotate-6" : "bg-forest/5 text-forest/20 group-hover:bg-terracotta/10 group-hover:text-terracotta"
-                        )}>
-                          <Calendar className="h-5 w-5" />
+              {slots.map((slot, i) => {
+                const isSelected = localSelectedIndex === i.toString();
+                const startDate = new Date(slot.startDate);
+                const endDate = new Date(slot.endDate);
+                
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => setLocalSelectedIndex(i.toString())}
+                    className={cn(
+                      "w-full p-5 rounded-[1.5rem] border-2 transition-all duration-500 flex items-center justify-between group relative overflow-hidden cursor-pointer",
+                      isSelected 
+                        ? "border-terracotta bg-white shadow-xl scale-[1.02]" 
+                        : "border-forest/5 bg-white hover:border-terracotta/30"
+                    )}
+                  >
+                    {isSelected && (
+                      <motion.div 
+                        layoutId="active-bg"
+                        className="absolute inset-0 bg-terracotta/[0.03] pointer-events-none" 
+                      />
+                    )}
+                    
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className={cn(
+                        "h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-500",
+                        isSelected ? "bg-terracotta text-white shadow-lg shadow-terracotta/20 rotate-6" : "bg-forest/5 text-forest/20 group-hover:bg-terracotta/10 group-hover:text-terracotta"
+                      )}>
+                        <Calendar className="h-5 w-5" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-sm font-black text-forest tracking-tight">
+                          {startDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} — {endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
-                        <div className="text-left">
-                          <div className="text-sm font-black text-forest tracking-tight">
-                            {startDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} — {endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </div>
-                          <div className={cn(
-                            "text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5",
-                            isSelected ? "text-terracotta" : "text-forest/30"
-                          )}>
-                            {slot.available !== false ? 'Available Seat' : 'Last few spots'}
-                          </div>
+                        <div className={cn(
+                          "text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5",
+                          isSelected ? "text-terracotta" : "text-forest/30"
+                        )}>
+                          {slot.available !== false ? 'Available Seat' : 'Last few spots'}
                         </div>
                       </div>
-                      {isSelected ? (
-                        <div className="bg-terracotta p-1 rounded-full text-white shadow-lg shadow-terracotta/20">
-                          <CheckCircle2 className="h-3 w-3" />
-                        </div>
-                      ) : (
-                        <div className="bg-forest/5 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all">
-                          <ArrowRight className="h-3 w-3 text-terracotta" />
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                });
-              })()}
+                    </div>
+                    {isSelected ? (
+                      <div className="bg-terracotta p-1 rounded-full text-white shadow-lg shadow-terracotta/20">
+                        <CheckCircle2 className="h-3 w-3" />
+                      </div>
+                    ) : (
+                      <div className="bg-forest/5 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                        <ArrowRight className="h-3 w-3 text-terracotta" />
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
 
             {/* Confirm Selection Button */}

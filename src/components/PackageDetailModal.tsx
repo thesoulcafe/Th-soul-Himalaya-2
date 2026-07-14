@@ -50,7 +50,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
         url: window.location.href,
       });
     } catch (err) {
-      if (err.name !== 'AbortError') console.log('Error sharing:', err);
+      console.log('Error sharing:', err);
     }
   };
 
@@ -119,14 +119,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
     navigate('/cart');
   };
 
-  const futureSlots = pkg.slots ? pkg.slots.filter((slot: any) => {
-    const start = new Date(slot.startDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return start >= today;
-  }) : [];
-
-  const canBook = pkg.isAvailable !== false && (futureSlots.length > 0 ? selectedSlotIndex !== '' : selectedDate !== '');
+  const canBook = pkg.isAvailable !== false && (pkg.slots?.length > 0 ? selectedSlotIndex !== '' : selectedDate !== '');
 
   return (
     <AnimatePresence>
@@ -306,7 +299,7 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                   {quantity > 0 ? (
                      <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
                        <div className="flex items-center justify-between bg-forest/[0.03] rounded-full border border-forest/10 p-1.5 w-full sm:w-auto shrink-0 shadow-inner">
@@ -336,39 +329,37 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                      </div>
                   ) : (
                     <>
-                      {(() => {
-                        return futureSlots.length > 0 ? (
-                         <div className="relative w-full sm:w-60 shrink-0 group overflow-hidden rounded-full">
-                            <select 
-                             value={selectedSlotIndex}
-                             onChange={(e) => setSelectedSlotIndex(e.target.value)}
-                             className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-6 pr-12 appearance-none focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white truncate"
-                           >
-                             <option value="">Select Date</option>
-                             {futureSlots.map((slot: any) => {
-                               const originalIndex = pkg.slots.indexOf(slot);
-                               const start = new Date(slot.startDate);
-                               let endStr = '';
-                               if (slot.endDate) {
-                                 endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`;
-                               } else if (duration) {
-                                 const daysMatch = duration.match(/(\d+)/);
-                                 const days = daysMatch ? parseInt(daysMatch[1]) : 1;
-                                 const end = new Date(start);
-                                 end.setDate(start.getDate() + days - 1);
-                                 endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`;
-                               }
-                               return (
-                                 <option key={originalIndex} value={originalIndex}>
-                                   {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
-                                 </option>
-                               );
-                             })}
-                           </select>
-                           <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/40 pointer-events-none group-hover:text-forest transition-colors" />
-                         </div>
-                       ) : (
-                        <div className="relative w-full sm:w-60 shrink-0 group overflow-hidden rounded-full">
+                      {pkg.slots && pkg.slots.length > 0 ? (
+                        <div className="relative w-full sm:w-[240px] lg:w-[280px] group shrink-0">
+                           <select 
+                            value={selectedSlotIndex}
+                            onChange={(e) => setSelectedSlotIndex(e.target.value)}
+                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-6 pr-12 appearance-none focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white truncate"
+                          >
+                            <option value="">Select Date</option>
+                            {pkg.slots.map((slot: any, i: number) => {
+                              const start = new Date(slot.startDate);
+                              let endStr = '';
+                              if (slot.endDate) {
+                                endStr = ` - ${new Date(slot.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`;
+                              } else if (duration) {
+                                const daysMatch = duration.match(/(\d+)/);
+                                const days = daysMatch ? parseInt(daysMatch[1]) : 1;
+                                const end = new Date(start);
+                                end.setDate(start.getDate() + days - 1);
+                                endStr = ` - ${end.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`;
+                              }
+                              return (
+                                <option key={i} value={i}>
+                                  {start.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{endStr}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-forest/40 pointer-events-none group-hover:text-forest transition-colors" />
+                        </div>
+                      ) : (
+                        <div className="relative w-full sm:w-[240px] lg:w-[280px] group shrink-0">
                           <div className="absolute left-5 top-1/2 -translate-y-1/2 text-terracotta z-10 pointer-events-none">
                             <Calendar className="h-5 w-5" />
                           </div>
@@ -377,16 +368,15 @@ export default function PackageDetailModal({ isOpen, onClose, pkg, onRequireAuth
                             min={new Date().toISOString().split('T')[0]}
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-4 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white"
+                            className="w-full h-14 rounded-full border border-forest/10 bg-forest/[0.02] pl-14 pr-6 focus:outline-none focus:ring-2 focus:ring-forest/10 text-forest font-bold text-xs tracking-[0.1em] uppercase cursor-pointer outline-none transition-all group-hover:bg-white text-clip"
                           />
                         </div>
-                      );
-                    })()}
+                      )}
 
                       <Button 
                         onClick={handleBooking}
                         disabled={!canBook}
-                        className="w-full sm:w-60 shrink-0 h-14 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-xs uppercase transition-all flex items-center justify-center gap-3 shadow-xl shadow-forest/20 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
+                        className="w-full sm:w-auto h-14 px-10 bg-forest hover:bg-forest/90 text-white rounded-full font-black tracking-[0.2em] text-xs uppercase transition-all flex items-center justify-center gap-3 shadow-xl shadow-forest/20 shrink-0 hover:scale-[1.02]"
                       >
                         Reserve Spot <ArrowRight className="h-4 w-4" />
                       </Button>

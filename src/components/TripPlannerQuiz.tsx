@@ -11,6 +11,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [countryCode, setCountryCode] = useState('+91');
   const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const questions = [
@@ -56,7 +57,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mobile) return;
+    if (!mobile || !email) return;
     setIsSubmitting(true);
     
     try {
@@ -76,6 +77,7 @@ export default function TripPlannerQuiz({ isOpen, onClose }: { isOpen: boolean, 
 - **Planning Duration:** ${getOptionLabel(2, answers[2])}
 
 User has requested their personalized itinerary on Mobile / WhatsApp: ${fullMobile}
+Email: ${email}
       `.trim();
 
       // 1. Save lead to messages
@@ -83,10 +85,18 @@ User has requested their personalized itinerary on Mobile / WhatsApp: ${fullMobi
         userId: auth.currentUser?.uid || null,
         userName: "Himalayan Explorer",
         userPhone: fullMobile,
+        userEmail: email,
         subject: "New Trip Planner Quiz & Guide Lead",
         message: formattedMessage,
         status: 'unread',
         createdAt: serverTimestamp()
+      });
+
+      // 2. Save email to newsletter subscribers
+      await addDoc(collection(db, 'newsletter_subscribers'), {
+        email: email,
+        subscribedAt: serverTimestamp(),
+        source: 'combined_quiz'
       });
 
       // Mark the quiz as submitted persistently so they are never prompted again
@@ -102,6 +112,7 @@ User has requested their personalized itinerary on Mobile / WhatsApp: ${fullMobi
           setAnswers({});
           setMobile('');
           setCountryCode('+91');
+          setEmail('');
         }, 500);
       }, 1000);
     } catch (error: any) {
@@ -193,10 +204,21 @@ User has requested their personalized itinerary on Mobile / WhatsApp: ${fullMobi
                     Your Personal Journey is Ready
                   </h3>
                   <p className="text-forest/70 mb-6 text-sm">
-                    Enter your details below to receive your customized, hand-crafted itinerary on WhatsApp.
+                    Enter your details below to receive your customized, hand-crafted itinerary on WhatsApp and our exclusive Himalayan PDF travel guide in your email inbox.
                   </p>
                   
                   <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-left">
+                    <div>
+                      <label className="block text-[11px] font-bold text-forest/60 mb-1 uppercase tracking-wider">Email Address</label>
+                      <input 
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="yourname@example.com"
+                        required
+                        className="w-full bg-white border border-forest/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-terracotta/30 focus:border-terracotta transition-all text-forest"
+                      />
+                    </div>
                     <div>
                       <label className="block text-[11px] font-bold text-forest/60 mb-1 uppercase tracking-wider">Mobile / WhatsApp Number</label>
                       <div className="flex gap-2">

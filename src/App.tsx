@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './lib/AuthContext';
@@ -94,9 +94,7 @@ export default function App() {
                   <Route path="contact" element={<Contact />} />
                   <Route path="tailor-made" element={<TailorMade />} />
                   <Route path="admin" element={<Admin />} />
-                  <Route path="tour-packages" element={<Navigate to="/tours" replace />} />
-                  <Route path="holistic-packages-trekking" element={<Navigate to="/trekks" replace />} />
-                                    <Route path="checkout" element={<Checkout />} />
+                  <Route path="checkout" element={<Checkout />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="dashboard/booking/:id" element={<BookingDetails />} />
                   <Route path="parvati-valley" element={<ParvatiValley />} />
@@ -107,7 +105,6 @@ export default function App() {
                   <Route path="enquiry-success" element={<Success />} />
                   <Route path="helmets-of-gods/:slug" element={<HelmetsOfGodsArticle />} />
                   <Route path="hamlet/:hamletId/article/:articleId" element={<ArticleDetail />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
               </Routes>
             </Suspense>

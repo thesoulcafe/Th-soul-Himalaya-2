@@ -179,7 +179,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-forest mb-1">Email Address</h4>
-                    <p className="text-forest/60 text-sm">thesoulcafe28@gmail.com</p>
+                    <p className="text-forest/60 text-sm">hello@thesoulhimalaya.com</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-6">

@@ -224,11 +224,6 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    match /offers/{offerId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
     match /helmets_of_gods/{document} {
       allow read: if true;
       allow write: if isAdmin();

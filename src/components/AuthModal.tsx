@@ -18,8 +18,7 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Mail, Lock, User, Chrome, Phone } from 'lucide-react';
-import { useAuth } from "@/lib/AuthContext";
-import { useCart } from "@/lib/CartContext";
+import { useAuth } from '@/lib/AuthContext';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -42,7 +41,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const { isBlocked } = useAuth();
   const navigate = useNavigate();
-  const { pendingCartItem } = useCart();
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -62,13 +60,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       
       onClose();
       if (window.location.pathname !== '/admin') {
-        if (!!pendingCartItem) {
-          navigate('/cart');
-        } else if (window.location.pathname === '/checkout' || window.location.pathname === '/cart') {
-          // stay
-        } else {
         navigate('/dashboard');
-        }
       }
     } catch (err: any) {
       setError(err.message);
@@ -97,13 +89,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       
       onClose();
       if (window.location.pathname !== '/admin') {
-        if (!!pendingCartItem) {
-          navigate('/cart');
-        } else if (window.location.pathname === '/checkout' || window.location.pathname === '/cart') {
-          // stay
-        } else {
         navigate('/dashboard');
-        }
       }
     } catch (err: any) {
       setError(err.message);
@@ -137,13 +123,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       }
       onClose();
       if (window.location.pathname !== '/admin') {
-        if (!!pendingCartItem) {
-          navigate('/cart');
-        } else if (window.location.pathname === '/checkout' || window.location.pathname === '/cart') {
-          // stay
-        } else {
         navigate('/dashboard');
-        }
       }
     } catch (err: any) {
       setError(err.message);

@@ -8,19 +8,9 @@ import {
   DEFAULT_SERVICES 
 } from './src/constants';
 
-let db = null;
-try {
-  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-  if (fs.existsSync(configPath)) {
-    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-    const firebaseApp = initializeApp(firebaseConfig);
-    db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
-  } else {
-    console.warn("⚠️ firebase-applet-config.json not found. Dynamic static meta pages from Firestore will be skipped.");
-  }
-} catch (e) {
-  console.error("⚠️ Failed to initialize Firebase in generate_static_meta.ts:", e);
-}
+const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf-8'));
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
 async function generateStaticHTML() {
   const distDir = path.join(process.cwd(), 'dist');
@@ -81,60 +71,56 @@ async function generateStaticHTML() {
   }
 
   // 1. Firebase SEO settings
-  if (db) {
-    try {
-      const seoSnap = await getDocs(collection(db, "seo_settings"));
-      seoSnap.forEach(doc => {
-        const data = doc.data();
-        const p = data.path;
-        if (!p) return;
-        // if p comes in as /tours?id=123 we must rewrite it to /tours/123 for static generation
-        let staticPath = p;
-        if (p.includes('?id=')) {
-          const [base_path, qs] = p.split('?id=');
-          staticPath = `${base_path}/${qs}`;
-        }
-        WriteTargetHTML(
-          staticPath,
-          data.title || 'The Soul Himalaya',
-          data.description || '',
-          data.ogImage || 'https://i.postimg.cc/wMSWmFKB/IMG-1095.webp'
-        );
-      });
-    } catch (e) {
-      console.error("Failed to build from seo_settings", e);
-    }
+  try {
+    const seoSnap = await getDocs(collection(db, "seo_settings"));
+    seoSnap.forEach(doc => {
+      const data = doc.data();
+      const p = data.path;
+      if (!p) return;
+      // if p comes in as /tours?id=123 we must rewrite it to /tours/123 for static generation
+      let staticPath = p;
+      if (p.includes('?id=')) {
+        const [base_path, qs] = p.split('?id=');
+        staticPath = `${base_path}/${qs}`;
+      }
+      WriteTargetHTML(
+        staticPath,
+        data.title || 'The Soul Himalaya',
+        data.description || '',
+        data.ogImage || 'https://i.postimg.cc/wMSWmFKB/IMG-1095.webp'
+      );
+    });
+  } catch (e) {
+    console.error("Failed to build from seo_settings", e);
+  }
 
-    // 2. Firebase Content
-    try {
-      const contentSnap = await getDocs(collection(db, "content"));
-      contentSnap.forEach(doc => {
-        const pkg = doc.data();
-        const type = pkg.type;
-        const id = doc.id;
-        let urlPath = null;
-        if (type === 'tour') urlPath = `/tours/${id}`;
-        else if (type === 'trekk' || type === 'trek') urlPath = `/trekks/${id}`;
-        else if (type === 'yoga') urlPath = `/yoga/${id}`;
-        else if (type === 'meditation') urlPath = `/meditation/${id}`;
-        else if (type === 'wfh') urlPath = `/wfh/${id}`;
-        else if (type === 'service') urlPath = `/services/${id}`;
+  // 2. Firebase Content
+  try {
+    const contentSnap = await getDocs(collection(db, "content"));
+    contentSnap.forEach(doc => {
+      const pkg = doc.data();
+      const type = pkg.type;
+      const id = doc.id;
+      let urlPath = null;
+      if (type === 'tour') urlPath = `/tours/${id}`;
+      else if (type === 'trekk' || type === 'trek') urlPath = `/trekks/${id}`;
+      else if (type === 'yoga') urlPath = `/yoga/${id}`;
+      else if (type === 'meditation') urlPath = `/meditation/${id}`;
+      else if (type === 'wfh') urlPath = `/wfh/${id}`;
+      else if (type === 'service') urlPath = `/services/${id}`;
 
-        if (!urlPath) return;
+      if (!urlPath) return;
 
-        const title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
-        const description = pkg.seoData?.metaDescription || pkg.shortDescription || pkg.description || "Experience curated retreats and adventures in Parvati Valley.";
-        let image = pkg.seoImage || pkg.seoData?.ogImageUrl;
-        if (!image && pkg.images && pkg.images.length > 0) image = pkg.images[0];
-        if (!image) image = pkg.image || pkg.coverImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
+      const title = pkg.seoData?.metaTitle || `${pkg.title || pkg.name} | The Soul Himalaya`;
+      const description = pkg.seoData?.metaDescription || pkg.shortDescription || pkg.description || "Experience curated retreats and adventures in Parvati Valley.";
+      let image = pkg.seoImage || pkg.seoData?.ogImageUrl;
+      if (!image && pkg.images && pkg.images.length > 0) image = pkg.images[0];
+      if (!image) image = pkg.image || pkg.coverImage || "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp";
 
-        WriteTargetHTML(urlPath, title, description, image);
-      });
-    } catch (e) {
-      console.error("Failed to build from content", e);
-    }
-  } else {
-    console.log("Skipping Firebase fetch since database is not available.");
+      WriteTargetHTML(urlPath, title, description, image);
+    });
+  } catch (e) {
+    console.error("Failed to build from content", e);
   }
 
   // 3. Fallback to constants
@@ -169,9 +155,6 @@ async function generateStaticHTML() {
     { path: '/trekks', title: "Himalayan Trekking | The Soul Himalaya", desc: "High-altitude glacier treks.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/yoga', title: "Yoga Retreats | The Soul Himalaya", desc: "Himalayan yoga journeys.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/meditation', title: "Meditation in Parvati | The Soul Himalaya", desc: "Peaceful silence and mindfulness.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
-    { path: '/about', title: "About Soul Himalaya | Sustainable Tourism & Empowerment", desc: "Learn about The Soul Himalaya's dedication to sustainable tourism, environmental preservation, and uplifting local Parvati Valley communities through mindful travel.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
-    { path: '/tour-packages', title: "Tour Packages in Himachal Pradesh | Parvati Valley Treks", desc: "Book your soulful tour package in Himachal Pradesh. Experience high-altitude trekking, curated corporate tours, and mindful adventures in the Parvati Valley.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
-    { path: '/holistic-packages-trekking', title: "Curated Retreats, Treks & Wellness Services Soul Himalaya", desc: "Explore the full range of Soul Himalaya services. From high-altitude trekking and bespoke corporate tours to wellness sanctuaries and digital remote workations.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" },
     { path: '/parvati-valley', title: "Parvati Valley Explorer | The Soul Himalaya", desc: "Explore the magic of Tosh.", img: "https://i.postimg.cc/wMSWmFKB/IMG-1095.webp" }
   ];
   for (const g of generics) {
@@ -179,10 +162,4 @@ async function generateStaticHTML() {
   }
 }
 
-generateStaticHTML().then(() => {
-  console.log("✅ Static HTML generation complete!");
-  process.exit(0);
-}).catch((e) => {
-  console.error("⚠️ Static HTML generation completed with warnings/errors:", e);
-  process.exit(0);
-});
+generateStaticHTML().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });
