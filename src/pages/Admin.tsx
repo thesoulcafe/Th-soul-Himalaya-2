@@ -7,7 +7,7 @@ import {
   LogOut, ShieldCheck, Star, LogIn, RefreshCw, Zap, Laptop, Compass, Wind, Menu,
   MessageCircle as MessageCircleIcon, Mail, Phone as PhoneIcon, Eye, EyeOff, Activity, Calendar,
   ArrowUpRight, ArrowDownRight, MoreVertical, Settings, Bell, Upload, Sparkles,
-  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb, Image as ImageIcon, Link, FileCode
+  Share2, Send, Instagram, HelpCircle, Globe, BarChart3, Target, Gauge, MousePointer2, Info, Download, Layers, Database, Code, ListTodo, PenTool, Lightbulb, Image as ImageIcon, Link, FileCode, Percent
 } from 'lucide-react';
 import { 
   DEFAULT_TOURS, 
@@ -87,7 +87,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
-type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager';
+type AdminTab = 'overview' | 'content' | 'bookings' | 'users' | 'messages' | 'seo_manager' | 'offers';
 type ContentType = 'tour' | 'trekk' | 'shop_item' | 'service' | 'yoga' | 'meditation' | 'adventure' | 'wfh' | 'itinerary' | 'config' | 'page_parvati' | 'instagram' | 'all';
 
 interface ContentItem {
@@ -180,6 +180,7 @@ export default function Admin() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [seoSettings, setSeoSettings] = useState<any[]>([]);
   const [seoProposals, setSeoProposals] = useState<any[] | null>(null);
   const [pseoLocations, setPseoLocations] = useState("Tosh, Malana, Kasol, Kheerganga, Kalga, Pulga");
@@ -335,7 +336,7 @@ export default function Admin() {
         try {
           const fallbackFormData = new FormData();
           fallbackFormData.append('file', file);
-          const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+          const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
           if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
           const data = await response.json();
           downloadURL = data.url;
@@ -503,6 +504,14 @@ export default function Admin() {
       console.error("Admin messages snapshot failed:", error);
     });
 
+    // Offers Listener
+    const offersQuery = query(collection(db, 'offers'));
+    const unsubscribeOffers = onSnapshot(offersQuery, (snapshot) => {
+      setOffers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Admin offers snapshot failed:", error);
+    });
+
     // SEO Settings Listener
     const seoQuery = query(collection(db, 'seo_settings'), orderBy('updatedAt', 'desc'));
     const unsubscribeSeo = onSnapshot(seoQuery, (snapshot) => {
@@ -524,6 +533,7 @@ export default function Admin() {
       unsubscribeBookings();
       unsubscribeUsers();
       unsubscribeMessages();
+      unsubscribeOffers();
       unsubscribeSeo();
       unsubscribeSite();
     };
@@ -1225,6 +1235,7 @@ export default function Admin() {
               { id: 'users', label: 'User Directory', icon: Users },
               { id: 'messages', label: 'Direct Messages', icon: MessageCircleIcon },
               { id: 'seo_manager', label: 'SEO Manager', icon: Search },
+              { id: 'offers', label: 'Offers', icon: Percent },
             ].map((item) => (
               <button
                 key={item.id}
@@ -1528,7 +1539,7 @@ export default function Admin() {
                                       setNotification({ message: 'Featured packages updated!', type: 'success' });
                                       setTimeout(() => setNotification(null), 3000);
                                     } catch (err) {
-                                      console.error(err);
+                                      if (err.name !== 'AbortError') console.error(err);
                                       setNotification({ message: 'Failed to update', type: 'error' });
                                       setTimeout(() => setNotification(null), 3000);
                                     }
@@ -3881,7 +3892,7 @@ export default function Admin() {
                                         }
                                         const fallbackFormData = new FormData();
                                         fallbackFormData.append('file', file);
-                                        const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                        const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
                                         if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
                                         const data = await response.json();
                                         downloadURL = data.url;
@@ -3890,7 +3901,7 @@ export default function Admin() {
                                       setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
                                       setNotification({ message: 'OG Image uploaded!', type: 'success' });
                                     } catch (err: any) {
-                                      console.error(err);
+                                      if (err.name !== 'AbortError') console.error(err);
                                       setNotification({ message: err.message || 'Upload failed', type: 'error' });
                                     } finally {
                                       setIsUploading(false);
@@ -3985,7 +3996,7 @@ export default function Admin() {
                               setNewGapTitle('');
                               setNotification({ message: 'Added content gap topic', type: 'success' });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }
                         }}
@@ -4002,7 +4013,7 @@ export default function Admin() {
                             setNewGapTitle('');
                             setNotification({ message: 'Added content gap topic', type: 'success' });
                           } catch (err) {
-                            console.error(err);
+                            if (err.name !== 'AbortError') console.error(err);
                           }
                         }}
                       >Add</Button>
@@ -4019,7 +4030,7 @@ export default function Admin() {
                                 contentGaps: updatedGaps
                               });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }}>
                             <Trash2 className="h-4 w-4" />
@@ -4051,7 +4062,7 @@ export default function Admin() {
                               setNewInfluencer('');
                               setNotification({ message: 'Added influencer to list', type: 'success' });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }
                         }}
@@ -4068,7 +4079,7 @@ export default function Admin() {
                             setNewInfluencer('');
                             setNotification({ message: 'Added influencer to list', type: 'success' });
                           } catch (err) {
-                            console.error(err);
+                            if (err.name !== 'AbortError') console.error(err);
                           }
                         }}
                       >Add</Button>
@@ -4088,7 +4099,7 @@ export default function Admin() {
                                 influencers: updatedList
                               });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }}>
                             <Trash2 className="h-4 w-4" />
@@ -4120,7 +4131,7 @@ export default function Admin() {
                               setNewEmail('');
                               setNotification({ message: 'Added email campaign', type: 'success' });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }
                         }}
@@ -4137,7 +4148,7 @@ export default function Admin() {
                             setNewEmail('');
                             setNotification({ message: 'Added email campaign', type: 'success' });
                           } catch (err) {
-                            console.error(err);
+                            if (err.name !== 'AbortError') console.error(err);
                           }
                         }}
                       >Add</Button>
@@ -4156,7 +4167,7 @@ export default function Admin() {
                                    emails: updatedList
                                  });
                                } catch (err) {
-                                 console.error(err);
+                                 if (err.name !== 'AbortError') console.error(err);
                                }
                              }}>
                                <Trash2 className="h-4 w-4" />
@@ -4189,7 +4200,7 @@ export default function Admin() {
                               setNewChecklistTask('');
                               setNotification({ message: 'Added checklist task', type: 'success' });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }
                         }}
@@ -4206,7 +4217,7 @@ export default function Admin() {
                             setNewChecklistTask('');
                             setNotification({ message: 'Added checklist task', type: 'success' });
                           } catch (err) {
-                            console.error(err);
+                            if (err.name !== 'AbortError') console.error(err);
                           }
                         }}
                       >Add</Button>
@@ -4228,7 +4239,7 @@ export default function Admin() {
                                     checklist: currentList
                                   });
                                 } catch (err) {
-                                  console.error(err);
+                                  if (err.name !== 'AbortError') console.error(err);
                                 }
                               }}
                             />
@@ -4243,7 +4254,7 @@ export default function Admin() {
                                 checklist: updatedList
                               });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }}>
                             <Trash2 className="h-4 w-4" />
@@ -4272,7 +4283,7 @@ export default function Admin() {
                           });
                           setNotification({ message: 'Notes saved', type: 'success' });
                         } catch (err) {
-                          console.error(err);
+                          if (err.name !== 'AbortError') console.error(err);
                         }
                       }}>Save Notes</Button>
                     </div>
@@ -4372,7 +4383,7 @@ export default function Admin() {
                           }, { merge: true });
                           setNotification({ message: 'Global SEO settings deployed', type: 'success' });
                         } catch (err) {
-                          console.error(err);
+                          if (err.name !== 'AbortError') console.error(err);
                           setNotification({ message: 'Update failed', type: 'error' });
                         } finally {
                           setIsProcessing(false);
@@ -4628,7 +4639,7 @@ export default function Admin() {
                           setSeoProposals(filteredSeedData);
                           setNotification({ message: `Successfully generated ${filteredSeedData.length} SEO proposals! Please review and apply them below.`, type: 'success' });
                         } catch (err) {
-                          console.error(err);
+                          if (err.name !== 'AbortError') console.error(err);
                           setNotification({ message: 'Failed to generate SEO proposals', type: 'error' });
                         } finally {
                           setIsProcessing(false);
@@ -4869,7 +4880,7 @@ export default function Admin() {
                               setNewTopicCluster('');
                               setNotification({ message: 'Added topic cluster', type: 'success' });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }
                         }}
@@ -4886,7 +4897,7 @@ export default function Admin() {
                             setNewTopicCluster('');
                             setNotification({ message: 'Added topic cluster', type: 'success' });
                           } catch (err) {
-                            console.error(err);
+                            if (err.name !== 'AbortError') console.error(err);
                           }
                         }}
                       >Add</Button>
@@ -4908,7 +4919,7 @@ export default function Admin() {
                                 topicalClusters: updatedList
                               });
                             } catch (err) {
-                              console.error(err);
+                              if (err.name !== 'AbortError') console.error(err);
                             }
                           }}>
                             <Trash2 className="h-4 w-4" />
@@ -6009,7 +6020,7 @@ export default function Admin() {
                                     }
                                     const fallbackFormData = new FormData();
                                     fallbackFormData.append('file', file);
-                                    const response = await fetch('/api/upload', { method: 'POST', body: fallbackFormData });
+                                    const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/upload', { method: 'POST', body: fallbackFormData });
                                     if (!response.ok) throw new Error("Fallback upload endpoint returned " + response.status);
                                     const data = await response.json();
                                     downloadURL = data.url;
@@ -6018,7 +6029,7 @@ export default function Admin() {
                                   setSeoFormData(prev => ({ ...prev, ogImage: downloadURL }));
                                   setNotification({ message: 'OG Image uploaded!', type: 'success' });
                                 } catch (err: any) {
-                                  console.error(err);
+                                  if (err.name !== 'AbortError') console.error(err);
                                   setNotification({ message: err.message || 'Upload failed', type: 'error' });
                                 } finally {
                                   setIsUploading(false);
@@ -6067,6 +6078,58 @@ export default function Admin() {
               </div>
             </motion.div>
           </div>
+        )}
+        {activeMainTab === 'offers' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="p-4 md:p-10 max-w-4xl mx-auto"
+          >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-forest tracking-tight">Special Offers</h2>
+                <p className="text-[10px] text-forest/40 font-bold uppercase tracking-widest">Manage discounts & promos</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-[2rem] border border-forest/10 p-6 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-forest text-lg">Active Offers ({offers.length})</h3>
+                <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">
+                  <Button className="bg-forest text-white rounded-xl h-9 text-xs">Open Firebase Console</Button>
+                </a>
+              </div>
+              
+              {offers.length === 0 ? (
+                <div className="text-center py-10 space-y-4">
+                  <div className="w-16 h-16 bg-forest/5 rounded-full flex items-center justify-center mx-auto text-terracotta">
+                    <Percent className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-forest">No Custom Offers</h3>
+                  <p className="text-sm text-forest/60 max-w-sm mx-auto">
+                    To add new offers, add documents in Firestore collection 'offers' with 'title', 'description', 'code', 'discount', 'iconName', 'validUntil', and 'color'.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {offers.map(offer => (
+                    <div key={offer.id} className="p-4 rounded-xl border border-forest/10 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-forest">{offer.title}</span>
+                        <Badge variant="outline" className="text-terracotta border-terracotta/20">{offer.code}</Badge>
+                      </div>
+                      <p className="text-xs text-forest/60 line-clamp-2">{offer.description}</p>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-forest/5">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-forest/40">{offer.validUntil}</span>
+                        <span className="text-xs font-bold text-forest">{offer.discount}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

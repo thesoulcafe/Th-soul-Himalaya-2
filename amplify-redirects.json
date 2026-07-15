@@ -4,5 +4,11 @@
     "target": "https://thesoulhimalaya.com/<*>",
     "status": "301",
     "condition": null
+  },
+  {
+    "source": "/<*>",
+    "target": "/index.html",
+    "status": "404-200",
+    "condition": null
   }
 ]

@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
   const navigate = useNavigate();
+  const [soulMessage, setSoulMessage] = React.useState('');
 
   return (
     <div className="pt-24 min-h-screen bg-cream px-6 pb-20">
@@ -126,46 +127,7 @@ export default function Cart() {
               </AnimatePresence>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-forest/5 space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between text-xs text-forest/40 uppercase tracking-widest font-bold">
-                  <span>Subtotal</span>
-                  <span>₹{totalPrice.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs text-forest/40 uppercase tracking-widest font-bold">
-                  <span>Service Tax (5%)</span>
-                  <span>₹{Math.round(totalPrice * 0.05).toLocaleString()}</span>
-                </div>
-                <Separator className="bg-forest/5" />
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-terracotta mb-1">Total Payable</p>
-                    <span className="text-3xl font-heading font-bold text-forest">₹{Math.round(totalPrice * 1.05).toLocaleString()}</span>
-                  </div>
-                  <div className="flex flex-col gap-3 w-full sm:w-auto">
-                    <Button 
-                      nativeButton={false}
-                      render={
-                        <Link to="/checkout" state={{ cartItems: cart, total: Math.round(totalPrice * 1.05) }} className="w-full sm:w-auto">
-                          Proceed to Checkout
-                        </Link>
-                      }
-                      className="w-full bg-terracotta hover:bg-terracotta/90 text-white px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-terracotta/20 flex items-center justify-center"
-                    />
-                    <Link to="/services" className="w-full">
-                      <Button 
-                        variant="outline" 
-                        className="w-full h-11 rounded-full border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300"
-                      >
-                        Explore More
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Soul Touch Card */}
+            {/* Soul Message Card */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -187,7 +149,7 @@ export default function Cart() {
                   </motion.div>
                   <div className="space-y-1">
                     <h3 className="text-2xl font-bold text-forest tracking-tight flex items-center gap-2">
-                      Soul Touch
+                      Soul Message
                       <motion.span
                         animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.1, 0.9] }}
                         transition={{ duration: 2, repeat: Infinity }}
@@ -208,6 +170,8 @@ export default function Cart() {
               <div className="relative z-10 mt-2">
                 <textarea 
                   placeholder="Share any special requests, dietary needs, or simply a message from your soul for this journey..."
+                  value={soulMessage}
+                  onChange={(e) => setSoulMessage(e.target.value)}
                   className="w-full h-40 bg-cream/20 border border-forest/10 rounded-[2rem] p-6 text-forest text-sm font-medium focus:ring-4 focus:ring-terracotta/5 focus:border-terracotta/30 transition-all outline-none resize-none placeholder:text-forest/20 shadow-inner group-hover:bg-white transition-all duration-500"
                 />
                 <div className="absolute bottom-4 right-6 flex items-center gap-2 text-[10px] font-bold text-forest/20 uppercase tracking-widest pointer-events-none">
@@ -221,6 +185,45 @@ export default function Cart() {
                 <p className="text-[11px] text-forest/40 font-medium italic">We'll handle every detail with love and intention.</p>
               </div>
             </motion.div>
+
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-forest/5 space-y-6">
+              <div className="space-y-3">
+                <div className="flex justify-between text-xs text-forest/40 uppercase tracking-widest font-bold">
+                  <span>Subtotal</span>
+                  <span>₹{totalPrice.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-forest/40 uppercase tracking-widest font-bold">
+                  <span>Service Tax (5%)</span>
+                  <span>₹{Math.round(totalPrice * 0.05).toLocaleString()}</span>
+                </div>
+                <Separator className="bg-forest/5" />
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-terracotta mb-1">Total Payable</p>
+                    <span className="text-3xl font-heading font-bold text-forest">₹{Math.round(totalPrice * 1.05).toLocaleString()}</span>
+                  </div>
+                  <div className="flex flex-col gap-3 w-full sm:w-auto">
+                    <Button 
+                      nativeButton={false}
+                      render={
+                        <Link to="/checkout" state={{ cartItems: cart, total: Math.round(totalPrice * 1.05), soulMessage }} className="w-full sm:w-auto">
+                          Proceed to Checkout
+                        </Link>
+                      }
+                      className="w-full bg-terracotta hover:bg-terracotta/90 text-white px-8 py-6 rounded-full text-lg font-bold shadow-lg shadow-terracotta/20 flex items-center justify-center"
+                    />
+                    <Link to="/services" className="w-full">
+                      <Button 
+                        variant="outline" 
+                        className="w-full h-11 rounded-full border-forest/10 text-forest hover:bg-forest hover:text-white font-bold text-[10px] uppercase tracking-widest transition-all duration-300"
+                      >
+                        Explore More
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

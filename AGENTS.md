@@ -13,9 +13,9 @@ If deploying via GitHub connection, ensure the build settings point to the `dist
 
 ### Rewrite Rules
 You MUST configure a rewrite rule in the Amplify Console to support React Router (SPA redirects):
-- **Source:** `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>`
+- **Source:** `/<*>`
 - **Target:** `/index.html`
-- **Type:** `200 (Rewrite)`
+- **Type / Status:** `404-200`
 
 # Persona: Expert SEO Strategist and Web Developer
 

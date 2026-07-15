@@ -3,9 +3,19 @@ import path from 'path';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
 
-const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf-8'));
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+let db = null;
+try {
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const firebaseApp = initializeApp(firebaseConfig);
+    db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+  } else {
+    console.warn("⚠️ firebase-applet-config.json not found. Dynamic sitemap entries from Firestore will be skipped.");
+  }
+} catch (e) {
+  console.error("⚠️ Failed to initialize Firebase in generate_sitemap.js:", e);
+}
 
 const baseUrl = 'https://thesoulhimalaya.com';
 const staticPages = [
@@ -53,39 +63,43 @@ async function generateSitemap() {
   }
 
   // Firebase SEO Settings
-  try {
-    const seoSnap = await getDocs(collection(db, "seo_settings"));
-    seoSnap.forEach(doc => {
-      const data = doc.data();
-      let p = data.path;
-      if (p) {
-        if (p.includes('?id=')) {
-          const [base_path, qs] = p.split('?id=');
-          p = `${base_path}/${qs}`;
+  if (db) {
+    try {
+      const seoSnap = await getDocs(collection(db, "seo_settings"));
+      seoSnap.forEach(doc => {
+        const data = doc.data();
+        let p = data.path;
+        if (p) {
+          if (p.includes('?id=')) {
+            const [base_path, qs] = p.split('?id=');
+            p = `${base_path}/${qs}`;
+          }
+          if (!dynamicUrls.includes(p)) {
+            dynamicUrls.push(p);
+          }
         }
-        if (!dynamicUrls.includes(p)) {
-          dynamicUrls.push(p);
-        }
-      }
-    });
+      });
 
-    const contentSnap = await getDocs(collection(db, "content"));
-    contentSnap.forEach(doc => {
-      const data = doc.data();
-      const type = data.type;
-      const id = doc.id;
-      let url = null;
-      if (type === 'tour') url = `/tours/${id}`;
-      else if (type === 'trekk' || type === 'trek') url = `/trekks/${id}`;
-      else if (type === 'yoga') url = `/yoga/${id}`;
-      else if (type === 'meditation') url = `/meditation/${id}`;
-      else if (type === 'wfh') url = `/wfh/${id}`;
-      else if (type === 'service') url = `/services/${id}`;
+      const contentSnap = await getDocs(collection(db, "content"));
+      contentSnap.forEach(doc => {
+        const data = doc.data();
+        const type = data.type;
+        const id = doc.id;
+        let url = null;
+        if (type === 'tour') url = `/tours/${id}`;
+        else if (type === 'trekk' || type === 'trek') url = `/trekks/${id}`;
+        else if (type === 'yoga') url = `/yoga/${id}`;
+        else if (type === 'meditation') url = `/meditation/${id}`;
+        else if (type === 'wfh') url = `/wfh/${id}`;
+        else if (type === 'service') url = `/services/${id}`;
 
-      if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
-    });
-  } catch(e) {
-    console.error("Failed to fetch from Firebase", e);
+        if (url && !dynamicUrls.includes(url)) dynamicUrls.push(url);
+      });
+    } catch(e) {
+      console.error("Failed to fetch from Firebase", e);
+    }
+  } else {
+    console.log("Skipping Firebase fetch since database is not available.");
   }
 
   const allUrls = [...new Set([...staticPages, ...dynamicUrls])];
@@ -109,4 +123,7 @@ async function generateSitemap() {
   process.exit(0);
 }
 
-generateSitemap();
+generateSitemap().catch(e => {
+  console.error("❌ Sitemap generation failed:", e);
+  process.exit(0);
+});
